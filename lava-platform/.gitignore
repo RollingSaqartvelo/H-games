@@ -3,9 +3,6 @@ bin/
 *.exe
 *.exe~
 
-# Frontend build output
-frontend/dist/
-
 # Node dependencies
 frontend/node_modules/
 
