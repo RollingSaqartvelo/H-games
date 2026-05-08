@@ -1,0 +1,25 @@
+# Go binaries
+bin/
+*.exe
+*.exe~
+
+# Frontend build output
+frontend/dist/
+
+# Node dependencies
+frontend/node_modules/
+
+# Logs and temp files
+*.log
+tunnel.log
+cf-tunnel*.log
+/tmp/
+
+# Secrets (never commit)
+.env
+.env.*
+!.env.example
+
+# OS
+.DS_Store
+Thumbs.db

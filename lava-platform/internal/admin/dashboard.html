@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Outlaw Escape — Admin</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0d0a06; color: #f5e6d0; font-family: 'Courier New', monospace; font-size: 13px; }
+  h1 { color: #d97706; padding: 16px 20px; border-bottom: 1px solid #3d2410; font-size: 18px; letter-spacing: 2px; }
+  h2 { color: #d97706; font-size: 13px; letter-spacing: 1px; margin-bottom: 8px; }
+  .header { display: flex; align-items: center; justify-content: space-between; }
+  .refresh { color: #8b6340; font-size: 11px; padding: 0 20px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 16px 20px; }
+  .card { background: #1a1008; border: 1px solid #3d2410; border-radius: 6px; padding: 14px; }
+  .card.full { grid-column: 1 / -1; }
+  .stat { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid #241608; }
+  .stat:last-child { border-bottom: none; }
+  .stat-val { color: #d97706; font-weight: bold; }
+  .profit { color: #22a060; }
+  table { width: 100%; border-collapse: collapse; }
+  th { color: #8b6340; text-align: left; padding: 4px 6px; border-bottom: 1px solid #3d2410; font-size: 11px; }
+  td { padding: 4px 6px; border-bottom: 1px solid #1a1008; }
+  tr:hover td { background: #241608; }
+  .badge { display: inline-block; padding: 1px 6px; border-radius: 3px; font-size: 11px; }
+  .badge-running { background: #1a4020; color: #22a060; }
+  .badge-crashed { background: #3a0a0a; color: #f87171; }
+  .badge-won     { background: #1a4020; color: #22a060; }
+  .badge-lost    { background: #3a0a0a; color: #f87171; }
+  .badge-pending { background: #3a2a00; color: #f0c040; }
+  .badge-starting{ background: #1a2a40; color: #60a5fa; }
+  .players-table td:nth-child(3),
+  .players-table td:nth-child(4) { color: #f0c040; }
+  .players-table td:nth-child(5) { color: #22a060; }
+  #status { color: #8b6340; font-size: 11px; padding: 8px 20px; }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>&#x1F920; OUTLAW ESCAPE &mdash; ADMIN</h1>
+  <div class="refresh" id="countdown">обновление через 10 сек</div>
+</div>
+<div id="status">Загрузка...</div>
+<div id="root"></div>
+
+<script>
+const KEY = 'change-me-in-production';
+let timer = 10;
+
+function fmt(n) { return Number(n).toFixed(2); }
+function ago(ts) {
+  var d = (Date.now() - new Date(ts)) / 1000;
+  if (d < 60) return Math.floor(d) + 'с назад';
+  if (d < 3600) return Math.floor(d/60) + 'м назад';
+  return Math.floor(d/3600) + 'ч назад';
+}
+function badge(status) {
+  var s = status.toLowerCase();
+  return '<span class="badge badge-' + s + '">' + status + '</span>';
+}
+
+function load() {
+  fetch('/admin/v1/stats', { headers: { 'X-SYSTEM-KEY': KEY } })
+    .then(function(res) {
+      if (!res.ok) { document.getElementById('status').textContent = 'Ошибка ' + res.status; return null; }
+      return res.json();
+    })
+    .then(function(d) {
+      if (!d) return;
+      document.getElementById('status').textContent = 'Обновлено: ' + new Date().toLocaleTimeString('ru');
+      render(d);
+    })
+    .catch(function(e) {
+      document.getElementById('status').textContent = 'Ошибка: ' + e.message;
+    });
+}
+
+function render(d) {
+  var t = d.totals;
+  var rounds = d.rounds || [];
+  var bets = d.bets || [];
+  var players = d.players || [];
+  var current = null;
+  for (var i = 0; i < rounds.length; i++) {
+    if (rounds[i].state === 'RUNNING' || rounds[i].state === 'STARTING') { current = rounds[i]; break; }
+  }
+  if (!current && rounds.length) current = rounds[0];
+
+  var currentHtml = current
+    ? '<div class="stat"><span>ID</span><span class="stat-val">' + current.id.slice(0,8) + '&hellip;</span></div>' +
+      '<div class="stat"><span>Статус</span><span>' + badge(current.state) + '</span></div>' +
+      '<div class="stat"><span>Crash point</span><span class="stat-val">' + (current.crash_point ? current.crash_point.toFixed(2) + '&times;' : '&mdash;') + '</span></div>' +
+      '<div class="stat"><span>Начало</span><span>' + (current.started_at ? ago(current.started_at) : '&mdash;') + '</span></div>'
+    : '<div style="color:#8b6340">Нет активного раунда</div>';
+
+  var playerRows = players.map(function(p) {
+    return '<tr><td>' + p.player_id + '</td><td>' + p.total_bets + '</td>' +
+      '<td>$' + fmt(p.total_wagered) + '</td>' +
+      '<td>$' + fmt(p.total_won) + '</td>' +
+      '<td class="profit">$' + fmt(p.house_profit) + '</td>' +
+      '<td>' + p.wins + 'W / ' + p.losses + 'L</td>' +
+      '<td>' + ago(p.last_bet) + '</td></tr>';
+  }).join('');
+
+  var betRows = bets.map(function(b) {
+    return '<tr><td>' + b.player_id + '</td>' +
+      '<td>$' + fmt(b.bet_amount) + '</td>' +
+      '<td>' + badge(b.status) + '</td>' +
+      '<td>' + (b.cashout_at ? b.cashout_at.toFixed(2) + '&times;' : '&mdash;') + '</td>' +
+      '<td>' + (b.payout_amount > 0 ? '$' + fmt(b.payout_amount) : '&mdash;') + '</td>' +
+      '<td>' + (b.crash_point ? b.crash_point.toFixed(2) + '&times;' : '&mdash;') + '</td>' +
+      '<td>' + ago(b.created_at) + '</td></tr>';
+  }).join('');
+
+  var roundRows = rounds.map(function(r) {
+    var dur = '&mdash;';
+    if (r.started_at && r.crashed_at) {
+      var s = (new Date(r.crashed_at) - new Date(r.started_at)) / 1000;
+      dur = s.toFixed(1) + 'с';
+    }
+    return '<tr><td>' + r.id.slice(0,8) + '&hellip;</td>' +
+      '<td>' + badge(r.state) + '</td>' +
+      '<td>' + (r.crash_point ? r.crash_point.toFixed(2) + '&times;' : '&mdash;') + '</td>' +
+      '<td>' + dur + '</td>' +
+      '<td>' + ago(r.created_at) + '</td></tr>';
+  }).join('');
+
+  document.getElementById('root').innerHTML =
+    '<div class="grid">' +
+    '<div class="card"><h2>ТЕКУЩИЙ РАУНД</h2>' + currentHtml + '</div>' +
+    '<div class="card"><h2>ИТОГИ</h2>' +
+      '<div class="stat"><span>Всего ставок</span><span class="stat-val">' + t.total_bets + '</span></div>' +
+      '<div class="stat"><span>Оборот</span><span class="stat-val">$' + fmt(t.total_wagered) + '</span></div>' +
+      '<div class="stat"><span>Выплачено</span><span class="stat-val">$' + fmt(t.total_won) + '</span></div>' +
+      '<div class="stat"><span>Профит казино</span><span class="stat-val profit">$' + fmt(t.house_profit) + '</span></div>' +
+      '<div class="stat"><span>Игроков</span><span class="stat-val">' + players.length + '</span></div>' +
+    '</div>' +
+    '<div class="card full"><h2>ИГРОКИ</h2>' +
+      '<table class="players-table"><thead><tr>' +
+      '<th>Player ID</th><th>Ставок</th><th>Оборот</th><th>Выиграл</th><th>Профит казино</th><th>W/L</th><th>Последняя ставка</th>' +
+      '</tr></thead><tbody>' + playerRows + '</tbody></table></div>' +
+    '<div class="card full"><h2>ПОСЛЕДНИЕ СТАВКИ (50)</h2>' +
+      '<table><thead><tr>' +
+      '<th>Player</th><th>Ставка</th><th>Статус</th><th>Cashout</th><th>Выплата</th><th>Crash point</th><th>Время</th>' +
+      '</tr></thead><tbody>' + betRows + '</tbody></table></div>' +
+    '<div class="card full"><h2>ИСТОРИЯ РАУНДОВ (20)</h2>' +
+      '<table><thead><tr><th>ID</th><th>Статус</th><th>Crash point</th><th>Длительность</th><th>Создан</th></tr></thead>' +
+      '<tbody>' + roundRows + '</tbody></table></div>' +
+    '</div>';
+}
+
+load();
+setInterval(function() {
+  timer--;
+  document.getElementById('countdown').textContent = 'обновление через ' + timer + ' сек';
+  if (timer <= 0) { timer = 10; load(); }
+}, 1000);
+</script>
+</body>
+</html>

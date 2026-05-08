@@ -1,0 +1,35 @@
+/**
+ * Session token resolution order:
+ *   1. ?token=<value> URL search param  (set by operator's TMA deep-link)
+ *   2. Telegram Mini App start_param    (passed via bot link)
+ *   3. sessionStorage                   (persisted from a previous page load)
+ *   4. VITE_DEV_TOKEN env var           (local development convenience)
+ */
+export function getSessionToken(): string {
+  // 1. URL param — operator redirects player here with ?token=xxx
+  const params = new URLSearchParams(window.location.search)
+  const urlToken = params.get('token')
+  if (urlToken) {
+    sessionStorage.setItem('crash_token', urlToken)
+    return urlToken
+  }
+
+  // 2. Telegram Mini App start_param
+  try {
+    const tma = (window as Window & typeof globalThis & { Telegram?: { WebApp?: { initDataUnsafe?: { start_param?: string } } } }).Telegram?.WebApp
+    const startParam = tma?.initDataUnsafe?.start_param
+    if (startParam) {
+      sessionStorage.setItem('crash_token', startParam)
+      return startParam
+    }
+  } catch {
+    // Not in Telegram context
+  }
+
+  // 3. Persisted token from earlier in the same session
+  const stored = sessionStorage.getItem('crash_token')
+  if (stored) return stored
+
+  // 4. Development fallback
+  return import.meta.env.VITE_DEV_TOKEN ?? ''
+}

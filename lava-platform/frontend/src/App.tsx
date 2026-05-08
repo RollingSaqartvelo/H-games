@@ -1,0 +1,106 @@
+import { useEffect, useRef } from 'react'
+import { TopBar }            from './components/TopBar'
+import { MultiplierHistory } from './components/MultiplierHistory'
+import { Multiplier }        from './components/Multiplier'
+import { RoundCountdown }    from './components/RoundCountdown'
+import { SocialTicker }      from './components/SocialTicker'
+import { DualBetPanel }      from './components/DualBetPanel'
+import { BettingVideo }      from './components/BettingVideo'
+import { useSocket }         from './hooks/useSocket'
+import { usePixi }           from './hooks/usePixi'
+import { useTMAAuth }        from './hooks/useTMAAuth'
+import { useBgMusic }        from './hooks/useBgMusic'
+import { initTMA }           from './lib/telegram'
+
+/**
+ * Layout (flex-column, 100dvh):
+ *
+ *   TopBar            48px  — logo / balance / state badge
+ *   MultiplierHistory 36px  — last 10 crash point pills
+ *   .game-area        flex:1 — PixiJS canvas + absolute overlays
+ *     pixi-mount        (absolute fill, z:1)
+ *     BettingVideo      (absolute fill, z:2)
+ *     SocialTicker      (absolute top-right, z:6)
+ *     Multiplier        (absolute center, z:5)
+ *     RoundCountdown    (absolute bottom, z:6)
+ *   app__footer       auto  — DualBetPanel (~280px)
+ *
+ * CRITICAL: pixi-mount ref must point to the SAME div for the entire lifetime
+ * of the App component. Using a conditional early-return with a different div
+ * causes React to detach the Pixi canvas from the DOM when loading ends.
+ * The splash screen is an absolute overlay (z:50) so the Pixi mount stays
+ * stable underneath it from the very first render.
+ */
+export function App() {
+  useEffect(() => { initTMA() }, [])
+
+  const pixiMount = useRef<HTMLDivElement>(null)
+  usePixi(pixiMount)
+  useBgMusic()
+
+  const { token, playerId, firstName, loading, error } = useTMAAuth()
+  useSocket(playerId)
+
+  return (
+    <div className="app">
+      <TopBar />
+      <MultiplierHistory />
+
+      {/* Game canvas — grows to fill all available space */}
+      <div className="game-area">
+        {/* z:1 — PixiJS canvas mount (stable ref, never swapped) */}
+        <div ref={pixiMount} className="pixi-mount" aria-hidden="true" />
+
+        {/* z:2 — Cinematic video bg for WAITING/BETTING; fades out on RUNNING */}
+        <BettingVideo />
+
+        {/* z:5-6 — Absolute overlays on top of canvas / video */}
+        <div className="game-overlay game-overlay--top-right">
+          <SocialTicker />
+        </div>
+
+        <div className="game-overlay game-overlay--center">
+          <Multiplier />
+        </div>
+
+        <div className="game-overlay game-overlay--bottom">
+          <RoundCountdown />
+        </div>
+
+        {/* z:50 — Splash overlay on first load; sits above Pixi so the mount
+            div stays in game-area and Pixi can initialise into the correct element */}
+        {loading && (
+          <div className="splash">
+            <div className="splash__logo">OUTLAW</div>
+            <div className="splash__spinner" />
+            <div className="splash__text">Loading…</div>
+          </div>
+        )}
+      </div>
+
+      {/* Fixed bottom controls */}
+      <footer className="app__footer">
+        {firstName && (
+          <div className="player-badge">🤠 {firstName}</div>
+        )}
+        {token && playerId ? (
+          <DualBetPanel token={token} playerId={playerId} />
+        ) : (
+          <div className="no-session">
+            {error ? (
+              <>
+                <p className="no-session__error">{error}</p>
+                <p className="no-session__hint">Close and reopen the app in Telegram.</p>
+              </>
+            ) : (
+              <>
+                <p>No session — open via Telegram bot</p>
+                <p className="no-session__hint"><code>?token=YOUR_TOKEN</code></p>
+              </>
+            )}
+          </div>
+        )}
+      </footer>
+    </div>
+  )
+}
