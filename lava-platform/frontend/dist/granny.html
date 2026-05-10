@@ -232,6 +232,41 @@
       text-align:center;padding:16px;
       font-family:'Courier New',monospace;font-size:11px;color:var(--muted);
     }
+
+    /* ── Betting video overlay (mirrors React BettingVideo.tsx) ── */
+    .bvb-wrap{
+      position:absolute;inset:0;z-index:2;
+      pointer-events:none;
+      opacity:1;
+      transition:opacity 600ms ease;
+    }
+    .bvb-wrap--out    { opacity:0 }
+    .bvb-wrap--hidden { display:none }
+    .bvb-vignette{
+      position:absolute;inset:0;
+      background:radial-gradient(ellipse at center,transparent 30%,rgba(2,10,3,.65) 100%);
+      pointer-events:none;
+    }
+
+    /* ── Warning overlay at ≤3 s ─────────────────────────────── */
+    .bvb-warning{
+      position:absolute;inset:0;z-index:3;
+      display:flex;align-items:center;justify-content:center;
+      pointer-events:none;
+      animation:warningPulse .55s ease-in-out infinite alternate;
+    }
+    .bvb-warning img{
+      max-width:85%;max-height:60%;object-fit:contain;
+    }
+    .bvb-warning-text{
+      font-size:30px;color:#ef4444;letter-spacing:4px;text-align:center;
+      text-shadow:0 0 30px rgba(239,68,68,.8);
+      font-family:'Rye',Georgia,serif;
+    }
+    @keyframes warningPulse{
+      from{opacity:.8;transform:scale(.97)}
+      to  {opacity:1;transform:scale(1)}
+    }
   </style>
 </head>
 <body>
@@ -253,6 +288,36 @@
   <!-- Game area -->
   <div class="game-area">
     <canvas id="scene"></canvas>
+
+    <!-- z:2 — Betting video bg; visible during STARTING/CREATED, fades on RUNNING -->
+    <div class="bvb-wrap" id="bvbWrap" aria-hidden="true">
+      <video
+        id="bvbVideo"
+        src="/video/granny-betting-loop.mp4"
+        autoplay loop muted playsinline preload="auto"
+        webkit-playsinline="true"
+        style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;display:block"
+      ></video>
+      <!-- Fallback static image if video fails -->
+      <img
+        id="bvbFallback"
+        src="/assets/betting/granny_betting_static.png"
+        alt=""
+        style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none"
+      >
+      <div class="bvb-vignette"></div>
+    </div>
+
+    <!-- z:3 — Warning overlay at ≤3 s -->
+    <div class="bvb-warning" id="bvbWarning" style="display:none" aria-hidden="true">
+      <img
+        id="bvbWarningImg"
+        src="/assets/betting/Warnings/granny_warning.png"
+        alt=""
+        onerror="this.style.display='none';document.getElementById('bvbWarningText').style.display='block'"
+      >
+      <div class="bvb-warning-text" id="bvbWarningText" style="display:none">⚡ LAST SECONDS!</div>
+    </div>
 
     <!-- Multiplier -->
     <div class="mult-wrap">
@@ -518,11 +583,13 @@ function connectWS() {
         startedAt = Date.now()
         showCountdown()
         resetBetsOnNewRound()
+        bvbOnStateChange('STARTING')   // startedAt must be set before this call
       }
       if (d.state === 'RUNNING') {
         startedAt = d.started_at ? d.started_at * 1000 : Date.now()
         document.getElementById('countdown').style.display = 'none'
         document.getElementById('crashedBanner').classList.remove('show')
+        bvbOnStateChange('RUNNING')
       }
     }
 
@@ -541,6 +608,7 @@ function connectWS() {
       updateMult(d.crash_point, true)
       addHistory(d.crash_point)
       markLostBets()
+      bvbOnStateChange('CRASHED')
       setTimeout(fetchBalance, 1500)
     }
   }
@@ -717,9 +785,131 @@ function onStateChange() {
 const origHandler = ws?.onmessage
 setInterval(() => { bets.forEach((_,i) => updateBtnState(i)) }, 500)
 
+// ── Betting video system (mirrors React BettingVideo.tsx logic) ───────────────
+const BVB_FADE_MS    = 600
+const BVB_WARN_SECS  = 3   // show warning when remaining ≤ this
+
+// 321.mp3 audio overlay — plays over main music, never cuts soundtrack
+const _cdAudio = new Audio('/audio/321.mp3')
+_cdAudio.volume  = 1.0
+_cdAudio.loop    = false
+_cdAudio.style.cssText = 'position:fixed;width:1px;height:1px;opacity:0;pointer-events:none;top:-9999px;left:-9999px;'
+document.body.appendChild(_cdAudio)
+
+let _bvbPhase       = 'visible'
+let _bvbFadeTimer   = null
+let _bvbTickTimer   = null
+let _bvbSirenPlayed = false
+
+function bvbSetPhase(phase) {
+  const wrap = document.getElementById('bvbWrap')
+  _bvbPhase = phase
+  if (phase === 'visible') {
+    wrap.style.display = ''
+    // Force reflow so transition fires from opacity:0 if coming from fading-out
+    void wrap.offsetHeight
+    wrap.style.opacity = '1'
+    wrap.classList.remove('bvb-wrap--out','bvb-wrap--hidden')
+  } else if (phase === 'fading-out') {
+    wrap.classList.remove('bvb-wrap--hidden')
+    wrap.style.display = ''
+    wrap.classList.add('bvb-wrap--out')
+    wrap.style.opacity = '0'
+  } else { // hidden
+    wrap.classList.add('bvb-wrap--hidden')
+    wrap.style.display = 'none'
+  }
+}
+
+function bvbPlay() {
+  const vid = document.getElementById('bvbVideo')
+  if (!vid) return
+  vid.currentTime = 0
+  vid.play().catch(() => {})
+}
+
+function bvbPause() {
+  const vid = document.getElementById('bvbVideo')
+  if (vid) vid.pause()
+}
+
+function bvbStartWarningTick() {
+  clearInterval(_bvbTickTimer)
+  _bvbSirenPlayed = false
+  _bvbTickTimer = setInterval(() => {
+    if (roundState !== 'STARTING') { clearInterval(_bvbTickTimer); return }
+    const remaining = Math.max(0, 10 - (Date.now() - startedAt) / 1000)
+    const show = remaining > 0 && remaining <= BVB_WARN_SECS
+    document.getElementById('bvbWarning').style.display = show ? 'flex' : 'none'
+    if (show && !_bvbSirenPlayed) {
+      _bvbSirenPlayed = true
+      // Overlay 321.mp3 without touching main music
+      _cdAudio.pause()
+      _cdAudio.currentTime = 0
+      _cdAudio.play().catch(() => {})
+    }
+  }, 100)
+}
+
+function bvbOnStateChange(state) {
+  clearTimeout(_bvbFadeTimer)
+  clearInterval(_bvbTickTimer)
+  document.getElementById('bvbWarning').style.display = 'none'
+
+  if (state === 'RUNNING') {
+    bvbSetPhase('fading-out')
+    _bvbFadeTimer = setTimeout(() => {
+      bvbSetPhase('hidden')
+      bvbPause()
+    }, BVB_FADE_MS + 50)
+    _bvbSirenPlayed = false
+    return
+  }
+
+  if (state === 'STARTING' || state === 'CREATED' || state === null) {
+    bvbSetPhase('visible')
+    bvbPlay()
+    if (state === 'STARTING') bvbStartWarningTick()
+    return
+  }
+
+  // CRASHED — warning already hidden above; keep video hidden until next STARTING
+}
+
+// Video load error → show static fallback image
+document.getElementById('bvbVideo').addEventListener('error', () => {
+  document.getElementById('bvbVideo').style.display = 'none'
+  document.getElementById('bvbFallback').style.display = 'block'
+})
+
+// Pause/resume on tab visibility change (mirrors BettingVideo.tsx)
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    bvbPause()
+  } else if (_bvbPhase === 'visible') {
+    bvbPlay()
+  }
+})
+
+// First-gesture unlock for iOS/Telegram WKWebView (mirrors App.tsx unlockAllMedia)
+function _unlockGrannyMedia() {
+  document.querySelectorAll('video, audio').forEach(el => {
+    if (el.paused) {
+      el.play().then(() => {
+        // Don't keep countdown audio running after unlock
+        if (el === _cdAudio) { el.pause(); el.currentTime = 0 }
+      }).catch(() => {})
+    }
+  })
+}
+document.addEventListener('touchstart', _unlockGrannyMedia, { once:true, passive:true })
+document.addEventListener('click',      _unlockGrannyMedia, { once:true })
+
 // ── Boot ──────────────────────────────────────────────────────────────────────
 auth()
 connectWS()
+// Show betting video immediately on load (CREATED state)
+bvbOnStateChange('CREATED')
 </script>
 </body>
 </html>
