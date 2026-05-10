@@ -447,6 +447,12 @@ let grannyY = 0, grannyX = 0.32, doctorY = 0, grannyOsc = 0, flameT = 0
 // Parallax state
 let bgOff = 0, lastTs = 0
 
+// ── Background image (preloaded during BETTING so no flicker on RUNNING) ──────
+const bgImg = new Image()
+let bgImgReady = false
+bgImg.onload = () => { bgImgReady = true }
+bgImg.src = '/assets/granny%20bg/grannybg.jpeg'
+
 function resizeCanvas() {
   const ga = canvas.parentElement
   canvas.width  = ga.clientWidth
@@ -631,6 +637,46 @@ function drawGround(W, H, off, ts) {
   }
 }
 
+// ── Image-based scrolling background (grannybg.jpeg mirror-loop) ──────────────
+function drawBackground(W, H, off, camY) {
+  if (!bgImgReady) {
+    // Still loading — use procedural fallback so screen is never black
+    drawSky(W, H); drawStars(W, H, off); drawClouds(W, H, off)
+    drawForest(W, H, off); drawSkyline(W, H, off); drawMidground(W, H, off)
+    drawGround(W, H, off, performance.now())
+    return
+  }
+
+  // Scale image to cover canvas height, preserve aspect ratio
+  const aspect  = bgImg.naturalWidth / bgImg.naturalHeight
+  const drawH   = H + Math.abs(camY) * 2   // extra height for pan headroom
+  const drawW   = drawH * aspect
+
+  // Mirror-loop: original tile then horizontally-flipped tile → seamless seam
+  const cycleW  = drawW * 2
+  const xOff    = off % cycleW
+  const tileY   = -camY                    // vertical camera offset
+
+  for (let i = -1; i <= Math.ceil(W / drawW) + 2; i++) {
+    const tileX = i * cycleW - xOff
+
+    // Original copy
+    if (tileX + drawW > 0 && tileX < W) {
+      ctx.drawImage(bgImg, tileX, tileY, drawW, drawH)
+    }
+
+    // Mirrored copy (flip horizontal so the seam is invisible)
+    const mX = tileX + drawW
+    if (mX + drawW > 0 && mX < W) {
+      ctx.save()
+      ctx.translate(mX + drawW, tileY)
+      ctx.scale(-1, 1)
+      ctx.drawImage(bgImg, 0, 0, drawW, drawH)
+      ctx.restore()
+    }
+  }
+}
+
 // ── Main draw loop ─────────────────────────────────────────────────────────────
 function drawScene(ts) {
   const W = canvas.width, H = canvas.height
@@ -649,14 +695,10 @@ function drawScene(ts) {
   flameT    = ts * 0.001
   grannyOsc = Math.sin(ts * 0.003) * 3
 
-  // ── Draw background layers (parallax) ──────────────────────────────────────
-  drawSky(W, H)
-  drawStars(W, H, bgOff)
-  drawClouds(W, H, bgOff)
-  drawForest(W, H, bgOff)
-  drawSkyline(W, H, bgOff)
-  drawMidground(W, H, bgOff)
-  drawGround(W, H, bgOff, ts)
+  // ── Background: grannybg.jpeg scrolling map ─────────────────────────────────
+  // Camera pans up as granny flies higher (grannyY smaller = higher in canvas)
+  const camY = (1 - Math.min(grannyY, H) / H) * H * 0.10
+  drawBackground(W, H, bgOff, camY)
 
   // ── Character Y animation ──────────────────────────────────────────────────
   if (running) {
