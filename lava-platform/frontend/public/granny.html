@@ -80,17 +80,7 @@
     /* ── Game area ──────────────────────────────────────────── */
     .game-area{
       flex:1;position:relative;overflow:hidden;
-      background:linear-gradient(180deg,#020a03 0%,#041a06 40%,#061f08 100%);
-    }
-
-    /* Sky grid lines (hospital-ish) */
-    .game-area::before{
-      content:'';position:absolute;inset:0;
-      background-image:
-        linear-gradient(rgba(34,197,94,.04) 1px,transparent 1px),
-        linear-gradient(90deg,rgba(34,197,94,.04) 1px,transparent 1px);
-      background-size:40px 40px;
-      pointer-events:none;
+      background:#030810;
     }
 
     /* ── Scene canvas ───────────────────────────────────────── */
@@ -332,7 +322,7 @@
 
     <!-- Crashed banner -->
     <div class="crashed-banner" id="crashedBanner">
-      <div class="crashed-title">CAUGHT!</div>
+      <div class="crashed-title">INJECTED!</div>
       <div class="crashed-point" id="crashedPoint">Doctor: 1.00×</div>
     </div>
   </div>
@@ -450,107 +440,267 @@ let startedAt = 0
 const canvas = document.getElementById('scene')
 const ctx    = canvas.getContext('2d')
 let animFrame = 0
-let grannyY   = 0  // 0=bottom, 1=top
-let grannyX   = 0.35
-let doctorY   = 0
-let grannyOsc = 0  // oscillation for wobble
-let flameT    = 0
+
+// Character state
+let grannyY = 0, grannyX = 0.32, doctorY = 0, grannyOsc = 0, flameT = 0
+
+// Parallax state
+let bgOff = 0, lastTs = 0
 
 function resizeCanvas() {
   const ga = canvas.parentElement
   canvas.width  = ga.clientWidth
   canvas.height = ga.clientHeight
-  grannyY = canvas.height * 0.55
-  doctorY = canvas.height * 0.85
+  grannyY = canvas.height * 0.40
+  doctorY = canvas.height * 0.80
 }
 resizeCanvas()
 window.addEventListener('resize', resizeCanvas)
 
+// ── Seeded pseudo-random (deterministic by position — no jitter on scroll) ────
+function rnd(s) { const x = Math.sin(s*9301+49297)*233280; return x - Math.floor(x) }
+
+// ── Layer 5: Night sky + stars + clouds ──────────────────────────────────────
+function drawSky(W, H) {
+  const g = ctx.createLinearGradient(0, 0, 0, H*0.78)
+  g.addColorStop(0,    '#030810')
+  g.addColorStop(0.38, '#0b1527')
+  g.addColorStop(0.74, '#172d4a')
+  g.addColorStop(1,    '#1e3a60')
+  ctx.fillStyle = g
+  ctx.fillRect(0, 0, W, H)
+}
+
+function drawStars(W, H, off) {
+  const sOff = off * 0.018
+  ctx.fillStyle = '#ffffff'
+  for (let i = 0; i < 55; i++) {
+    const sx = ((rnd(i*3+1)*W*2.5 - sOff) % (W*2) + W*2) % (W*2) - W*0.25
+    const sy = rnd(i*3+2) * H * 0.40
+    ctx.globalAlpha = 0.35 + rnd(i*3+3)*0.65
+    ctx.fillRect(sx, sy, 1.5, 1.5)
+  }
+  ctx.globalAlpha = 1
+}
+
+function drawClouds(W, H, off) {
+  const cOff = off * 0.055
+  for (let i = 0; i < 5; i++) {
+    const cx = ((rnd(i+80)*W*2.4 - cOff) % (W*2) + W*2) % (W*2) - 60
+    const cy = H*0.05 + rnd(i+80.1)*H*0.20
+    const cr = 38 + rnd(i+80.2)*52
+    ctx.fillStyle = `rgba(18,42,88,${0.30+rnd(i+80.3)*0.28})`
+    ctx.beginPath()
+    ctx.arc(cx,          cy,          cr,       0, Math.PI*2)
+    ctx.arc(cx+cr*.88,   cy+cr*.12,   cr*.62,   0, Math.PI*2)
+    ctx.arc(cx-cr*.88,   cy+cr*.12,   cr*.62,   0, Math.PI*2)
+    ctx.arc(cx+cr*.32,   cy-cr*.42,   cr*.46,   0, Math.PI*2)
+    ctx.fill()
+  }
+}
+
+// ── Layer 4: Distant forest / tree silhouette ─────────────────────────────────
+function drawForest(W, H, off) {
+  const fOff  = off * 0.14
+  const baseY = H * 0.63
+  const TILE  = 72
+  ctx.fillStyle = '#0c2212'
+  const s = Math.floor(fOff/TILE)-1, e = s + Math.ceil(W/TILE) + 3
+  for (let i = s; i <= e; i++) {
+    const x  = i*TILE - (fOff % TILE)
+    const h1 = 30+rnd(i*7+200)*44, w1 = 22+rnd(i*7+201)*30
+    ctx.beginPath(); ctx.moveTo(x,baseY); ctx.lineTo(x+w1/2,baseY-h1); ctx.lineTo(x+w1,baseY); ctx.closePath(); ctx.fill()
+    const x2=x+w1*0.55, h2=18+rnd(i*7+202)*34, w2=18+rnd(i*7+203)*26
+    ctx.beginPath(); ctx.moveTo(x2,baseY); ctx.lineTo(x2+w2/2,baseY-h2); ctx.lineTo(x2+w2,baseY); ctx.closePath(); ctx.fill()
+  }
+}
+
+// ── Layer 3: Distant skyline (skyscrapers) ────────────────────────────────────
+function drawSkyline(W, H, off) {
+  const sOff = off * 0.22, baseY = H * 0.67, TILE = 96
+  const s = Math.floor(sOff/TILE)-1, e = s + Math.ceil(W/TILE) + 3
+  for (let i = s; i <= e; i++) {
+    const r1=rnd(i*11+300), r2=rnd(i*11+301), r3=rnd(i*11+302)
+    const bW=38+r1*48, bH=65+r2*162, bX=i*TILE-(sOff%TILE), bY=baseY-bH
+    ctx.fillStyle = `rgb(${8+r3*12|0},${16+r3*18|0},${30+r3*22|0})`
+    ctx.fillRect(bX, bY, bW, bH)
+    if (bH > 140 && r1 > 0.5) {
+      ctx.fillStyle = '#08172a'; ctx.fillRect(bX+bW/2-1, bY-18, 2.5, 18)
+      ctx.fillStyle = '#ff3030'; ctx.beginPath(); ctx.arc(bX+bW/2, bY-20, 2, 0, Math.PI*2); ctx.fill()
+    }
+    const rows=Math.floor(bH/13)|0, cols=Math.floor(bW/9)|0
+    for (let row=0; row<rows-1; row++) for (let col=0; col<cols; col++) {
+      if (rnd(i*300+row*10+col) > 0.50) {
+        const w=rnd(i*50+row+col)
+        ctx.fillStyle = w>0.45 ? `rgba(255,${170+w*55|0},70,${0.4+w*0.42})` : `rgba(155,205,255,0.52)`
+        ctx.fillRect(bX+2+col*9, bY+5+row*13, 5, 7)
+      }
+    }
+  }
+}
+
+// ── Layer 2: Midground buildings + hospital ───────────────────────────────────
+function drawMidground(W, H, off) {
+  const mOff = off * 0.50, baseY = H * 0.77, TILE = 118
+  const s = Math.floor(mOff/TILE)-1, e = s + Math.ceil(W/TILE) + 3
+  for (let i = s; i <= e; i++) {
+    const r1=rnd(i*13+400),r2=rnd(i*13+401),r3=rnd(i*13+402),r4=rnd(i*13+403)
+    const bW=58+r1*52, bH=48+r2*115, bX=i*TILE-(mOff%TILE), bY=baseY-bH
+    const isHosp = r4 > 0.80
+    if (isHosp) {
+      ctx.fillStyle = '#c4dbd2'; ctx.fillRect(bX, bY, bW, bH)
+      const cx=bX+bW/2
+      ctx.fillStyle = '#e53e3e'
+      ctx.fillRect(cx-2.5, bY+6, 5, 15); ctx.fillRect(cx-8, bY+10, 16, 5)
+      const rows=Math.floor(bH/19)|0, cols=Math.floor(bW/15)|0
+      ctx.fillStyle='rgba(255,255,185,0.9)'
+      for (let row=0;row<rows-1;row++) for (let col=0;col<cols;col++)
+        if (rnd(i*400+row*15+col)>0.35) ctx.fillRect(bX+5+col*15, bY+8+row*19, 8, 11)
+    } else {
+      const sh=0.07+r3*0.12
+      ctx.fillStyle=`rgb(${sh*210|0},${(sh+0.02)*235|0},${(sh+0.08)*255|0})`
+      ctx.fillRect(bX, bY, bW, bH)
+      const rows=Math.floor(bH/18)|0, cols=Math.floor(bW/13)|0
+      for (let row=0;row<rows-1;row++) for (let col=0;col<cols;col++) {
+        if (rnd(i*400+row*13+col)>0.44) {
+          const w=rnd(i*100+row*13+col)
+          ctx.fillStyle=`rgba(${210+w*45|0},${140+w*80|0},60,${0.62+w*0.3})`
+          ctx.fillRect(bX+4+col*13, bY+6+row*18, 7, 10)
+        }
+      }
+      const numAC=Math.floor(r3*4)
+      ctx.fillStyle='#0f1e38'
+      for (let a=0;a<numAC;a++) ctx.fillRect(bX+a*16+4, bY-8, 12, 7)
+    }
+  }
+}
+
+// ── Layer 1: Road / streetlights / cars ──────────────────────────────────────
+function drawGround(W, H, off, ts) {
+  const gY = H * 0.78
+
+  // Sidewalk strip
+  ctx.fillStyle = '#1c2334'; ctx.fillRect(0, gY, W, 10)
+
+  // Road surface gradient
+  const rg = ctx.createLinearGradient(0, gY+10, 0, H)
+  rg.addColorStop(0,'#131320'); rg.addColorStop(1,'#090910')
+  ctx.fillStyle = rg; ctx.fillRect(0, gY+10, W, H-gY-10)
+
+  // Center lane dashes
+  const laneY = gY+10+(H-gY-10)*0.44, dW=28, dG=22, lOff=off%(dW+dG)
+  ctx.fillStyle='#b08a10'
+  for (let x=-lOff; x<W+dW; x+=dW+dG) ctx.fillRect(x, laneY-1.5, dW, 3)
+
+  // Streetlights
+  const ltOff=off%160
+  for (let x=-ltOff; x<W+40; x+=160) {
+    ctx.strokeStyle='#28384e'; ctx.lineWidth=2.5
+    ctx.beginPath(); ctx.moveTo(x,gY); ctx.lineTo(x,gY-52); ctx.lineTo(x+22,gY-52); ctx.stroke()
+    const glow=ctx.createRadialGradient(x+22,gY-52,2,x+22,gY-52,28)
+    glow.addColorStop(0,'rgba(255,188,65,0.52)'); glow.addColorStop(0.4,'rgba(255,188,65,0.13)'); glow.addColorStop(1,'rgba(255,188,65,0)')
+    ctx.fillStyle=glow; ctx.beginPath(); ctx.arc(x+22,gY-52,28,0,Math.PI*2); ctx.fill()
+    ctx.fillStyle='#ffd855'; ctx.beginPath(); ctx.arc(x+22,gY-52,3,0,Math.PI*2); ctx.fill()
+  }
+
+  // Cars
+  const COLS=['#c0392b','#2471a3','#1e8449','#b7950b','#7b241c','#e8e8e8','#2e4057','#d35400']
+  const roadTop=gY+12, laneH=(H-gY-12)/2
+  for (let lane=0; lane<2; lane++) {
+    const lY=roadTop+lane*laneH+laneH*0.28, spd=1.0+lane*0.38
+    for (let i=0; i<4; i++) {
+      const cs=lane*200+i*31
+      const cX=W+50 - ((off*spd + rnd(cs)*180 + i*230) % (W+130))
+      const cW=46+rnd(cs+1)*18, cH=14+rnd(cs+2)*6
+      const isAmb=rnd(cs+4)>0.87
+      ctx.fillStyle = isAmb ? '#f0f0ee' : COLS[Math.floor(rnd(cs+3)*COLS.length)]
+      ctx.beginPath()
+      if (ctx.roundRect) ctx.roundRect(cX, lY-cH/2, cW, cH, 3)
+      else ctx.rect(cX, lY-cH/2, cW, cH)
+      ctx.fill()
+      if (isAmb) {
+        ctx.fillStyle='rgba(200,0,0,0.75)'; ctx.fillRect(cX+4, lY-cH/2+cH*0.30, cW-8, cH*0.22)
+        ctx.fillStyle=Math.sin(ts*0.008+cs)>0?'#e53e3e':'#3182ce'
+        ctx.beginPath(); ctx.arc(cX+cW/2, lY-cH/2-3, 3.5, 0, Math.PI*2); ctx.fill()
+      }
+      ctx.fillStyle='rgba(255,215,95,0.85)'
+      ctx.beginPath(); ctx.arc(cX+cW+1, lY-3.5, 2.5, 0, Math.PI*2); ctx.arc(cX+cW+1, lY+3.5, 2.5, 0, Math.PI*2); ctx.fill()
+      ctx.fillStyle='rgba(200,25,25,0.82)'
+      ctx.beginPath(); ctx.arc(cX-1, lY-3.5, 2.5, 0, Math.PI*2); ctx.arc(cX-1, lY+3.5, 2.5, 0, Math.PI*2); ctx.fill()
+    }
+  }
+}
+
+// ── Main draw loop ─────────────────────────────────────────────────────────────
 function drawScene(ts) {
   const W = canvas.width, H = canvas.height
-  ctx.clearRect(0,0,W,H)
+  ctx.clearRect(0, 0, W, H)
+
+  const dt = lastTs > 0 ? Math.min((ts - lastTs) / 1000, 0.05) : 0
+  lastTs = ts
 
   const running = roundState === 'RUNNING'
   const crashed = roundState === 'CRASHED'
-  const t = ts * 0.001
 
-  flameT = t
-  grannyOsc = Math.sin(t * 3) * 3
+  // Update parallax offset
+  if (running)                    bgOff += 160 * Math.pow(Math.max(multiplier,1), 0.6) * dt
+  else if (roundState==='STARTING') bgOff += 18 * dt
 
-  // -- Target Y based on multiplier (higher mult = granny flies higher)
+  flameT    = ts * 0.001
+  grannyOsc = Math.sin(ts * 0.003) * 3
+
+  // ── Draw background layers (parallax) ──────────────────────────────────────
+  drawSky(W, H)
+  drawStars(W, H, bgOff)
+  drawClouds(W, H, bgOff)
+  drawForest(W, H, bgOff)
+  drawSkyline(W, H, bgOff)
+  drawMidground(W, H, bgOff)
+  drawGround(W, H, bgOff, ts)
+
+  // ── Character Y animation ──────────────────────────────────────────────────
   if (running) {
-    const progress = Math.min((multiplier - 1) / 9, 1) // 1x→10x maps to 0→1
-    const targetY = H * 0.75 - progress * H * 0.55
-    grannyY += (targetY - grannyY) * 0.05
-    // Doctor chases slowly
-    const doctorTargetY = H * 0.88
-    doctorY += (doctorTargetY - doctorY) * 0.03
+    const progress = Math.min((multiplier - 1) / 9, 1)
+    grannyY += (H*0.68 - progress*H*0.50 - grannyY) * 0.05
+    doctorY += (H*0.83 - doctorY) * 0.03
   } else if (crashed) {
-    // Doctor catches granny — snap together
-    grannyY += (H * 0.55 - grannyY) * 0.08
-    doctorY += (grannyY + 30 - doctorY) * 0.1
+    grannyY += (H*0.72 - grannyY) * 0.08
+    doctorY += (grannyY - 25 - doctorY) * 0.10
   } else {
-    // Idle — gentle float
-    const idleY = H * 0.55 + Math.sin(t*1.5)*8
-    grannyY += (idleY - grannyY) * 0.05
-    doctorY += (H * 0.85 - doctorY) * 0.05
+    grannyY += (H*0.40 + Math.sin(ts*0.0015)*8 - grannyY) * 0.05
+    doctorY += (H*0.80 - doctorY) * 0.05
   }
 
-  const gX = W * grannyX
-  const dX = W * 0.65
+  const gX = W * grannyX, dX = W * 0.66
 
-  // Jetpack flame
+  // ── Jetpack flame ──────────────────────────────────────────────────────────
   if (!crashed) {
-    const flameH = 18 + Math.sin(flameT * 12) * 8
-    const grad = ctx.createLinearGradient(gX, grannyY+24, gX, grannyY+24+flameH)
-    grad.addColorStop(0,'rgba(34,197,94,.9)')
-    grad.addColorStop(0.5,'rgba(134,239,172,.7)')
-    grad.addColorStop(1,'rgba(34,197,94,0)')
-    ctx.fillStyle = grad
-    ctx.beginPath()
-    ctx.ellipse(gX, grannyY+28+flameH/2, 6, flameH/2, 0, 0, Math.PI*2)
-    ctx.fill()
+    const flameH = 18 + Math.sin(flameT*12)*8
+    const fg = ctx.createLinearGradient(gX, grannyY+24, gX, grannyY+24+flameH)
+    fg.addColorStop(0,'rgba(34,197,94,.9)'); fg.addColorStop(0.5,'rgba(134,239,172,.7)'); fg.addColorStop(1,'rgba(34,197,94,0)')
+    ctx.fillStyle=fg; ctx.beginPath(); ctx.ellipse(gX, grannyY+28+flameH/2, 6, flameH/2, 0, 0, Math.PI*2); ctx.fill()
   }
 
-  // Granny (emoji-based)
-  ctx.save()
-  ctx.translate(gX, grannyY + grannyOsc)
-  if (crashed) { ctx.rotate(Math.PI/8) }
-  ctx.font = '42px serif'
-  ctx.textAlign = 'center'
-  ctx.textBaseline = 'middle'
+  // ── Granny ─────────────────────────────────────────────────────────────────
+  ctx.save(); ctx.translate(gX, grannyY+grannyOsc)
+  if (crashed) ctx.rotate(Math.PI/8)
+  ctx.font='42px serif'; ctx.textAlign='center'; ctx.textBaseline='middle'
   ctx.fillText('👵', 0, 0)
-  // Jetpack
-  ctx.font = '24px serif'
-  ctx.fillText('🚀', 10, 20)
+  ctx.font='24px serif'; ctx.fillText('🚀', 10, 20)
   ctx.restore()
 
-  // Doctor (chasing)
-  ctx.save()
-  ctx.translate(dX, doctorY)
-  if (crashed) {
-    ctx.translate(gX - dX, grannyY - doctorY - 10)
-  }
-  ctx.font = '38px serif'
-  ctx.textAlign = 'center'
-  ctx.textBaseline = 'middle'
+  // ── Doctor ─────────────────────────────────────────────────────────────────
+  ctx.save(); ctx.translate(dX, doctorY)
+  if (crashed) ctx.translate(gX-dX, grannyY-doctorY-10)
+  ctx.font='38px serif'; ctx.textAlign='center'; ctx.textBaseline='middle'
   ctx.fillText('👨‍⚕️', 0, 0)
-  // Syringe — points toward granny
-  ctx.save()
-  ctx.rotate(-Math.PI/4)
-  ctx.font = '22px serif'
-  ctx.fillText('💉', -16, -16)
-  ctx.restore()
+  ctx.save(); ctx.rotate(-Math.PI/4); ctx.font='22px serif'; ctx.fillText('💉', -16, -16); ctx.restore()
   ctx.restore()
 
-  // Caught label
+  // ── INJECTED crash text ────────────────────────────────────────────────────
   if (crashed) {
-    ctx.save()
-    ctx.font = 'bold 16px Courier New'
-    ctx.fillStyle = '#ef4444'
-    ctx.textAlign = 'center'
-    ctx.fillText('INJECTED! 💉', W/2, H*0.3)
-    ctx.restore()
+    ctx.save(); ctx.font='bold 16px Courier New'; ctx.fillStyle='#ef4444'; ctx.textAlign='center'
+    ctx.fillText('INJECTED! 💉', W/2, H*0.28); ctx.restore()
   }
 
   animFrame = requestAnimationFrame(drawScene)
