@@ -17,6 +17,7 @@ export function Multiplier() {
   const isStarting = roundState === 'STARTING'
   const isWaiting  = !roundState || roundState === 'CREATED'
 
+
   // Color tier: crash = red, running = dynamic tier, others = neutral
   const colorClass = isCrashed
     ? 'mult--crashed'
@@ -44,7 +45,7 @@ export function Multiplier() {
             {value.toFixed(2)}
             <span className="mult__x mult__x-label">×</span>
           </div>
-          {isCrashed && <div className="mult__crashed-badge">CAUGHT!</div>}
+          {/* WASTED badge replaced by WastedOverlay cinematic PNG */}
         </>
       )}
     </div>

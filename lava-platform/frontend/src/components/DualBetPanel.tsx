@@ -4,6 +4,8 @@ import { api, ApiError } from '../api/http'
 import { haptic } from '../lib/telegram'
 import { useRealtimeMult } from '../hooks/useRealtimeMult'
 import type { ActiveBet } from '../store/game'
+import { YouWinOverlay } from './YouWinOverlay'
+import { playWinSound } from '../audio/WinSound'
 
 // ─── Shared constants ────────────────────────────────────────────────────────
 
@@ -41,9 +43,10 @@ function useBetPanel(token: string) {
   const mult          = useRealtimeMult()
 
   // ── Per-panel local state ───────────────────────────────────────────────────
-  const [activeBet,   setActiveBet]   = useState<ActiveBet | null>(null)
-  const [cashedOut,   setCashedOut]   = useState(false)
-  const [cashoutMult, setCashoutMult] = useState<number | null>(null)
+  const [activeBet,     setActiveBet]     = useState<ActiveBet | null>(null)
+  const [cashedOut,     setCashedOut]     = useState(false)
+  const [cashoutMult,   setCashoutMult]   = useState<number | null>(null)
+  const [cashoutPayout, setCashoutPayout] = useState<number | null>(null)
 
   const [betAmount,   setBetAmount]   = useState('1.00')
   const [autoCashout, setAutoCashout] = useState('')
@@ -69,6 +72,7 @@ function useBetPanel(token: string) {
       setActiveBet(null)
       setCashedOut(false)
       setCashoutMult(null)
+      setCashoutPayout(null)
       setError(null)
     }
   }, [roundId])
@@ -105,8 +109,13 @@ function useBetPanel(token: string) {
       const resp = await api.cashout(token, { bet_id: activeBet.betId })
       setCashedOut(true)
       setCashoutMult(resp.multiplier ?? null)
-      if (resp.payout) setBalance(parseFloat(resp.payout))
+      if (resp.payout) {
+        const p = parseFloat(resp.payout)
+        setCashoutPayout(p)
+        setBalance(p)
+      }
       addCashedOut()
+      playWinSound()
       haptic('success')
     } catch (e) {
       setError(e instanceof ApiError ? e.message : 'Failed to escape')
@@ -115,6 +124,25 @@ function useBetPanel(token: string) {
       setLoading(false)
     }
   }, [canCashout, activeBet, token, setBalance])
+
+  // ── Auto-cashout sync — backend fires cashout, WS event arrives, update local state ──
+  const lastCashoutEvent = useGame((s) => s.lastCashoutEvent)
+  const activeBetRef = useRef(activeBet)
+  activeBetRef.current = activeBet
+  useEffect(() => {
+    const ev = lastCashoutEvent
+    const ab = activeBetRef.current
+    if (!ev || !ab || ev.bet_id !== ab.betId || cashedOut) return
+    setCashedOut(true)
+    setCashoutMult(ev.multiplier)
+    const p = parseFloat(ev.payout)
+    setCashoutPayout(p)
+    setBalance(p)
+    addCashedOut()
+    playWinSound()
+    haptic('success')
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lastCashoutEvent])
 
   // ── Auto bet — fires once per round using a stable ref ─────────────────────
   const handleBetRef = useRef(handleBet)
@@ -151,6 +179,10 @@ function useBetPanel(token: string) {
     autoBet,     setAutoBet,
     // Status
     loading, error, locked,
+    // Win overlay data
+    cashedOut,
+    cashoutMult,
+    cashoutPayout,
     // Action
     buttonState: getButtonState(),
     onAction: canCashout ? handleCashout : handleBet,
@@ -180,19 +212,19 @@ function ActionButton({ state, loading, onAction }: {
     case 'cashout':
       return (
         <button className="dbp-btn dbp-btn--cashout" onClick={onAction} disabled={loading}>
-          {loading ? 'Escaping…' : `ESCAPE $${state.payout.toFixed(2)}`}
+          {loading ? 'Cashing out…' : `CASHOUT $${state.payout.toFixed(2)}`}
         </button>
       )
     case 'escaped':
       return (
         <button className="dbp-btn dbp-btn--escaped" disabled>
-          ESCAPED {state.mult.toFixed(2)}×
+          WIN {state.mult.toFixed(2)}×
         </button>
       )
     case 'caught':
       return (
         <button className="dbp-btn dbp-btn--caught" disabled>
-          CAUGHT! {state.mult.toFixed(2)}×
+          WASTED {state.mult.toFixed(2)}×
         </button>
       )
     case 'riding':
@@ -353,8 +385,15 @@ function BetBlockUI({
 function PanelA({ token }: { token: string; playerId: string }) {
   const p = useBetPanel(token)
   return (
-    <BetBlockUI
-      label="PANEL A"
+    <>
+      <YouWinOverlay
+        panel="a"
+        show={p.cashedOut && p.cashoutMult !== null}
+        amount={p.cashoutPayout ?? 0}
+        multiplier={p.cashoutMult ?? 0}
+      />
+      <BetBlockUI
+        label="PANEL A"
       betAmount={p.betAmount}
       onBetAmountChange={p.setBetAmount}
       onIncrement={() => p.setBetAmount((Math.max(BET_MIN, p.betAmt + BET_STEP)).toFixed(2))}
@@ -371,14 +410,22 @@ function PanelA({ token }: { token: string; playerId: string }) {
       onAction={p.onAction}
       locked={p.locked}
     />
+    </>
   )
 }
 
 function PanelB({ token }: { token: string }) {
   const p = useBetPanel(token)
   return (
-    <BetBlockUI
-      label="PANEL B"
+    <>
+      <YouWinOverlay
+        panel="b"
+        show={p.cashedOut && p.cashoutMult !== null}
+        amount={p.cashoutPayout ?? 0}
+        multiplier={p.cashoutMult ?? 0}
+      />
+      <BetBlockUI
+        label="PANEL B"
       betAmount={p.betAmount}
       onBetAmountChange={p.setBetAmount}
       onIncrement={() => p.setBetAmount((Math.max(BET_MIN, p.betAmt + BET_STEP)).toFixed(2))}
@@ -395,6 +442,7 @@ function PanelB({ token }: { token: string }) {
       onAction={p.onAction}
       locked={p.locked}
     />
+    </>
   )
 }
 

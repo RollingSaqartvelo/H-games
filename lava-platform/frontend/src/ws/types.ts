@@ -48,6 +48,7 @@ export interface BetPlacedData {
 
 export interface CashoutData {
   round_id: string
+  bet_id: string
   player_id: string
   multiplier: number
   payout: string

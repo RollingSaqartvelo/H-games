@@ -24,7 +24,7 @@ function getPlatformWidth(index: number, elapsedMs: number): number {
 }
 
 function getPlatformSpacing(elapsedMs: number): number {
-  return Math.max(115, 245 - elapsedMs / 380)
+  return Math.max(88, 190 - elapsedMs / 380)
 }
 
 // Visual colors per variant

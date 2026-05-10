@@ -6,6 +6,7 @@ import { RoundCountdown }    from './components/RoundCountdown'
 import { SocialTicker }      from './components/SocialTicker'
 import { DualBetPanel }      from './components/DualBetPanel'
 import { BettingVideo }      from './components/BettingVideo'
+import { WastedOverlay }    from './components/WastedOverlay'
 import { useSocket }         from './hooks/useSocket'
 import { usePixi }           from './hooks/usePixi'
 import { useTMAAuth }        from './hooks/useTMAAuth'
@@ -31,8 +32,28 @@ import { initTMA }           from './lib/telegram'
  * The splash screen is an absolute overlay (z:50) so the Pixi mount stays
  * stable underneath it from the very first render.
  */
+// On the first user touch, unlock all media elements in the DOM.
+// iOS WKWebView (Telegram) blocks even muted video autoplay until a gesture.
+function unlockAllMedia(): void {
+  document.querySelectorAll<HTMLMediaElement>('video, audio').forEach((el) => {
+    if (el.paused) {
+      void el.play().then(() => {
+        // For audio elements that shouldn't auto-start: pause immediately after unlock
+        if (el.tagName === 'AUDIO' && !el.classList.contains('music')) {
+          el.pause()
+          el.currentTime = 0
+        }
+      }).catch(() => {})
+    }
+  })
+}
+
 export function App() {
-  useEffect(() => { initTMA() }, [])
+  useEffect(() => {
+    initTMA()
+    window.addEventListener('touchstart', unlockAllMedia, { once: true, passive: true })
+    window.addEventListener('click',      unlockAllMedia, { once: true })
+  }, [])
 
   const pixiMount = useRef<HTMLDivElement>(null)
   usePixi(pixiMount)
@@ -66,6 +87,9 @@ export function App() {
         <div className="game-overlay game-overlay--bottom">
           <RoundCountdown />
         </div>
+
+        {/* z:99 — Wasted cinematic slam on crash */}
+        <WastedOverlay />
 
         {/* z:50 — Splash overlay on first load; sits above Pixi so the mount
             div stays in game-area and Pixi can initialise into the correct element */}

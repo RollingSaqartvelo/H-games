@@ -31,18 +31,26 @@ import { ObstacleLayer }   from './layers/ObstacleLayer'
 import { ParticleLayer }   from './layers/ParticleLayer'
 import { GunfireCrashFX } from './layers/GunfireCrashFX'
 import { HorseRider }      from './entities/HorseRider'
+import { SheriffRider }    from './entities/SheriffRider'
 import { useGame }         from '../store/game'
 import { lerp, expLerp } from './utils/easing'
 import type { RoundState } from '../ws/types'
+import { playKnutSound }  from '../audio/KnutSound'
 
-const CHAR_X_FRAC = 0.30   // rider fixed at 30% from left
+const CHAR_X_FRAC      = 0.55   // rider fixed at 55% from left
+// this.sheriffBehind is computed dynamically so sheriff stays at the same screen X
+// when the hero moves: base 105px + compensation for the 10% hero shift
+const SHERIFF_BEHIND_BASE = 105
+const FLOOR_DISPLAY_H  = 220    // must match FloorLayer DISPLAY_HEIGHT
+// Visual ground surface: tile is 220px, cacti bases appear ~130px into the tile from top
+const FLOOR_GROUND_INSET = 185
 
 function jumpCycleMs(elapsedMs: number): number {
-  if (elapsedMs < 5_000)  return 1_900
-  if (elapsedMs < 15_000) return 1_550
-  if (elapsedMs < 30_000) return 1_200
-  if (elapsedMs < 60_000) return 900
-  return 700
+  if (elapsedMs < 5_000)  return 1_550
+  if (elapsedMs < 15_000) return 1_250
+  if (elapsedMs < 30_000) return  980
+  if (elapsedMs < 60_000) return  720
+  return 560
 }
 
 function resolvePosition(elapsedMs: number): { platIndex: number; msUntilNextJump: number } {
@@ -65,12 +73,14 @@ export class GameScene {
   private world:     Container
   private obstacles: ObstacleLayer
   private particles: ParticleLayer
+  private sheriff:   SheriffRider
   private rider:     HorseRider
   private flash:     GunfireCrashFX
 
   private W = 0
   private H = 0
   private charScreenX = 0
+  private sheriffBehind = 0
 
   private charWorldX = 0
   private cameraX    = 0
@@ -105,6 +115,7 @@ export class GameScene {
     this.W = app.screen.width
     this.H = app.screen.height
     this.charScreenX = this.W * CHAR_X_FRAC
+    this.sheriffBehind = SHERIFF_BEHIND_BASE + Math.round(this.W * 0.10)
 
     this.container = new Container()
 
@@ -113,10 +124,12 @@ export class GameScene {
     this.world     = new Container()
     this.obstacles = new ObstacleLayer(this.W, this.H)
     this.particles = new ParticleLayer()
+    this.sheriff   = new SheriffRider()
     this.rider     = new HorseRider()
     this.flash     = new GunfireCrashFX(this.W, this.H)
 
     this.world.addChild(
+      this.sheriff.container,  // behind obstacles/hero — runs on floor below platforms
       this.obstacles.container,
       this.particles.container,
       this.rider.container,
@@ -204,6 +217,7 @@ export class GameScene {
     this.placeRiderOnObstacle(0)
     this.updateCameraSnap()
     this.rider.setState('idle')
+    this.sheriff.reset()
     this.phase = 'idle'
   }
 
@@ -221,6 +235,7 @@ export class GameScene {
     this.nextJumpAt = Date.now()   // start jumping immediately on load
     this.phase      = 'idle'
     this.rider.setState('idle')
+    this.sheriff.startRunning()
     this.triggerShake(7)
   }
 
@@ -268,6 +283,11 @@ export class GameScene {
     const camMaxWorldX = -this.cameraX + this.W + 80
     this.obstacles.update(dt, camMinWorldX, camMaxWorldX)
 
+    // Sheriff: locked to visual floor surface, always this.sheriffBehind world-px behind hero
+    this.sheriff.container.x = this.charWorldX - this.sheriffBehind
+    this.sheriff.container.y = this.H - FLOOR_DISPLAY_H + FLOOR_GROUND_INSET
+    this.sheriff.update(dt)
+
     this.particles.update(dt)
     this.rider.update(dt)
     this.desert.update(dt, this.charWorldX, 0)
@@ -297,7 +317,7 @@ export class GameScene {
         break
 
       case 'crouch':
-        if (now - this.phaseStart >= 250) {
+        if (now - this.phaseStart >= 195) {
           this.startAirborne(now, elapsedMs)
         }
         break
@@ -327,10 +347,10 @@ export class GameScene {
       }
 
       case 'impact':
-        if (now - this.phaseStart >= 220) {
+        if (now - this.phaseStart >= 175) {
           this.rider.setState('idle')
           this.phase = 'idle'
-          this.nextJumpAt = now + jumpCycleMs(elapsedMs) * 0.38
+          this.nextJumpAt = now + jumpCycleMs(elapsedMs) * 0.28
         }
         break
     }
@@ -382,6 +402,7 @@ export class GameScene {
   }
 
   private startAirTumble(now: number): void {
+    playKnutSound()
     this.pendingCrash     = false
     this.alreadyFallen    = true
     this.fallStartY       = this.rider.container.y   // physics baseline set here
@@ -395,6 +416,12 @@ export class GameScene {
     this.obstacles.triggerCrash(this.platIndex)
     this.particles.spawnCrashBurst(this.charWorldX, this.fallStartY)
     this.triggerShake(12)
+
+    // Sheriff lasso throw: hero local coords relative to sheriff container
+    this.sheriff.startAttack(
+      this.sheriffBehind,                                       // heroLocalX
+      this.rider.container.y - (this.H - FLOOR_DISPLAY_H + FLOOR_GROUND_INSET),
+    )
   }
 
   private tickAirTumble(now: number): void {
@@ -428,6 +455,7 @@ export class GameScene {
   }
 
   private startFall(): void {
+    playKnutSound()
     this.pendingCrash     = false
     this.alreadyFallen    = true
     this.fallStartY       = this.rider.container.y
@@ -442,6 +470,12 @@ export class GameScene {
     this.particles.spawnCrashBurst(this.charWorldX, this.fallStartY)
     this.triggerShake(20)
     // rider.setState('fall') is intentionally delayed — see tickFall
+
+    // Sheriff lasso throw: hero local coords relative to sheriff container
+    this.sheriff.startAttack(
+      this.sheriffBehind,
+      this.rider.container.y - (this.H - FLOOR_DISPLAY_H + FLOOR_GROUND_INSET),
+    )
   }
 
   private tickFall(now: number): void {
@@ -492,6 +526,7 @@ export class GameScene {
   resize(w: number, h: number): void {
     this.W = w; this.H = h
     this.charScreenX = w * CHAR_X_FRAC
+    this.sheriffBehind = SHERIFF_BEHIND_BASE + Math.round(w * 0.10)
     this.desert.resize(w, h)
     this.floor.resize(w, h)
     this.obstacles.resize(w, h)
@@ -507,6 +542,7 @@ export class GameScene {
     this.floor.destroy()
     this.obstacles.destroy()
     this.particles.destroy()
+    this.sheriff.destroy()
     this.rider.destroy()
     this.flash.destroy()
     this.container.destroy({ children: true })

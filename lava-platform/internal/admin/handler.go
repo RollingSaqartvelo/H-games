@@ -117,7 +117,7 @@ func (h *Handler) Stats(c *gin.Context) {
 		       SUM(bet_amount)::float8,
 		       COALESCE(SUM(payout_amount),0)::float8,
 		       (SUM(bet_amount) - COALESCE(SUM(payout_amount),0))::float8,
-		       COUNT(*) FILTER (WHERE status = 'WON')::int,
+		       COUNT(*) FILTER (WHERE status = 'CASHED_OUT')::int,
 		       COUNT(*) FILTER (WHERE status = 'LOST')::int,
 		       MAX(created_at)
 		FROM round_bets

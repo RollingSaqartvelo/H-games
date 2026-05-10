@@ -55,7 +55,7 @@ export function CountdownOverlay() {
         <div className="countdown-go">RIDE!</div>
       ) : (
         <>
-          <p className="countdown-label">HEIST STARTS IN</p>
+          {seconds > 3 && <p className="countdown-label">HEIST STARTS IN</p>}
           <div key={animKey} className={`countdown-number ${urgencyClass}`}>
             {seconds}
           </div>

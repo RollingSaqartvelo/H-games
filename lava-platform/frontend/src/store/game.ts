@@ -69,6 +69,9 @@ interface GameState {
   // ── Social cashout feed (last 6 cashouts by any player) ─────────────────────
   recentCashouts: CashoutFeedEntry[]
 
+  // ── Last cashout event — used by DualBetPanel to detect auto-cashout ─────────
+  lastCashoutEvent: CashoutData | null
+
   // ── Form ────────────────────────────────────────────────────────────────────
   betAmount: string
   autoCashout: string
@@ -114,6 +117,7 @@ export const useGame = create<GameState & GameActions>()(
     anyBetLost: false,
     history: [],
     recentCashouts: [],
+    lastCashoutEvent: null,
     betAmount: '1.00',
     autoCashout: '',
     balance: null,
@@ -138,6 +142,7 @@ export const useGame = create<GameState & GameActions>()(
           activeBetCount:    newRound ? 0     : prev.activeBetCount,
           cashedOutCount:    newRound ? 0     : prev.cashedOutCount,
           anyBetLost:        newRound ? false : prev.anyBetLost,
+          lastCashoutEvent:  newRound ? null  : prev.lastCashoutEvent,
           crashPoint: null,
           serverSeed: null,
         }
@@ -175,9 +180,9 @@ export const useGame = create<GameState & GameActions>()(
         }
         const recentCashouts = [entry, ...prev.recentCashouts].slice(0, 6)
         if (d.player_id === myPlayerId) {
-          return { cashedOut: true, cashoutMultiplier: d.multiplier, payout: d.payout, recentCashouts }
+          return { cashedOut: true, cashoutMultiplier: d.multiplier, payout: d.payout, recentCashouts, lastCashoutEvent: d }
         }
-        return { recentCashouts }
+        return { recentCashouts, lastCashoutEvent: d }
       }),
 
     setBetActive: (bet) =>

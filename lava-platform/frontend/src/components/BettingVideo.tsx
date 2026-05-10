@@ -8,7 +8,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useGame } from '../store/game'
 
-const VIDEO_SRC    = '/video/betting-loop.mp4'
+const VIDEO_SRC    = '/video/betting-loop2.mp4'
 const FADE_OUT_MS  = 600
 const SIREN_THRESH = 2
 
@@ -112,7 +112,7 @@ export function BettingVideo() {
         <video
           ref={videoRef}
           src={VIDEO_SRC}
-          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'center center', display: 'block' }}
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center center', display: 'block' }}
           autoPlay
           loop
           muted

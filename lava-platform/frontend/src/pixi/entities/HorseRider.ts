@@ -139,8 +139,8 @@ export class HorseRider {
   private updateSpriteMode(_dt: number): void {
     if (!this.heroSprite) return
 
-    // hero_fall.png faces right; all others face left and need flip
-    const scaleX = (this.state === 'fall' || this.state === 'tumble') ? HORSE_SCALE : -HORSE_SCALE
+    // hero_fall.png and airborne face right; idle/crouch/impact face left and need flip
+    const scaleX = (this.state === 'fall' || this.state === 'tumble' || this.state === 'airborne') ? HORSE_SCALE : -HORSE_SCALE
     this.heroSprite.scale.set(scaleX, HORSE_SCALE)
 
     // Container scale is NEVER touched in sprite mode (would fight hero scale.x).

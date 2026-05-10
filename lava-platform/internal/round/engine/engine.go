@@ -49,7 +49,7 @@ func DefaultConfig() Config {
 		CrashCooldown:   5 * time.Second,
 		GrowthRate:      0.06,
 		TickInterval:    100 * time.Millisecond,
-		DefaultRTP:      96,
+		DefaultRTP:      94,
 		MaxCrashPoint:   1000.0,
 	}
 }
@@ -57,28 +57,28 @@ func DefaultConfig() Config {
 // ─── In-memory bet tracking ───────────────────────────────────────────────────
 
 type activeBet struct {
-	bet         *domain.RoundBet
-	mu          sync.Mutex
-	cashedOut   bool
+	bet       *domain.RoundBet
+	mu        sync.Mutex
+	cashedOut bool
 }
 
 // ─── Engine ───────────────────────────────────────────────────────────────────
 
 type Engine struct {
-	cfg       Config
-	repo      repository.Repository
-	wallet    domain.WalletProvider
-	pub       *realtime.Publisher
-	hub       *realtime.Hub
-	locker    *lock.Locker
+	cfg    Config
+	repo   repository.Repository
+	wallet domain.WalletProvider
+	pub    *realtime.Publisher
+	hub    *realtime.Hub
+	locker *lock.Locker
 
 	// Protected by mu
-	mu          sync.RWMutex
-	round       *domain.Round
-	bets        map[string]*activeBet // betID → activeBet
+	mu    sync.RWMutex
+	round *domain.Round
+	bets  map[string]*activeBet // betID → activeBet
 
 	// Atomic: multiplier * 100 (e.g. 150 = 1.50x). Lock-free reads.
-	multiplier  int64
+	multiplier int64
 }
 
 func New(cfg Config, repo repository.Repository, wallet domain.WalletProvider,
@@ -422,6 +422,7 @@ func (e *Engine) Cashout(ctx context.Context, req *CashoutRequest) (*CashoutResp
 
 	realtime.LogPublishErr(e.pub.Publish(ctx, realtime.MsgTypeCashout, realtime.CashoutData{
 		RoundID:    r.ID,
+		BetID:      req.BetID,
 		PlayerID:   req.PlayerID,
 		Multiplier: mult,
 		Payout:     payout.StringFixed(2),

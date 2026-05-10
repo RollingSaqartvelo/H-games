@@ -104,6 +104,7 @@ type BetPlacedData struct {
 
 type CashoutData struct {
 	RoundID    string  `json:"round_id"`
+	BetID      string  `json:"bet_id"`
 	PlayerID   string  `json:"player_id"`
 	Multiplier float64 `json:"multiplier"`
 	Payout     string  `json:"payout"`

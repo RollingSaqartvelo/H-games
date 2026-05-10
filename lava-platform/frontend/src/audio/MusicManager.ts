@@ -1,4 +1,4 @@
-const MUSIC_SRC  = '/audio/la%20verdad.mp3'
+const MUSIC_SRC  = '/audio/Blues%20Saraceno%20%E2%80%93%20Dogs%20of%20War.mp3'
 const TARGET_VOL = 0.35
 const FADE_MS    = 800
 const TICK_MS    = 50
@@ -8,18 +8,14 @@ const FADE_STEPS = FADE_MS / TICK_MS
 const audio = new Audio(MUSIC_SRC)
 audio.loop   = true
 audio.volume = 0
+// 'music' class: App.tsx unlockAllMedia() plays but does NOT pause music elements
+audio.className = 'music'
+// Must be in DOM so App.tsx unlockAllMedia() finds it on first gesture
+audio.style.cssText = 'position:fixed;width:1px;height:1px;opacity:0;pointer-events:none;top:-9999px;left:-9999px;'
+if (typeof document !== 'undefined') document.body.appendChild(audio)
 
 let fadeTimer: ReturnType<typeof setInterval> | null = null
 let playing = false
-
-// ── Unlock iOS autoplay on first gesture ─────────────────────────────────────
-// Play silently on first touch so subsequent play() calls work without gesture
-
-function onFirstGesture() {
-  audio.play().catch(() => {})
-}
-document.addEventListener('touchstart', onFirstGesture, { once: true, passive: true })
-document.addEventListener('click',      onFirstGesture, { once: true })
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
