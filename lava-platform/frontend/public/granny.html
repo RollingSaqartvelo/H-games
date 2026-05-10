@@ -142,18 +142,20 @@
       flex-shrink:0;
       background:rgba(2,10,3,.97);
       border-top:1px solid var(--border);
-      padding:10px 10px;
-      padding-bottom:max(env(safe-area-inset-bottom,10px),10px);
-      display:flex;gap:8px;
+      padding:8px;
+      padding-bottom:max(env(safe-area-inset-bottom,8px),8px);
+      display:flex;gap:6px;
+      overflow:hidden;   /* prevent panel B from spilling off-screen */
     }
 
     .bet-panel{
-      flex:1;
+      flex:1 1 0;        /* flex-basis:0 ensures equal split regardless of content */
+      min-width:0;       /* allow shrinking below intrinsic width */
       background:#041008;
       border:1px solid var(--border);
       border-radius:12px;
-      padding:10px;
-      display:flex;flex-direction:column;gap:6px;
+      padding:8px;
+      display:flex;flex-direction:column;gap:5px;
     }
     .bet-panel.active-bet { border-color:var(--green) }
     .bet-panel.crashed-bet{ border-color:#7f1d1d }
@@ -222,6 +224,25 @@
       text-align:center;padding:16px;
       font-family:'Courier New',monospace;font-size:11px;color:var(--muted);
     }
+
+    /* ── Social cashout ticker ───────────────────────────────── */
+    .social-ticker{
+      position:absolute;top:8px;right:8px;z-index:6;
+      display:flex;flex-direction:column;gap:4px;
+      pointer-events:none;max-width:175px;
+    }
+    .social-tick{
+      background:rgba(2,16,4,0.88);
+      border:1px solid var(--green-dim);
+      border-radius:8px;padding:4px 8px;
+      font-family:'Courier New',monospace;font-size:10px;
+      color:var(--green-b);
+      white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+      animation:tickIn .3s ease;
+    }
+    .social-tick--out{ animation:tickOut .4s ease forwards }
+    @keyframes tickIn { from{opacity:0;transform:translateX(16px)} to{opacity:1;transform:translateX(0)} }
+    @keyframes tickOut{ to  {opacity:0;transform:translateX(16px)} }
 
     /* ── Betting video overlay (mirrors React BettingVideo.tsx) ── */
     .bvb-wrap{
@@ -325,6 +346,9 @@
       <div class="crashed-title">INJECTED!</div>
       <div class="crashed-point" id="crashedPoint">Doctor: 1.00×</div>
     </div>
+
+    <!-- z:6 — Social cashout ticker (top-right, like Outlaw SocialTicker) -->
+    <div class="social-ticker" id="socialTicker"></div>
   </div>
 
   <!-- Bet panels -->
@@ -791,6 +815,10 @@ function connectWS() {
       updateAutoCashoutPreviews()
     }
 
+    if (msg.type === 'cashout') {
+      addSocialTick(d.player_id, d.multiplier, d.payout)
+    }
+
     if (msg.type === 'crashed') {
       roundState = 'CRASHED'
       updateBadge()
@@ -961,6 +989,22 @@ async function doCashout(i) {
     fetchBalance()
   } catch { btn.disabled=false }
   updateBtnState(i)
+}
+
+// ── Social cashout ticker ─────────────────────────────────────────────────────
+function addSocialTick(playerId, multiplier, payout) {
+  const ticker = document.getElementById('socialTicker')
+  if (!ticker) return
+  const shortId = playerId ? '…' + String(playerId).slice(-5) : '???'
+  const el = document.createElement('div')
+  el.className = 'social-tick'
+  el.textContent = '💊 ' + shortId + ' +$' + parseFloat(payout).toFixed(2) + ' @ ' + parseFloat(multiplier).toFixed(2) + '×'
+  ticker.insertBefore(el, ticker.firstChild)
+  while (ticker.children.length > 4) ticker.removeChild(ticker.lastChild)
+  setTimeout(() => {
+    el.classList.add('social-tick--out')
+    setTimeout(() => el.remove(), 400)
+  }, 3000)
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
