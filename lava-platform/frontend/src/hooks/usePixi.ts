@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { GameEngine } from '../pixi/GameEngine'
+import { useGame } from '../store/game'
 
 export function usePixi(mountRef: React.RefObject<HTMLDivElement | null>): void {
   const engineRef   = useRef<GameEngine | null>(null)
@@ -43,6 +44,7 @@ export function usePixi(mountRef: React.RefObject<HTMLDivElement | null>): void 
       destroyedRef.current = true
       engineRef.current?.destroy()
       engineRef.current = null
+      useGame.getState().setPixiReady(false)
     }
   // mountRef is stable — only run once on mount
   // eslint-disable-next-line react-hooks/exhaustive-deps

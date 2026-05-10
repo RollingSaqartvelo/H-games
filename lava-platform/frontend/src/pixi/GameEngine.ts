@@ -15,6 +15,7 @@
 import { Application } from 'pixi.js'
 import { GameScene } from './GameScene'
 import { preloadGameAssets } from '../game/AssetLoader'
+import { useGame } from '../store/game'
 
 export class GameEngine {
   readonly app: Application
@@ -79,6 +80,9 @@ export class GameEngine {
 
     const scene = new GameScene(app)
     app.stage.addChild(scene.container)
+
+    // Signal React that the scene is fully ready to render
+    useGame.getState().setPixiReady(true)
 
     return new GameEngine(app, scene, mount)
   }

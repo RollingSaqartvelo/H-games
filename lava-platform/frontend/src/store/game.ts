@@ -30,6 +30,9 @@ export interface CashoutFeedEntry {
 }
 
 interface GameState {
+  // ── PixiJS readiness — true once GameEngine.create() resolves ───────────────
+  pixiReady: boolean
+
   // ── Connection ──────────────────────────────────────────────────────────────
   wsStatus: SocketStatus
 
@@ -81,6 +84,7 @@ interface GameState {
 }
 
 interface GameActions {
+  setPixiReady(v: boolean): void
   setWsStatus(s: SocketStatus): void
   applyState(d: StateData): void
   applyTick(d: TickData): void
@@ -99,6 +103,7 @@ interface GameActions {
 export const useGame = create<GameState & GameActions>()(
   subscribeWithSelector((set) => ({
     // ── Initial state ──────────────────────────────────────────────────────────
+    pixiReady: false,
     wsStatus: 'connecting',
     roundId: null,
     roundState: null,
@@ -124,6 +129,7 @@ export const useGame = create<GameState & GameActions>()(
 
     // ── Actions ────────────────────────────────────────────────────────────────
 
+    setPixiReady: (pixiReady) => set({ pixiReady }),
     setWsStatus: (wsStatus) => set({ wsStatus }),
 
     applyState: (d) =>

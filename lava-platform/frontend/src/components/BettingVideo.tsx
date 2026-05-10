@@ -17,6 +17,7 @@ type Phase = 'visible' | 'fading-out' | 'hidden'
 export function BettingVideo() {
   const roundState = useGame((s) => s.roundState)
   const startingAt = useGame((s) => s.startingAt)
+  const pixiReady  = useGame((s) => s.pixiReady)
 
   const videoRef = useRef<HTMLVideoElement>(null)
   const timerRef = useRef<number | undefined>(undefined)
@@ -32,6 +33,10 @@ export function BettingVideo() {
     window.clearTimeout(timerRef.current)
 
     if (roundState === 'RUNNING') {
+      // Keep video visible until PixiJS scene is fully loaded — prevents black
+      // flash on slow mobile connections where asset loading outlasts WS connect.
+      if (!pixiReady) return
+
       setPhase('fading-out')
       timerRef.current = window.setTimeout(() => {
         setPhase('hidden')
@@ -67,7 +72,7 @@ export function BettingVideo() {
     }
 
     return () => window.clearTimeout(timerRef.current)
-  }, [roundState])
+  }, [roundState, pixiReady])
 
   // ── Siren tick ────────────────────────────────────────────────────────────
 
