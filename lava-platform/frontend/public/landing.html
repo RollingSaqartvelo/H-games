@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#080501">
+  <title>H-GAMES</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+
+    :root{
+      --gold:       #d4a843;
+      --gold-b:     #f5e070;
+      --gold-dim:   #7a5820;
+      --bg:         #080501;
+      --surface:    #110a02;
+      --border:     #2a1a06;
+      --text:       #e8d4a0;
+      --muted:      #6a5030;
+      --glow:       rgba(212,168,67,.45);
+    }
+
+    html,body{
+      width:100%;min-height:100%;
+      background:var(--bg);
+      color:var(--text);
+      font-family:Georgia,'Times New Roman',serif;
+      overflow-x:hidden;
+    }
+
+    /* ── Dust particles ─────────────────────────────────── */
+    .dust{
+      position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:0;
+    }
+    .dust span{
+      position:absolute;
+      width:2px;height:2px;
+      border-radius:50%;
+      background:var(--gold-dim);
+      opacity:0;
+      animation:float linear infinite;
+    }
+    @keyframes float{
+      0%  {transform:translateY(100vh) translateX(0);  opacity:0}
+      10% {opacity:.4}
+      90% {opacity:.2}
+      100%{transform:translateY(-10vh) translateX(30px);opacity:0}
+    }
+
+    /* ── Layout ──────────────────────────────────────────── */
+    .page{
+      position:relative;z-index:1;
+      display:flex;flex-direction:column;align-items:center;
+      min-height:100vh;
+      padding:0 18px 40px;
+      padding-top:max(env(safe-area-inset-top,16px),16px);
+    }
+
+    /* ── Logo ────────────────────────────────────────────── */
+    .logo-wrap{
+      width:100%;max-width:320px;
+      margin:0 auto 6px;
+    }
+    .logo-img{
+      width:100%;height:auto;
+      border-radius:10px;
+      display:block;
+    }
+    .logo-fallback{
+      font-size:38px;font-weight:900;
+      letter-spacing:6px;
+      background:linear-gradient(90deg,#60c0ff,#a060ff,#ff80c0);
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+      text-align:center;padding:12px 0;
+    }
+    .provider-sub{
+      text-align:center;
+      font-size:10px;letter-spacing:7px;
+      text-transform:uppercase;
+      color:var(--gold-dim);
+      margin-bottom:20px;
+    }
+
+    /* ── Divider ─────────────────────────────────────────── */
+    .divider{
+      width:100%;max-width:320px;
+      height:1px;
+      background:linear-gradient(90deg,transparent,var(--border),transparent);
+      margin-bottom:20px;
+    }
+
+    /* ── Player card ─────────────────────────────────────── */
+    .card{
+      width:100%;max-width:320px;
+      background:linear-gradient(145deg,#160c02 0%,#0c0701 100%);
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:18px;
+      margin-bottom:20px;
+      position:relative;
+      overflow:hidden;
+    }
+    .card::before{
+      content:'';position:absolute;
+      top:0;left:10%;right:10%;height:1px;
+      background:linear-gradient(90deg,transparent,var(--gold),transparent);
+    }
+
+    .player-row{
+      display:flex;align-items:center;gap:14px;
+      margin-bottom:16px;
+    }
+    .avatar{
+      width:54px;height:54px;border-radius:50%;
+      border:2px solid var(--gold-dim);
+      background:var(--surface);
+      display:flex;align-items:center;justify-content:center;
+      font-size:22px;font-weight:bold;color:var(--gold);
+      overflow:hidden;flex-shrink:0;
+    }
+    .avatar img{width:100%;height:100%;object-fit:cover}
+    .player-meta{flex:1;min-width:0}
+    .player-name{
+      font-size:17px;font-weight:bold;
+      color:var(--gold-b);
+      white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+    }
+    .player-username{
+      font-size:12px;color:var(--muted);
+      font-family:monospace;margin-bottom:5px;
+    }
+    .badge{
+      display:inline-block;
+      padding:2px 9px;border-radius:20px;
+      font-size:9px;letter-spacing:2px;font-weight:bold;
+      font-family:monospace;
+      background:rgba(212,168,67,.12);
+      border:1px solid var(--gold-dim);
+      color:var(--gold);
+    }
+
+    .stats{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .stat{
+      background:rgba(0,0,0,.35);
+      border:1px solid var(--border);
+      border-radius:8px;padding:9px 12px;
+    }
+    .stat-lbl{
+      font-size:8px;letter-spacing:2px;text-transform:uppercase;
+      color:var(--muted);font-family:monospace;margin-bottom:3px;
+    }
+    .stat-val{
+      font-size:14px;color:var(--gold-b);
+      font-family:monospace;font-weight:bold;
+    }
+
+    /* ── Server offline ──────────────────────────────────── */
+    #offlineBanner{
+      display:none;
+      width:100%;max-width:320px;
+      padding:14px 18px;
+      background:rgba(80,15,5,.5);
+      border:1px solid rgba(160,50,30,.5);
+      border-radius:10px;
+      text-align:center;margin-bottom:20px;
+    }
+    .off-icon{font-size:28px;margin-bottom:4px}
+    .off-title{font-size:14px;color:#cc5533;font-weight:bold;margin-bottom:2px}
+    .off-sub{font-size:11px;color:var(--muted)}
+
+    /* ── JOIN button ─────────────────────────────────────── */
+    #joinBtn{
+      width:100%;max-width:320px;
+      padding:18px;
+      background:linear-gradient(135deg,#7a4800 0%,#b86e00 45%,#7a4800 100%);
+      border:2px solid var(--gold);
+      border-radius:14px;
+      color:#fff8e0;
+      font-size:17px;font-family:Georgia,serif;font-weight:bold;
+      letter-spacing:3px;text-transform:uppercase;
+      cursor:pointer;position:relative;overflow:hidden;
+      margin-bottom:16px;
+      box-shadow:0 0 28px var(--glow),inset 0 1px 0 rgba(255,220,100,.25);
+      animation:glow-pulse 2.8s ease-in-out infinite;
+      transition:transform .1s,opacity .2s;
+    }
+    #joinBtn:disabled{opacity:.35;animation:none;cursor:default}
+    #joinBtn:not(:disabled):active{transform:scale(.97)}
+
+    @keyframes glow-pulse{
+      0%,100%{box-shadow:0 0 20px var(--glow),inset 0 1px 0 rgba(255,220,100,.25)}
+      50%    {box-shadow:0 0 50px var(--glow),0 0 80px rgba(212,168,67,.18),inset 0 1px 0 rgba(255,220,100,.3)}
+    }
+    #joinBtn::before{
+      content:'';position:absolute;
+      top:-50%;left:-70%;width:45%;height:200%;
+      background:linear-gradient(90deg,transparent,rgba(255,255,255,.18),transparent);
+      transform:skewX(-20deg);
+      animation:shine 3.5s ease-in-out infinite 1.2s;
+    }
+    @keyframes shine{0%{left:-70%}100%{left:170%}}
+
+    /* ── Secondary ───────────────────────────────────────── */
+    .sec-row{
+      display:flex;gap:8px;
+      width:100%;max-width:320px;
+      margin-bottom:24px;
+    }
+    .sec-btn{
+      flex:1;padding:9px 4px;
+      background:transparent;
+      border:1px solid var(--border);
+      border-radius:8px;
+      color:var(--muted);
+      font-size:10px;letter-spacing:1px;text-transform:uppercase;
+      cursor:pointer;font-family:monospace;
+      transition:all .2s;
+    }
+    .sec-btn:active{background:rgba(42,26,8,.6);color:var(--gold);border-color:var(--gold-dim)}
+
+    /* ── Footer ──────────────────────────────────────────── */
+    .footer{
+      width:100%;max-width:320px;
+      border-top:1px solid var(--border);
+      padding-top:14px;
+    }
+    .f-row{
+      display:flex;justify-content:space-between;
+      align-items:center;margin-bottom:7px;
+    }
+    .f-lbl{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);font-family:monospace}
+    .f-val{font-size:11px;color:var(--gold-dim);font-family:monospace}
+    .pf-row{
+      display:flex;align-items:center;gap:6px;
+      font-size:9px;color:#3a6a3a;font-family:monospace;margin-top:6px;
+    }
+    .pf-dot{
+      width:6px;height:6px;border-radius:50%;background:#40a040;
+      animation:blink 2s ease-in-out infinite;flex-shrink:0;
+    }
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
+  </style>
+</head>
+<body>
+
+<!-- Floating dust -->
+<div class="dust" id="dust"></div>
+
+<div class="page">
+
+  <!-- Logo -->
+  <div class="logo-wrap">
+    <img class="logo-img" src="/assets/hgames-logo.jpg" alt="H-GAMES"
+         onerror="this.style.display='none';document.getElementById('logoFb').style.display='block'">
+    <div class="logo-fallback" id="logoFb" style="display:none">H-GAMES</div>
+  </div>
+  <div class="provider-sub">Provider</div>
+  <div class="divider"></div>
+
+  <!-- Player card -->
+  <div class="card">
+    <div class="player-row">
+      <div class="avatar" id="avatar">?</div>
+      <div class="player-meta">
+        <div class="player-name" id="playerName">Loading…</div>
+        <div class="player-username" id="playerUsername">@—</div>
+        <div class="badge" id="badge">⭐ OUTLAW</div>
+      </div>
+    </div>
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-lbl">Player ID</div>
+        <div class="stat-val" id="playerId">#——</div>
+      </div>
+      <div class="stat">
+        <div class="stat-lbl">Balance</div>
+        <div class="stat-val" id="balance">$——</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Offline banner -->
+  <div id="offlineBanner">
+    <div class="off-icon">🌵</div>
+    <div class="off-title">Server sleeping…</div>
+    <div class="off-sub">Saddle up later, partner.</div>
+  </div>
+
+  <!-- JOIN -->
+  <button id="joinBtn">🤠 &nbsp;JOIN THE HEIST</button>
+
+  <!-- Secondary -->
+  <div class="sec-row">
+    <button class="sec-btn" onclick="onFairPlay()">⚖ Fair Play</button>
+    <button class="sec-btn" onclick="onSettings()">⚙ Settings</button>
+    <button class="sec-btn" onclick="onSupport()">✉ Support</button>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <div class="f-row">
+      <span class="f-lbl">RTP</span>
+      <span class="f-val">94.0%</span>
+    </div>
+    <div class="f-row">
+      <span class="f-lbl">Session</span>
+      <span class="f-val" id="sessionHash">#——————</span>
+    </div>
+    <div class="pf-row">
+      <div class="pf-dot"></div>
+      Provably Fair · Cryptographic seed verification
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ── Telegram SDK ──────────────────────────────────────────────────────────────
+const tg = window.Telegram?.WebApp
+if (tg) {
+  tg.ready()
+  tg.expand()
+  tg.disableVerticalSwipes?.()
+  tg.setHeaderColor?.('#080501')
+  tg.setBackgroundColor?.('#080501')
+}
+
+// ── Dust particles ────────────────────────────────────────────────────────────
+;(function spawnDust() {
+  const wrap = document.getElementById('dust')
+  for (let i = 0; i < 22; i++) {
+    const s = document.createElement('span')
+    s.style.cssText = [
+      `left:${Math.random()*100}%`,
+      `animation-duration:${8+Math.random()*14}s`,
+      `animation-delay:${Math.random()*12}s`,
+      `width:${1+Math.random()*2}px`,
+      `height:${1+Math.random()*2}px`,
+      `opacity:0`,
+    ].join(';')
+    wrap.appendChild(s)
+  }
+})()
+
+// ── User profile ──────────────────────────────────────────────────────────────
+const user = tg?.initDataUnsafe?.user || {}
+
+if (user.first_name) {
+  document.getElementById('playerName').textContent =
+    user.first_name + (user.last_name ? ' ' + user.last_name : '')
+} else {
+  document.getElementById('playerName').textContent = 'Partner'
+}
+
+if (user.username) {
+  document.getElementById('playerUsername').textContent = '@' + user.username
+} else {
+  document.getElementById('playerUsername').textContent = '@ —'
+}
+
+// Avatar
+const avatarEl = document.getElementById('avatar')
+const initials = (user.first_name || 'O')[0].toUpperCase()
+if (user.photo_url) {
+  const img = document.createElement('img')
+  img.src = user.photo_url
+  img.onerror = () => { avatarEl.textContent = initials }
+  avatarEl.innerHTML = ''
+  avatarEl.appendChild(img)
+} else {
+  avatarEl.textContent = initials
+}
+
+// Status badge
+const BADGES = ['⭐ ROOKIE', '🤠 OUTLAW', '👑 LEGEND']
+if (user.id) {
+  document.getElementById('badge').textContent = BADGES[user.id % BADGES.length]
+}
+
+// Session hash
+const rawHash = tg?.initDataUnsafe?.hash || Math.random().toString(36).slice(2)
+document.getElementById('sessionHash').textContent = '#' + rawHash.slice(0, 8).toUpperCase()
+
+// ── Game URL (same server, root path) ────────────────────────────────────────
+const GAME_URL = window.location.origin + '/'
+
+// ── Server health check ───────────────────────────────────────────────────────
+async function checkServer() {
+  try {
+    const r = await fetch('/tma/health', {
+      signal: AbortSignal.timeout ? AbortSignal.timeout(4000) : undefined,
+    })
+    return r.ok
+  } catch { return false }
+}
+
+// ── Auth → get balance & player ID ───────────────────────────────────────────
+async function fetchProfile() {
+  try {
+    const initData = tg?.initData || ''
+    if (!initData) return
+    const r = await fetch('/tma/auth', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ init_data: initData }),
+    })
+    if (!r.ok) return
+    const d = await r.json()
+    if (d.balance != null) {
+      document.getElementById('balance').textContent =
+        '$' + parseFloat(d.balance).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})
+    }
+    if (d.player_id) {
+      document.getElementById('playerId').textContent = '#' + d.player_id
+    }
+  } catch {}
+}
+
+// ── JOIN handler ──────────────────────────────────────────────────────────────
+document.getElementById('joinBtn').addEventListener('click', () => {
+  tg?.HapticFeedback?.impactOccurred('heavy')
+  window.location.href = GAME_URL
+})
+
+// ── Secondary buttons ─────────────────────────────────────────────────────────
+function onFairPlay() {
+  const h = rawHash.slice(0, 16).toUpperCase()
+  tg?.showAlert?.(
+    '⚖ Provably Fair\n\n' +
+    'H-GAMES uses cryptographic server seeds to guarantee every outcome is tamper-proof.\n\n' +
+    'Session seed: ' + h + '…\n\n' +
+    'RTP: 94.0%'
+  )
+}
+function onSettings() {
+  tg?.showAlert?.('⚙ Settings\n\nComing soon.')
+}
+function onSupport() {
+  if (tg?.openTelegramLink) {
+    tg.openTelegramLink('https://t.me/hgames_support')
+  } else {
+    window.open('https://t.me/hgames_support', '_blank')
+  }
+}
+
+// ── Boot ──────────────────────────────────────────────────────────────────────
+;(async () => {
+  const [online] = await Promise.all([checkServer(), fetchProfile()])
+
+  if (!online) {
+    document.getElementById('offlineBanner').style.display = 'block'
+    const btn = document.getElementById('joinBtn')
+    btn.disabled = true
+    btn.textContent = '🌵  SERVER OFFLINE'
+  }
+})()
+</script>
+</body>
+</html>

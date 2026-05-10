@@ -121,7 +121,7 @@ func (b *botClient) sendStart(chatID int64, from *User) {
 				{
 					{
 						"text":    "🎮 Play Outlaw Escape",
-						"web_app": map[string]string{"url": b.appURL},
+						"web_app": map[string]string{"url": strings.TrimRight(b.appURL, "/") + "/landing.html"},
 					},
 				},
 			},
