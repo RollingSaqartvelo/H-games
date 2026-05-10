@@ -7,25 +7,27 @@
   <title>H-GAMES</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Rye&display=swap');
     *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 
     :root{
-      --gold:       #d4a843;
-      --gold-b:     #f5e070;
-      --gold-dim:   #7a5820;
-      --bg:         #080501;
-      --surface:    #110a02;
-      --border:     #2a1a06;
-      --text:       #e8d4a0;
-      --muted:      #6a5030;
-      --glow:       rgba(212,168,67,.45);
+      --gold:       #d97706;
+      --gold-b:     #fbbf24;
+      --gold-light: #f59e0b;
+      --gold-dim:   #78340f;
+      --bg:         #060402;
+      --surface:    #110c06;
+      --border:     #3a2210;
+      --text:       #f5e6d0;
+      --muted:      #9a7252;
+      --glow:       rgba(217,119,6,.35);
     }
 
     html,body{
       width:100%;min-height:100%;
       background:var(--bg);
       color:var(--text);
-      font-family:Georgia,'Times New Roman',serif;
+      font-family:'Rye',Georgia,serif;
       overflow-x:hidden;
     }
 
@@ -79,6 +81,7 @@
       font-size:10px;letter-spacing:7px;
       text-transform:uppercase;
       color:var(--gold-dim);
+      font-family:'Courier New',monospace;
       margin-bottom:20px;
     }
 
@@ -125,16 +128,17 @@
       font-size:17px;font-weight:bold;
       color:var(--gold-b);
       white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+      font-family:'Rye',Georgia,serif;
     }
     .player-username{
       font-size:12px;color:var(--muted);
-      font-family:monospace;margin-bottom:5px;
+      font-family:'Courier New',monospace;margin-bottom:5px;
     }
     .badge{
       display:inline-block;
       padding:2px 9px;border-radius:20px;
       font-size:9px;letter-spacing:2px;font-weight:bold;
-      font-family:monospace;
+      font-family:'Courier New',monospace;
       background:rgba(212,168,67,.12);
       border:1px solid var(--gold-dim);
       color:var(--gold);
@@ -148,11 +152,11 @@
     }
     .stat-lbl{
       font-size:8px;letter-spacing:2px;text-transform:uppercase;
-      color:var(--muted);font-family:monospace;margin-bottom:3px;
+      color:var(--muted);font-family:'Courier New',monospace;margin-bottom:3px;
     }
     .stat-val{
       font-size:14px;color:var(--gold-b);
-      font-family:monospace;font-weight:bold;
+      font-family:'Courier New',monospace;font-weight:bold;
     }
 
     /* ── Server offline ──────────────────────────────────── */
@@ -177,7 +181,7 @@
       border:2px solid var(--gold);
       border-radius:14px;
       color:#fff8e0;
-      font-size:17px;font-family:Georgia,serif;font-weight:bold;
+      font-size:17px;font-family:'Rye',Georgia,serif;font-weight:bold;
       letter-spacing:3px;text-transform:uppercase;
       cursor:pointer;position:relative;overflow:hidden;
       margin-bottom:16px;
@@ -214,7 +218,7 @@
       border-radius:8px;
       color:var(--muted);
       font-size:10px;letter-spacing:1px;text-transform:uppercase;
-      cursor:pointer;font-family:monospace;
+      cursor:pointer;font-family:'Courier New',monospace;
       transition:all .2s;
     }
     .sec-btn:active{background:rgba(42,26,8,.6);color:var(--gold);border-color:var(--gold-dim)}
@@ -229,11 +233,11 @@
       display:flex;justify-content:space-between;
       align-items:center;margin-bottom:7px;
     }
-    .f-lbl{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);font-family:monospace}
-    .f-val{font-size:11px;color:var(--gold-dim);font-family:monospace}
+    .f-lbl{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);font-family:'Courier New',monospace}
+    .f-val{font-size:11px;color:var(--gold-dim);font-family:'Courier New',monospace}
     .pf-row{
       display:flex;align-items:center;gap:6px;
-      font-size:9px;color:#3a6a3a;font-family:monospace;margin-top:6px;
+      font-size:9px;color:#3a6a3a;font-family:'Courier New',monospace;margin-top:6px;
     }
     .pf-dot{
       width:6px;height:6px;border-radius:50%;background:#40a040;
