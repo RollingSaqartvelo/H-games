@@ -93,13 +93,24 @@ func (h *BotHandler) processUpdate(update Update) {
 // ── Bot API calls ─────────────────────────────────────────────────────────────
 
 func (b *botClient) sendStart(chatID int64, from *User) {
-	name := "there"
+	name := "partner"
 	if from != nil && from.FirstName != "" {
 		name = from.FirstName
 	}
 
 	text := fmt.Sprintf(
-		"Hey %s! 🚀\n\nWelcome to *Lava Crash* — the provably fair crash game.\n\nTap the button below to play!",
+		"🤠 Welcome to H\\-GAMES Provider, %s\\!\n\n"+
+			"Saddle up and enter the world of Western Crime Game — where every second counts, every jump is a gamble, and every escape could make you rich\\.\n\n"+
+			"🏜 *OUTLAW ESCAPE:*\n"+
+			"Ride fast\\. Jump platform to platform\\. Outsmart the sheriff\\. Cash out before you get WASTED\\.\n\n"+
+			"💰 *Features:*\n"+
+			"• Provably Fair gameplay\n"+
+			"• Real\\-time multipliers\n"+
+			"• Instant Cashout\n"+
+			"• Dual bet mode\n"+
+			"• Premium western action\n\n"+
+			"🎯 *Your mission:*\n"+
+			"Escape with the loot\\. Survive the chase\\. Beat the crash\\.",
 		name,
 	)
 
@@ -109,7 +120,7 @@ func (b *botClient) sendStart(chatID int64, from *User) {
 			"inline_keyboard": [][]map[string]interface{}{
 				{
 					{
-						"text":    "🎮 Play Now",
+						"text":    "🎮 Play Outlaw Escape",
 						"web_app": map[string]string{"url": b.appURL},
 					},
 				},
@@ -122,11 +133,11 @@ func (b *botClient) sendStart(chatID int64, from *User) {
 
 func (b *botClient) sendHelp(chatID int64) {
 	b.sendMessage(chatID,
-		"*Lava Crash* — How to play:\n\n"+
-			"1. Place your bet before the round starts\n"+
-			"2. Watch the multiplier climb 🚀\n"+
-			"3. Cash out before it crashes!\n\n"+
-			"The higher you wait, the bigger the payout — but crash too late and you lose.\n\n"+
+		"🤠 *OUTLAW ESCAPE* — How to play:\n\n"+
+			"1\\. Place your bet before the heist starts\n"+
+			"2\\. Watch the multiplier climb as your outlaw rides 🏇\n"+
+			"3\\. Cash out before the sheriff catches you\\!\n\n"+
+			"The longer you ride, the bigger the payout — but wait too long and you get WASTED\\.\n\n"+
 			"/play — Launch the game",
 		nil,
 	)
@@ -136,7 +147,7 @@ func (b *botClient) sendMessage(chatID int64, text string, replyMarkup interface
 	body := map[string]interface{}{
 		"chat_id":    chatID,
 		"text":       text,
-		"parse_mode": "Markdown",
+		"parse_mode": "MarkdownV2",
 	}
 	if replyMarkup != nil {
 		body["reply_markup"] = replyMarkup
