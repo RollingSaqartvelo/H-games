@@ -466,7 +466,7 @@ const ctx    = canvas.getContext('2d')
 let animFrame = 0
 
 // Character state
-let grannyY = 0, grannyX = 0.32, doctorY = 0, grannyOsc = 0, flameT = 0
+let grannyY = 0, grannyX = 0.62, doctorY = 0, grannyOsc = 0, doctorOsc = 0, flameT = 0
 
 // Parallax state
 let bgOff = 0, lastTs = 0
@@ -477,12 +477,20 @@ let bgImgReady = false
 bgImg.onload = () => { bgImgReady = true }
 bgImg.src = '/assets/granny%20bg/grannybg.jpeg'
 
+// ── Character assets ──────────────────────────────────────────────────────────
+const grannyImg = new Image(), doctorImg = new Image()
+let grannyImgReady = false, doctorImgReady = false
+grannyImg.onload = () => { grannyImgReady = true }
+doctorImg.onload = () => { doctorImgReady = true }
+grannyImg.src = '/assets/granny/granny%20hero.png'
+doctorImg.src = '/assets/granny/medicin%20hero.png'
+
 function resizeCanvas() {
   const ga = canvas.parentElement
   canvas.width  = ga.clientWidth
   canvas.height = ga.clientHeight
-  grannyY = canvas.height * 0.40
-  doctorY = canvas.height * 0.80
+  grannyY = canvas.height * 0.42
+  doctorY = canvas.height * 0.62
 }
 resizeCanvas()
 window.addEventListener('resize', resizeCanvas)
@@ -717,50 +725,57 @@ function drawScene(ts) {
   else if (roundState==='STARTING') bgOff += 18 * dt
 
   flameT    = ts * 0.001
-  grannyOsc = Math.sin(ts * 0.003) * 3
+  grannyOsc = Math.sin(ts * 0.003) * 4
+  doctorOsc = Math.sin(ts * 0.003 + 1.3) * 3  // offset phase from granny
 
   // ── Background: grannybg.jpeg scrolling map ─────────────────────────────────
-  // Camera pans up as granny flies higher (grannyY smaller = higher in canvas)
   const camY = (1 - Math.min(grannyY, H) / H) * H * 0.10
   drawBackground(W, H, bgOff, camY)
 
   // ── Character Y animation ──────────────────────────────────────────────────
   if (running) {
     const progress = Math.min((multiplier - 1) / 9, 1)
-    grannyY += (H*0.68 - progress*H*0.50 - grannyY) * 0.05
-    doctorY += (H*0.83 - doctorY) * 0.03
+    // Granny flies up; doctor stays in mid-air pursuit lane below her
+    grannyY += (H*0.45 - progress*H*0.32 - grannyY) * 0.05  // 45% → 13%
+    doctorY += (H*0.62 - doctorY) * 0.04
   } else if (crashed) {
-    grannyY += (H*0.72 - grannyY) * 0.08
-    doctorY += (grannyY - 25 - doctorY) * 0.10
+    grannyY += (H*0.55 - grannyY) * 0.07
+    doctorY += (grannyY - 35 - doctorY) * 0.09  // doctor catches up behind granny
   } else {
-    grannyY += (H*0.40 + Math.sin(ts*0.0015)*8 - grannyY) * 0.05
-    doctorY += (H*0.80 - doctorY) * 0.05
+    // Idle hover during BETTING
+    grannyY += (H*0.42 + Math.sin(ts*0.0015)*6 - grannyY) * 0.05
+    doctorY += (H*0.62 + Math.sin(ts*0.0015+1.2)*4 - doctorY) * 0.05
   }
 
-  const gX = W * grannyX, dX = W * 0.66
+  const gX = W * grannyX   // 0.62 — granny ahead (right)
+  const dX = W * 0.28       // doctor behind (left)
 
-  // ── Jetpack flame ──────────────────────────────────────────────────────────
-  if (!crashed) {
-    const flameH = 18 + Math.sin(flameT*12)*8
-    const fg = ctx.createLinearGradient(gX, grannyY+24, gX, grannyY+24+flameH)
-    fg.addColorStop(0,'rgba(34,197,94,.9)'); fg.addColorStop(0.5,'rgba(134,239,172,.7)'); fg.addColorStop(1,'rgba(34,197,94,0)')
-    ctx.fillStyle=fg; ctx.beginPath(); ctx.ellipse(gX, grannyY+28+flameH/2, 6, flameH/2, 0, 0, Math.PI*2); ctx.fill()
+  // ── Doctor (drawn first — behind granny in z-order) ───────────────────────
+  ctx.save()
+  ctx.translate(dX, doctorY + doctorOsc)
+  if (crashed) ctx.translate(gX - dX, grannyY - doctorY - 10)
+  if (doctorImgReady) {
+    const dH = 88, dW = dH * (doctorImg.naturalWidth / doctorImg.naturalHeight)
+    ctx.drawImage(doctorImg, -dW / 2, -dH / 2, dW, dH)
+  } else {
+    ctx.font='38px serif'; ctx.textAlign='center'; ctx.textBaseline='middle'
+    ctx.fillText('👨‍⚕️', 0, 0)
+    ctx.save(); ctx.rotate(-Math.PI/4); ctx.font='22px serif'; ctx.fillText('💉', -16, -16); ctx.restore()
   }
-
-  // ── Granny ─────────────────────────────────────────────────────────────────
-  ctx.save(); ctx.translate(gX, grannyY+grannyOsc)
-  if (crashed) ctx.rotate(Math.PI/8)
-  ctx.font='42px serif'; ctx.textAlign='center'; ctx.textBaseline='middle'
-  ctx.fillText('👵', 0, 0)
-  ctx.font='24px serif'; ctx.fillText('🚀', 10, 20)
   ctx.restore()
 
-  // ── Doctor ─────────────────────────────────────────────────────────────────
-  ctx.save(); ctx.translate(dX, doctorY)
-  if (crashed) ctx.translate(gX-dX, grannyY-doctorY-10)
-  ctx.font='38px serif'; ctx.textAlign='center'; ctx.textBaseline='middle'
-  ctx.fillText('👨‍⚕️', 0, 0)
-  ctx.save(); ctx.rotate(-Math.PI/4); ctx.font='22px serif'; ctx.fillText('💉', -16, -16); ctx.restore()
+  // ── Granny (drawn after doctor — in front) ─────────────────────────────────
+  ctx.save()
+  ctx.translate(gX, grannyY + grannyOsc)
+  if (crashed) ctx.rotate(Math.PI / 10)
+  if (grannyImgReady) {
+    const gH = 105, gW = gH * (grannyImg.naturalWidth / grannyImg.naturalHeight)
+    ctx.drawImage(grannyImg, -gW / 2, -gH / 2, gW, gH)
+  } else {
+    ctx.font='42px serif'; ctx.textAlign='center'; ctx.textBaseline='middle'
+    ctx.fillText('👵', 0, 0)
+    ctx.font='24px serif'; ctx.fillText('🚀', 10, 20)
+  }
   ctx.restore()
 
   // ── INJECTED crash text ────────────────────────────────────────────────────
@@ -795,6 +810,7 @@ function connectWS() {
       if (d.state === 'STARTING') {
         multiplier = 1.00
         updateMult(1.00)
+        updateMultVis()
         document.getElementById('crashedBanner').classList.remove('show')
         startedAt = Date.now()
         showCountdown()
@@ -805,6 +821,7 @@ function connectWS() {
         startedAt = d.started_at ? d.started_at * 1000 : Date.now()
         document.getElementById('countdown').style.display = 'none'
         document.getElementById('crashedBanner').classList.remove('show')
+        updateMultVis()
         bvbOnStateChange('RUNNING')
       }
     }
@@ -821,6 +838,7 @@ function connectWS() {
 
     if (msg.type === 'crashed') {
       roundState = 'CRASHED'
+      updateMultVis()
       updateBadge()
       document.getElementById('countdown').style.display = 'none'
       document.getElementById('crashedPoint').textContent = 'Doctor: ' + d.crash_point.toFixed(2) + '×'
@@ -839,6 +857,12 @@ function updateBadge() {
   const el = document.getElementById('stateBadge')
   el.className = 'state-badge ' + (roundState==='RUNNING'?'running':roundState==='CRASHED'?'crashed':'betting')
   el.textContent = roundState === 'CRASHED' ? 'CAUGHT' : roundState === 'RUNNING' ? 'RUNNING' : 'BETTING'
+}
+
+function updateMultVis() {
+  const show = roundState === 'RUNNING' || roundState === 'CRASHED'
+  const el = document.querySelector('.mult-wrap')
+  if (el) el.style.visibility = show ? 'visible' : 'hidden'
 }
 
 function updateMult(v, crashed=false) {
@@ -1146,6 +1170,7 @@ auth()
 connectWS()
 // Show betting video immediately on load (CREATED state)
 bvbOnStateChange('CREATED')
+updateMultVis()
 </script>
 </body>
 </html>
