@@ -36,6 +36,7 @@ func (s RoundState) CanTransitionTo(next RoundState) bool {
 
 type Round struct {
 	ID             string
+	GameType       string     // "outlaw_escape" | "granny_jet"
 	State          RoundState
 	ServerSeed     string     // concealed during round; revealed at crash
 	ServerSeedHash string     // SHA256(serverSeed) — published before STARTING

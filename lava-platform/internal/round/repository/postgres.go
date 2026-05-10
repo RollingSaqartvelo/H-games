@@ -17,8 +17,8 @@ type Repository interface {
 	UpdateRoundState(ctx context.Context, id string, state domain.RoundState, startedAt, crashedAt *time.Time) error
 	RevealServerSeed(ctx context.Context, id, serverSeed string) error
 	GetRoundByID(ctx context.Context, id string) (*domain.Round, error)
-	GetLatestRound(ctx context.Context) (*domain.Round, error)
-	GetRoundHistory(ctx context.Context, limit, offset int) ([]*domain.Round, error)
+	GetLatestRound(ctx context.Context, gameType string) (*domain.Round, error)
+	GetRoundHistory(ctx context.Context, gameType string, limit, offset int) ([]*domain.Round, error)
 
 	CreateBet(ctx context.Context, bet *domain.RoundBet) (*domain.RoundBet, error)
 	GetBetByID(ctx context.Context, id string) (*domain.RoundBet, error)
@@ -40,12 +40,12 @@ func NewPostgres(pool *pgxpool.Pool) Repository {
 func (r *postgresRepo) CreateRound(ctx context.Context, round *domain.Round) (*domain.Round, error) {
 	const q = `
 		INSERT INTO rounds
-			(id, state, server_seed_hash, client_seed, nonce, rtp_profile, house_edge, crash_point)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+			(id, game_type, state, server_seed_hash, client_seed, nonce, rtp_profile, house_edge, crash_point)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
 		RETURNING created_at`
 
 	err := r.pool.QueryRow(ctx, q,
-		round.ID, round.State, round.ServerSeedHash,
+		round.ID, round.GameType, round.State, round.ServerSeedHash,
 		round.ClientSeed, round.Nonce, round.RTPProfile,
 		round.HouseEdge, round.CrashPoint,
 	).Scan(&round.CreatedAt)
@@ -71,7 +71,7 @@ func (r *postgresRepo) RevealServerSeed(ctx context.Context, id, serverSeed stri
 
 func (r *postgresRepo) GetRoundByID(ctx context.Context, id string) (*domain.Round, error) {
 	const q = `
-		SELECT id, state, COALESCE(server_seed,''), server_seed_hash, client_seed,
+		SELECT id, COALESCE(game_type,'outlaw_escape'), state, COALESCE(server_seed,''), server_seed_hash, client_seed,
 		       nonce, rtp_profile, house_edge::text, crash_point::text,
 		       started_at, crashed_at, created_at
 		FROM rounds WHERE id = $1`
@@ -83,29 +83,30 @@ func (r *postgresRepo) GetRoundByID(ctx context.Context, id string) (*domain.Rou
 	return round, err
 }
 
-func (r *postgresRepo) GetLatestRound(ctx context.Context) (*domain.Round, error) {
+func (r *postgresRepo) GetLatestRound(ctx context.Context, gameType string) (*domain.Round, error) {
 	const q = `
-		SELECT id, state, COALESCE(server_seed,''), server_seed_hash, client_seed,
+		SELECT id, COALESCE(game_type,'outlaw_escape'), state, COALESCE(server_seed,''), server_seed_hash, client_seed,
 		       nonce, rtp_profile, house_edge::text, crash_point::text,
 		       started_at, crashed_at, created_at
-		FROM rounds ORDER BY created_at DESC LIMIT 1`
+		FROM rounds WHERE game_type = $1
+		ORDER BY created_at DESC LIMIT 1`
 
-	round, err := scanRound(r.pool.QueryRow(ctx, q))
+	round, err := scanRound(r.pool.QueryRow(ctx, q, gameType))
 	if errors.Is(err, pgx.ErrNoRows) {
 		return nil, nil
 	}
 	return round, err
 }
 
-func (r *postgresRepo) GetRoundHistory(ctx context.Context, limit, offset int) ([]*domain.Round, error) {
+func (r *postgresRepo) GetRoundHistory(ctx context.Context, gameType string, limit, offset int) ([]*domain.Round, error) {
 	const q = `
-		SELECT id, state, COALESCE(server_seed,''), server_seed_hash, client_seed,
+		SELECT id, COALESCE(game_type,'outlaw_escape'), state, COALESCE(server_seed,''), server_seed_hash, client_seed,
 		       nonce, rtp_profile, house_edge::text, crash_point::text,
 		       started_at, crashed_at, created_at
-		FROM rounds WHERE state IN ('CRASHED','FINISHED')
-		ORDER BY created_at DESC LIMIT $1 OFFSET $2`
+		FROM rounds WHERE state IN ('CRASHED','FINISHED') AND game_type = $1
+		ORDER BY created_at DESC LIMIT $2 OFFSET $3`
 
-	rows, err := r.pool.Query(ctx, q, limit, offset)
+	rows, err := r.pool.Query(ctx, q, gameType, limit, offset)
 	if err != nil {
 		return nil, err
 	}
@@ -228,7 +229,7 @@ func scanRound(row rowScanner) (*domain.Round, error) {
 	var r domain.Round
 	var he, cp string
 	err := row.Scan(
-		&r.ID, &r.State, &r.ServerSeed, &r.ServerSeedHash, &r.ClientSeed,
+		&r.ID, &r.GameType, &r.State, &r.ServerSeed, &r.ServerSeedHash, &r.ClientSeed,
 		&r.Nonce, &r.RTPProfile, &he, &cp,
 		&r.StartedAt, &r.CrashedAt, &r.CreatedAt,
 	)

@@ -15,12 +15,13 @@ import (
 )
 
 type Handler struct {
-	eng  *engine.Engine
-	repo roundrepo.Repository
+	eng      *engine.Engine
+	repo     roundrepo.Repository
+	gameType string
 }
 
-func New(eng *engine.Engine, repo roundrepo.Repository) *Handler {
-	return &Handler{eng: eng, repo: repo}
+func New(eng *engine.Engine, repo roundrepo.Repository, gameType string) *Handler {
+	return &Handler{eng: eng, repo: repo, gameType: gameType}
 }
 
 func (h *Handler) RegisterRoutes(bet gin.IRouter, public gin.IRouter) {
@@ -133,7 +134,7 @@ func (h *Handler) RoundHistory(c *gin.Context) {
 		limit = 100
 	}
 
-	rounds, err := h.repo.GetRoundHistory(c.Request.Context(), limit, offset)
+	rounds, err := h.repo.GetRoundHistory(c.Request.Context(), h.gameType, limit, offset)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

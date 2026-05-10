@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#020a03">
+  <title>Granny Run — H-GAMES</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Rye&display=swap');
+    *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    :root{
+      --green:      #22c55e;
+      --green-b:    #4ade80;
+      --green-dim:  #14532d;
+      --green-glow: rgba(34,197,94,.4);
+      --red:        #ef4444;
+      --red-glow:   rgba(239,68,68,.4);
+      --bg:         #020a03;
+      --surface:    #041008;
+      --border:     #0d2e12;
+      --text:       #d4ffd8;
+      --muted:      #3a7a42;
+      --gold:       #d97706;
+    }
+    html,body{
+      width:100%;height:100%;overflow:hidden;
+      background:var(--bg);color:var(--text);
+      font-family:'Rye',Georgia,serif;
+    }
+
+    /* ── Layout ──────────────────────────────────────────────── */
+    .app{
+      display:flex;flex-direction:column;
+      height:100dvh;
+      padding-top:env(safe-area-inset-top,0px);
+      padding-bottom:env(safe-area-inset-bottom,0px);
+    }
+
+    /* ── TopBar ─────────────────────────────────────────────── */
+    .topbar{
+      flex-shrink:0;height:48px;
+      display:flex;align-items:center;justify-content:space-between;
+      padding:0 14px;
+      background:rgba(2,10,3,.95);
+      border-bottom:1px solid var(--border);
+      z-index:10;
+    }
+    .topbar-logo{font-size:13px;letter-spacing:2px;color:var(--green);text-transform:uppercase}
+    .topbar-balance{
+      font-family:'Courier New',monospace;font-size:13px;
+      color:var(--green-b);display:flex;align-items:center;gap:6px;
+    }
+    .topbar-balance .coin{font-size:16px}
+    .state-badge{
+      font-family:'Courier New',monospace;font-size:10px;letter-spacing:1px;
+      padding:3px 9px;border-radius:20px;text-transform:uppercase;
+    }
+    .state-badge.betting { background:rgba(34,197,94,.15);color:var(--green);border:1px solid var(--green-dim) }
+    .state-badge.running { background:rgba(239,68,68,.15);color:#f87171;border:1px solid #7f1d1d }
+    .state-badge.crashed { background:rgba(239,68,68,.2);color:#ef4444;border:1px solid #991b1b }
+
+    /* ── History pills ──────────────────────────────────────── */
+    .history{
+      flex-shrink:0;height:34px;
+      display:flex;align-items:center;gap:5px;padding:0 10px;
+      overflow-x:auto;scrollbar-width:none;
+      background:rgba(2,10,3,.9);border-bottom:1px solid var(--border);
+    }
+    .history::-webkit-scrollbar{display:none}
+    .pill{
+      flex-shrink:0;padding:2px 8px;border-radius:20px;
+      font-family:'Courier New',monospace;font-size:10px;font-weight:bold;
+    }
+    .pill.low  {background:#0d2e12;color:#4ade80}
+    .pill.med  {background:#142a00;color:#a3e635}
+    .pill.high {background:#1a2000;color:#fbbf24}
+    .pill.epic {background:#1a0a2a;color:#c084fc}
+
+    /* ── Game area ──────────────────────────────────────────── */
+    .game-area{
+      flex:1;position:relative;overflow:hidden;
+      background:linear-gradient(180deg,#020a03 0%,#041a06 40%,#061f08 100%);
+    }
+
+    /* Sky grid lines (hospital-ish) */
+    .game-area::before{
+      content:'';position:absolute;inset:0;
+      background-image:
+        linear-gradient(rgba(34,197,94,.04) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(34,197,94,.04) 1px,transparent 1px);
+      background-size:40px 40px;
+      pointer-events:none;
+    }
+
+    /* ── Scene canvas ───────────────────────────────────────── */
+    #scene{
+      position:absolute;inset:0;width:100%;height:100%;
+    }
+
+    /* ── Multiplier center display ──────────────────────────── */
+    .mult-wrap{
+      position:absolute;top:50%;left:50%;transform:translate(-50%,-60%);
+      text-align:center;pointer-events:none;z-index:5;
+    }
+    .mult-val{
+      font-size:72px;letter-spacing:-2px;
+      text-shadow:0 0 40px var(--green-glow);
+      transition:color .3s;
+      line-height:1;
+    }
+    .mult-val.normal { color:var(--green-b) }
+    .mult-val.hot    { color:#a3e635 }
+    .mult-val.epic   { color:#c084fc }
+    .mult-val.crashed{ color:var(--red);text-shadow:0 0 40px var(--red-glow) }
+    .mult-x{font-size:32px;color:var(--muted);vertical-align:super}
+
+    /* ── Countdown ──────────────────────────────────────────── */
+    .countdown{
+      position:absolute;bottom:16px;left:50%;transform:translateX(-50%);
+      text-align:center;pointer-events:none;z-index:5;
+    }
+    .countdown-label{
+      font-family:'Courier New',monospace;font-size:9px;letter-spacing:3px;
+      text-transform:uppercase;color:var(--muted);margin-bottom:4px;
+    }
+    .countdown-val{
+      font-size:38px;color:var(--green-b);
+      text-shadow:0 0 20px var(--green-glow);
+    }
+
+    /* ── Crashed banner ─────────────────────────────────────── */
+    .crashed-banner{
+      display:none;
+      position:absolute;inset:0;z-index:20;
+      background:rgba(0,0,0,.75);
+      align-items:center;justify-content:center;flex-direction:column;gap:8px;
+    }
+    .crashed-banner.show{display:flex}
+    .crashed-title{
+      font-size:52px;color:var(--red);letter-spacing:4px;
+      text-shadow:0 0 60px var(--red-glow);
+      animation:crashPulse .6s ease-in-out;
+    }
+    .crashed-point{
+      font-family:'Courier New',monospace;font-size:18px;color:#f87171;
+    }
+    @keyframes crashPulse{0%{transform:scale(1.4)}100%{transform:scale(1)}}
+
+    /* ── Bet panel ──────────────────────────────────────────── */
+    .bet-footer{
+      flex-shrink:0;
+      background:rgba(2,10,3,.97);
+      border-top:1px solid var(--border);
+      padding:10px 10px;
+      padding-bottom:max(env(safe-area-inset-bottom,10px),10px);
+      display:flex;gap:8px;
+    }
+
+    .bet-panel{
+      flex:1;
+      background:#041008;
+      border:1px solid var(--border);
+      border-radius:12px;
+      padding:10px;
+      display:flex;flex-direction:column;gap:6px;
+    }
+    .bet-panel.active-bet { border-color:var(--green) }
+    .bet-panel.crashed-bet{ border-color:#7f1d1d }
+
+    .bp-label{
+      font-family:'Courier New',monospace;font-size:8px;letter-spacing:2px;
+      text-transform:uppercase;color:var(--muted);
+    }
+    .bp-amount-row{display:flex;gap:4px;align-items:center}
+    .bp-amount{
+      flex:1;background:#020a03;border:1px solid var(--border);
+      border-radius:7px;padding:7px 8px;
+      font-family:'Courier New',monospace;font-size:14px;color:var(--text);
+      outline:none;
+    }
+    .bp-amount:focus{border-color:var(--green-dim)}
+    .bp-quick{display:flex;gap:3px}
+    .bp-q{
+      flex:1;padding:4px 0;font-size:9px;
+      background:#041008;border:1px solid var(--border);
+      border-radius:5px;color:var(--muted);cursor:pointer;
+      font-family:'Courier New',monospace;
+    }
+    .bp-q:active{background:#0d2e12;color:var(--green)}
+
+    .bp-cashout-row{display:flex;gap:4px;align-items:center}
+    .bp-cashout-label{
+      font-family:'Courier New',monospace;font-size:8px;
+      color:var(--muted);white-space:nowrap;
+    }
+    .bp-cashout{
+      flex:1;background:#020a03;border:1px solid var(--border);
+      border-radius:7px;padding:5px 8px;
+      font-family:'Courier New',monospace;font-size:12px;color:var(--text);
+      outline:none;
+    }
+
+    .bp-btn{
+      width:100%;padding:10px;border-radius:8px;
+      font-family:'Rye',Georgia,serif;font-size:13px;letter-spacing:1px;
+      cursor:pointer;transition:all .15s;
+    }
+    .bp-btn-bet{
+      background:linear-gradient(135deg,#0a3a12,#16701f,#0a3a12);
+      border:1px solid var(--green);color:#d4ffd8;
+      box-shadow:0 0 14px var(--green-glow);
+    }
+    .bp-btn-bet:disabled{opacity:.35;cursor:default;box-shadow:none}
+    .bp-btn-cashout{
+      background:linear-gradient(135deg,#3a0a0a,#901010,#3a0a0a);
+      border:1px solid var(--red);color:#ffd4d4;
+      box-shadow:0 0 14px var(--red-glow);
+      animation:cashoutPulse 1s ease-in-out infinite;
+    }
+    @keyframes cashoutPulse{
+      0%,100%{box-shadow:0 0 10px var(--red-glow)}
+      50%    {box-shadow:0 0 25px var(--red-glow),0 0 40px rgba(239,68,68,.2)}
+    }
+    .bp-payout{
+      font-family:'Courier New',monospace;font-size:10px;
+      color:var(--green);text-align:center;
+    }
+
+    /* ── No session ─────────────────────────────────────────── */
+    .no-session{
+      text-align:center;padding:16px;
+      font-family:'Courier New',monospace;font-size:11px;color:var(--muted);
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <!-- TopBar -->
+  <div class="topbar">
+    <div class="topbar-balance">
+      <span class="coin">💊</span>
+      <span id="balance">—</span>
+    </div>
+    <div class="topbar-logo">GRANNY RUN</div>
+    <div class="state-badge betting" id="stateBadge">BETTING</div>
+  </div>
+
+  <!-- History -->
+  <div class="history" id="history"></div>
+
+  <!-- Game area -->
+  <div class="game-area">
+    <canvas id="scene"></canvas>
+
+    <!-- Multiplier -->
+    <div class="mult-wrap">
+      <div class="mult-val normal" id="multVal">1.00<span class="mult-x">×</span></div>
+    </div>
+
+    <!-- Countdown -->
+    <div class="countdown" id="countdown" style="display:none">
+      <div class="countdown-label">Heist starts in</div>
+      <div class="countdown-val" id="countdownVal">10</div>
+    </div>
+
+    <!-- Crashed banner -->
+    <div class="crashed-banner" id="crashedBanner">
+      <div class="crashed-title">CAUGHT!</div>
+      <div class="crashed-point" id="crashedPoint">Doctor: 1.00×</div>
+    </div>
+  </div>
+
+  <!-- Bet panels -->
+  <div class="bet-footer" id="betFooter">
+    <div class="no-session" id="noSession" style="display:none;width:100%">
+      Open via Telegram bot to play
+    </div>
+    <div class="bet-panel" id="panel0" style="display:none">
+      <div class="bp-label">Bet A</div>
+      <div class="bp-amount-row">
+        <input class="bp-amount" id="amount0" type="number" min="0.1" step="0.1" value="1.00" placeholder="0.00">
+      </div>
+      <div class="bp-quick">
+        <button class="bp-q" onclick="addAmount(0,1)">+1</button>
+        <button class="bp-q" onclick="addAmount(0,5)">+5</button>
+        <button class="bp-q" onclick="addAmount(0,10)">+10</button>
+        <button class="bp-q" onclick="halvAmount(0)">½</button>
+      </div>
+      <div class="bp-cashout-row">
+        <span class="bp-cashout-label">Auto ×</span>
+        <input class="bp-cashout" id="cashout0" type="number" min="1.1" step="0.1" placeholder="off">
+      </div>
+      <div id="payout0" class="bp-payout" style="display:none"></div>
+      <button class="bp-btn bp-btn-bet" id="btn0" onclick="handleBtn(0)">BET</button>
+    </div>
+    <div class="bet-panel" id="panel1" style="display:none">
+      <div class="bp-label">Bet B</div>
+      <div class="bp-amount-row">
+        <input class="bp-amount" id="amount1" type="number" min="0.1" step="0.1" value="1.00" placeholder="0.00">
+      </div>
+      <div class="bp-quick">
+        <button class="bp-q" onclick="addAmount(1,1)">+1</button>
+        <button class="bp-q" onclick="addAmount(1,5)">+5</button>
+        <button class="bp-q" onclick="addAmount(1,10)">+10</button>
+        <button class="bp-q" onclick="halvAmount(1)">½</button>
+      </div>
+      <div class="bp-cashout-row">
+        <span class="bp-cashout-label">Auto ×</span>
+        <input class="bp-cashout" id="cashout1" type="number" min="1.1" step="0.1" placeholder="off">
+      </div>
+      <div id="payout1" class="bp-payout" style="display:none"></div>
+      <button class="bp-btn bp-btn-bet" id="btn1" onclick="handleBtn(1)">BET</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ── Telegram SDK ──────────────────────────────────────────────────────────────
+const tg = window.Telegram?.WebApp
+if (tg) { tg.ready(); tg.expand(); tg.disableVerticalSwipes?.() }
+
+// ── Session / Auth ────────────────────────────────────────────────────────────
+let TOKEN = sessionStorage.getItem('crash_token') || ''
+let PLAYER_ID = ''
+let CURRENCY  = 'USD'
+
+async function auth() {
+  const initData = tg?.initData || ''
+  if (!initData && !TOKEN) {
+    document.getElementById('noSession').style.display = 'block'
+    return
+  }
+  if (TOKEN) { showPanels(); await fetchBalance(); return }
+  try {
+    const r = await fetch('/tma/auth', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ init_data: initData }),
+    })
+    if (!r.ok) { document.getElementById('noSession').style.display='block'; return }
+    const d = await r.json()
+    if (!d.token) { document.getElementById('noSession').style.display='block'; return }
+    TOKEN = d.token
+    PLAYER_ID = d.player_id || ''
+    CURRENCY  = d.currency  || 'USD'
+    sessionStorage.setItem('crash_token', TOKEN)
+    if (d.balance != null) document.getElementById('balance').textContent = '$'+parseFloat(d.balance).toFixed(2)
+    showPanels()
+  } catch { document.getElementById('noSession').style.display='block' }
+}
+
+function showPanels() {
+  document.getElementById('panel0').style.display = 'flex'
+  document.getElementById('panel1').style.display = 'flex'
+  document.getElementById('noSession').style.display = 'none'
+}
+
+async function fetchBalance() {
+  try {
+    const r = await fetch('/tma/auth', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ init_data: tg?.initData || '' }),
+    })
+    const d = await r.json()
+    if (d.balance != null) document.getElementById('balance').textContent = '$'+parseFloat(d.balance).toFixed(2)
+    if (d.player_id) PLAYER_ID = d.player_id
+    if (d.currency)  CURRENCY  = d.currency
+  } catch {}
+}
+
+// ── State ─────────────────────────────────────────────────────────────────────
+let roundState = 'CREATED'
+let roundId    = ''
+let multiplier = 1.00
+let bets = [
+  { id:'', active:false, cashedOut:false, currency:'USD', amount:1 },
+  { id:'', active:false, cashedOut:false, currency:'USD', amount:1 },
+]
+let historyItems = []
+let startedAt = 0
+
+// ── Canvas scene ──────────────────────────────────────────────────────────────
+const canvas = document.getElementById('scene')
+const ctx    = canvas.getContext('2d')
+let animFrame = 0
+let grannyY   = 0  // 0=bottom, 1=top
+let grannyX   = 0.35
+let doctorY   = 0
+let grannyOsc = 0  // oscillation for wobble
+let flameT    = 0
+
+function resizeCanvas() {
+  const ga = canvas.parentElement
+  canvas.width  = ga.clientWidth
+  canvas.height = ga.clientHeight
+  grannyY = canvas.height * 0.55
+  doctorY = canvas.height * 0.85
+}
+resizeCanvas()
+window.addEventListener('resize', resizeCanvas)
+
+function drawScene(ts) {
+  const W = canvas.width, H = canvas.height
+  ctx.clearRect(0,0,W,H)
+
+  const running = roundState === 'RUNNING'
+  const crashed = roundState === 'CRASHED'
+  const t = ts * 0.001
+
+  flameT = t
+  grannyOsc = Math.sin(t * 3) * 3
+
+  // -- Target Y based on multiplier (higher mult = granny flies higher)
+  if (running) {
+    const progress = Math.min((multiplier - 1) / 9, 1) // 1x→10x maps to 0→1
+    const targetY = H * 0.75 - progress * H * 0.55
+    grannyY += (targetY - grannyY) * 0.05
+    // Doctor chases slowly
+    const doctorTargetY = H * 0.88
+    doctorY += (doctorTargetY - doctorY) * 0.03
+  } else if (crashed) {
+    // Doctor catches granny — snap together
+    grannyY += (H * 0.55 - grannyY) * 0.08
+    doctorY += (grannyY + 30 - doctorY) * 0.1
+  } else {
+    // Idle — gentle float
+    const idleY = H * 0.55 + Math.sin(t*1.5)*8
+    grannyY += (idleY - grannyY) * 0.05
+    doctorY += (H * 0.85 - doctorY) * 0.05
+  }
+
+  const gX = W * grannyX
+  const dX = W * 0.65
+
+  // Jetpack flame
+  if (!crashed) {
+    const flameH = 18 + Math.sin(flameT * 12) * 8
+    const grad = ctx.createLinearGradient(gX, grannyY+24, gX, grannyY+24+flameH)
+    grad.addColorStop(0,'rgba(34,197,94,.9)')
+    grad.addColorStop(0.5,'rgba(134,239,172,.7)')
+    grad.addColorStop(1,'rgba(34,197,94,0)')
+    ctx.fillStyle = grad
+    ctx.beginPath()
+    ctx.ellipse(gX, grannyY+28+flameH/2, 6, flameH/2, 0, 0, Math.PI*2)
+    ctx.fill()
+  }
+
+  // Granny (emoji-based)
+  ctx.save()
+  ctx.translate(gX, grannyY + grannyOsc)
+  if (crashed) { ctx.rotate(Math.PI/8) }
+  ctx.font = '42px serif'
+  ctx.textAlign = 'center'
+  ctx.textBaseline = 'middle'
+  ctx.fillText('👵', 0, 0)
+  // Jetpack
+  ctx.font = '24px serif'
+  ctx.fillText('🚀', 10, 20)
+  ctx.restore()
+
+  // Doctor (chasing)
+  ctx.save()
+  ctx.translate(dX, doctorY)
+  if (crashed) {
+    ctx.translate(gX - dX, grannyY - doctorY - 10)
+  }
+  ctx.font = '38px serif'
+  ctx.textAlign = 'center'
+  ctx.textBaseline = 'middle'
+  ctx.fillText('👨‍⚕️', 0, 0)
+  // Syringe — points toward granny
+  ctx.save()
+  ctx.rotate(-Math.PI/4)
+  ctx.font = '22px serif'
+  ctx.fillText('💉', -16, -16)
+  ctx.restore()
+  ctx.restore()
+
+  // Caught label
+  if (crashed) {
+    ctx.save()
+    ctx.font = 'bold 16px Courier New'
+    ctx.fillStyle = '#ef4444'
+    ctx.textAlign = 'center'
+    ctx.fillText('INJECTED! 💉', W/2, H*0.3)
+    ctx.restore()
+  }
+
+  animFrame = requestAnimationFrame(drawScene)
+}
+animFrame = requestAnimationFrame(drawScene)
+
+// ── WebSocket ─────────────────────────────────────────────────────────────────
+let ws, wsRetry = 0
+
+function connectWS() {
+  const proto = location.protocol === 'https:' ? 'wss' : 'ws'
+  ws = new WebSocket(`${proto}://${location.host}/ws/granny`)
+
+  ws.onopen  = () => { wsRetry = 0 }
+  ws.onclose = () => { setTimeout(connectWS, Math.min(1000 * 2**wsRetry++, 15000)) }
+  ws.onerror = () => ws.close()
+
+  ws.onmessage = e => {
+    let msg; try { msg = JSON.parse(e.data) } catch { return }
+    const d = msg.data
+
+    if (msg.type === 'state') {
+      roundState = d.state
+      roundId    = d.id
+      updateBadge()
+      if (d.state === 'STARTING') {
+        multiplier = 1.00
+        updateMult(1.00)
+        document.getElementById('crashedBanner').classList.remove('show')
+        startedAt = Date.now()
+        showCountdown()
+        resetBetsOnNewRound()
+      }
+      if (d.state === 'RUNNING') {
+        startedAt = d.started_at ? d.started_at * 1000 : Date.now()
+        document.getElementById('countdown').style.display = 'none'
+        document.getElementById('crashedBanner').classList.remove('show')
+      }
+    }
+
+    if (msg.type === 'tick') {
+      multiplier = d.multiplier
+      updateMult(d.multiplier)
+      updateAutoCashoutPreviews()
+    }
+
+    if (msg.type === 'crashed') {
+      roundState = 'CRASHED'
+      updateBadge()
+      document.getElementById('countdown').style.display = 'none'
+      document.getElementById('crashedPoint').textContent = 'Doctor: ' + d.crash_point.toFixed(2) + '×'
+      document.getElementById('crashedBanner').classList.add('show')
+      updateMult(d.crash_point, true)
+      addHistory(d.crash_point)
+      markLostBets()
+      setTimeout(fetchBalance, 1500)
+    }
+  }
+}
+
+// ── UI helpers ────────────────────────────────────────────────────────────────
+function updateBadge() {
+  const el = document.getElementById('stateBadge')
+  el.className = 'state-badge ' + (roundState==='RUNNING'?'running':roundState==='CRASHED'?'crashed':'betting')
+  el.textContent = roundState === 'CRASHED' ? 'CAUGHT' : roundState === 'RUNNING' ? 'RUNNING' : 'BETTING'
+}
+
+function updateMult(v, crashed=false) {
+  const el = document.getElementById('multVal')
+  el.innerHTML = v.toFixed(2) + '<span class="mult-x">×</span>'
+  if (crashed) { el.className='mult-val crashed'; return }
+  if (v >= 5)       el.className='mult-val epic'
+  else if (v >= 2)  el.className='mult-val hot'
+  else              el.className='mult-val normal'
+  // Live payout preview for active bets
+  bets.forEach((b,i) => {
+    if (b.active && !b.cashedOut) {
+      const payEl = document.getElementById('payout'+i)
+      payEl.textContent = 'Est. $' + (b.amount * v).toFixed(2)
+      payEl.style.display = 'block'
+    }
+  })
+}
+
+function showCountdown() {
+  const el = document.getElementById('countdown')
+  el.style.display = 'block'
+  const tick = () => {
+    if (roundState !== 'STARTING') { el.style.display='none'; return }
+    const rem = Math.max(0, 10 - (Date.now()-startedAt)/1000)
+    document.getElementById('countdownVal').textContent = rem.toFixed(1)
+    setTimeout(tick, 100)
+  }
+  tick()
+}
+
+function addHistory(cp) {
+  historyItems.unshift(cp)
+  if (historyItems.length > 20) historyItems.pop()
+  const el = document.getElementById('history')
+  el.innerHTML = historyItems.map(v => {
+    const cls = v >= 10 ? 'epic' : v >= 3 ? 'high' : v >= 2 ? 'med' : 'low'
+    return `<span class="pill ${cls}">${v.toFixed(2)}×</span>`
+  }).join('')
+}
+
+// ── Bet logic ─────────────────────────────────────────────────────────────────
+function resetBetsOnNewRound() {
+  bets.forEach((b,i) => {
+    if (b.cashedOut || !b.active) {
+      b.id = ''; b.active = false; b.cashedOut = false
+      document.getElementById('panel'+i).classList.remove('active-bet','crashed-bet')
+      document.getElementById('payout'+i).style.display = 'none'
+      updateBtnState(i)
+    }
+  })
+}
+
+function markLostBets() {
+  bets.forEach((b,i) => {
+    if (b.active && !b.cashedOut) {
+      b.active = false
+      document.getElementById('panel'+i).classList.add('crashed-bet')
+      document.getElementById('payout'+i).style.display = 'none'
+      updateBtnState(i)
+    }
+  })
+}
+
+function updateBtnState(i) {
+  const btn    = document.getElementById('btn'+i)
+  const b      = bets[i]
+  const isBetting = roundState === 'STARTING'
+  const isRunning = roundState === 'RUNNING'
+
+  if (b.active && !b.cashedOut && isRunning) {
+    btn.textContent = 'CASH OUT'
+    btn.className = 'bp-btn bp-btn-cashout'
+    btn.disabled = false
+  } else if (!b.active && !b.cashedOut && isBetting) {
+    btn.textContent = 'BET'
+    btn.className = 'bp-btn bp-btn-bet'
+    btn.disabled = false
+  } else {
+    btn.textContent = b.cashedOut ? '✓ CASHED' : 'BET'
+    btn.className = 'bp-btn bp-btn-bet'
+    btn.disabled = true
+  }
+}
+
+function updateAutoCashoutPreviews() {
+  bets.forEach((_,i) => updateBtnState(i))
+}
+
+async function handleBtn(i) {
+  const b = bets[i]
+  if (b.active && !b.cashedOut && roundState === 'RUNNING') {
+    await doCashout(i)
+  } else if (!b.active && roundState === 'STARTING') {
+    await doBet(i)
+  }
+}
+
+async function doBet(i) {
+  if (!TOKEN) return
+  const amount = parseFloat(document.getElementById('amount'+i).value)
+  const autoCashout = parseFloat(document.getElementById('cashout'+i).value) || 0
+  if (!amount || amount <= 0) return
+
+  const btn = document.getElementById('btn'+i)
+  btn.disabled = true
+
+  try {
+    const r = await fetch('/tma/v1/granny/bet', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+TOKEN},
+      body: JSON.stringify({ amount: amount.toFixed(2), currency: CURRENCY, auto_cashout: autoCashout || undefined }),
+    })
+    const d = await r.json()
+    if (!r.ok) { alert(d.error || 'Bet failed'); btn.disabled=false; return }
+    bets[i].id = d.bet_id
+    bets[i].active = true
+    bets[i].cashedOut = false
+    bets[i].amount = amount
+    document.getElementById('panel'+i).classList.add('active-bet')
+    tg?.HapticFeedback?.impactOccurred('medium')
+    fetchBalance()
+  } catch (e) { alert('Network error'); btn.disabled=false }
+  updateBtnState(i)
+}
+
+async function doCashout(i) {
+  if (!TOKEN || !bets[i].id) return
+  const btn = document.getElementById('btn'+i)
+  btn.disabled = true
+
+  try {
+    const r = await fetch('/tma/v1/granny/cashout', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+TOKEN},
+      body: JSON.stringify({ bet_id: bets[i].id }),
+    })
+    const d = await r.json()
+    if (!r.ok) { btn.disabled=false; updateBtnState(i); return }
+    bets[i].cashedOut = true
+    bets[i].active = false
+    document.getElementById('panel'+i).classList.remove('active-bet')
+    document.getElementById('panel'+i).classList.add('active-bet')
+    const payEl = document.getElementById('payout'+i)
+    payEl.textContent = '💊 $' + parseFloat(d.payout).toFixed(2) + ' @ ' + d.multiplier.toFixed(2) + '×'
+    payEl.style.display = 'block'
+    tg?.HapticFeedback?.notificationOccurred('success')
+    fetchBalance()
+  } catch { btn.disabled=false }
+  updateBtnState(i)
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+function addAmount(i, v)  { const el=document.getElementById('amount'+i); el.value=(parseFloat(el.value||0)+v).toFixed(2) }
+function halvAmount(i)    { const el=document.getElementById('amount'+i); el.value=Math.max(0.1,parseFloat(el.value||0)/2).toFixed(2) }
+
+// Update bet buttons on state change
+function onStateChange() {
+  updateBadge()
+  bets.forEach((_,i) => updateBtnState(i))
+}
+
+// Intercept state changes
+const origHandler = ws?.onmessage
+setInterval(() => { bets.forEach((_,i) => updateBtnState(i)) }, 500)
+
+// ── Boot ──────────────────────────────────────────────────────────────────────
+auth()
+connectWS()
+</script>
+</body>
+</html>

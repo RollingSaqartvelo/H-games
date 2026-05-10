@@ -40,22 +40,22 @@ func main() {
 
 	runMigrations(cfg.Database.DSN)
 
-	// Wire shared engine-layer dependencies (Engine, Hub, Publisher).
+	// Wire shared engine-layer dependencies (one set per game).
 	deps := router.Wire(cfg, infra)
 
 	// Background context that lives for the full server lifetime.
 	bgCtx, bgCancel := context.WithCancel(context.Background())
 	defer bgCancel()
 
-	// Start WebSocket hub.
-	go deps.Hub.Run(bgCtx)
+	// Outlaw Escape — hub, pub/sub, scheduler.
+	go deps.Outlaw.Hub.Run(bgCtx)
+	go deps.Outlaw.Pub.Subscribe(bgCtx, deps.Outlaw.Hub)
+	go scheduler.New(deps.Outlaw.Engine, deps.Outlaw.Engine.Cfg()).Run(bgCtx)
 
-	// Subscribe Redis pub/sub → Hub broadcast.
-	go deps.Pub.Subscribe(bgCtx, deps.Hub)
-
-	// Start round scheduler (perpetual crash game loop).
-	sched := scheduler.New(deps.Engine, deps.Engine.Cfg())
-	go sched.Run(bgCtx)
+	// Granny Run — hub, pub/sub, scheduler.
+	go deps.Granny.Hub.Run(bgCtx)
+	go deps.Granny.Pub.Subscribe(bgCtx, deps.Granny.Hub)
+	go scheduler.New(deps.Granny.Engine, deps.Granny.Engine.Cfg()).Run(bgCtx)
 
 	r := router.New(cfg, infra, deps)
 

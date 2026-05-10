@@ -35,6 +35,7 @@ import (
 // ─── Config ───────────────────────────────────────────────────────────────────
 
 type Config struct {
+	GameType        string        // "outlaw_escape" | "granny_jet"
 	BettingDuration time.Duration // how long the STARTING phase lasts
 	CrashCooldown   time.Duration // pause between rounds
 	GrowthRate      float64       // multiplier = exp(growthRate * t)
@@ -119,6 +120,7 @@ func (e *Engine) CreateRound(ctx context.Context) (*domain.Round, error) {
 
 	round := &domain.Round{
 		ID:             uuid.NewString(),
+		GameType:       e.cfg.GameType,
 		State:          domain.RoundStateCreated,
 		ServerSeed:     serverSeed,
 		ServerSeedHash: fair.ServerSeedHash(serverSeed),

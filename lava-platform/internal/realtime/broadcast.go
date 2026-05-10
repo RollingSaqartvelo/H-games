@@ -12,7 +12,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-const broadcastChannel = "round:broadcast"
+const channelPrefix = "round:broadcast"
 
 // MsgType identifies WebSocket message categories.
 type MsgType string
@@ -34,26 +34,28 @@ type Msg struct {
 
 // Publisher publishes messages to Redis and provides a subscriber for the Hub.
 type Publisher struct {
-	client *redis.Client
+	client  *redis.Client
+	channel string
 }
 
-func NewPublisher(client *redis.Client) *Publisher {
-	return &Publisher{client: client}
+// NewPublisher creates a publisher scoped to a single game type's Redis channel.
+func NewPublisher(client *redis.Client, gameType string) *Publisher {
+	return &Publisher{client: client, channel: channelPrefix + ":" + gameType}
 }
 
-// Publish serializes msg and pushes it to the Redis broadcast channel.
+// Publish serializes msg and pushes it to the game's Redis broadcast channel.
 func (p *Publisher) Publish(ctx context.Context, msgType MsgType, data any) error {
 	b, err := json.Marshal(Msg{Type: msgType, Data: data})
 	if err != nil {
 		return fmt.Errorf("marshal msg: %w", err)
 	}
-	return p.client.Publish(ctx, broadcastChannel, b).Err()
+	return p.client.Publish(ctx, p.channel, b).Err()
 }
 
 // Subscribe reads from Redis pub/sub and forwards raw bytes to the Hub.
 // Runs until ctx is cancelled.
 func (p *Publisher) Subscribe(ctx context.Context, hub *Hub) {
-	sub := p.client.Subscribe(ctx, broadcastChannel)
+	sub := p.client.Subscribe(ctx, p.channel)
 	defer sub.Close()
 
 	ch := sub.Channel()

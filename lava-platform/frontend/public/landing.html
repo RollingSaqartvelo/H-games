@@ -173,37 +173,69 @@
     .off-title{font-size:14px;color:#cc5533;font-weight:bold;margin-bottom:2px}
     .off-sub{font-size:11px;color:var(--muted)}
 
-    /* ── JOIN button ─────────────────────────────────────── */
-    #joinBtn{
+    /* ── Game buttons ────────────────────────────────────── */
+    .games-label{
       width:100%;max-width:320px;
-      padding:18px;
-      background:linear-gradient(135deg,#7a4800 0%,#b86e00 45%,#7a4800 100%);
-      border:2px solid var(--gold);
+      text-align:center;
+      font-size:9px;letter-spacing:4px;text-transform:uppercase;
+      color:var(--muted);font-family:'Courier New',monospace;
+      margin-bottom:14px;
+    }
+    .game-btn{
+      width:100%;max-width:320px;
+      padding:18px 20px;
       border-radius:14px;
-      color:#fff8e0;
       font-size:17px;font-family:'Rye',Georgia,serif;font-weight:bold;
-      letter-spacing:3px;text-transform:uppercase;
+      letter-spacing:2px;text-transform:uppercase;
       cursor:pointer;position:relative;overflow:hidden;
-      margin-bottom:16px;
-      box-shadow:0 0 28px var(--glow),inset 0 1px 0 rgba(255,220,100,.25);
-      animation:glow-pulse 2.8s ease-in-out infinite;
+      margin-bottom:12px;
       transition:transform .1s,opacity .2s;
+      display:flex;align-items:center;justify-content:center;gap:10px;
     }
-    #joinBtn:disabled{opacity:.35;animation:none;cursor:default}
-    #joinBtn:not(:disabled):active{transform:scale(.97)}
-
-    @keyframes glow-pulse{
-      0%,100%{box-shadow:0 0 20px var(--glow),inset 0 1px 0 rgba(255,220,100,.25)}
-      50%    {box-shadow:0 0 50px var(--glow),0 0 80px rgba(212,168,67,.18),inset 0 1px 0 rgba(255,220,100,.3)}
-    }
-    #joinBtn::before{
+    .game-btn:disabled{opacity:.35;animation:none;cursor:default}
+    .game-btn:not(:disabled):active{transform:scale(.97)}
+    .game-btn::before{
       content:'';position:absolute;
       top:-50%;left:-70%;width:45%;height:200%;
-      background:linear-gradient(90deg,transparent,rgba(255,255,255,.18),transparent);
+      background:linear-gradient(90deg,transparent,rgba(255,255,255,.15),transparent);
       transform:skewX(-20deg);
       animation:shine 3.5s ease-in-out infinite 1.2s;
     }
     @keyframes shine{0%{left:-70%}100%{left:170%}}
+
+    /* Outlaw — gold/orange */
+    #joinBtn{
+      background:linear-gradient(135deg,#7a4800 0%,#b86e00 45%,#7a4800 100%);
+      border:2px solid var(--gold);
+      color:#fff8e0;
+      box-shadow:0 0 28px var(--glow),inset 0 1px 0 rgba(255,220,100,.25);
+      animation:glow-gold 2.8s ease-in-out infinite;
+    }
+    @keyframes glow-gold{
+      0%,100%{box-shadow:0 0 20px var(--glow),inset 0 1px 0 rgba(255,220,100,.25)}
+      50%    {box-shadow:0 0 50px var(--glow),0 0 80px rgba(217,119,6,.18),inset 0 1px 0 rgba(255,220,100,.3)}
+    }
+
+    /* Granny Run — toxic green */
+    #grannyBtn{
+      background:linear-gradient(135deg,#0a3a12 0%,#16701f 45%,#0a3a12 100%);
+      border:2px solid #22c55e;
+      color:#d4ffd8;
+      box-shadow:0 0 28px rgba(34,197,94,.3),inset 0 1px 0 rgba(100,255,120,.2);
+      animation:glow-green 2.8s ease-in-out infinite 0.6s;
+    }
+    @keyframes glow-green{
+      0%,100%{box-shadow:0 0 20px rgba(34,197,94,.3),inset 0 1px 0 rgba(100,255,120,.2)}
+      50%    {box-shadow:0 0 50px rgba(34,197,94,.5),0 0 80px rgba(34,197,94,.15),inset 0 1px 0 rgba(100,255,120,.3)}
+    }
+
+    .coming-soon{
+      width:100%;max-width:320px;
+      text-align:center;
+      font-size:9px;letter-spacing:3px;text-transform:uppercase;
+      color:var(--muted);font-family:'Courier New',monospace;
+      margin-bottom:20px;opacity:.5;
+    }
 
     /* ── Secondary ───────────────────────────────────────── */
     .sec-row{
@@ -291,8 +323,11 @@
     <div class="off-sub">Saddle up later, partner.</div>
   </div>
 
-  <!-- JOIN -->
-  <button id="joinBtn">🤠 &nbsp;JOIN THE HEIST</button>
+  <!-- Game selector -->
+  <div class="games-label">Choose Your Escape</div>
+  <button id="joinBtn"   class="game-btn">🤠 &nbsp;JOIN THE HEIST</button>
+  <button id="grannyBtn" class="game-btn">👵 &nbsp;GRANNY RUN</button>
+  <div class="coming-soon">· More escapes coming soon ·</div>
 
   <!-- Secondary -->
   <div class="sec-row">
@@ -411,6 +446,7 @@ async function fetchProfile() {
     })
     if (!r.ok) return
     const d = await r.json()
+    if (d.token) sessionStorage.setItem('crash_token', d.token)
     if (d.balance != null) {
       document.getElementById('balance').textContent =
         '$' + parseFloat(d.balance).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})
@@ -425,6 +461,11 @@ async function fetchProfile() {
 document.getElementById('joinBtn').addEventListener('click', () => {
   tg?.HapticFeedback?.impactOccurred('heavy')
   window.location.href = GAME_URL
+})
+
+document.getElementById('grannyBtn').addEventListener('click', () => {
+  tg?.HapticFeedback?.impactOccurred('heavy')
+  window.location.href = window.location.origin + '/granny.html'
 })
 
 // ── Secondary buttons ─────────────────────────────────────────────────────────
@@ -457,6 +498,7 @@ function onSupport() {
     const btn = document.getElementById('joinBtn')
     btn.disabled = true
     btn.textContent = '🌵  SERVER OFFLINE'
+    document.getElementById('grannyBtn').disabled = true
   }
 })()
 </script>

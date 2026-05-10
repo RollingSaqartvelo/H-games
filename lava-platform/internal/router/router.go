@@ -30,31 +30,44 @@ import (
 	walletSvc "github.com/lava-platform/internal/wallet/service"
 )
 
-// Deps holds pre-constructed engine-layer dependencies that are shared
-// between the router and the scheduler (both need the same Engine instance).
-type Deps struct {
+// GameDeps holds the per-game engine, hub and publisher.
+type GameDeps struct {
 	Engine *roundEngine.Engine
 	Hub    *realtime.Hub
 	Pub    *realtime.Publisher
 }
 
-// Wire constructs all shared dependencies from infrastructure.
-// Call once in main; pass the result to both New() and the scheduler.
-func Wire(cfg *config.Config, infra *infrastructure.Infra) *Deps {
-	pub := realtime.NewPublisher(infra.Cache)
-	hub := realtime.NewHub()
+// Deps holds pre-constructed engine-layer dependencies for all games.
+type Deps struct {
+	Outlaw GameDeps // outlaw_escape
+	Granny GameDeps // granny_run
+}
 
+// Wire constructs all shared dependencies from infrastructure.
+// Call once in main; pass the result to both New() and the schedulers.
+func Wire(cfg *config.Config, infra *infrastructure.Infra) *Deps {
 	wRepo := walletRepo.NewPostgres(infra.DB)
 	locker := lock.New(infra.Cache)
 	provider := walletSvc.New(wRepo, locker)
-
 	rRepo := roundRepo.NewPostgres(infra.DB)
-	eng := roundEngine.New(roundEngine.DefaultConfig(), rRepo, provider, pub, hub, locker)
+
+	// Outlaw Escape
+	outlawPub := realtime.NewPublisher(infra.Cache, "outlaw_escape")
+	outlawHub := realtime.NewHub()
+	outlawCfg := roundEngine.DefaultConfig()
+	outlawCfg.GameType = "outlaw_escape"
+	outlawEng := roundEngine.New(outlawCfg, rRepo, provider, outlawPub, outlawHub, locker)
+
+	// Granny Run
+	grannyPub := realtime.NewPublisher(infra.Cache, "granny_run")
+	grannyHub := realtime.NewHub()
+	grannyCfg := roundEngine.DefaultConfig()
+	grannyCfg.GameType = "granny_run"
+	grannyEng := roundEngine.New(grannyCfg, rRepo, provider, grannyPub, grannyHub, locker)
 
 	return &Deps{
-		Engine: eng,
-		Hub:    hub,
-		Pub:    pub,
+		Outlaw: GameDeps{Engine: outlawEng, Hub: outlawHub, Pub: outlawPub},
+		Granny: GameDeps{Engine: grannyEng, Hub: grannyHub, Pub: grannyPub},
 	}
 }
 
@@ -93,9 +106,11 @@ func New(cfg *config.Config, infra *infrastructure.Infra, deps *Deps) *gin.Engin
 	wallet := walletHandler.New(provider, callbackSvc)
 
 	rRepo := roundRepo.NewPostgres(infra.DB)
-	rHandler := roundHandler.New(deps.Engine, rRepo)
+	outlawHandler := roundHandler.New(deps.Outlaw.Engine, rRepo, "outlaw_escape")
+	grannyHandler := roundHandler.New(deps.Granny.Engine, rRepo, "granny_run")
 
-	wsHandler := realtime.NewWSHandler(deps.Hub)
+	outlawWS := realtime.NewWSHandler(deps.Outlaw.Hub)
+	grannyWS  := realtime.NewWSHandler(deps.Granny.Hub)
 
 	// ── Admin API (X-SYSTEM-KEY) ──────────────────────────────────────────────
 	adm := adminHandler.New(infra.DB)
@@ -134,18 +149,25 @@ func New(cfg *config.Config, infra *infrastructure.Infra, deps *Deps) *gin.Engin
 		}
 	}
 
-	// ── Crash game ────────────────────────────────────────────────────────────
+	// ── Provider crash game (Outlaw Escape) ──────────────────────────────────
 	crash := r.Group("/api/v1/crash")
 	crash.Use(middleware.OperatorAuth(opSvc))
 	{
-		// Mutations require a player session
 		betGroup := crash.Group("")
 		betGroup.Use(middleware.SessionValidate(sessSvc))
-
-		rHandler.RegisterRoutes(betGroup, crash)
+		outlawHandler.RegisterRoutes(betGroup, crash)
 	}
 
-	// ── Telegram Mini App auth + bot webhook (public — no operator HMAC) ────
+	// ── Provider granny game (Granny Run) ─────────────────────────────────────
+	granny := r.Group("/api/v1/granny")
+	granny.Use(middleware.OperatorAuth(opSvc))
+	{
+		grannyBet := granny.Group("")
+		grannyBet.Use(middleware.SessionValidate(sessSvc))
+		grannyHandler.RegisterRoutes(grannyBet, granny)
+	}
+
+	// ── Telegram Mini App auth + bot webhook (public — no operator HMAC) ─────
 	if cfg.Telegram.BotToken != "" {
 		tmaValidator := telegram.NewValidator(cfg.Telegram.BotToken, cfg.Telegram.AuthMaxAge)
 		tmaHandler   := telegram.NewHandler(tmaValidator, sessSvc, provider, cfg.Telegram.TMAOperatorID)
@@ -156,23 +178,26 @@ func New(cfg *config.Config, infra *infrastructure.Infra, deps *Deps) *gin.Engin
 		tma.GET("/health",   tmaHandler.Health)
 		tma.POST("/webhook", botHandler.Webhook)
 
-		// Game routes for TMA players — session auth only, no operator HMAC.
-		// The session itself proves operator identity (TMA operator ID is embedded in the token).
-		tmaGame := tma.Group("/v1/crash")
-		tmaGame.Use(middleware.SessionValidate(sessSvc))
-		rHandler.RegisterRoutes(tmaGame, tmaGame)
+		// Outlaw Escape TMA routes
+		tmaOutlaw := tma.Group("/v1/crash")
+		tmaOutlaw.Use(middleware.SessionValidate(sessSvc))
+		outlawHandler.RegisterRoutes(tmaOutlaw, tmaOutlaw)
 
-		// Register webhook with Telegram asynchronously (non-fatal if it fails)
+		// Granny Run TMA routes
+		tmaGranny := tma.Group("/v1/granny")
+		tmaGranny.Use(middleware.SessionValidate(sessSvc))
+		grannyHandler.RegisterRoutes(tmaGranny, tmaGranny)
+
 		go func() {
 			if err := botHandler.RegisterWebhook(context.Background(), cfg.Telegram.AppURL); err != nil {
-				// Log only — webhook can be registered manually via setup-tma.sh
 				_ = err
 			}
 		}()
 	}
 
 	// ── WebSocket ─────────────────────────────────────────────────────────────
-	r.GET("/ws/crash", wsHandler.ServeWS)
+	r.GET("/ws/crash",  outlawWS.ServeWS)
+	r.GET("/ws/granny", grannyWS.ServeWS)
 
 	// ── Frontend SPA ──────────────────────────────────────────────────────────
 	// Serve built React app from frontend/dist if it exists.
@@ -200,6 +225,9 @@ func serveFrontend(r *gin.Engine) {
 
 	// Serve other static root files (favicon, manifest, etc.)
 	r.StaticFile("/favicon.ico", distDir+"/favicon.ico")
+	r.StaticFile("/landing.html", distDir+"/landing.html")
+	r.StaticFile("/privacy.html", distDir+"/privacy.html")
+	r.StaticFile("/granny.html", distDir+"/granny.html")
 
 	// SPA catch-all: serve index.html for any non-API path
 	r.NoRoute(func(c *gin.Context) {
