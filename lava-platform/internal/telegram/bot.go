@@ -98,7 +98,7 @@ func (b *botClient) sendStart(chatID int64, from *User) {
 		name = from.FirstName
 	}
 
-	text := fmt.Sprintf(
+	caption := fmt.Sprintf(
 		"🤠 Welcome to H\\-GAMES Provider, %s\\!\n\n"+
 			"Saddle up and enter the world of Western Crime Game — where every second counts, every jump is a gamble, and every escape could make you rich\\.\n\n"+
 			"🏜 *OUTLAW ESCAPE:*\n"+
@@ -128,7 +128,16 @@ func (b *botClient) sendStart(chatID int64, from *User) {
 		}
 	}
 
-	b.sendMessage(chatID, text, keyboard)
+	// Send logo image + caption in one message; fall back to text-only if no URL
+	if b.appURL != "" {
+		photoURL := strings.TrimRight(b.appURL, "/") + "/assets/hgames-logo.jpg"
+		if err := b.sendPhoto(chatID, photoURL, caption, keyboard); err != nil {
+			// Photo failed — send text-only so the user still gets the message
+			b.sendMessage(chatID, caption, keyboard)
+		}
+	} else {
+		b.sendMessage(chatID, caption, keyboard)
+	}
 }
 
 func (b *botClient) sendHelp(chatID int64) {
@@ -141,6 +150,19 @@ func (b *botClient) sendHelp(chatID int64) {
 			"/play — Launch the game",
 		nil,
 	)
+}
+
+func (b *botClient) sendPhoto(chatID int64, photoURL, caption string, replyMarkup interface{}) error {
+	body := map[string]interface{}{
+		"chat_id":    chatID,
+		"photo":      photoURL,
+		"caption":    caption,
+		"parse_mode": "MarkdownV2",
+	}
+	if replyMarkup != nil {
+		body["reply_markup"] = replyMarkup
+	}
+	return b.apiCall("sendPhoto", body)
 }
 
 func (b *botClient) sendMessage(chatID int64, text string, replyMarkup interface{}) {
