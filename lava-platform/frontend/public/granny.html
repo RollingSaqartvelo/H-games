@@ -142,28 +142,23 @@
       flex-shrink:0;
       background:rgba(2,10,3,.97);
       border-top:1px solid var(--border);
-      padding:8px;
-      padding-bottom:max(env(safe-area-inset-bottom,8px),8px);
-      display:flex;gap:6px;
-      overflow:hidden;   /* prevent panel B from spilling off-screen */
+      padding:10px;
+      padding-bottom:max(env(safe-area-inset-bottom,10px),10px);
+      display:flex;
     }
 
     .bet-panel{
-      flex:1 1 0;        /* flex-basis:0 ensures equal split regardless of content */
-      min-width:0;       /* allow shrinking below intrinsic width */
+      width:100%;
       background:#041008;
       border:1px solid var(--border);
-      border-radius:12px;
-      padding:8px;
-      display:flex;flex-direction:column;gap:5px;
+      border-radius:14px;
+      padding:12px 14px;
+      display:flex;flex-direction:column;gap:8px;
     }
     .bet-panel.active-bet { border-color:var(--green) }
     .bet-panel.crashed-bet{ border-color:#7f1d1d }
 
-    .bp-label{
-      font-family:'Courier New',monospace;font-size:8px;letter-spacing:2px;
-      text-transform:uppercase;color:var(--muted);
-    }
+    .bp-label{ display:none }
     .bp-amount-row{display:flex;gap:4px;align-items:center}
     .bp-amount{
       flex:1;background:#020a03;border:1px solid var(--border);
@@ -172,11 +167,11 @@
       outline:none;
     }
     .bp-amount:focus{border-color:var(--green-dim)}
-    .bp-quick{display:flex;gap:3px}
+    .bp-quick{display:flex;gap:6px}
     .bp-q{
-      flex:1;padding:4px 0;font-size:9px;
+      flex:1;padding:7px 0;font-size:11px;
       background:#041008;border:1px solid var(--border);
-      border-radius:5px;color:var(--muted);cursor:pointer;
+      border-radius:7px;color:var(--muted);cursor:pointer;
       font-family:'Courier New',monospace;
     }
     .bp-q:active{background:#0d2e12;color:var(--green)}
@@ -194,8 +189,8 @@
     }
 
     .bp-btn{
-      width:100%;padding:10px;border-radius:8px;
-      font-family:'Rye',Georgia,serif;font-size:13px;letter-spacing:1px;
+      width:100%;padding:14px;border-radius:10px;
+      font-family:'Rye',Georgia,serif;font-size:16px;letter-spacing:1.5px;
       cursor:pointer;transition:all .15s;
     }
     .bp-btn-bet{
@@ -281,11 +276,11 @@
 
     /* ── Granny Win Overlay — mirrors Outlaw YouWinOverlay ──────── */
     .gywi{
-      position:fixed;top:22vh;width:50vw;z-index:45;
+      position:fixed;top:22vh;left:50%;transform:translateX(-50%);
+      width:min(90vw,420px);z-index:45;
       pointer-events:none;display:none;
     }
-    .gywi--a{ left:0 }
-    .gywi--b{ left:50vw }
+    .gywi--a{ /* single centered panel */ }
     .gywi--visible{ display:block }
     .gywi--fading{ animation:gywi-fadeout 250ms ease-out forwards }
     @keyframes gywi-fadeout{
@@ -419,39 +414,14 @@
       <div id="payout0" class="bp-payout" style="display:none"></div>
       <button class="bp-btn bp-btn-bet" id="btn0" onclick="handleBtn(0)">BET</button>
     </div>
-    <div class="bet-panel" id="panel1" style="display:none">
-      <div class="bp-label">Bet B</div>
-      <div class="bp-amount-row">
-        <input class="bp-amount" id="amount1" type="number" min="0.1" step="0.1" value="1.00" placeholder="0.00">
-      </div>
-      <div class="bp-quick">
-        <button class="bp-q" onclick="addAmount(1,1)">+1</button>
-        <button class="bp-q" onclick="addAmount(1,5)">+5</button>
-        <button class="bp-q" onclick="addAmount(1,10)">+10</button>
-        <button class="bp-q" onclick="halvAmount(1)">½</button>
-      </div>
-      <div class="bp-cashout-row">
-        <span class="bp-cashout-label">Auto ×</span>
-        <input class="bp-cashout" id="cashout1" type="number" min="1.1" step="0.1" placeholder="off">
-      </div>
-      <div id="payout1" class="bp-payout" style="display:none"></div>
-      <button class="bp-btn bp-btn-bet" id="btn1" onclick="handleBtn(1)">BET</button>
-    </div>
   </div>
 
-  <!-- Win overlays — position:fixed, one per panel, mirrors Outlaw YouWinOverlay -->
+  <!-- Win overlay — centered, full-width single panel -->
   <div class="gywi gywi--a" id="gywi0" aria-hidden="true">
     <div class="gywi__inner">
       <img class="gywi__img" id="gywi0img" src="/assets/ui/granny%20wins/Grannywin.png" alt="WIN" draggable="false">
       <span class="gywi__amount" id="gywi0amount"></span>
       <span class="gywi__mult" id="gywi0mult"></span>
-    </div>
-  </div>
-  <div class="gywi gywi--b" id="gywi1" aria-hidden="true">
-    <div class="gywi__inner">
-      <img class="gywi__img" id="gywi1img" src="/assets/ui/granny%20wins/Grannywin.png" alt="WIN" draggable="false">
-      <span class="gywi__amount" id="gywi1amount"></span>
-      <span class="gywi__mult" id="gywi1mult"></span>
     </div>
   </div>
 
@@ -493,7 +463,6 @@ async function auth() {
 
 function showPanels() {
   document.getElementById('panel0').style.display = 'flex'
-  document.getElementById('panel1').style.display = 'flex'
   document.getElementById('noSession').style.display = 'none'
 }
 
@@ -515,7 +484,6 @@ let roundState = 'CREATED'
 let roundId    = ''
 let multiplier = 1.00
 let bets = [
-  { id:'', active:false, cashedOut:false, currency:'USD', amount:1 },
   { id:'', active:false, cashedOut:false, currency:'USD', amount:1 },
 ]
 let historyItems = []
@@ -969,7 +937,7 @@ function updateMultVis() {
 }
 
 // ── Win overlay — mirrors YouWinOverlay.tsx timing exactly ────────────────────
-const _gywiTimers = [null, null]
+const _gywiTimers = [null]
 function showGrannyWin(i, amount, mult) {
   clearTimeout(_gywiTimers[i])
   const el  = document.getElementById('gywi' + i)
