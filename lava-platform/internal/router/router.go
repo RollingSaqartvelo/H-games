@@ -225,7 +225,12 @@ func serveFrontend(r *gin.Engine) {
 
 	// Serve other static root files (favicon, manifest, etc.)
 	r.StaticFile("/favicon.ico", distDir+"/favicon.ico")
-	r.StaticFile("/landing.html", distDir+"/landing.html")
+	r.GET("/landing.html", func(c *gin.Context) {
+		c.Header("Cache-Control", "no-cache, no-store, must-revalidate")
+		c.Header("Pragma", "no-cache")
+		c.Header("Expires", "0")
+		c.File(distDir + "/landing.html")
+	})
 	r.StaticFile("/privacy.html", distDir+"/privacy.html")
 	// granny.html served with no-cache so Telegram WebView always fetches the latest version
 	r.GET("/granny.html", func(c *gin.Context) {
