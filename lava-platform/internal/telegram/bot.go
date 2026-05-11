@@ -100,17 +100,26 @@ func (b *botClient) sendStart(chatID int64, from *User) {
 
 	caption := fmt.Sprintf(
 		"🤠 Welcome to H\\-GAMES Provider, %s\\!\n\n"+
-			"Saddle up and enter the world of Western Crime Game — where every second counts, every jump is a gamble, and every escape could make you rich\\.\n\n"+
-			"🏜 *OUTLAW ESCAPE:*\n"+
-			"Ride fast\\. Jump platform to platform\\. Outsmart the sheriff\\. Cash out before you get WASTED\\.\n\n"+
-			"💰 *Features:*\n"+
+			"Step into a world where chaos pays, timing is everything, and every escape could turn into fortune\\.\n\n"+
+			"🎮 *AVAILABLE GAMES:*\n\n"+
+			"🏜️ *OUTLAW ESCAPE:*\n"+
+			"Ride hard\\. Leap platform to platform\\. Stay ahead of the sheriff\\. Cash out before you get WASTED\\.\n\n"+
+			"👵 *GRANNY RUN:*\n"+
+			"Break out\\. Launch skyward on jet\\-powered walkers\\. Escape the doctor\\. Fly fast, cash out, and don't get caught\\.\n\n"+
+			"💰 *FEATURES:*\n"+
 			"• Provably Fair gameplay\n"+
 			"• Real\\-time multipliers\n"+
 			"• Instant Cashout\n"+
-			"• Dual bet mode\n"+
-			"• Premium western action\n\n"+
-			"🎯 *Your mission:*\n"+
-			"Escape with the loot\\. Survive the chase\\. Beat the crash\\.",
+			"• Auto Cashout\n"+
+			"• Premium themed action\n"+
+			"• Unique game worlds\n"+
+			"• H\\-GAMES provider system\n\n"+
+			"🎯 *YOUR MISSION:*\n"+
+			"Choose your escape\\.\n"+
+			"Survive the chase\\.\n"+
+			"Beat the crash\\.\n"+
+			"Cash out at the perfect moment\\.\n\n"+
+			"🔥 Two worlds\\. Two escapes\\. One goal: WIN BIG\\.",
 		name,
 	)
 
@@ -120,7 +129,7 @@ func (b *botClient) sendStart(chatID int64, from *User) {
 			"inline_keyboard": [][]map[string]interface{}{
 				{
 					{
-						"text":    "🎮 Play Outlaw Escape",
+						"text":    "🎮 Play H-Games",
 						"web_app": map[string]string{"url": strings.TrimRight(b.appURL, "/") + "/landing.html"},
 					},
 				},
@@ -214,7 +223,31 @@ func (b *botClient) RegisterWebhook(ctx context.Context, webhookURL string) erro
 	return b.apiCall("setWebhook", map[string]string{"url": full})
 }
 
+// setMenuButton updates the bot's default menu button for all users to a Web App
+// pointing at appURL. This auto-fixes the menu button whenever the tunnel URL changes.
+func (b *botClient) setMenuButton(appURL string) error {
+	if appURL == "" {
+		return nil
+	}
+	url := strings.TrimRight(appURL, "/") + "/landing.html"
+	log.Info().Str("url", url).Msg("setting telegram menu button")
+	return b.apiCall("setChatMenuButton", map[string]interface{}{
+		"menu_button": map[string]interface{}{
+			"type":    "web_app",
+			"text":    "Play H-Games",
+			"web_app": map[string]string{"url": url},
+		},
+	})
+}
+
 // RegisterWebhook is the exported entry point on BotHandler.
 func (h *BotHandler) RegisterWebhook(ctx context.Context, appURL string) error {
-	return h.bot.RegisterWebhook(ctx, appURL)
+	if err := h.bot.RegisterWebhook(ctx, appURL); err != nil {
+		return err
+	}
+	// Also update the menu button so it always points at the current tunnel URL.
+	if err := h.bot.setMenuButton(appURL); err != nil {
+		log.Warn().Err(err).Msg("telegram: setMenuButton failed")
+	}
+	return nil
 }
