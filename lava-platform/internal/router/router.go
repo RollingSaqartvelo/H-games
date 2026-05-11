@@ -227,7 +227,13 @@ func serveFrontend(r *gin.Engine) {
 	r.StaticFile("/favicon.ico", distDir+"/favicon.ico")
 	r.StaticFile("/landing.html", distDir+"/landing.html")
 	r.StaticFile("/privacy.html", distDir+"/privacy.html")
-	r.StaticFile("/granny.html", distDir+"/granny.html")
+	// granny.html served with no-cache so Telegram WebView always fetches the latest version
+	r.GET("/granny.html", func(c *gin.Context) {
+		c.Header("Cache-Control", "no-cache, no-store, must-revalidate")
+		c.Header("Pragma", "no-cache")
+		c.Header("Expires", "0")
+		c.File(distDir + "/granny.html")
+	})
 
 	// SPA catch-all: serve index.html for any non-API path
 	r.NoRoute(func(c *gin.Context) {
