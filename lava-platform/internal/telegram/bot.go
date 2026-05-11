@@ -130,7 +130,7 @@ func (b *botClient) sendStart(chatID int64, from *User) {
 				{
 					{
 						"text":    "🎮 Play H-Games",
-						"web_app": map[string]string{"url": strings.TrimRight(b.appURL, "/") + "/landing.html"},
+						"web_app": map[string]string{"url": strings.TrimRight(b.appURL, "/") + "/landing.html?v=2"},
 					},
 				},
 			},
@@ -229,7 +229,7 @@ func (b *botClient) setMenuButton(appURL string) error {
 	if appURL == "" {
 		return nil
 	}
-	url := strings.TrimRight(appURL, "/") + "/landing.html"
+	url := strings.TrimRight(appURL, "/") + "/landing.html?v=2"
 	log.Info().Str("url", url).Msg("setting telegram menu button")
 	return b.apiCall("setChatMenuButton", map[string]interface{}{
 		"menu_button": map[string]interface{}{
