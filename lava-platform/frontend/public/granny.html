@@ -278,6 +278,51 @@
       from{opacity:.8;transform:scale(.97)}
       to  {opacity:1;transform:scale(1)}
     }
+
+    /* ── Granny Win Overlay — mirrors Outlaw YouWinOverlay ──────── */
+    .gywi{
+      position:fixed;top:22vh;width:50vw;z-index:45;
+      pointer-events:none;display:none;
+    }
+    .gywi--a{ left:0 }
+    .gywi--b{ left:50vw }
+    .gywi--visible{ display:block }
+    .gywi--fading{ animation:gywi-fadeout 250ms ease-out forwards }
+    @keyframes gywi-fadeout{
+      to{ opacity:0;transform:translateY(-15px) }
+    }
+    .gywi__inner{
+      position:relative;width:96%;margin:0 auto;
+    }
+    .gywi__img{
+      width:100%;height:auto;display:block;
+      filter:drop-shadow(0 0 16px rgba(212,175,55,.65));
+    }
+    .gywi__img--pop{
+      animation:gywi-popin 320ms cubic-bezier(0.34,1.56,0.64,1) both;
+    }
+    @keyframes gywi-popin{
+      0%  { transform:scale(0.8) }
+      70% { transform:scale(1.08) }
+      100%{ transform:scale(1.0) }
+    }
+    .gywi__amount{
+      position:absolute;top:62%;left:52%;
+      transform:translate(-50%,-50%);
+      color:#fff;font-weight:900;
+      font-family:'Courier New',monospace;
+      letter-spacing:.5px;text-align:center;
+      text-shadow:0 1px 3px rgba(0,0,0,.6);
+      white-space:nowrap;max-width:52%;overflow:hidden;
+    }
+    .gywi__mult{
+      position:absolute;top:100%;left:50%;
+      transform:translateX(-50%);margin-top:4px;
+      color:#fff;font-weight:900;font-size:13px;
+      font-family:'Courier New',monospace;
+      text-shadow:0 1px 4px rgba(0,0,0,.8);
+      white-space:nowrap;
+    }
   </style>
 </head>
 <body>
@@ -394,6 +439,22 @@
     </div>
   </div>
 
+  <!-- Win overlays — position:fixed, one per panel, mirrors Outlaw YouWinOverlay -->
+  <div class="gywi gywi--a" id="gywi0" aria-hidden="true">
+    <div class="gywi__inner">
+      <img class="gywi__img" id="gywi0img" src="/assets/ui/granny%20wins/Grannywin.png" alt="WIN" draggable="false">
+      <span class="gywi__amount" id="gywi0amount"></span>
+      <span class="gywi__mult" id="gywi0mult"></span>
+    </div>
+  </div>
+  <div class="gywi gywi--b" id="gywi1" aria-hidden="true">
+    <div class="gywi__inner">
+      <img class="gywi__img" id="gywi1img" src="/assets/ui/granny%20wins/Grannywin.png" alt="WIN" draggable="false">
+      <span class="gywi__amount" id="gywi1amount"></span>
+      <span class="gywi__mult" id="gywi1mult"></span>
+    </div>
+  </div>
+
 </div>
 
 <script>
@@ -475,7 +536,7 @@ let bgOff = 0, lastTs = 0
 const bgImg = new Image()
 let bgImgReady = false
 bgImg.onload = () => { bgImgReady = true }
-bgImg.src = '/assets/granny%20bg/grannybg.jpeg'
+bgImg.src = '/assets/granny%20bg/grannynewbg.jpeg'
 
 // ── Character assets ──────────────────────────────────────────────────────────
 const grannyImg = new Image(), doctorImg = new Image()
@@ -484,6 +545,32 @@ grannyImg.onload = () => { grannyImgReady = true }
 doctorImg.onload = () => { doctorImgReady = true }
 grannyImg.src = '/assets/granny/granny%20hero.png'
 doctorImg.src = '/assets/granny/medicin%20hero.png'
+
+// ── Win overlay asset (preloaded so no lag on cashout) ────────────────────────
+const _grannyWinImg = new Image()
+_grannyWinImg.src = '/assets/ui/granny%20wins/Grannywin.png'
+
+// ── Win sound — mirrors WinSound.ts: preloaded, deduped across panels ─────────
+const _winAudio = new Audio('/audio/wins%20%D0%B7%D0%B2%D1%83%D0%BA.mp3')
+_winAudio.preload = 'auto'
+_winAudio.loop    = false
+_winAudio.volume  = 1.0
+_winAudio.style.cssText = 'position:fixed;width:1px;height:1px;opacity:0;pointer-events:none;top:-9999px;left:-9999px'
+document.body.appendChild(_winAudio)
+let _winLastAt = 0
+function playGrannyWinSound() {
+  const now = Date.now()
+  if (now - _winLastAt < 100) return
+  _winLastAt = now
+  _winAudio.pause()
+  _winAudio.currentTime = 0
+  _winAudio.volume = 1.0
+  _winAudio.play().catch(() => {
+    const retry = () => { _winAudio.currentTime = 0; _winAudio.play().catch(() => {}) }
+    document.addEventListener('touchstart', retry, { once:true, passive:true })
+    document.addEventListener('click',      retry, { once:true })
+  })
+}
 
 function resizeCanvas() {
   const ga = canvas.parentElement
@@ -834,6 +921,22 @@ function connectWS() {
 
     if (msg.type === 'cashout') {
       addSocialTick(d.player_id, d.multiplier, d.payout)
+      // Auto-cashout: if this event matches one of our active bets, handle win
+      bets.forEach((b, i) => {
+        if (b.active && !b.cashedOut && b.id === d.bet_id) {
+          b.cashedOut = true
+          b.active    = false
+          document.getElementById('panel'+i).classList.remove('active-bet')
+          const payEl = document.getElementById('payout'+i)
+          payEl.textContent = '💊 $' + parseFloat(d.payout).toFixed(2) + ' @ ' + d.multiplier.toFixed(2) + '×'
+          payEl.style.display = 'block'
+          updateBtnState(i)
+          showGrannyWin(i, parseFloat(d.payout), d.multiplier)
+          playGrannyWinSound()
+          tg?.HapticFeedback?.notificationOccurred('success')
+          fetchBalance()
+        }
+      })
     }
 
     if (msg.type === 'crashed') {
@@ -863,6 +966,37 @@ function updateMultVis() {
   const show = roundState === 'RUNNING' || roundState === 'CRASHED'
   const el = document.querySelector('.mult-wrap')
   if (el) el.style.visibility = show ? 'visible' : 'hidden'
+}
+
+// ── Win overlay — mirrors YouWinOverlay.tsx timing exactly ────────────────────
+const _gywiTimers = [null, null]
+function showGrannyWin(i, amount, mult) {
+  clearTimeout(_gywiTimers[i])
+  const el  = document.getElementById('gywi' + i)
+  const img = document.getElementById('gywi' + i + 'img')
+
+  // Amount text
+  const amtStr   = amount.toLocaleString('en-US', { minimumFractionDigits:2, maximumFractionDigits:2 })
+  const fontSize = amount >= 1000 ? '10px' : amount >= 100 ? '12px' : '14px'
+  const amtEl    = document.getElementById('gywi' + i + 'amount')
+  amtEl.textContent  = '$' + amtStr
+  amtEl.style.fontSize = fontSize
+  document.getElementById('gywi' + i + 'mult').textContent = 'x' + mult.toFixed(2)
+
+  // Re-trigger spring pop-in (reset animation)
+  img.classList.remove('gywi__img--pop')
+  img.offsetWidth // force reflow
+  img.classList.add('gywi__img--pop')
+
+  // Show
+  el.classList.remove('gywi--fading')
+  el.classList.add('gywi--visible')
+
+  // Outlaw timing: fade starts at 1200ms, element gone at 1450ms
+  _gywiTimers[i] = setTimeout(() => {
+    el.classList.add('gywi--fading')
+    setTimeout(() => el.classList.remove('gywi--visible', 'gywi--fading'), 250)
+  }, 1200)
 }
 
 function updateMult(v, crashed=false) {
@@ -1009,6 +1143,8 @@ async function doCashout(i) {
     const payEl = document.getElementById('payout'+i)
     payEl.textContent = '💊 $' + parseFloat(d.payout).toFixed(2) + ' @ ' + d.multiplier.toFixed(2) + '×'
     payEl.style.display = 'block'
+    showGrannyWin(i, parseFloat(d.payout), d.multiplier)
+    playGrannyWinSound()
     tg?.HapticFeedback?.notificationOccurred('success')
     fetchBalance()
   } catch { btn.disabled=false }
