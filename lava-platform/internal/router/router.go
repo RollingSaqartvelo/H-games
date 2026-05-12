@@ -141,7 +141,9 @@ func New(cfg *config.Config, infra *infrastructure.Infra, deps *Deps) *gin.Engin
 		// Gemini asset generation (admin-only, server-side key)
 		if cfg.Gemini.APIKey != "" {
 			geminiH := gemini.NewHandler(cfg.Gemini.APIKey, "frontend/dist/assets")
-			admin.POST("/gemini/generate", geminiH.Generate)
+			admin.POST("/gemini/generate",        geminiH.Generate)
+			admin.POST("/gemini/batch",           geminiH.Batch)
+			admin.POST("/gemini/preset/bubble",   geminiH.GenerateBubbleFrames)
 		}
 	}
 
