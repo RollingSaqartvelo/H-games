@@ -54,11 +54,12 @@
     }
 
     /* ── Shared animations ──────────────────────────────────── */
-    @keyframes grad-flow   { 0%,100%{ background-position:0% 50% } 50%{ background-position:100% 50% } }
-    @keyframes border-spin { 0%{ background-position:0% 50% } 100%{ background-position:400% 50% } }
-    @keyframes card-top    { 0%,100%{ opacity:.35 } 50%{ opacity:1 } }
-    @keyframes eu-drift    { 0%,100%{ transform:translateY(0) } 50%{ transform:translateY(-6px) } }
-    @keyframes blink2      { 0%,100%{ opacity:1 } 50%{ opacity:.2 } }
+    @keyframes grad-flow       { 0%,100%{ background-position:0% 50% } 50%{ background-position:100% 50% } }
+    @keyframes border-spin     { 0%{ background-position:0% 50% } 100%{ background-position:400% 50% } }
+    @keyframes card-top        { 0%,100%{ opacity:.35 } 50%{ opacity:1 } }
+    @keyframes eu-drift        { 0%,100%{ transform:translateY(0) } 50%{ transform:translateY(-6px) } }
+    @keyframes blink2          { 0%,100%{ opacity:1 } 50%{ opacity:.2 } }
+    @keyframes nav-border-sweep{ 0%{ background-position:0% 0 } 100%{ background-position:300% 0 } }
 
     /* ── Gradient border utility ────────────────────────────── */
     /* Applied to any element that needs animated gradient outline */
@@ -385,12 +386,28 @@
       }
       .d-nav__logo { cursor:pointer; display:block }
       .d-nav__logo img { height:30px; display:block }
-      .d-nav__links { display:flex; align-items:center; gap:40px }
+      .d-nav__links { display:flex; align-items:center; gap:10px }
       .d-nav__links a {
-        font-size:9px; letter-spacing:.35em; text-transform:uppercase;
-        color:var(--muted); text-decoration:none; transition:color .2s; cursor:pointer;
+        position:relative;
+        display:inline-flex; align-items:center; justify-content:center;
+        padding:5px 16px; font-size:8.5px; letter-spacing:.38em; text-transform:uppercase;
+        color:rgba(200,220,255,.42); text-decoration:none; cursor:pointer;
+        background:rgba(0,0,0,.45); backdrop-filter:blur(6px);
+        transition:color .25s, background .25s;
+        white-space:nowrap;
       }
-      .d-nav__links a:hover { color:var(--c1) }
+      .d-nav__links a::before {
+        content:''; position:absolute; inset:0; padding:1px;
+        background:linear-gradient(90deg,#7FE8FF,#4AB8FF,#7B61FF,#D94BFF,#FF71B8,#7FE8FF);
+        background-size:300% 100%;
+        -webkit-mask:linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        -webkit-mask-composite:xor; mask-composite:exclude;
+        pointer-events:none; opacity:.28;
+        transition:opacity .25s;
+        animation:nav-border-sweep 5s linear infinite;
+      }
+      .d-nav__links a:hover { color:rgba(240,248,255,.85); background:rgba(127,232,255,.04) }
+      .d-nav__links a:hover::before { opacity:.65 }
       .d-nav__cta { display:flex; gap:12px; align-items:center }
 
       /* HERO */
