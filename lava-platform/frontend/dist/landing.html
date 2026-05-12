@@ -4,10 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="theme-color" content="#080501">
-  <title>H-GAMES</title>
+  <title>H-GAMES — Premium Crash Game Provider</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Rye&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Rye&family=Orbitron:wght@600;700;900&family=Share+Tech+Mono&display=swap');
     *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 
     :root{
@@ -15,12 +15,17 @@
       --gold-b:     #fbbf24;
       --gold-light: #f59e0b;
       --gold-dim:   #78340f;
+      --green:      #22c55e;
+      --green-b:    #4ade80;
+      --green-dim:  #14532d;
       --bg:         #060402;
+      --bg-d:       #030204;
       --surface:    #110c06;
       --border:     #3a2210;
       --text:       #f5e6d0;
       --muted:      #9a7252;
       --glow:       rgba(217,119,6,.35);
+      --glow-g:     rgba(34,197,94,.3);
     }
 
     html,body{
@@ -31,27 +36,39 @@
       overflow-x:hidden;
     }
 
-    /* ── Dust particles ─────────────────────────────────── */
+    /* ════════════════════════════════════════════════════════
+       SHARED — particles
+    ════════════════════════════════════════════════════════ */
     .dust{
       position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:0;
     }
     .dust span{
       position:absolute;
-      width:2px;height:2px;
       border-radius:50%;
-      background:var(--gold-dim);
       opacity:0;
       animation:float linear infinite;
     }
     @keyframes float{
       0%  {transform:translateY(100vh) translateX(0);  opacity:0}
-      10% {opacity:.4}
+      10% {opacity:.5}
       90% {opacity:.2}
       100%{transform:translateY(-10vh) translateX(30px);opacity:0}
     }
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
+    @keyframes shine{0%{left:-70%}100%{left:170%}}
+    @keyframes glow-gold{
+      0%,100%{box-shadow:0 0 20px var(--glow),inset 0 1px 0 rgba(255,220,100,.25)}
+      50%    {box-shadow:0 0 50px var(--glow),0 0 80px rgba(217,119,6,.18),inset 0 1px 0 rgba(255,220,100,.3)}
+    }
+    @keyframes glow-green{
+      0%,100%{box-shadow:0 0 20px var(--glow-g),inset 0 1px 0 rgba(100,255,120,.2)}
+      50%    {box-shadow:0 0 50px var(--glow-g),0 0 80px rgba(34,197,94,.15),inset 0 1px 0 rgba(100,255,120,.3)}
+    }
 
-    /* ── Layout ──────────────────────────────────────────── */
-    .page{
+    /* ════════════════════════════════════════════════════════
+       MOBILE LAYOUT  (≤ 768px)
+    ════════════════════════════════════════════════════════ */
+    .mobile-layout{
       position:relative;z-index:1;
       display:flex;flex-direction:column;align-items:center;
       min-height:100vh;
@@ -59,61 +76,42 @@
       padding-top:max(env(safe-area-inset-top,16px),16px);
     }
 
-    /* ── Logo ────────────────────────────────────────────── */
-    .logo-wrap{
-      width:100%;max-width:320px;
-      margin:0 auto 6px;
-    }
-    .logo-img{
-      width:100%;height:auto;
-      border-radius:10px;
-      display:block;
-    }
+    /* Logo */
+    .logo-wrap{width:100%;max-width:320px;margin:0 auto 6px}
+    .logo-img{width:100%;height:auto;border-radius:10px;display:block}
     .logo-fallback{
-      font-size:38px;font-weight:900;
-      letter-spacing:6px;
+      font-size:38px;font-weight:900;letter-spacing:6px;
       background:linear-gradient(90deg,#60c0ff,#a060ff,#ff80c0);
       -webkit-background-clip:text;-webkit-text-fill-color:transparent;
       text-align:center;padding:12px 0;
     }
     .provider-sub{
-      text-align:center;
-      font-size:10px;letter-spacing:7px;
-      text-transform:uppercase;
-      color:var(--gold-dim);
-      font-family:'Courier New',monospace;
-      margin-bottom:20px;
+      text-align:center;font-size:10px;letter-spacing:7px;
+      text-transform:uppercase;color:var(--gold-dim);
+      font-family:'Courier New',monospace;margin-bottom:20px;
     }
 
-    /* ── Divider ─────────────────────────────────────────── */
+    /* Divider */
     .divider{
-      width:100%;max-width:320px;
-      height:1px;
+      width:100%;max-width:320px;height:1px;
       background:linear-gradient(90deg,transparent,var(--border),transparent);
       margin-bottom:20px;
     }
 
-    /* ── Player card ─────────────────────────────────────── */
+    /* Player card */
     .card{
       width:100%;max-width:320px;
       background:linear-gradient(145deg,#160c02 0%,#0c0701 100%);
-      border:1px solid var(--border);
-      border-radius:16px;
-      padding:18px;
-      margin-bottom:20px;
-      position:relative;
-      overflow:hidden;
+      border:1px solid var(--border);border-radius:16px;
+      padding:18px;margin-bottom:20px;
+      position:relative;overflow:hidden;
     }
     .card::before{
       content:'';position:absolute;
       top:0;left:10%;right:10%;height:1px;
       background:linear-gradient(90deg,transparent,var(--gold),transparent);
     }
-
-    .player-row{
-      display:flex;align-items:center;gap:14px;
-      margin-bottom:16px;
-    }
+    .player-row{display:flex;align-items:center;gap:14px;margin-bottom:16px}
     .avatar{
       width:54px;height:54px;border-radius:50%;
       border:2px solid var(--gold-dim);
@@ -125,66 +123,41 @@
     .avatar img{width:100%;height:100%;object-fit:cover}
     .player-meta{flex:1;min-width:0}
     .player-name{
-      font-size:17px;font-weight:bold;
-      color:var(--gold-b);
+      font-size:17px;font-weight:bold;color:var(--gold-b);
       white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
       font-family:'Rye',Georgia,serif;
     }
-    .player-username{
-      font-size:12px;color:var(--muted);
-      font-family:'Courier New',monospace;margin-bottom:5px;
-    }
+    .player-username{font-size:12px;color:var(--muted);font-family:'Courier New',monospace;margin-bottom:5px}
     .badge{
-      display:inline-block;
-      padding:2px 9px;border-radius:20px;
+      display:inline-block;padding:2px 9px;border-radius:20px;
       font-size:9px;letter-spacing:2px;font-weight:bold;
       font-family:'Courier New',monospace;
-      background:rgba(212,168,67,.12);
-      border:1px solid var(--gold-dim);
-      color:var(--gold);
+      background:rgba(212,168,67,.12);border:1px solid var(--gold-dim);color:var(--gold);
     }
-
     .stats{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-    .stat{
-      background:rgba(0,0,0,.35);
-      border:1px solid var(--border);
-      border-radius:8px;padding:9px 12px;
-    }
-    .stat-lbl{
-      font-size:8px;letter-spacing:2px;text-transform:uppercase;
-      color:var(--muted);font-family:'Courier New',monospace;margin-bottom:3px;
-    }
-    .stat-val{
-      font-size:14px;color:var(--gold-b);
-      font-family:'Courier New',monospace;font-weight:bold;
-    }
+    .stat{background:rgba(0,0,0,.35);border:1px solid var(--border);border-radius:8px;padding:9px 12px}
+    .stat-lbl{font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);font-family:'Courier New',monospace;margin-bottom:3px}
+    .stat-val{font-size:14px;color:var(--gold-b);font-family:'Courier New',monospace;font-weight:bold}
 
-    /* ── Server offline ──────────────────────────────────── */
+    /* Offline */
     #offlineBanner{
-      display:none;
-      width:100%;max-width:320px;
-      padding:14px 18px;
-      background:rgba(80,15,5,.5);
-      border:1px solid rgba(160,50,30,.5);
-      border-radius:10px;
+      display:none;width:100%;max-width:320px;
+      padding:14px 18px;background:rgba(80,15,5,.5);
+      border:1px solid rgba(160,50,30,.5);border-radius:10px;
       text-align:center;margin-bottom:20px;
     }
     .off-icon{font-size:28px;margin-bottom:4px}
     .off-title{font-size:14px;color:#cc5533;font-weight:bold;margin-bottom:2px}
     .off-sub{font-size:11px;color:var(--muted)}
 
-    /* ── Game buttons ────────────────────────────────────── */
+    /* Game buttons */
     .games-label{
-      width:100%;max-width:320px;
-      text-align:center;
+      width:100%;max-width:320px;text-align:center;
       font-size:9px;letter-spacing:4px;text-transform:uppercase;
-      color:var(--muted);font-family:'Courier New',monospace;
-      margin-bottom:14px;
+      color:var(--muted);font-family:'Courier New',monospace;margin-bottom:14px;
     }
     .game-btn{
-      width:100%;max-width:320px;
-      padding:18px 20px;
-      border-radius:14px;
+      width:100%;max-width:320px;padding:18px 20px;border-radius:14px;
       font-size:17px;font-family:'Rye',Georgia,serif;font-weight:bold;
       letter-spacing:2px;text-transform:uppercase;
       cursor:pointer;position:relative;overflow:hidden;
@@ -201,91 +174,383 @@
       transform:skewX(-20deg);
       animation:shine 3.5s ease-in-out infinite 1.2s;
     }
-    @keyframes shine{0%{left:-70%}100%{left:170%}}
-
-    /* Outlaw — gold/orange */
     #joinBtn{
       background:linear-gradient(135deg,#7a4800 0%,#b86e00 45%,#7a4800 100%);
-      border:2px solid var(--gold);
-      color:#fff8e0;
+      border:2px solid var(--gold);color:#fff8e0;
       box-shadow:0 0 28px var(--glow),inset 0 1px 0 rgba(255,220,100,.25);
       animation:glow-gold 2.8s ease-in-out infinite;
     }
-    @keyframes glow-gold{
-      0%,100%{box-shadow:0 0 20px var(--glow),inset 0 1px 0 rgba(255,220,100,.25)}
-      50%    {box-shadow:0 0 50px var(--glow),0 0 80px rgba(217,119,6,.18),inset 0 1px 0 rgba(255,220,100,.3)}
-    }
-
-    /* Granny Run — toxic green */
     #grannyBtn{
       background:linear-gradient(135deg,#0a3a12 0%,#16701f 45%,#0a3a12 100%);
-      border:2px solid #22c55e;
-      color:#d4ffd8;
+      border:2px solid #22c55e;color:#d4ffd8;
       box-shadow:0 0 28px rgba(34,197,94,.3),inset 0 1px 0 rgba(100,255,120,.2);
       animation:glow-green 2.8s ease-in-out infinite 0.6s;
     }
-    @keyframes glow-green{
-      0%,100%{box-shadow:0 0 20px rgba(34,197,94,.3),inset 0 1px 0 rgba(100,255,120,.2)}
-      50%    {box-shadow:0 0 50px rgba(34,197,94,.5),0 0 80px rgba(34,197,94,.15),inset 0 1px 0 rgba(100,255,120,.3)}
-    }
-
     .coming-soon{
-      width:100%;max-width:320px;
-      text-align:center;
+      width:100%;max-width:320px;text-align:center;
       font-size:9px;letter-spacing:3px;text-transform:uppercase;
       color:var(--muted);font-family:'Courier New',monospace;
       margin-bottom:20px;opacity:.5;
     }
 
-    /* ── Secondary ───────────────────────────────────────── */
-    .sec-row{
-      display:flex;gap:8px;
-      width:100%;max-width:320px;
-      margin-bottom:24px;
-    }
+    /* Secondary */
+    .sec-row{display:flex;gap:8px;width:100%;max-width:320px;margin-bottom:24px}
     .sec-btn{
-      flex:1;padding:9px 4px;
-      background:transparent;
-      border:1px solid var(--border);
-      border-radius:8px;
-      color:var(--muted);
-      font-size:10px;letter-spacing:1px;text-transform:uppercase;
-      cursor:pointer;font-family:'Courier New',monospace;
-      transition:all .2s;
+      flex:1;padding:9px 4px;background:transparent;
+      border:1px solid var(--border);border-radius:8px;
+      color:var(--muted);font-size:10px;letter-spacing:1px;text-transform:uppercase;
+      cursor:pointer;font-family:'Courier New',monospace;transition:all .2s;
     }
     .sec-btn:active{background:rgba(42,26,8,.6);color:var(--gold);border-color:var(--gold-dim)}
 
-    /* ── Footer ──────────────────────────────────────────── */
-    .footer{
-      width:100%;max-width:320px;
-      border-top:1px solid var(--border);
-      padding-top:14px;
-    }
-    .f-row{
-      display:flex;justify-content:space-between;
-      align-items:center;margin-bottom:7px;
-    }
+    /* Footer */
+    .footer{width:100%;max-width:320px;border-top:1px solid var(--border);padding-top:14px}
+    .f-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px}
     .f-lbl{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);font-family:'Courier New',monospace}
     .f-val{font-size:11px;color:var(--gold-dim);font-family:'Courier New',monospace}
-    .pf-row{
-      display:flex;align-items:center;gap:6px;
-      font-size:9px;color:#3a6a3a;font-family:'Courier New',monospace;margin-top:6px;
+    .pf-row{display:flex;align-items:center;gap:6px;font-size:9px;color:#3a6a3a;font-family:'Courier New',monospace;margin-top:6px}
+    .pf-dot{width:6px;height:6px;border-radius:50%;background:#40a040;animation:blink 2s ease-in-out infinite;flex-shrink:0}
+
+    /* ════════════════════════════════════════════════════════
+       DESKTOP LAYOUT  (≥ 769px) — hidden on mobile
+    ════════════════════════════════════════════════════════ */
+    .desktop-layout{ display:none }
+
+    @media (min-width: 769px) {
+      html,body{ height:100%;overflow:hidden }
+
+      .mobile-layout{ display:none !important }
+      .dust{ display:none }
+
+      .desktop-layout{
+        display:flex;flex-direction:column;
+        width:100vw;height:100vh;
+        background:radial-gradient(ellipse at 20% 50%,rgba(120,60,0,.18) 0%,transparent 60%),
+                   radial-gradient(ellipse at 80% 50%,rgba(10,60,20,.2) 0%,transparent 60%),
+                   linear-gradient(180deg,#020104 0%,#030208 50%,#020104 100%);
+        position:relative;overflow:hidden;
+        font-family:'Orbitron','Courier New',monospace;
+      }
+
+      /* Animated grid overlay */
+      .desktop-layout::before{
+        content:'';position:absolute;inset:0;
+        background-image:
+          linear-gradient(rgba(217,119,6,.04) 1px,transparent 1px),
+          linear-gradient(90deg,rgba(217,119,6,.04) 1px,transparent 1px);
+        background-size:60px 60px;
+        pointer-events:none;z-index:0;
+      }
+      /* Scanline effect */
+      .desktop-layout::after{
+        content:'';position:absolute;inset:0;
+        background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.08) 2px,rgba(0,0,0,.08) 4px);
+        pointer-events:none;z-index:0;
+      }
+
+      /* ── Desktop particles */
+      .d-particles{
+        position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:1;
+      }
+      .d-particles span{
+        position:absolute;border-radius:50%;opacity:0;
+        animation:float linear infinite;
+      }
+
+      /* ── Navbar */
+      .d-nav{
+        position:relative;z-index:10;
+        flex-shrink:0;height:64px;
+        display:flex;align-items:center;justify-content:space-between;
+        padding:0 48px;
+        border-bottom:1px solid rgba(217,119,6,.15);
+        background:rgba(2,1,4,.7);
+        backdrop-filter:blur(12px);
+      }
+      .d-nav__logo{
+        font-family:'Orbitron',monospace;
+        font-size:22px;font-weight:900;letter-spacing:4px;
+        background:linear-gradient(90deg,var(--gold-b),var(--gold),var(--gold-b));
+        -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+        text-shadow:none;
+        cursor:pointer;
+      }
+      .d-nav__links{
+        display:flex;align-items:center;gap:36px;
+      }
+      .d-nav__links a{
+        font-family:'Share Tech Mono',monospace;
+        font-size:11px;letter-spacing:3px;text-transform:uppercase;
+        color:rgba(245,230,208,.45);
+        text-decoration:none;
+        transition:color .2s;
+        cursor:pointer;
+      }
+      .d-nav__links a:hover{ color:var(--gold-b) }
+      .d-nav__play{
+        font-family:'Orbitron',monospace;
+        font-size:10px;font-weight:700;letter-spacing:3px;
+        padding:9px 24px;border-radius:6px;
+        background:linear-gradient(135deg,#7a4800,#c07800,#7a4800);
+        border:1px solid var(--gold);
+        color:#fff8e0;cursor:pointer;
+        box-shadow:0 0 20px rgba(217,119,6,.3);
+        transition:box-shadow .2s,transform .1s;
+      }
+      .d-nav__play:hover{ box-shadow:0 0 36px rgba(217,119,6,.6);transform:translateY(-1px) }
+      .d-nav__play:active{ transform:scale(.97) }
+
+      /* ── Hero */
+      .d-hero{
+        position:relative;z-index:2;
+        flex:1;
+        display:flex;align-items:center;
+        padding:0 48px;
+        gap:60px;
+      }
+
+      /* ── Left column */
+      .d-left{
+        flex:1;max-width:560px;
+        display:flex;flex-direction:column;
+        gap:0;
+      }
+      .d-tag{
+        font-family:'Share Tech Mono',monospace;
+        font-size:10px;letter-spacing:5px;text-transform:uppercase;
+        color:var(--gold-dim);
+        margin-bottom:18px;
+        display:flex;align-items:center;gap:10px;
+      }
+      .d-tag::before{
+        content:'';display:inline-block;
+        width:32px;height:1px;
+        background:var(--gold-dim);
+      }
+      .d-title{
+        font-family:'Orbitron',monospace;
+        font-size:clamp(52px,7vw,100px);
+        font-weight:900;
+        line-height:.9;
+        letter-spacing:-2px;
+        background:linear-gradient(160deg,#fff8e0 0%,var(--gold-b) 40%,var(--gold) 70%,#a05000 100%);
+        -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+        margin-bottom:8px;
+        filter:drop-shadow(0 0 40px rgba(217,119,6,.4));
+      }
+      .d-subtitle{
+        font-family:'Share Tech Mono',monospace;
+        font-size:clamp(14px,1.4vw,18px);
+        letter-spacing:4px;text-transform:uppercase;
+        color:rgba(245,230,208,.5);
+        margin-bottom:36px;
+      }
+
+      /* Stats row */
+      .d-stats{
+        display:flex;gap:32px;
+        margin-bottom:40px;
+      }
+      .d-stat-item{
+        display:flex;flex-direction:column;gap:4px;
+        padding-left:16px;
+        border-left:2px solid rgba(217,119,6,.3);
+      }
+      .d-stat-val{
+        font-family:'Orbitron',monospace;
+        font-size:clamp(22px,2.5vw,32px);font-weight:700;
+        color:var(--gold-b);
+        line-height:1;
+      }
+      .d-stat-lbl{
+        font-family:'Share Tech Mono',monospace;
+        font-size:9px;letter-spacing:3px;text-transform:uppercase;
+        color:var(--muted);
+      }
+
+      /* CTA buttons */
+      .d-btns{
+        display:flex;gap:16px;
+        margin-bottom:32px;
+        flex-wrap:wrap;
+      }
+      .d-btn{
+        font-family:'Orbitron',monospace;
+        font-size:12px;font-weight:700;letter-spacing:2px;
+        padding:14px 32px;border-radius:8px;
+        cursor:pointer;position:relative;overflow:hidden;
+        transition:transform .1s,box-shadow .2s;
+        display:flex;align-items:center;gap:10px;
+      }
+      .d-btn::before{
+        content:'';position:absolute;
+        top:-50%;left:-70%;width:45%;height:200%;
+        background:linear-gradient(90deg,transparent,rgba(255,255,255,.12),transparent);
+        transform:skewX(-20deg);
+        animation:shine 4s ease-in-out infinite 2s;
+      }
+      .d-btn:active{ transform:scale(.97) }
+      .d-btn--gold{
+        background:linear-gradient(135deg,#7a4800 0%,#b86e00 50%,#7a4800 100%);
+        border:1.5px solid var(--gold);color:#fff8e0;
+        box-shadow:0 0 28px var(--glow);
+        animation:glow-gold 3s ease-in-out infinite;
+      }
+      .d-btn--gold:hover{ box-shadow:0 0 50px rgba(217,119,6,.6);transform:translateY(-2px) }
+      .d-btn--green{
+        background:linear-gradient(135deg,#0a3a12 0%,#16701f 50%,#0a3a12 100%);
+        border:1.5px solid var(--green);color:#d4ffd8;
+        box-shadow:0 0 28px var(--glow-g);
+        animation:glow-green 3s ease-in-out infinite .6s;
+      }
+      .d-btn--green:hover{ box-shadow:0 0 50px rgba(34,197,94,.55);transform:translateY(-2px) }
+      .d-btn:disabled{ opacity:.3;animation:none;cursor:default;transform:none !important }
+
+      /* Provably fair */
+      .d-pf{
+        display:flex;align-items:center;gap:8px;
+        font-family:'Share Tech Mono',monospace;
+        font-size:10px;letter-spacing:2px;
+        color:rgba(50,120,50,.7);
+      }
+      .d-pf-dot{
+        width:6px;height:6px;border-radius:50%;
+        background:#40a040;
+        animation:blink 2s ease-in-out infinite;
+        flex-shrink:0;
+      }
+
+      /* ── Right column */
+      .d-right{
+        flex:1;max-width:640px;
+        display:flex;flex-direction:column;
+        align-items:center;gap:20px;
+      }
+      .d-games-grid{
+        display:grid;grid-template-columns:1fr 1fr;
+        gap:20px;width:100%;
+      }
+      .d-game-card{
+        position:relative;overflow:hidden;
+        border-radius:16px;
+        padding:32px 24px;
+        cursor:pointer;
+        display:flex;flex-direction:column;align-items:center;gap:12px;
+        transition:transform .2s,box-shadow .2s;
+      }
+      .d-game-card:hover{ transform:translateY(-6px) scale(1.02) }
+      .d-game-card::before{
+        content:'';position:absolute;inset:0;
+        background:linear-gradient(180deg,rgba(255,255,255,.06) 0%,transparent 50%);
+        border-radius:16px;pointer-events:none;
+      }
+      .d-game-card--gold{
+        background:linear-gradient(160deg,#1a0e02 0%,#0e0701 100%);
+        border:1.5px solid rgba(217,119,6,.4);
+        box-shadow:0 0 40px rgba(217,119,6,.12),inset 0 1px 0 rgba(255,220,100,.08);
+        animation:glow-gold 4s ease-in-out infinite;
+      }
+      .d-game-card--green{
+        background:linear-gradient(160deg,#041008 0%,#020604 100%);
+        border:1.5px solid rgba(34,197,94,.35);
+        box-shadow:0 0 40px rgba(34,197,94,.1),inset 0 1px 0 rgba(100,255,120,.06);
+        animation:glow-green 4s ease-in-out infinite .8s;
+      }
+      .d-card-emoji{
+        font-size:52px;line-height:1;
+        filter:drop-shadow(0 0 12px rgba(255,200,50,.4));
+      }
+      .d-card-name{
+        font-family:'Orbitron',monospace;
+        font-size:14px;font-weight:700;letter-spacing:2px;
+        text-align:center;
+      }
+      .d-game-card--gold  .d-card-name{ color:var(--gold-b) }
+      .d-game-card--green .d-card-name{ color:var(--green-b) }
+      .d-card-desc{
+        font-family:'Share Tech Mono',monospace;
+        font-size:10px;letter-spacing:2px;text-transform:uppercase;
+        color:var(--muted);text-align:center;
+      }
+      .d-card-rtp{
+        font-family:'Share Tech Mono',monospace;
+        font-size:9px;letter-spacing:2px;
+        padding:3px 10px;border-radius:20px;
+        color:var(--muted);
+      }
+      .d-game-card--gold  .d-card-rtp{ background:rgba(217,119,6,.1);border:1px solid rgba(217,119,6,.2) }
+      .d-game-card--green .d-card-rtp{ background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2) }
+      .d-card-play{
+        font-family:'Orbitron',monospace;
+        font-size:10px;font-weight:700;letter-spacing:2px;
+        padding:8px 20px;border-radius:6px;
+        cursor:pointer;transition:opacity .2s;
+        margin-top:4px;
+      }
+      .d-game-card--gold  .d-card-play{
+        background:linear-gradient(135deg,#7a4800,#b86e00,#7a4800);
+        border:1px solid var(--gold);color:#fff8e0;
+      }
+      .d-game-card--green .d-card-play{
+        background:linear-gradient(135deg,#0a3a12,#16701f,#0a3a12);
+        border:1px solid var(--green);color:#d4ffd8;
+      }
+      .d-card-play:hover{ opacity:.85 }
+
+      .d-coming-soon{
+        font-family:'Share Tech Mono',monospace;
+        font-size:9px;letter-spacing:4px;text-transform:uppercase;
+        color:rgba(154,114,82,.35);
+      }
+
+      /* ── Desktop offline banner */
+      #dOfflineBanner{
+        display:none;
+        position:fixed;top:80px;left:50%;transform:translateX(-50%);
+        padding:10px 24px;
+        background:rgba(80,15,5,.85);
+        border:1px solid rgba(160,50,30,.6);
+        border-radius:8px;z-index:100;
+        font-family:'Share Tech Mono',monospace;
+        font-size:11px;letter-spacing:2px;color:#cc5533;
+      }
+
+      /* ── Vertical accent line */
+      .d-divider-v{
+        width:1px;height:60%;align-self:center;flex-shrink:0;
+        background:linear-gradient(180deg,transparent,rgba(217,119,6,.25),transparent);
+      }
     }
-    .pf-dot{
-      width:6px;height:6px;border-radius:50%;background:#40a040;
-      animation:blink 2s ease-in-out infinite;flex-shrink:0;
+
+    /* Only render desktop elements on desktop */
+    .d-particles,.d-nav,.d-hero,.d-left,.d-right,
+    .d-tag,.d-title,.d-subtitle,.d-stats,.d-btns,.d-pf,
+    .d-games-grid,.d-game-card,.d-coming-soon,
+    #dOfflineBanner,.d-divider-v{ display:none }
+
+    @media (min-width:769px){
+      .d-particles{ display:block }
+      .d-nav{ display:flex }
+      .d-hero{ display:flex }
+      .d-left{ display:flex }
+      .d-right{ display:flex }
+      .d-stats{ display:flex }
+      .d-btns{ display:flex }
+      .d-pf{ display:flex }
+      .d-games-grid{ display:grid }
+      .d-coming-soon{ display:block }
+      .d-divider-v{ display:block }
     }
-    @keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
   </style>
 </head>
 <body>
 
-<!-- Floating dust -->
+<!-- ═══════════════════════════════════════════════════════════
+     MOBILE LAYOUT
+══════════════════════════════════════════════════════════════ -->
 <div class="dust" id="dust"></div>
 
-<div class="page">
-
-  <!-- Logo -->
+<div class="mobile-layout">
   <div class="logo-wrap">
     <img class="logo-img" src="/assets/hgames-logo.jpg" alt="H-GAMES"
          onerror="this.style.display='none';document.getElementById('logoFb').style.display='block'">
@@ -294,7 +559,6 @@
   <div class="provider-sub">Provider</div>
   <div class="divider"></div>
 
-  <!-- Player card -->
   <div class="card">
     <div class="player-row">
       <div class="avatar" id="avatar">?</div>
@@ -316,27 +580,23 @@
     </div>
   </div>
 
-  <!-- Offline banner -->
   <div id="offlineBanner">
     <div class="off-icon">🌵</div>
     <div class="off-title">Server sleeping…</div>
     <div class="off-sub">Saddle up later, partner.</div>
   </div>
 
-  <!-- Game selector -->
   <div class="games-label">Choose Your Escape</div>
   <button id="joinBtn"   class="game-btn">🤠 &nbsp;JOIN THE HEIST</button>
   <button id="grannyBtn" class="game-btn">👵 &nbsp;GRANNY RUN</button>
   <div class="coming-soon">· More escapes coming soon ·</div>
 
-  <!-- Secondary -->
   <div class="sec-row">
     <button class="sec-btn" onclick="onFairPlay()">⚖ Fair Play</button>
     <button class="sec-btn" onclick="onSettings()">⚙ Settings</button>
     <button class="sec-btn" onclick="onSupport()">✉ Support</button>
   </div>
 
-  <!-- Footer -->
   <div class="footer">
     <div class="f-row">
       <span class="f-lbl">RTP</span>
@@ -351,8 +611,99 @@
       Provably Fair · Cryptographic seed verification
     </div>
   </div>
-
 </div>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     DESKTOP LAYOUT
+══════════════════════════════════════════════════════════════ -->
+<div class="desktop-layout">
+
+  <!-- Desktop particles -->
+  <div class="d-particles" id="dParticles"></div>
+
+  <!-- Navbar -->
+  <nav class="d-nav">
+    <div class="d-nav__logo" onclick="window.scrollTo(0,0)">H•GAMES</div>
+    <div class="d-nav__links">
+      <a onclick="document.getElementById('dJoinCard').scrollIntoView({behavior:'smooth'})">Games</a>
+      <a onclick="onFairPlay()">Fair Play</a>
+      <a onclick="onSupport()">Support</a>
+    </div>
+    <button class="d-nav__play" id="dNavPlayBtn">▶ PLAY NOW</button>
+  </nav>
+
+  <!-- Offline notice -->
+  <div id="dOfflineBanner">⚠ &nbsp;Server offline — check back soon</div>
+
+  <!-- Hero -->
+  <div class="d-hero">
+
+    <!-- Left: branding + CTAs -->
+    <div class="d-left">
+      <div class="d-tag">Premium Crash Game Provider</div>
+      <h1 class="d-title">H-GAMES</h1>
+      <p class="d-subtitle">Crash · Bet · Win · Repeat</p>
+
+      <div class="d-stats">
+        <div class="d-stat-item">
+          <span class="d-stat-val">2</span>
+          <span class="d-stat-lbl">Games</span>
+        </div>
+        <div class="d-stat-item">
+          <span class="d-stat-val">94%</span>
+          <span class="d-stat-lbl">RTP</span>
+        </div>
+        <div class="d-stat-item">
+          <span class="d-stat-val">∞</span>
+          <span class="d-stat-lbl">Rounds</span>
+        </div>
+        <div class="d-stat-item">
+          <span class="d-stat-val" id="dBalance">—</span>
+          <span class="d-stat-lbl">Balance</span>
+        </div>
+      </div>
+
+      <div class="d-btns">
+        <button class="d-btn d-btn--gold" id="dJoinBtn">🤠 &nbsp;JOIN THE HEIST</button>
+        <button class="d-btn d-btn--green" id="dGrannyBtn">👵 &nbsp;GRANNY RUN</button>
+      </div>
+
+      <div class="d-pf">
+        <div class="d-pf-dot"></div>
+        Provably Fair · Cryptographic seed verification · RTP 94.0%
+      </div>
+    </div>
+
+    <div class="d-divider-v"></div>
+
+    <!-- Right: game cards -->
+    <div class="d-right">
+      <div class="d-games-grid">
+
+        <div class="d-game-card d-game-card--gold" id="dJoinCard" onclick="goOutlaw()">
+          <div class="d-card-emoji">🤠</div>
+          <div class="d-card-name">OUTLAW ESCAPE</div>
+          <div class="d-card-desc">Classic crash heist</div>
+          <div class="d-card-rtp">RTP 94%</div>
+          <button class="d-card-play" id="dJoinCardBtn" onclick="event.stopPropagation();goOutlaw()">PLAY</button>
+        </div>
+
+        <div class="d-game-card d-game-card--green" onclick="goGranny()">
+          <div class="d-card-emoji">👵</div>
+          <div class="d-card-name">GRANNY RUN</div>
+          <div class="d-card-desc">Escape the hospital</div>
+          <div class="d-card-rtp">RTP 94%</div>
+          <button class="d-card-play" id="dGrannyCardBtn" onclick="event.stopPropagation();goGranny()">PLAY</button>
+        </div>
+
+      </div>
+      <div class="d-coming-soon">· More escapes coming soon ·</div>
+    </div>
+
+  </div>
+</div>
+
 
 <script>
 // ── Telegram SDK ──────────────────────────────────────────────────────────────
@@ -365,8 +716,10 @@ if (tg) {
   tg.setBackgroundColor?.('#080501')
 }
 
-// ── Dust particles ────────────────────────────────────────────────────────────
-;(function spawnDust() {
+const isMobile = window.innerWidth < 769
+
+// ── Mobile dust particles ─────────────────────────────────────────────────────
+if (isMobile) {
   const wrap = document.getElementById('dust')
   for (let i = 0; i < 22; i++) {
     const s = document.createElement('span')
@@ -376,13 +729,34 @@ if (tg) {
       `animation-delay:${Math.random()*12}s`,
       `width:${1+Math.random()*2}px`,
       `height:${1+Math.random()*2}px`,
+      `background:#78340f`,
       `opacity:0`,
     ].join(';')
     wrap.appendChild(s)
   }
-})()
+}
 
-// ── User profile ──────────────────────────────────────────────────────────────
+// ── Desktop particles ─────────────────────────────────────────────────────────
+if (!isMobile) {
+  const wrap = document.getElementById('dParticles')
+  const colors = ['#78340f','#78340f','#14532d','#14532d','#a05010']
+  for (let i = 0; i < 50; i++) {
+    const s = document.createElement('span')
+    const sz = 1 + Math.random() * 3
+    s.style.cssText = [
+      `left:${Math.random()*100}%`,
+      `animation-duration:${10+Math.random()*20}s`,
+      `animation-delay:${Math.random()*18}s`,
+      `width:${sz}px`,
+      `height:${sz}px`,
+      `background:${colors[Math.floor(Math.random()*colors.length)]}`,
+      `opacity:0`,
+    ].join(';')
+    wrap.appendChild(s)
+  }
+}
+
+// ── User profile (mobile) ─────────────────────────────────────────────────────
 const user = tg?.initDataUnsafe?.user || {}
 
 if (user.first_name) {
@@ -391,16 +765,14 @@ if (user.first_name) {
 } else {
   document.getElementById('playerName').textContent = 'Partner'
 }
-
 if (user.username) {
   document.getElementById('playerUsername').textContent = '@' + user.username
 } else {
   document.getElementById('playerUsername').textContent = '@ —'
 }
 
-// Avatar
 const avatarEl = document.getElementById('avatar')
-const initials = (user.first_name || 'O')[0].toUpperCase()
+const initials = (user.first_name || 'H')[0].toUpperCase()
 if (user.photo_url) {
   const img = document.createElement('img')
   img.src = user.photo_url
@@ -411,18 +783,32 @@ if (user.photo_url) {
   avatarEl.textContent = initials
 }
 
-// Status badge
 const BADGES = ['⭐ ROOKIE', '🤠 OUTLAW', '👑 LEGEND']
 if (user.id) {
   document.getElementById('badge').textContent = BADGES[user.id % BADGES.length]
 }
 
-// Session hash
 const rawHash = tg?.initDataUnsafe?.hash || Math.random().toString(36).slice(2)
 document.getElementById('sessionHash').textContent = '#' + rawHash.slice(0, 8).toUpperCase()
 
-// ── Game URL (same server, root path) ────────────────────────────────────────
-const GAME_URL = window.location.origin + '/play'
+// ── Navigation helpers ────────────────────────────────────────────────────────
+function goOutlaw() { window.location.href = window.location.origin + '/play' }
+function goGranny() { window.location.href = window.location.origin + '/granny.html?v=29' }
+
+// ── Mobile buttons ────────────────────────────────────────────────────────────
+document.getElementById('joinBtn').addEventListener('click', () => {
+  tg?.HapticFeedback?.impactOccurred('heavy')
+  goOutlaw()
+})
+document.getElementById('grannyBtn').addEventListener('click', () => {
+  tg?.HapticFeedback?.impactOccurred('heavy')
+  goGranny()
+})
+
+// ── Desktop buttons ───────────────────────────────────────────────────────────
+document.getElementById('dJoinBtn').addEventListener('click', goOutlaw)
+document.getElementById('dGrannyBtn').addEventListener('click', goGranny)
+document.getElementById('dNavPlayBtn').addEventListener('click', goOutlaw)
 
 // ── Server health check ───────────────────────────────────────────────────────
 async function checkServer() {
@@ -434,7 +820,7 @@ async function checkServer() {
   } catch { return false }
 }
 
-// ── Auth → get balance & player ID ───────────────────────────────────────────
+// ── Auth → balance & player ID ────────────────────────────────────────────────
 async function fetchProfile() {
   try {
     const initData = tg?.initData || ''
@@ -448,8 +834,9 @@ async function fetchProfile() {
     const d = await r.json()
     if (d.token) sessionStorage.setItem('crash_token', d.token)
     if (d.balance != null) {
-      document.getElementById('balance').textContent =
-        '$' + parseFloat(d.balance).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})
+      const fmt = '$' + parseFloat(d.balance).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})
+      document.getElementById('balance').textContent = fmt
+      document.getElementById('dBalance').textContent = fmt
     }
     if (d.player_id) {
       document.getElementById('playerId').textContent = '#' + d.player_id
@@ -457,29 +844,15 @@ async function fetchProfile() {
   } catch {}
 }
 
-// ── JOIN handler ──────────────────────────────────────────────────────────────
-document.getElementById('joinBtn').addEventListener('click', () => {
-  tg?.HapticFeedback?.impactOccurred('heavy')
-  window.location.href = GAME_URL
-})
-
-document.getElementById('grannyBtn').addEventListener('click', () => {
-  tg?.HapticFeedback?.impactOccurred('heavy')
-  window.location.href = window.location.origin + '/granny.html?v=3'
-})
-
 // ── Secondary buttons ─────────────────────────────────────────────────────────
 function onFairPlay() {
   const h = rawHash.slice(0, 16).toUpperCase()
-  tg?.showAlert?.(
-    '⚖ Provably Fair\n\n' +
-    'H-GAMES uses cryptographic server seeds to guarantee every outcome is tamper-proof.\n\n' +
-    'Session seed: ' + h + '…\n\n' +
-    'RTP: 94.0%'
-  )
+  const msg = '⚖ Provably Fair\n\nH-GAMES uses cryptographic server seeds to guarantee every outcome is tamper-proof.\n\nSession seed: ' + h + '…\n\nRTP: 94.0%'
+  tg?.showAlert ? tg.showAlert(msg) : alert(msg)
 }
 function onSettings() {
-  tg?.showAlert?.('⚙ Settings\n\nComing soon.')
+  const msg = '⚙ Settings\n\nComing soon.'
+  tg?.showAlert ? tg.showAlert(msg) : alert(msg)
 }
 function onSupport() {
   if (tg?.openTelegramLink) {
@@ -494,11 +867,19 @@ function onSupport() {
   const [online] = await Promise.all([checkServer(), fetchProfile()])
 
   if (!online) {
+    // Mobile offline
     document.getElementById('offlineBanner').style.display = 'block'
-    const btn = document.getElementById('joinBtn')
-    btn.disabled = true
-    btn.textContent = '🌵  SERVER OFFLINE'
+    document.getElementById('joinBtn').disabled = true
+    document.getElementById('joinBtn').textContent = '🌵  SERVER OFFLINE'
     document.getElementById('grannyBtn').disabled = true
+
+    // Desktop offline
+    document.getElementById('dOfflineBanner').style.display = 'block'
+    document.getElementById('dJoinBtn').disabled = true
+    document.getElementById('dGrannyBtn').disabled = true
+    document.getElementById('dNavPlayBtn').disabled = true
+    document.getElementById('dJoinCardBtn').disabled = true
+    document.getElementById('dGrannyCardBtn').disabled = true
   }
 })()
 </script>
