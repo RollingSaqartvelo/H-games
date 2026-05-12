@@ -151,10 +151,12 @@
 
     /* Mobile logo */
     .m-logo{
-      font-size:42px; letter-spacing:.15em;
-      background-size:100% 1em;
       margin-bottom:4px;
       display:block;
+    }
+    .m-logo img{
+      width:220px; max-width:80vw;
+      display:block; margin:0 auto;
     }
     .m-sub{
       font-size:8px; letter-spacing:.5em; text-transform:uppercase;
@@ -406,8 +408,10 @@
         backdrop-filter:blur(16px);
       }
       .d-nav__logo{
-        font-size:18px; letter-spacing:.3em;
         cursor:pointer; display:block;
+      }
+      .d-nav__logo img{
+        height:32px; display:block;
       }
       .d-nav__links{
         display:flex; align-items:center; gap:40px;
@@ -441,9 +445,8 @@
         margin-bottom:16px;
         animation:eu-drift 6s ease-in-out infinite;
       }
-      .d-logo{
-        font-size:clamp(64px,9vw,130px);
-        letter-spacing:.1em;
+      .d-logo img{
+        width:clamp(280px,35vw,520px);
         display:block;
       }
       .d-provider{
@@ -582,7 +585,9 @@
 <div class="mobile">
 
   <!-- Logo -->
-  <div class="m-logo eu">H-GAMES</div>
+  <div class="m-logo">
+    <img src="/assets/hgames-logo.jpg" alt="H-GAMES">
+  </div>
   <div class="m-sub">Premium Game Provider</div>
 
   <!-- Player card -->
@@ -675,7 +680,9 @@
 
   <!-- Nav -->
   <nav class="d-nav">
-    <div class="d-nav__logo eu">H•GAMES</div>
+    <div class="d-nav__logo">
+          <img src="/assets/hgames-logo.jpg" alt="H-GAMES">
+        </div>
     <div class="d-nav__links">
       <a onclick="onFairPlay()">Provably Fair</a>
       <a onclick="onSupport()">Support</a>
@@ -693,7 +700,9 @@
     <!-- Left -->
     <div class="d-left">
       <div class="d-logo-wrap">
-        <div class="d-logo eu">H-GAMES</div>
+        <div class="d-logo">
+          <img src="/assets/hgames-logo.jpg" alt="H-GAMES">
+        </div>
       </div>
       <div class="d-provider eu-tag">Premium Crash Game Provider</div>
 

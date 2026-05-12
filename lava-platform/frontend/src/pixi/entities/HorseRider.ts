@@ -1,110 +1,97 @@
+/**
+ * OutlawRunner — the player's escaped outlaw running through the western town.
+ *
+ * Uses hero PNG sprites when available, falls back to procedural graphics.
+ * States:
+ *   idle    — standing, light sway (before round starts)
+ *   running — forward sprint, arm swing, dust kick, coat flapping
+ *   fall    — captured / shot, tumbling forward with coat spread
+ */
+
 import { Container, Graphics, Sprite, Assets, Texture } from 'pixi.js'
 import { ASSET_PATHS, HORSE_SCALE, HORSE_HOOF_OFFSET_Y } from '../../game/config'
 
-export type RiderState = 'idle' | 'crouch' | 'airborne' | 'impact' | 'fall' | 'tumble'
+export type RiderState = 'idle' | 'running' | 'fall' |
+  // Legacy states (kept for type-safety, mapped to nearest equivalent)
+  'crouch' | 'airborne' | 'impact' | 'tumble'
 
-// All normal states use idle texture — prevents direction flip when textures
-// have different original facing. Only fall/tumble switch texture.
 const HERO_TEX_MAP: Record<RiderState, string> = {
   idle:     ASSET_PATHS.hero.idle,
+  running:  ASSET_PATHS.hero.idle,
   crouch:   ASSET_PATHS.hero.idle,
-  airborne: ASSET_PATHS.hero.jump,
+  airborne: ASSET_PATHS.hero.idle,
   impact:   ASSET_PATHS.hero.idle,
-  tumble:   ASSET_PATHS.hero.fall,   // hero_fall.png during mid-air crash tumble
+  tumble:   ASSET_PATHS.hero.fall,
   fall:     ASSET_PATHS.hero.fall,
 }
 
-/**
- * Horse + outlaw rider.
- *
- * Sprite mode (active when PNG assets are in the Assets cache):
- *   horseSprite  — horse PNG, anchor bottom-center
- *   heroSprite   — hero PNG, anchored to sit on horse's back
- *   Container squash/stretch/rotation drives animation — no per-frame redraws.
- *
- * Procedural fallback (when sprites unavailable):
- *   Identical to original Graphics-based implementation.
- *
- * State machine (managed externally by GameScene):
- *   idle / crouch / airborne / impact / fall
- */
 export class HorseRider {
   readonly container: Container
 
-  // ── Sprite mode ────────────────────────────────────────────────────────────
   private heroSprite?: Sprite
   private readonly useSprites: boolean
 
-  // ── Procedural fallback ────────────────────────────────────────────────────
-  private body:   Graphics
-  private legs:   Graphics
+  // Procedural graphics layers
   private shadow: Graphics
-  private loot:   Graphics
-  private lines:  Graphics
+  private body:   Graphics
+  private coat:   Graphics
+  private arms:   Graphics
+  private legs:   Graphics
+  private dust:   Graphics
 
-  // ── Shared state ───────────────────────────────────────────────────────────
   private state:     RiderState = 'idle'
-  private time      = 0
-  private phaseTime = 0
-
-  private scaleX            = 1
-  private scaleY            = 1
-  private rotation          = 0
-  private fallSpin          = 0
-  private flashOn           = false
-  private fallEntryRotation = 0   // rotation captured when entering fall from tumble
+  private time       = 0
+  private phaseTime  = 0
+  private fallSpin   = 0
+  private flashOn    = false
+  private fallEntryRot = 0
 
   constructor() {
     this.container = new Container()
 
-    // Always create procedural Graphics (needed for fallback, no-op if sprite mode)
     this.shadow = new Graphics()
-    this.legs   = new Graphics()
     this.body   = new Graphics()
-    this.loot   = new Graphics()
-    this.lines  = new Graphics()
-    this.container.addChild(this.shadow, this.legs, this.loot, this.body, this.lines)
+    this.coat   = new Graphics()
+    this.arms   = new Graphics()
+    this.legs   = new Graphics()
+    this.dust   = new Graphics()
+    this.container.addChild(this.shadow, this.dust, this.legs, this.coat, this.body, this.arms)
 
     const heroTex = Assets.get<Texture>(ASSET_PATHS.hero.idle)
     this.useSprites = !!heroTex
+
     if (heroTex) {
-      // ── Sprite mode: hero only, mirrored to face right ───────────────────
-      this.body.visible = this.legs.visible = this.shadow.visible =
-        this.loot.visible = this.lines.visible = false
+      this.body.visible  = false
+      this.coat.visible  = false
+      this.arms.visible  = false
+      this.legs.visible  = false
+      this.dust.visible  = false
+      this.shadow.visible = false
 
       this.heroSprite = new Sprite(heroTex)
-      this.heroSprite.anchor.set(0.5, 1.0)          // bottom-center = foot point
-      // Negative x-scale mirrors the sprite horizontally
+      this.heroSprite.anchor.set(0.5, 1.0)
       this.heroSprite.scale.set(-HORSE_SCALE, HORSE_SCALE)
       this.heroSprite.y = HORSE_HOOF_OFFSET_Y
       this.container.addChild(this.heroSprite)
-
-      console.log('[HorseRider] hero-only sprite mode —', heroTex.width, 'x', heroTex.height)
     } else {
-      // ── Procedural fallback ────────────────────────────────────────────────
-      this.buildBody()
-      console.log('[HorseRider] procedural fallback (sprites not in cache)')
+      this.buildProceduralOutlaw()
     }
   }
 
-  // ── Public API ─────────────────────────────────────────────────────────────
-
   setState(state: RiderState): void {
     if (this.state === state) return
-    // Capture rotation so fall can decay smoothly from tumble angle
-    if (state === 'fall') this.fallEntryRotation = this.container.rotation
+    if (state === 'fall') this.fallEntryRot = this.container.rotation
     this.state     = state
     this.phaseTime = 0
     this.fallSpin  = 0
     this.flashOn   = false
 
     if (this.useSprites && this.heroSprite) {
-      const etex = Assets.get<Texture>(HERO_TEX_MAP[state])
-      if (etex) this.heroSprite.texture = etex
+      const tex = Assets.get<Texture>(HERO_TEX_MAP[state])
+      if (tex) this.heroSprite.texture = tex
     }
 
-    if (state === 'idle') {
-      this.scaleX = 1; this.scaleY = 1; this.rotation = 0
+    if (state === 'idle' || state === 'running') {
       this.container.rotation = 0
     }
   }
@@ -114,19 +101,9 @@ export class HorseRider {
     this.phaseTime += dt
 
     if (this.useSprites) {
-      this.updateSpriteMode(dt)
+      this.updateSprite(dt)
     } else {
-      switch (this.state) {
-        case 'idle':     this.tickIdle();     break
-        case 'crouch':   this.tickCrouch();   break
-        case 'airborne': this.tickAirborne(); break
-        case 'impact':   this.tickImpact();   break
-        case 'fall':     this.tickFall(dt);   break
-      }
-      this.container.scale.x   = this.scaleX
-      this.container.scale.y   = this.scaleY
-      this.container.rotation  = this.rotation
-      this.drawShadow()
+      this.updateProcedural(dt)
     }
   }
 
@@ -136,221 +113,257 @@ export class HorseRider {
 
   // ── Sprite-mode animation ─────────────────────────────────────────────────
 
-  private updateSpriteMode(_dt: number): void {
+  private updateSprite(_dt: number): void {
     if (!this.heroSprite) return
 
-    // hero_fall.png and airborne face right; idle/crouch/impact face left and need flip
-    const scaleX = (this.state === 'fall' || this.state === 'tumble' || this.state === 'airborne') ? HORSE_SCALE : -HORSE_SCALE
-    this.heroSprite.scale.set(scaleX, HORSE_SCALE)
-
-    // Container scale is NEVER touched in sprite mode (would fight hero scale.x).
-    // Only rotation and vertical bob are animated.
     switch (this.state) {
       case 'idle': {
-        this.heroSprite.y     = HORSE_HOOF_OFFSET_Y + Math.sin(this.time * 2.5) * 1.5
+        // Gentle idle sway
+        this.heroSprite.scale.set(-HORSE_SCALE, HORSE_SCALE)
+        this.heroSprite.y = HORSE_HOOF_OFFSET_Y + Math.sin(this.time * 1.8) * 1.5
         this.container.rotation = 0
         break
       }
+      case 'running':
       case 'crouch':
-      case 'impact': {
-        this.heroSprite.y     = HORSE_HOOF_OFFSET_Y
-        this.container.rotation = 0
-        break
-      }
+      case 'impact':
       case 'airborne': {
-        // hero_jump.png — exact reference pose, stable silhouette
-        this.heroSprite.y       = HORSE_HOOF_OFFSET_Y
-        this.container.rotation = -0.06   // very slight upward lean, cinematic only
+        // Running: fast vertical bob, slight forward lean
+        this.heroSprite.scale.set(-HORSE_SCALE, HORSE_SCALE)
+        const bob = Math.sin(this.time * 9.5) * 3.5
+        this.heroSprite.y = HORSE_HOOF_OFFSET_Y + bob
+        // Lean forward based on bob cycle (feels like sprinting)
+        this.container.rotation = -0.10 + Math.sin(this.time * 9.5) * 0.04
         break
       }
       case 'tumble': {
-        // hero_fall.png rotating 90° head-down during mid-air crash
-        this.heroSprite.y       = HORSE_HOOF_OFFSET_Y
-        this.container.rotation = Math.min(this.phaseTime * 6.0, Math.PI / 2)
+        this.heroSprite.scale.set(HORSE_SCALE, HORSE_SCALE)
+        this.heroSprite.y = HORSE_HOOF_OFFSET_Y
+        this.container.rotation = Math.min(this.phaseTime * 5.5, Math.PI / 2)
         break
       }
       case 'fall': {
+        this.heroSprite.scale.set(HORSE_SCALE, HORSE_SCALE)
         this.heroSprite.y = HORSE_HOOF_OFFSET_Y
-        if (this.fallEntryRotation > Math.PI / 4) {
-          // coming from air tumble — lock at 90° (head pointing down)
+        if (this.fallEntryRot > Math.PI / 4) {
           this.container.rotation = Math.PI / 2
         } else {
-          // coming from platform crash — slight forward tilt
-          const decay = Math.exp(-this.phaseTime * 7)
-          this.container.rotation = 0.08 + (this.fallEntryRotation - 0.08) * decay
+          // Forward tumble on capture — rotate forward
+          const target = Math.PI * 0.45
+          this.container.rotation = lerp(this.fallEntryRot, target,
+            Math.min(this.phaseTime * 2.5, 1))
         }
         break
       }
     }
   }
 
-  // ── Procedural: build static body ─────────────────────────────────────────
+  // ── Procedural outlaw drawing ─────────────────────────────────────────────
 
-  private buildBody(flash = false): void {
+  private buildProceduralOutlaw(flash = false): void {
     this.body.clear()
 
-    const horseBody  = flash ? 0xff4422 : 0x8b4513
-    const horseDark  = flash ? 0xcc2200 : 0x5c2e00
-    const horseLight = flash ? 0xff8844 : 0xc4711c
+    const skin  = flash ? 0xff9966 : 0xe8a87c
+    const coat  = flash ? 0xff4422 : 0x3d1f06
+    const shirt = flash ? 0xff6633 : 0x6b3510
+    const hat   = flash ? 0xff6644 : 0x5c3410
+    const pants = flash ? 0xcc3322 : 0x2a1003
+    const boot  = flash ? 0xaa2200 : 0x1a0a00
+    const gold  = 0xd4a017
 
-    this.body.roundRect(-28, -22, 56, 18, 8).fill({ color: horseBody })
-    this.body.roundRect(-24, -12, 48, 6, 4).fill({ color: horseLight, alpha: 0.25 })
-    this.body.poly([14, -20, 22, -20, 26, -38, 18, -38]).fill({ color: horseBody })
-    this.body.ellipse(26, -40, 12, 9).fill({ color: horseBody })
-    this.body.ellipse(35, -39, 6, 5).fill({ color: horseLight })
-    this.body.circle(37, -38, 1.5).fill({ color: horseDark })
-    this.body.circle(27, -43, 2.5).fill({ color: horseDark })
-    this.body.circle(26.5, -43.5, 0.9).fill({ color: 0xffffff, alpha: 0.8 })
-    this.body.poly([22, -48, 18, -44, 25, -44]).fill({ color: horseBody })
-    this.body.poly([22, -47, 19, -44, 24, -44]).fill({ color: 0xff9988, alpha: 0.6 })
-
-    for (let i = 0; i < 4; i++) {
-      const mx = 18 - i * 3
-      this.body.poly([mx, -44, mx - 2, -30, mx + 2, -30]).fill({ color: horseDark, alpha: 0.8 })
-    }
-    for (let i = 0; i < 3; i++) {
-      const ty = -14 - i * 3
-      const tx = -28 - i * 2
-      this.body.poly([tx, ty - 2, tx - 6, ty + 4, tx - 4, ty + 8, tx - 1, ty + 5])
-        .fill({ color: horseDark, alpha: 0.85 - i * 0.15 })
-    }
-
-    this.body.roundRect(-4, -26, 16, 6, 3).fill({ color: 0x4a2406 })
-    this.body.roundRect(-2, -27, 12, 3, 2).fill({ color: 0x7a3c10, alpha: 0.8 })
-
-    const riderBody  = flash ? 0xff4422 : 0x3d1f06
-    const riderShirt = flash ? 0xee3311 : 0x6b3510
-    this.body.roundRect(-2, -48, 14, 22, 4).fill({ color: riderBody })
-    this.body.roundRect(0, -46, 10, 8, 2).fill({ color: riderShirt, alpha: 0.7 })
-    this.body.rect(-2, -30, 14, 3).fill({ color: 0x2a1003 })
-    this.body.circle(5, -29, 2).fill({ color: 0xd4a017 })
-
-    const skinColor = flash ? 0xff9955 : 0xe8a87c
-    this.body.circle(6, -54, 8).fill({ color: skinColor })
-    this.body.roundRect(0, -54, 12, 5, 2).fill({ color: 0xb22222, alpha: 0.85 })
-    this.body.circle(9, -56, 1.8).fill({ color: 0x1a0a00 })
-    this.body.circle(9, -56, 0.7).fill({ color: 0xffffff, alpha: 0.6 })
-    this.body.roundRect(-6, -62, 26, 3, 1.5).fill({ color: 0x3d2200 })
-    this.body.roundRect(-1, -74, 16, 13, 4).fill({ color: 0x5c3410 })
-    this.body.rect(-1, -63, 16, 2).fill({ color: 0x7a4a20 })
-    this.body.roundRect(1, -72, 10, 6, 3).fill({ color: 0x7a4a20, alpha: 0.4 })
-    this.body.poly([12, -44, 16, -44, 26, -38, 22, -37]).fill({ color: riderBody })
-    this.body.roundRect(22, -40, 8, 3, 1).fill({ color: 0x1a1a1a })
-    this.body.circle(24, -38, 3).fill({ color: 0x2a2a2a })
-    this.body.circle(24, -38, 2).fill({ color: 0x333333 })
-  }
-
-  // ── Procedural: loot ──────────────────────────────────────────────────────
-
-  private drawLoot(bounceY: number): void {
-    this.loot.clear()
-    this.loot.roundRect(-22, -38 + bounceY, 12, 14, 5).fill({ color: 0xb8860b })
-    this.loot.roundRect(-20, -36 + bounceY, 8, 10, 3).fill({ color: 0xdaa520, alpha: 0.6 })
-    this.loot.roundRect(-18, -34 + bounceY, 4, 8, 1).fill({ color: 0xffd700, alpha: 0.9 })
-    this.loot.roundRect(-19, -31 + bounceY, 6, 1.5, 0).fill({ color: 0xffd700, alpha: 0.9 })
-    this.loot.roundRect(-19, -28 + bounceY, 6, 1.5, 0).fill({ color: 0xffd700, alpha: 0.9 })
-    this.loot.circle(-16, -38 + bounceY, 2.5).fill({ color: 0x8b6914 })
-  }
-
-  // ── Procedural: shadow ────────────────────────────────────────────────────
-
-  private drawShadow(): void {
+    // Shadow
     this.shadow.clear()
-    const squish = this.state === 'impact' ? 2.0 : 1.0
-    const alpha  = this.state === 'impact' ? 0.4 : 0.18
-    this.shadow.ellipse(0, 2, 28 * squish, 5).fill({ color: 0x000000, alpha })
+    this.shadow.ellipse(0, 4, 16, 4).fill({ color: 0x000000, alpha: 0.22 })
+
+    // Boots
+    this.body.roundRect(-7, -10, 8, 10, 2).fill({ color: boot })
+    this.body.roundRect(1,  -10, 8, 10, 2).fill({ color: boot })
+    // Boot tips angle forward (running direction)
+    this.body.roundRect(-9, -2, 6, 4, 2).fill({ color: boot })
+    this.body.roundRect(3, -2, 6, 4, 2).fill({ color: boot })
+
+    // Pants
+    this.body.roundRect(-6, -32, 7, 24, 3).fill({ color: pants })
+    this.body.roundRect(1,  -32, 7, 24, 3).fill({ color: pants })
+    // Belt with buckle
+    this.body.rect(-7, -33, 16, 3).fill({ color: 0x2a1003 })
+    this.body.rect(-2, -35, 6, 4).fill({ color: gold })
+
+    // Torso / shirt
+    this.body.roundRect(-7, -56, 16, 26, 4).fill({ color: shirt })
+    // Vest overlay
+    this.body.roundRect(-5, -54, 4, 20, 2).fill({ color: coat, alpha: 0.8 })
+    this.body.roundRect(3,  -54, 4, 20, 2).fill({ color: coat, alpha: 0.8 })
+
+    // Neck & head
+    this.body.roundRect(-3, -64, 8, 10, 3).fill({ color: skin })
+    this.body.circle(1, -70, 9).fill({ color: skin })
+    // Stubble / face detail
+    this.body.circle(-2, -68, 1.5).fill({ color: 0x8b6050, alpha: 0.6 })
+    this.body.circle(4,  -68, 1.5).fill({ color: 0x8b6050, alpha: 0.6 })
+
+    // Hat brim
+    this.body.rect(-12, -78, 26, 3).fill({ color: hat })
+    // Hat crown
+    this.body.roundRect(-6, -96, 16, 20, 4).fill({ color: hat })
+    this.body.roundRect(-4, -94, 12, 4, 2).fill({ color: 0x7a4a20, alpha: 0.4 })
+    // Hat band
+    this.body.rect(-6, -78, 16, 3).fill({ color: 0xd4a017, alpha: 0.85 })
   }
 
-  // ── Procedural: legs ──────────────────────────────────────────────────────
-
-  private drawLegs(gallop: number): void {
-    this.legs.clear()
-    const hoofColor = 0x2a1500
-    const legColor  = 0x6b3510
-    const shinColor = 0x3d1f06
-    const phases    = [gallop * 0.8, -gallop * 0.8 + 0.15, -gallop * 0.7 - 0.1, gallop * 0.7 - 0.15]
-    const legAttachX = [-18, -10, 10, 18]
-    for (let i = 0; i < 4; i++) {
-      const ax = legAttachX[i]
-      const phase = phases[i]
-      const kx = ax + Math.sin(phase) * 10
-      const ky = -4 + 14
-      const fx = kx + Math.sin(phase * 0.6) * 8
-      const fy = ky + 10
-      this.legs.poly([ax - 2, -4, ax + 2, -4, kx + 2, ky, kx - 2, ky]).fill({ color: legColor })
-      this.legs.poly([kx - 2, ky, kx + 2, ky, fx + 2, fy, fx - 2, fy]).fill({ color: shinColor })
-      this.legs.roundRect(fx - 4, fy, 8, 4, 2).fill({ color: hoofColor })
+  private updateProcedural(dt: number): void {
+    switch (this.state) {
+      case 'idle':    this.tickProceduralIdle();          break
+      case 'running':
+      case 'crouch':
+      case 'impact':
+      case 'airborne': this.tickProceduralRunning();      break
+      case 'tumble':
+      case 'fall':    this.tickProceduralFall(dt);        break
     }
   }
 
-  // ── Procedural: speed lines ────────────────────────────────────────────────
-
-  private drawSpeedLines(intensity: number): void {
-    this.lines.clear()
-    if (intensity <= 0) return
-    const alpha = intensity * 0.4
-    for (let i = 0; i < 4; i++) {
-      const yOff = -20 + i * 10
-      const len  = 18 - i * 3
-      const pulse = Math.sin(this.phaseTime * 14 + i * 0.7) * 0.15 + 0.85
-      this.lines.rect(-40, yOff - 1, len, 2)
-        .fill({ color: 0xd4a017, alpha: alpha * pulse * (1 - i * 0.2) })
-    }
+  private tickProceduralIdle(): void {
+    this.container.rotation = 0
+    const bob = Math.sin(this.time * 2.0) * 1.5
+    this.container.y = bob
+    this.drawCoat(0, 0)
+    this.drawArms(0, 0)
+    this.drawLegs(0, false)
   }
 
-  // ── Procedural: tick phases ────────────────────────────────────────────────
+  private tickProceduralRunning(): void {
+    // Running bob
+    const cycle = this.time * 9.5
+    const bob   = Math.sin(cycle) * 3.5
+    const lean  = -0.12 + Math.sin(cycle) * 0.035
+    this.container.y = bob
+    this.container.rotation = lean
 
-  private tickIdle(): void {
-    const bob = Math.sin(this.time * 2.5) * 2
-    this.drawLegs(Math.sin(this.time * 2.5) * 0.1)
-    this.drawLoot(bob * 0.5)
-    this.drawSpeedLines(0)
-    this.scaleX = 1; this.scaleY = 1; this.rotation = 0
+    // Arms pump front-back
+    const armSwing = Math.sin(cycle) * 0.55
+    this.drawArms(armSwing, -armSwing)
+
+    // Coat flapping behind
+    const flapT = Math.sin(cycle * 0.5) * 0.4
+    this.drawCoat(flapT, -bob * 0.4)
+
+    // Legs stride
+    this.drawLegs(cycle, true)
+
+    // Foot dust at rear boot contact
+    this.drawFootDust(cycle)
   }
 
-  private tickCrouch(): void {
-    const t = Math.min(this.phaseTime / 0.18, 1)
-    this.scaleY = 1 - t * 0.22
-    this.scaleX = 1 + t * 0.15
-    this.rotation = 0
-    this.drawLegs(0.3)
-    this.drawLoot(4 * t)
-    this.drawSpeedLines(0)
-  }
+  private tickProceduralFall(dt: number): void {
+    this.fallSpin += dt * (3.5 + this.phaseTime * 2.8)
+    this.container.rotation = this.fallSpin
+    this.container.y = 0
+    this.drawCoat(0.6, 0)
+    this.drawArms(0.8, -0.8)
+    this.drawLegs(this.time * 6, false)
 
-  private tickAirborne(): void {
-    const gallop = Math.sin(this.phaseTime * 12) * 0.9
-    this.rotation = -0.18
-    this.scaleX = 1; this.scaleY = 1
-    this.drawLegs(gallop)
-    this.drawLoot(Math.sin(this.phaseTime * 12) * 3)
-    this.drawSpeedLines(1)
-  }
-
-  private tickImpact(): void {
-    const t = Math.min(this.phaseTime / 0.25, 1)
-    const squash = 1 - Math.sin(t * Math.PI) * 0.38
-    this.scaleY = Math.max(0.68, squash)
-    this.scaleX = Math.min(1.3, 1 + (1 - squash) * 0.7)
-    this.rotation = 0
-    this.drawLegs(0.25)
-    this.drawLoot(6 * (1 - t))
-    this.drawSpeedLines(0)
-  }
-
-  private tickFall(dt: number): void {
-    this.fallSpin += dt * (4 + this.phaseTime * 3)
-    this.rotation = this.fallSpin
-    this.scaleX = 1; this.scaleY = 1
-    this.drawLegs(Math.sin(this.phaseTime * 8) * 0.6)
-    this.drawLoot(Math.sin(this.phaseTime * 10) * 5)
-    this.drawSpeedLines(0)
-
-    const period  = 0.07
+    // Flash effect
+    const period = 0.07
     const nowFlash = Math.floor(this.phaseTime / period) % 2 === 1
     if (nowFlash !== this.flashOn) {
       this.flashOn = nowFlash
-      this.buildBody(this.flashOn)
+      this.buildProceduralOutlaw(this.flashOn)
     }
   }
+
+  // Coat: long western duster coat that flaps behind
+  private drawCoat(flapAngle: number, offsetY: number): void {
+    this.coat.clear()
+    // Back panel of coat (flaps behind as outlaw runs)
+    const coatColor = 0x3d1f06
+    const flap = Math.sin(flapAngle) * 12
+    // Main coat body
+    this.coat.poly([
+      -8, -55 + offsetY,
+      8,  -55 + offsetY,
+      12 + flap, -20 + offsetY,
+      -12 - flap, -20 + offsetY,
+    ]).fill({ color: coatColor, alpha: 0.9 })
+    // Coat tail (longer flap)
+    this.coat.poly([
+      0, -30 + offsetY,
+      10 + flap * 1.5, -10 + offsetY,
+      -10 - flap * 1.5, -10 + offsetY,
+    ]).fill({ color: 0x2a1003, alpha: 0.7 })
+  }
+
+  // Arms: pump front-back during running
+  private drawArms(frontAngle: number, backAngle: number): void {
+    this.arms.clear()
+    const skin   = 0xe8a87c
+    const sleeve = 0x6b3510
+
+    // Back arm (left in screen space, swings forward when running)
+    const bax = -8 + Math.sin(backAngle) * 14
+    const bay = -46 + Math.abs(Math.cos(backAngle)) * 6
+    this.arms.roundRect(-10, -56, 6, 20, 3).fill({ color: sleeve })
+    this.arms.roundRect(bax - 3, bay, 6, 8, 2).fill({ color: skin })
+
+    // Front arm (right, swings back)
+    const fax = 6 + Math.sin(frontAngle) * 14
+    const fay = -46 + Math.abs(Math.cos(frontAngle)) * 6
+    this.arms.roundRect(5, -56, 6, 20, 3).fill({ color: sleeve })
+    this.arms.roundRect(fax - 3, fay, 6, 8, 2).fill({ color: skin })
+
+    // Revolver in front hand (always visible)
+    this.arms.roundRect(fax + 2, fay + 2, 3, 9, 1).fill({ color: 0x2a2a2a })
+    this.arms.roundRect(fax, fay + 4, 3, 4, 1).fill({ color: 0x1a1a1a })
+  }
+
+  // Legs: stride animation
+  private drawLegs(cycle: number, running: boolean): void {
+    this.legs.clear()
+    if (!running) {
+      // Static idle legs
+      this.legs.roundRect(-7, -32, 7, 24, 3).fill({ color: 0x2a1003 })
+      this.legs.roundRect(1,  -32, 7, 24, 3).fill({ color: 0x2a1003 })
+      return
+    }
+    const pants = 0x2a1003
+    // Front leg
+    const frontKick = Math.sin(cycle) * 22
+    this.legs.poly([
+      -7, -32, 1, -32,
+      1 + frontKick * 0.4, -18,
+      -6 + frontKick * 0.3, -18,
+    ]).fill({ color: pants })
+    this.legs.roundRect(
+      -8 + frontKick * 0.5, -18,
+      8, 12, 2,
+    ).fill({ color: pants })
+
+    // Back leg
+    const backKick = -Math.sin(cycle) * 22
+    this.legs.poly([
+      1, -32, 9, -32,
+      9 + backKick * 0.3, -18,
+      0 + backKick * 0.4, -18,
+    ]).fill({ color: pants })
+    this.legs.roundRect(
+      0 + backKick * 0.5, -18,
+      8, 12, 2,
+    ).fill({ color: pants })
+  }
+
+  // Foot dust puff at ground contact
+  private drawFootDust(cycle: number): void {
+    this.dust.clear()
+    const contact = Math.max(0, Math.sin(cycle)) * 0.7
+    if (contact < 0.2) return
+    const alpha = contact * 0.4
+    this.dust.ellipse(-12, 4, 10 * contact, 4 * contact)
+      .fill({ color: 0xc8a060, alpha })
+    this.dust.ellipse(12, 4, 8 * contact, 3 * contact)
+      .fill({ color: 0xc8a060, alpha: alpha * 0.6 })
+  }
+}
+
+function lerp(a: number, b: number, t: number): number {
+  return a + (b - a) * t
 }

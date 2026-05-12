@@ -1,27 +1,23 @@
 /**
- * GameScene — Western Outlaw Escape crash game.
+ * GameScene — Outlaw Chase crash game.
  *
  * Architecture:
  *   scene root
- *     ├─ desert         (sunset sky + canyon parallax, screen space)
- *     ├─ worldContainer (scrolls horizontally as rider jumps)
- *     │     ├─ obstacles  (PNG platform sprites)
- *     │     ├─ particles  (hoof dust, gold bursts, arrest explosions)
- *     │     └─ rider      (horse + outlaw, the global runner)
- *     └─ flash           (gunfire crash flash overlay)
+ *     ├─ desert         (sunset sky + canyon parallax)
+ *     ├─ worldContainer (scrolls horizontally)
+ *     │     ├─ buildings  (procedural western town, 4 floor levels)
+ *     │     ├─ particles  (dust, escape burst, crash burst)
+ *     │     ├─ sheriff    (pursuer, always visible behind outlaw)
+ *     │     └─ rider      (outlaw runner, fixed screen X)
+ *     ├─ floor          (ground tiles on top)
+ *     └─ flash          (gunfire flash on crash)
  *
- * ── CASHOUT BUG FIX ──────────────────────────────────────────────────────────
- * The rider is a GLOBAL RUNNER, not the player's personal character.
- * Personal cashout (cashedOut=true) NEVER changes the jump machine phase.
- * The horse keeps galloping until the round actually crashes.
- *
- * On cashout: spawn gold escape burst at rider position (visual feedback),
- *             continue normal gallop.
- * On crash:   rider falls into the dust cloud, sheriff catches outlaw.
- *
- * This ensures all spectators see a continuous chase regardless of
- * individual cashout events.
- * ─────────────────────────────────────────────────────────────────────────────
+ * MECHANIC:
+ *   Outlaw runs horizontally LEFT→RIGHT through connected western building floors.
+ *   Sheriff chases behind — gap shrinks as multiplier climbs.
+ *   Floor level (0=street, 1=balcony, 2=rooftop, 3=high) shifts automatically.
+ *   Crash = sheriff captures outlaw / shoots.
+ *   No jumping. No platforms. Continuous forward escape.
  */
 
 import { Application, Container } from 'pixi.js'
@@ -37,33 +33,47 @@ import { lerp, expLerp } from './utils/easing'
 import type { RoundState } from '../ws/types'
 import { playKnutSound }  from '../audio/KnutSound'
 
-const CHAR_X_FRAC      = 0.55   // rider fixed at 55% from left
-// this.sheriffBehind is computed dynamically so sheriff stays at the same screen X
-// when the hero moves: base 105px + compensation for the 10% hero shift
-const SHERIFF_BEHIND_BASE = 105
-const FLOOR_DISPLAY_H  = 220    // must match FloorLayer DISPLAY_HEIGHT
-// Visual ground surface: tile is 220px, cacti bases appear ~130px into the tile from top
-const FLOOR_GROUND_INSET = 185
+// Outlaw is pinned at 38% from left — leaves room for sheriff behind
+const CHAR_X_FRAC = 0.38
 
-function jumpCycleMs(elapsedMs: number): number {
-  if (elapsedMs < 5_000)  return 1_550
-  if (elapsedMs < 15_000) return 1_250
-  if (elapsedMs < 30_000) return  980
-  if (elapsedMs < 60_000) return  720
-  return 560
+// Floor Y positions as fraction of canvas height (world Y = screen Y, no vertical scroll)
+const FLOOR_Y_FRACS = [0.705, 0.545, 0.390, 0.248] as const
+
+// Sheriff starts 260px behind, gap closes as time passes
+function getSheriffTargetGap(elapsedMs: number): number {
+  const t = elapsedMs / 1000
+  return Math.max(58, 260 - t * 3.5)
 }
 
-function resolvePosition(elapsedMs: number): { platIndex: number; msUntilNextJump: number } {
-  let acc = 0; let index = 0
-  while (true) {
-    const dur = jumpCycleMs(acc)
-    if (acc + dur > elapsedMs) return { platIndex: index, msUntilNextJump: acc + dur - elapsedMs }
-    acc += dur; index++
-  }
+// Run speed increases over time
+function getRunSpeed(elapsedMs: number): number {
+  return Math.min(420, 190 + (elapsedMs / 1000) * 3.4)
 }
 
-type JumpPhase = 'idle' | 'crouch' | 'airborne' | 'impact' | 'fall' | 'airTumble'
-// NOTE: 'cashout' phase removed — horse always continues until crash
+// Floor transition interval shortens over time for rising tension
+function getFloorInterval(elapsedMs: number): number {
+  return Math.max(2.2, 5.8 - (elapsedMs / 1000) * 0.045)
+}
+
+// Approximate integral of getRunSpeed for position sync on late join
+function estimateWorldX(elapsedMs: number): number {
+  const t = elapsedMs / 1000
+  return 190 * t + 1.7 * t * t
+}
+
+type RunPhase = 'idle' | 'running' | 'captured'
+
+// Floor picking: pick adjacent floor, bias upward with time
+function pickNextFloor(current: number, elapsedMs: number, rng: number): number {
+  const t = elapsedMs / 1000
+  const maxFloor = Math.min(3, Math.floor(t / 9))
+  const candidates: number[] = [current]
+  if (current > 0)        candidates.push(current - 1)
+  if (current < maxFloor) candidates.push(current + 1)
+  // Bias toward higher floor when going higher is possible
+  if (current < maxFloor) candidates.push(current + 1)
+  return candidates[Math.floor(rng * candidates.length)]
+}
 
 export class GameScene {
   readonly container: Container
@@ -71,7 +81,7 @@ export class GameScene {
   private desert:    DesertSkyLayer
   private floor:     FloorLayer
   private world:     Container
-  private obstacles: ObstacleLayer
+  private buildings: ObstacleLayer
   private particles: ParticleLayer
   private sheriff:   SheriffRider
   private rider:     HorseRider
@@ -80,34 +90,34 @@ export class GameScene {
   private W = 0
   private H = 0
   private charScreenX = 0
-  private sheriffBehind = 0
 
   private charWorldX = 0
   private cameraX    = 0
   private shakeAmt   = 0
 
-  private phase:     JumpPhase = 'idle'
-  private phaseStart = 0
-  private platIndex  = 0
-  private nextJumpAt = Infinity
+  // Floor system
+  private targetFloorIdx      = 0
+  private floorY              = 0          // current smooth Y
+  private floorTransitionTimer = 3.5       // seconds until next floor change
+  private floorRng            = 0.31       // deterministic rng seed for floor picks
 
-  private jumpFromX = 0; private jumpFromY = 0
-  private jumpToX   = 0; private jumpToY   = 0
-  private jumpArcH  = 0; private jumpDurMs = 0
+  // Sheriff approach
+  private sheriffGap       = 260          // current visual gap (world px)
+  private sheriffTargetGap = 260
 
-  private fallStartY      = 0
-  private fallSplashed    = false
-  private riderFallStarted  = false
-  private lastCoinSpawn     = 0
-  private lastJumpCoinSpawn = 0
+  // Running dust timer
+  private dustTimer = 0
 
-  private pendingCrash  = false
-  private alreadyFallen = false
+  // Run machine
+  private phase:          RunPhase = 'idle'
+  private captureElapsed  = 0
+  private captureDone     = false
 
-  // cashedOut: only triggers a visual burst, never stops the jump machine
+  // Cashout: only triggers visual burst, never stops the runner
   private cashedOut       = false
   private escapeBurstDone = false
 
+  private alreadyCaptured = false
   private prevRoundState: RoundState | null = null
   private unsubs: Array<() => void> = []
 
@@ -115,22 +125,22 @@ export class GameScene {
     this.W = app.screen.width
     this.H = app.screen.height
     this.charScreenX = this.W * CHAR_X_FRAC
-    this.sheriffBehind = SHERIFF_BEHIND_BASE + Math.round(this.W * 0.10)
 
     this.container = new Container()
 
     this.desert    = new DesertSkyLayer(this.W, this.H)
     this.floor     = new FloorLayer(this.W, this.H)
     this.world     = new Container()
-    this.obstacles = new ObstacleLayer(this.W, this.H)
+    this.buildings = new ObstacleLayer(this.W, this.H)
     this.particles = new ParticleLayer()
     this.sheriff   = new SheriffRider()
     this.rider     = new HorseRider()
     this.flash     = new GunfireCrashFX(this.W, this.H)
 
+    // Draw order: buildings behind, then sheriff, then particles, then rider
     this.world.addChild(
-      this.sheriff.container,  // behind obstacles/hero — runs on floor below platforms
-      this.obstacles.container,
+      this.buildings.container,
+      this.sheriff.container,
       this.particles.container,
       this.rider.container,
     )
@@ -138,14 +148,18 @@ export class GameScene {
     this.container.addChild(
       this.desert.container,
       this.world,
-      this.floor.container,    // floor on top of world so cacti appear in front
+      this.floor.container,    // floor tiles on top for ground-in-front effect
       this.flash.container,
     )
 
-    this.obstacles.ensureGenerated(5, 0)
-    this.placeRiderOnObstacle(0)
+    this.floorY = this.H * FLOOR_Y_FRACS[0]
+    this.rider.container.x = this.charWorldX
+    this.rider.container.y = this.floorY
+    this.sheriff.container.x = this.charWorldX - this.sheriffGap
+    this.sheriff.container.y = this.floorY
     this.updateCameraSnap()
 
+    // Subscribe to game state changes
     const unsubState = useGame.subscribe(
       (s) => s.roundState,
       (state) => this.onRoundStateChange(state),
@@ -156,22 +170,17 @@ export class GameScene {
         if (v && !this.cashedOut) {
           this.cashedOut = true
           this.escapeBurstDone = false
-          // Jump machine is NOT modified — horse keeps galloping
         }
       },
     )
     this.unsubs.push(unsubState, unsubCashout)
     this.app.ticker.add(this.tick)
 
-    // If the game is already running when the scene mounts, Zustand's subscribe
-    // won't fire (it only fires on changes). Handle the current state immediately.
     const currentState = useGame.getState().roundState
-    if (currentState !== null) {
-      this.onRoundStateChange(currentState)
-    }
+    if (currentState !== null) this.onRoundStateChange(currentState)
   }
 
-  // ── Round state ──────────────────────────────────────────────────────────────
+  // ── Round state ───────────────────────────────────────────────────────────
 
   private onRoundStateChange(state: RoundState | null): void {
     const prev = this.prevRoundState
@@ -185,37 +194,35 @@ export class GameScene {
       this.beginRound()
       return
     }
-    if (state === 'CRASHED' && !this.alreadyFallen) {
-      if (this.phase === 'idle' || this.phase === 'crouch') {
-        this.startFall()
-      } else if (this.phase === 'airborne') {
-        this.startAirTumble(Date.now())
-      } else {
-        // impact / other — break platform immediately, fall on next idle
-        this.obstacles.triggerCrash(this.platIndex)
-        this.pendingCrash = true
-      }
+    if (state === 'CRASHED' && !this.alreadyCaptured) {
+      this.startCapture()
     }
   }
 
   private resetRound(): void {
-    this.pendingCrash     = false
-    this.alreadyFallen    = false
-    this.cashedOut        = false
-    this.escapeBurstDone  = false
-    this.fallSplashed     = false
-    this.riderFallStarted  = false
-    this.lastCoinSpawn     = 0
-    this.lastJumpCoinSpawn = 0
-    this.platIndex       = 0
-    this.nextJumpAt      = Infinity
-    this.shakeAmt        = 0
+    this.alreadyCaptured    = false
+    this.cashedOut          = false
+    this.escapeBurstDone    = false
+    this.captureElapsed     = 0
+    this.captureDone        = false
+    this.shakeAmt           = 0
+    this.charWorldX         = 0
+    this.targetFloorIdx     = 0
+    this.floorTransitionTimer = 3.5
+    this.floorRng           = 0.31
+    this.sheriffGap         = 260
+    this.sheriffTargetGap   = 260
+    this.dustTimer          = 0
 
-    this.obstacles.reset()
-    this.obstacles.ensureGenerated(5, 0)
+    this.buildings.reset()
+    this.buildings.ensureGenerated(8, 0)
     this.floor.reset()
-    this.placeRiderOnObstacle(0)
+
+    this.floorY = this.H * FLOOR_Y_FRACS[0]
+    this.rider.container.x = this.charWorldX
+    this.rider.container.y = this.floorY
     this.updateCameraSnap()
+
     this.rider.setState('idle')
     this.sheriff.reset()
     this.phase = 'idle'
@@ -225,26 +232,31 @@ export class GameScene {
     const { elapsedMs, lastTickAt } = useGame.getState()
     const interp = elapsedMs + (Date.now() - lastTickAt)
 
-    const { platIndex } = resolvePosition(interp)
-    this.obstacles.ensureGenerated(platIndex + 6, interp)
+    this.charWorldX = estimateWorldX(interp)
+    this.floorY     = this.H * FLOOR_Y_FRACS[0]
 
-    this.platIndex = platIndex
-    this.placeRiderOnObstacle(platIndex)
+    this.buildings.ensureGenerated(Math.ceil(this.charWorldX / 300) + 10, interp)
+
+    this.rider.container.x = this.charWorldX
+    this.rider.container.y = this.floorY
     this.updateCameraSnap()
 
-    this.nextJumpAt = Date.now()   // start jumping immediately on load
-    this.phase      = 'idle'
-    this.rider.setState('idle')
+    this.phase = 'running'
+    this.rider.setState('running')
     this.sheriff.startRunning()
-    this.triggerShake(7)
+    this.triggerShake(6)
   }
 
-  private placeRiderOnObstacle(index: number): void {
-    const def = this.obstacles.getPlatform(index)
-    if (!def) return
-    this.charWorldX        = def.worldX
-    this.rider.container.x = def.worldX
-    this.rider.container.y = def.worldY   // surface lock: container origin = platform flat top
+  private startCapture(): void {
+    playKnutSound()
+    this.alreadyCaptured = true
+    this.captureElapsed  = 0
+    this.captureDone     = false
+    this.phase           = 'captured'
+    this.rider.setState('fall')
+    this.sheriff.startAttack(this.sheriffGap, 0)
+    this.particles.spawnCrashBurst(this.charWorldX, this.floorY)
+    this.triggerShake(15)
   }
 
   private updateCameraSnap(): void {
@@ -253,7 +265,7 @@ export class GameScene {
     this.world.y = 0
   }
 
-  // ── Main tick ────────────────────────────────────────────────────────────────
+  // ── Main tick ─────────────────────────────────────────────────────────────
 
   private tick = ({ deltaMS }: { deltaMS: number }): void => {
     const dt  = deltaMS / 1000
@@ -264,248 +276,106 @@ export class GameScene {
       ? elapsedMs + (now - lastTickAt)
       : 0
 
-    // Spawn escape burst exactly once on cashout (gold coins visual)
+    // Cashout: spawn escape burst exactly once
     if (this.cashedOut && !this.escapeBurstDone && roundState === 'RUNNING') {
       this.escapeBurstDone = true
-      this.particles.spawnEscapeBurst(
-        this.charWorldX,
-        this.rider.container.y,
-      )
+      this.particles.spawnEscapeBurst(this.charWorldX, this.floorY)
     }
 
-    this.updateJumpMachine(now, interpMs)
+    if (this.phase === 'running')  this.tickRunning(dt, interpMs)
+    else if (this.phase === 'captured') this.tickCapture(dt)
+
     this.updateCamera(dt)
 
-    // Zoom intentionally removed — multiplier must NEVER move hero/floor vertically.
-    // Camera is Y-locked; only X scrolls. Floor stays pinned to screen bottom.
-
-    const camMinWorldX = -this.cameraX - 80
-    const camMaxWorldX = -this.cameraX + this.W + 80
-    this.obstacles.update(dt, camMinWorldX, camMaxWorldX)
-
-    // Sheriff: locked to visual floor surface, always this.sheriffBehind world-px behind hero
-    this.sheriff.container.x = this.charWorldX - this.sheriffBehind
-    this.sheriff.container.y = this.H - FLOOR_DISPLAY_H + FLOOR_GROUND_INSET
-    this.sheriff.update(dt)
+    const camMinWorldX = -this.cameraX - 120
+    const camMaxWorldX = -this.cameraX + this.W + 120
+    this.buildings.update(dt, camMinWorldX, camMaxWorldX)
 
     this.particles.update(dt)
     this.rider.update(dt)
     this.desert.update(dt, this.charWorldX, 0)
     this.floor.update(this.charWorldX, this.cameraX)
     this.flash.update(dt)
+    this.sheriff.update(dt)
   }
 
-  // ── Jump machine ─────────────────────────────────────────────────────────────
-  // cashedOut flag is IGNORED here — it only triggers particles, not phase changes.
-  // The horse gallops continuously until the round CRASHES.
+  private tickRunning(dt: number, interpMs: number): void {
+    const speed = getRunSpeed(interpMs)
+    this.charWorldX += speed * dt
 
-  private updateJumpMachine(now: number, elapsedMs: number): void {
-    if (this.phase === 'fall')      { this.tickFall(now);     return }
-    if (this.phase === 'airTumble') { this.tickAirTumble(now); return }
-
-    if (useGame.getState().roundState !== 'RUNNING') return
-
-    switch (this.phase) {
-      case 'idle':
-        if (now >= this.nextJumpAt) {
-          if (this.pendingCrash) {
-            this.startFall()
-          } else {
-            this.startCrouch(now)
-          }
-        }
-        break
-
-      case 'crouch':
-        if (now - this.phaseStart >= 195) {
-          this.startAirborne(now, elapsedMs)
-        }
-        break
-
-      case 'airborne': {
-        // Crash flagged mid-air — start tumble immediately, don't wait for landing
-        if (this.pendingCrash) { this.startAirTumble(now); break }
-
-        const elapsed = now - this.phaseStart
-        const t = Math.min(elapsed / this.jumpDurMs, 1)
-        const wx = lerp(this.jumpFromX, this.jumpToX, t)
-        const wy = lerp(this.jumpFromY, this.jumpToY, t) + this.jumpArcH * Math.sin(Math.PI * t)
-        this.rider.container.x = wx
-        this.rider.container.y = wy
-        this.charWorldX = wx
-
-        // Coin trail behind hero during jump
-        if (now - this.lastJumpCoinSpawn > 100) {
-          this.lastJumpCoinSpawn = now
-          this.particles.spawnJumpCoinTrail(wx, wy)
-        }
-
-        if (t >= 1) {
-          this.startImpact(now, this.platIndex + 1)
-        }
-        break
+    // Floor transition countdown
+    this.floorTransitionTimer -= dt
+    if (this.floorTransitionTimer <= 0) {
+      this.floorRng = (this.floorRng * 9301 + 49297) % 233280 / 233280  // LCG
+      const next = pickNextFloor(this.targetFloorIdx, interpMs, this.floorRng)
+      if (next !== this.targetFloorIdx) {
+        this.targetFloorIdx = next
       }
+      this.floorTransitionTimer = getFloorInterval(interpMs)
+    }
 
-      case 'impact':
-        if (now - this.phaseStart >= 175) {
-          this.rider.setState('idle')
-          this.phase = 'idle'
-          this.nextJumpAt = now + jumpCycleMs(elapsedMs) * 0.28
+    // Smooth Y lerp toward target floor
+    const targetY = this.H * FLOOR_Y_FRACS[this.targetFloorIdx]
+    this.floorY = expLerp(this.floorY, targetY, 3.5, dt)
+
+    // Position outlaw
+    this.rider.container.x = this.charWorldX
+    this.rider.container.y = this.floorY
+
+    // Sheriff gap closes over time
+    this.sheriffTargetGap = getSheriffTargetGap(interpMs)
+    this.sheriffGap = expLerp(this.sheriffGap, this.sheriffTargetGap, 0.9, dt)
+
+    // Sheriff follows on same floor, slightly lower for depth
+    this.sheriff.container.x = this.charWorldX - this.sheriffGap
+    this.sheriff.container.y = this.floorY + 8
+
+    // Running dust trail
+    this.dustTimer -= dt
+    if (this.dustTimer <= 0) {
+      this.dustTimer = 0.18
+      this.particles.spawnLandingDust(
+        this.charWorldX - 20,
+        this.floorY + 12,
+      )
+    }
+
+    // Ensure buildings visible ahead
+    this.buildings.ensureGenerated(Math.ceil(this.charWorldX / 300) + 10, interpMs)
+  }
+
+  private tickCapture(dt: number): void {
+    this.captureElapsed += dt
+
+    // Sheriff rushes to close the gap
+    if (this.captureElapsed < 0.65) {
+      const t = this.captureElapsed / 0.65
+      const eased = 1 - Math.pow(1 - t, 2.5)
+      this.sheriffGap = lerp(this.sheriffGap, 0, eased)
+    } else {
+      this.sheriffGap = 0
+      if (!this.captureDone) {
+        this.captureDone = true
+        this.flash.trigger()
+        this.triggerShake(20)
+        this.particles.spawnLavaSplash(this.charWorldX, this.floorY)
+        // Coin spill
+        for (let i = 0; i < 3; i++) {
+          this.particles.spawnFallCoins(
+            this.charWorldX + (Math.random() - 0.5) * 40,
+            this.floorY,
+          )
         }
-        break
-    }
-  }
-
-  private startCrouch(now: number): void {
-    const { elapsedMs, lastTickAt } = useGame.getState()
-    const interp = elapsedMs + (Date.now() - lastTickAt)
-    this.obstacles.ensureGenerated(this.platIndex + 6, interp)
-    this.phase      = 'crouch'
-    this.phaseStart = now
-    this.rider.setState('crouch')
-  }
-
-  private startAirborne(now: number, elapsedMs: number): void {
-    const fromDef = this.obstacles.getPlatform(this.platIndex)
-    const toDef   = this.obstacles.getPlatform(this.platIndex + 1)
-    if (!fromDef || !toDef) return
-
-    const foot = 14
-    this.jumpFromX = fromDef.worldX
-    this.jumpFromY = fromDef.worldY - foot
-    this.jumpToX   = toDef.worldX
-    this.jumpToY   = toDef.worldY - foot
-
-    const dy = Math.abs(this.jumpToY - this.jumpFromY)
-    this.jumpArcH  = -(70 + dy * 0.25 + Math.random() * 18)
-    this.jumpDurMs = jumpCycleMs(elapsedMs) * 0.60
-
-    this.phase      = 'airborne'
-    this.phaseStart = now
-    this.rider.setState('airborne')
-  }
-
-  private startImpact(now: number, newIndex: number): void {
-    this.platIndex = newIndex
-    this.placeRiderOnObstacle(newIndex)
-    this.charWorldX = this.rider.container.x
-
-    this.phase      = 'impact'
-    this.phaseStart = now
-    this.rider.setState('impact')
-    this.triggerShake(5)
-
-    this.particles.spawnLandingDust(
-      this.charWorldX,
-      this.rider.container.y + 14 + 4,
-    )
-  }
-
-  private startAirTumble(now: number): void {
-    playKnutSound()
-    this.pendingCrash     = false
-    this.alreadyFallen    = true
-    this.fallStartY       = this.rider.container.y   // physics baseline set here
-    this.fallSplashed     = false
-    this.riderFallStarted = false
-    this.lastCoinSpawn    = now
-
-    this.phase      = 'airTumble'
-    this.phaseStart = now
-    this.rider.setState('tumble')
-    this.obstacles.triggerCrash(this.platIndex)
-    this.particles.spawnCrashBurst(this.charWorldX, this.fallStartY)
-    this.triggerShake(12)
-
-    // Sheriff lasso throw: hero local coords relative to sheriff container
-    this.sheriff.startAttack(
-      this.sheriffBehind,                                       // heroLocalX
-      this.rider.container.y - (this.H - FLOOR_DISPLAY_H + FLOOR_GROUND_INSET),
-    )
-  }
-
-  private tickAirTumble(now: number): void {
-    const elapsed = (now - this.phaseStart) / 1000
-    const gravity = 380
-
-    this.rider.container.y = this.fallStartY + 0.5 * gravity * elapsed * elapsed
-
-    // Chaotic coin spill during tumble
-    if (now - this.lastCoinSpawn > 85) {
-      this.lastCoinSpawn = now
-      this.particles.spawnFallCoins(this.charWorldX, this.rider.container.y)
+      }
     }
 
-    // After ~0.30 s, switch to hero_fall.png — physics timeline is UNCHANGED
-    // (same phaseStart + fallStartY) so tickFall continues seamlessly
-    if (!this.riderFallStarted && elapsed >= 0.30) {
-      this.riderFallStarted = true
-      this.rider.setState('fall')
-      this.phase = 'fall'
-      return
-    }
-
-    const splashY = this.H * 0.82
-    if (!this.fallSplashed && this.rider.container.y >= splashY) {
-      this.fallSplashed = true
-      this.particles.spawnLavaSplash(this.charWorldX, splashY)
-      this.flash.trigger()
-      this.triggerShake(16)
-    }
+    this.sheriff.container.x = this.charWorldX - this.sheriffGap
+    this.sheriff.container.y = this.floorY + 8
+    this.rider.container.x   = this.charWorldX
+    this.rider.container.y   = this.floorY
   }
 
-  private startFall(): void {
-    playKnutSound()
-    this.pendingCrash     = false
-    this.alreadyFallen    = true
-    this.fallStartY       = this.rider.container.y
-    this.fallSplashed     = false
-    this.riderFallStarted = false
-    this.lastCoinSpawn    = 0
-
-    this.phase      = 'fall'
-    this.phaseStart = Date.now()
-    // Platform breaks and particles fire immediately
-    this.obstacles.triggerCrash(this.platIndex)
-    this.particles.spawnCrashBurst(this.charWorldX, this.fallStartY)
-    this.triggerShake(20)
-    // rider.setState('fall') is intentionally delayed — see tickFall
-
-    // Sheriff lasso throw: hero local coords relative to sheriff container
-    this.sheriff.startAttack(
-      this.sheriffBehind,
-      this.rider.container.y - (this.H - FLOOR_DISPLAY_H + FLOOR_GROUND_INSET),
-    )
-  }
-
-  private tickFall(now: number): void {
-    const elapsed = (now - this.phaseStart) / 1000
-    const gravity = 380
-
-    // Switch hero to fall pose after short delay (platform breaks first visually)
-    if (!this.riderFallStarted && elapsed >= 0.18) {
-      this.riderFallStarted = true
-      this.rider.setState('fall')
-    }
-
-    this.rider.container.y = this.fallStartY + 0.5 * gravity * elapsed * elapsed
-
-    // Spill gold coins continuously while hero is falling and still on screen
-    if (this.riderFallStarted && elapsed < 2.2 && now - this.lastCoinSpawn > 115) {
-      this.lastCoinSpawn = now
-      this.particles.spawnFallCoins(this.charWorldX, this.rider.container.y)
-    }
-
-    const splashY = this.H * 0.82
-    if (!this.fallSplashed && this.rider.container.y >= splashY) {
-      this.fallSplashed = true
-      this.particles.spawnLavaSplash(this.charWorldX, splashY)
-      this.flash.trigger()
-      this.triggerShake(16)
-    }
-  }
-
-  // ── Camera ───────────────────────────────────────────────────────────────────
+  // ── Camera ────────────────────────────────────────────────────────────────
 
   private triggerShake(amount: number): void {
     this.shakeAmt = Math.max(this.shakeAmt, amount)
@@ -516,31 +386,31 @@ export class GameScene {
     this.cameraX = expLerp(this.cameraX, targetCamX, 5.5, dt)
     this.shakeAmt = Math.max(0, this.shakeAmt - dt * 9 * this.shakeAmt)
     const sx = (Math.random() - 0.5) * this.shakeAmt
-    const sy = (Math.random() - 0.5) * this.shakeAmt * 0.4
+    const sy = (Math.random() - 0.5) * this.shakeAmt * 0.3
     this.world.x = this.cameraX + sx
     this.world.y = sy
   }
 
-  // ── Resize ───────────────────────────────────────────────────────────────────
+  // ── Resize ────────────────────────────────────────────────────────────────
 
   resize(w: number, h: number): void {
     this.W = w; this.H = h
     this.charScreenX = w * CHAR_X_FRAC
-    this.sheriffBehind = SHERIFF_BEHIND_BASE + Math.round(w * 0.10)
+    this.floorY = h * FLOOR_Y_FRACS[this.targetFloorIdx]
     this.desert.resize(w, h)
     this.floor.resize(w, h)
-    this.obstacles.resize(w, h)
+    this.buildings.resize(w, h)
     this.flash.resize(w, h)
   }
 
-  // ── Cleanup ──────────────────────────────────────────────────────────────────
+  // ── Cleanup ───────────────────────────────────────────────────────────────
 
   destroy(): void {
     this.app.ticker.remove(this.tick)
     this.unsubs.forEach((u) => u())
     this.desert.destroy()
     this.floor.destroy()
-    this.obstacles.destroy()
+    this.buildings.destroy()
     this.particles.destroy()
     this.sheriff.destroy()
     this.rider.destroy()
