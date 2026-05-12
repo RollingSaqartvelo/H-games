@@ -36,8 +36,9 @@ export function TopBar() {
   return (
     <header className="top-bar">
       <div className="top-bar__row">
-        {/* Left: balance */}
+        {/* Left: back + balance */}
         <div className="top-bar__left">
+          <button className="top-bar__back" onClick={() => window.location.href = '/'} aria-label="Back">&#8592;</button>
           <WsIndicator status={wsStatus} />
           <div className="top-bar__balance">
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">

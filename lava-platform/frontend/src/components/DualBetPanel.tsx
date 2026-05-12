@@ -107,9 +107,10 @@ function useBetPanel(token: string) {
 
   // ── Bet handler ─────────────────────────────────────────────────────────────
   const handleBet = useCallback(async () => {
+    if (!token) { alert('Открой игру через Telegram бот чтобы делать ставки'); return }
     if (roundState !== 'STARTING' || locked || loading) return
     await placeBet(betAmount, acEnabled, autoCashout)
-  }, [roundState, locked, loading, betAmount, acEnabled, autoCashout, placeBet])
+  }, [token, roundState, locked, loading, betAmount, acEnabled, autoCashout, placeBet])
 
   // ── Queue next-round bet ─────────────────────────────────────────────────────
   const handleQueueNextRound = useCallback(() => {

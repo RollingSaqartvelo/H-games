@@ -59,7 +59,7 @@ export function App() {
   usePixi(pixiMount)
   useBgMusic()
 
-  const { token, playerId, firstName, loading, error } = useTMAAuth()
+  const { token, playerId, firstName, loading } = useTMAAuth()
   useSocket(playerId)
 
   return (
@@ -107,23 +107,7 @@ export function App() {
         {firstName && (
           <div className="player-badge">🤠 {firstName}</div>
         )}
-        {token && playerId ? (
-          <DualBetPanel token={token} playerId={playerId} />
-        ) : (
-          <div className="no-session">
-            {error ? (
-              <>
-                <p className="no-session__error">{error}</p>
-                <p className="no-session__hint">Close and reopen the app in Telegram.</p>
-              </>
-            ) : (
-              <>
-                <p>No session — open via Telegram bot</p>
-                <p className="no-session__hint"><code>?token=YOUR_TOKEN</code></p>
-              </>
-            )}
-          </div>
-        )}
+        <DualBetPanel token={token} playerId={playerId} />
       </footer>
     </div>
   )

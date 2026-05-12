@@ -192,6 +192,17 @@ ul, li { list-style: none; }
   gap: 6px;
   min-width: 90px;
 }
+.top-bar__back {
+  background: none;
+  border: 1px solid rgba(217,119,6,.4);
+  border-radius: 6px;
+  color: var(--gold);
+  font-size: 16px;
+  line-height: 1;
+  padding: 2px 7px 3px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
 .top-bar__balance {
   display: flex;
   align-items: center;
