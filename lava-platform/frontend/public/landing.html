@@ -422,7 +422,7 @@ const rawHash = tg?.initDataUnsafe?.hash || Math.random().toString(36).slice(2)
 document.getElementById('sessionHash').textContent = '#' + rawHash.slice(0, 8).toUpperCase()
 
 // ── Game URL (same server, root path) ────────────────────────────────────────
-const GAME_URL = window.location.origin + '/'
+const GAME_URL = window.location.origin + '/play'
 
 // ── Server health check ───────────────────────────────────────────────────────
 async function checkServer() {
