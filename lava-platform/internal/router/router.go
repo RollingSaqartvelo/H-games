@@ -225,6 +225,13 @@ func serveFrontend(r *gin.Engine) {
 
 	// Serve other static root files (favicon, manifest, etc.)
 	r.StaticFile("/favicon.ico", distDir+"/favicon.ico")
+	// Root → landing page (game selector)
+	r.GET("/", func(c *gin.Context) {
+		c.Header("Cache-Control", "no-cache, no-store, must-revalidate")
+		c.Header("Pragma", "no-cache")
+		c.Header("Expires", "0")
+		c.File(distDir + "/landing.html")
+	})
 	r.GET("/landing.html", func(c *gin.Context) {
 		c.Header("Cache-Control", "no-cache, no-store, must-revalidate")
 		c.Header("Pragma", "no-cache")
