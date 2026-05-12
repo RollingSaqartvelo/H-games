@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#020a03">
   <title>Granny Run — H-GAMES</title>
   <!-- Force Telegram WebView to bypass cache on stale versions -->
-  <script>if(!location.search.includes('v=26'))location.replace('/granny.html?v=26')</script>
+  <script>if(!location.search.includes('v=27'))location.replace('/granny.html?v=27')</script>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Orbitron:wght@600;700;900&family=Share+Tech+Mono&display=swap');
@@ -919,26 +919,23 @@ let CURRENCY  = 'USD'
 
 async function auth() {
   const initData = tg?.initData || ''
-  if (!initData && !TOKEN) {
-    document.getElementById('noSession').style.display = 'block'
-    return
-  }
   if (TOKEN) { showPanels(); await fetchBalance(); return }
+  if (!initData) { showPanels(); return }
   try {
     const r = await fetch('/tma/auth', {
       method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ init_data: initData }),
     })
-    if (!r.ok) { document.getElementById('noSession').style.display='block'; return }
+    if (!r.ok) { showPanels(); return }
     const d = await r.json()
-    if (!d.token) { document.getElementById('noSession').style.display='block'; return }
+    if (!d.token) { showPanels(); return }
     TOKEN = d.token
     PLAYER_ID = d.player_id || ''
     CURRENCY  = d.currency  || 'USD'
     sessionStorage.setItem('crash_token', TOKEN)
     if (d.balance != null) document.getElementById('balance').textContent = '$'+parseFloat(d.balance).toFixed(2)
     showPanels()
-  } catch { document.getElementById('noSession').style.display='block' }
+  } catch { showPanels() }
 }
 
 function showPanels() {
