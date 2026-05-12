@@ -11,8 +11,7 @@ import (
 	"time"
 )
 
-// Imagen 4 — best available image generation model on this key
-const imagenURL = "https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict"
+const generateURL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent"
 
 type Client struct {
 	apiKey string
@@ -26,32 +25,42 @@ func NewClient(apiKey string) *Client {
 	}
 }
 
-type imagenRequest struct {
-	Instances  []imagenInstance  `json:"instances"`
-	Parameters imagenParameters  `json:"parameters"`
+type generateRequest struct {
+	Contents         []gcontent       `json:"contents"`
+	GenerationConfig generationConfig `json:"generationConfig"`
 }
 
-type imagenInstance struct {
-	Prompt string `json:"prompt"`
+type gcontent struct {
+	Parts []gpart `json:"parts"`
 }
 
-type imagenParameters struct {
-	SampleCount int    `json:"sampleCount"`
-	AspectRatio string `json:"aspectRatio"`
+type gpart struct {
+	Text string `json:"text"`
 }
 
-type imagenResponse struct {
-	Predictions []struct {
-		BytesBase64Encoded string `json:"bytesBase64Encoded"`
-		MimeType           string `json:"mimeType"`
-	} `json:"predictions"`
+type generationConfig struct {
+	ResponseModalities []string `json:"responseModalities"`
 }
 
-// GenerateImage calls Imagen 4 and returns raw image bytes + mime type.
+type generateResponse struct {
+	Candidates []struct {
+		Content struct {
+			Parts []struct {
+				Text       string `json:"text,omitempty"`
+				InlineData *struct {
+					MimeType string `json:"mimeType"`
+					Data     string `json:"data"`
+				} `json:"inlineData,omitempty"`
+			} `json:"parts"`
+		} `json:"content"`
+	} `json:"candidates"`
+}
+
+// GenerateImage calls Gemini 2.5 Flash Image and returns raw image bytes + mime type.
 func (c *Client) GenerateImage(ctx context.Context, prompt string) ([]byte, string, error) {
-	reqBody := imagenRequest{
-		Instances:  []imagenInstance{{Prompt: prompt}},
-		Parameters: imagenParameters{SampleCount: 1, AspectRatio: "1:1"},
+	reqBody := generateRequest{
+		Contents:         []gcontent{{Parts: []gpart{{Text: prompt}}}},
+		GenerationConfig: generationConfig{ResponseModalities: []string{"IMAGE"}},
 	}
 
 	buf, err := json.Marshal(reqBody)
@@ -59,7 +68,7 @@ func (c *Client) GenerateImage(ctx context.Context, prompt string) ([]byte, stri
 		return nil, "", err
 	}
 
-	url := fmt.Sprintf("%s?key=%s", imagenURL, c.apiKey)
+	url := fmt.Sprintf("%s?key=%s", generateURL, c.apiKey)
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewReader(buf))
 	if err != nil {
 		return nil, "", err
@@ -78,28 +87,25 @@ func (c *Client) GenerateImage(ctx context.Context, prompt string) ([]byte, stri
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, "", fmt.Errorf("imagen api error %d: %s", resp.StatusCode, string(body))
+		return nil, "", fmt.Errorf("gemini api error %d: %s", resp.StatusCode, string(body))
 	}
 
-	var result imagenResponse
+	var result generateResponse
 	if err := json.Unmarshal(body, &result); err != nil {
 		return nil, "", err
 	}
 
-	if len(result.Predictions) == 0 || result.Predictions[0].BytesBase64Encoded == "" {
-		return nil, "", fmt.Errorf("imagen returned no image")
+	for _, cand := range result.Candidates {
+		for _, p := range cand.Content.Parts {
+			if p.InlineData != nil && p.InlineData.Data != "" {
+				imgBytes, err := base64.StdEncoding.DecodeString(p.InlineData.Data)
+				if err != nil {
+					return nil, "", fmt.Errorf("base64 decode: %w", err)
+				}
+				return imgBytes, p.InlineData.MimeType, nil
+			}
+		}
 	}
 
-	pred := result.Predictions[0]
-	imgBytes, err := base64.StdEncoding.DecodeString(pred.BytesBase64Encoded)
-	if err != nil {
-		return nil, "", fmt.Errorf("base64 decode: %w", err)
-	}
-
-	mimeType := pred.MimeType
-	if mimeType == "" {
-		mimeType = "image/png"
-	}
-
-	return imgBytes, mimeType, nil
+	return nil, "", fmt.Errorf("gemini returned no image in response")
 }
