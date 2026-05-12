@@ -2,12 +2,12 @@
  * useTMAAuth — Telegram Mini App authentication hook.
  *
  * Resolution order:
- *   1. Existing valid token in sessionStorage / URL param  → use immediately
+ *   1. Existing valid token in localStorage / URL param  → use immediately
  *   2. window.Telegram.WebApp.initData available           → exchange via /tma/auth
  *   3. VITE_DEV_TOKEN env var                              → use for local dev
  *   4. No token                                            → show "no session" UI
  *
- * The hook is idempotent: it stores the resolved token in sessionStorage so
+ * The hook is idempotent: it stores the resolved token in localStorage so
  * subsequent renders (and StrictMode double-invocations) are instant.
  */
 
@@ -61,7 +61,7 @@ export function useTMAAuth(): TMAAuthState {
     let cancelled = false
 
     async function resolve() {
-      // 1. Existing token (URL param → sessionStorage → VITE_DEV_TOKEN)
+      // 1. Existing token (URL param → localStorage → VITE_DEV_TOKEN)
       const existing = getSessionToken()
       if (existing) {
         if (!cancelled) {
@@ -83,7 +83,7 @@ export function useTMAAuth(): TMAAuthState {
 
         if (initData) {
           const data = await exchangeInitData(initData)
-          sessionStorage.setItem('crash_token', data.token)
+          localStorage.setItem('crash_token', data.token)
           if (!cancelled) {
             setState({
               token:     data.token,

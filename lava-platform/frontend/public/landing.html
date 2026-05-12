@@ -814,10 +814,10 @@ function hideLoginSections() {
 }
 
 function applyStoredSession() {
-  const name    = sessionStorage.getItem('player_name')    || ''
-  const uname   = sessionStorage.getItem('player_username') || ''
-  const balance = sessionStorage.getItem('player_balance')  || '0.00'
-  const pid     = sessionStorage.getItem('player_id')       || ''
+  const name    = localStorage.getItem('player_name')    || ''
+  const uname   = localStorage.getItem('player_username') || ''
+  const balance = localStorage.getItem('player_balance')  || '0.00'
+  const pid     = localStorage.getItem('player_id')       || ''
   if (name) renderProfile(name, uname, null)
   if (pid)  document.getElementById('playerId').textContent = '#'+pid
   const fmt = '$'+parseFloat(balance).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})
@@ -843,11 +843,11 @@ function onTelegramWidgetAuth(widgetUser) {
   .then(r => { if (!r.ok) throw new Error(r.status); return r.json() })
   .then(d => {
     if (!d.token) throw new Error('no token')
-    sessionStorage.setItem('crash_token',     d.token)
-    sessionStorage.setItem('player_id',       d.player_id   || '')
-    sessionStorage.setItem('player_name',     d.first_name  || '')
-    sessionStorage.setItem('player_username', d.username    || '')
-    sessionStorage.setItem('player_balance',  d.balance     || '0.00')
+    localStorage.setItem('crash_token',     d.token)
+    localStorage.setItem('player_id',       d.player_id   || '')
+    localStorage.setItem('player_name',     d.first_name  || '')
+    localStorage.setItem('player_username', d.username    || '')
+    localStorage.setItem('player_balance',  d.balance     || '0.00')
 
     renderProfile(d.first_name || '', d.username || '', null)
     if (d.player_id) document.getElementById('playerId').textContent = '#'+d.player_id
@@ -958,7 +958,7 @@ async function fetchProfile(){
     })
     if(!r.ok) return
     const d = await r.json()
-    if(d.token) sessionStorage.setItem('crash_token', d.token)
+    if(d.token) localStorage.setItem('crash_token', d.token)
     if(d.balance != null){
       const fmt = '$'+parseFloat(d.balance).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})
       document.getElementById('balance').textContent = fmt
@@ -969,7 +969,7 @@ async function fetchProfile(){
 
 // ── Boot ──────────────────────────────────────────────────────────────────────
 ;(async()=>{
-  const storedToken = sessionStorage.getItem('crash_token')
+  const storedToken = localStorage.getItem('crash_token')
 
   let authPromise
   if (tg?.initData) {

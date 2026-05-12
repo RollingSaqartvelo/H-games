@@ -1,4 +1,4 @@
-import{w as U,a as g,S as c,u as S,B as _,b as m,E as I,c as p}from"./index-DjyK1yRi.js";const x={name:"local-uniform-bit",vertex:{header:`
+import{w as U,a as g,S as c,u as S,B as _,b as m,E as I,c as p}from"./index-BjtX9GNO.js";const x={name:"local-uniform-bit",vertex:{header:`
 
             struct LocalUniforms {
                 uTransformMatrix:mat3x3<f32>,
@@ -183,4 +183,4 @@ import{w as U,a as g,S as c,u as S,B as _,b as m,E as I,c as p}from"./index-DjyK
         data[offset + 2] = v[2];
         data[offset + 3] = v[3];
     `};class P extends I{constructor({buffer:t,offset:a,size:s}){super(),this.uid=p("buffer"),this._resourceType="bufferResource",this._touched=0,this._resourceId=p("resource"),this._bufferResource=!0,this.destroyed=!1,this.buffer=t,this.offset=a|0,this.size=s,this.buffer.on("change",this.onBufferChange,this)}onBufferChange(){this._resourceId=p("resource"),this.emit("change",this)}destroy(t=!1){this.destroyed=!0,t&&this.buffer.destroy(),this.emit("change",this),this.buffer=null,this.removeAllListeners()}}export{P as B,l as G,B as U,x as a,F as b,k as c,h as d,A as e,D as f,R as g,C as l,O as t,w as u};
-//# sourceMappingURL=BufferResource-7xz7uADl.js.map
+//# sourceMappingURL=BufferResource-CriJu0yj.js.map

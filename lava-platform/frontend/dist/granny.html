@@ -917,7 +917,7 @@ const tg = window.Telegram?.WebApp
 if (tg) { tg.ready(); tg.expand(); tg.disableVerticalSwipes?.() }
 
 // ── Session / Auth ────────────────────────────────────────────────────────────
-let TOKEN = sessionStorage.getItem('crash_token') || ''
+let TOKEN = localStorage.getItem('crash_token') || ''
 let PLAYER_ID = ''
 let CURRENCY  = 'USD'
 
@@ -936,7 +936,7 @@ async function auth() {
     TOKEN = d.token
     PLAYER_ID = d.player_id || ''
     CURRENCY  = d.currency  || 'USD'
-    sessionStorage.setItem('crash_token', TOKEN)
+    localStorage.setItem('crash_token', TOKEN)
     if (d.balance != null) document.getElementById('balance').textContent = '$'+parseFloat(d.balance).toFixed(2)
     showPanels()
   } catch { showPanels() }
