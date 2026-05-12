@@ -10,6 +10,7 @@ import (
 	adminHandler "github.com/lava-platform/internal/admin"
 	"github.com/lava-platform/internal/callback"
 	"github.com/lava-platform/internal/config"
+	"github.com/lava-platform/internal/gemini"
 	healthHandler "github.com/lava-platform/internal/handler"
 	"github.com/lava-platform/internal/infrastructure"
 	"github.com/lava-platform/internal/lock"
@@ -41,6 +42,7 @@ type GameDeps struct {
 type Deps struct {
 	Outlaw GameDeps // outlaw_escape
 	Granny GameDeps // granny_run
+	Bubble GameDeps // bubble_gum
 }
 
 // Wire constructs all shared dependencies from infrastructure.
@@ -65,9 +67,17 @@ func Wire(cfg *config.Config, infra *infrastructure.Infra) *Deps {
 	grannyCfg.GameType = "granny_run"
 	grannyEng := roundEngine.New(grannyCfg, rRepo, provider, grannyPub, grannyHub, locker)
 
+	// Bubble Gum
+	bubblePub := realtime.NewPublisher(infra.Cache, "bubble_gum")
+	bubbleHub := realtime.NewHub()
+	bubbleCfg := roundEngine.DefaultConfig()
+	bubbleCfg.GameType = "bubble_gum"
+	bubbleEng := roundEngine.New(bubbleCfg, rRepo, provider, bubblePub, bubbleHub, locker)
+
 	return &Deps{
 		Outlaw: GameDeps{Engine: outlawEng, Hub: outlawHub, Pub: outlawPub},
 		Granny: GameDeps{Engine: grannyEng, Hub: grannyHub, Pub: grannyPub},
+		Bubble: GameDeps{Engine: bubbleEng, Hub: bubbleHub, Pub: bubblePub},
 	}
 }
 
@@ -111,6 +121,9 @@ func New(cfg *config.Config, infra *infrastructure.Infra, deps *Deps) *gin.Engin
 
 	outlawWS := realtime.NewWSHandler(deps.Outlaw.Hub)
 	grannyWS  := realtime.NewWSHandler(deps.Granny.Hub)
+	bubbleWS  := realtime.NewWSHandler(deps.Bubble.Hub)
+
+	bubbleHandler := roundHandler.New(deps.Bubble.Engine, rRepo, "bubble_gum")
 
 	// ── Admin API (X-SYSTEM-KEY) ──────────────────────────────────────────────
 	adm := adminHandler.New(infra.DB)
@@ -124,6 +137,12 @@ func New(cfg *config.Config, infra *infrastructure.Infra, deps *Deps) *gin.Engin
 		admin.PUT("/operators/:id/status", opHandler.UpdateStatus)
 		admin.GET("/rtp-profiles",         opHandler.ListRTPProfiles)
 		admin.GET("/stats",                adm.Stats)
+
+		// Gemini asset generation (admin-only, server-side key)
+		if cfg.Gemini.APIKey != "" {
+			geminiH := gemini.NewHandler(cfg.Gemini.APIKey, "frontend/dist/assets")
+			admin.POST("/gemini/generate", geminiH.Generate)
+		}
 	}
 
 	// ── Provider API (HMAC signed) ────────────────────────────────────────────
@@ -167,6 +186,15 @@ func New(cfg *config.Config, infra *infrastructure.Infra, deps *Deps) *gin.Engin
 		grannyHandler.RegisterRoutes(grannyBet, granny)
 	}
 
+	// ── Provider bubble game (Bubble Gum) ────────────────────────────────────
+	bubble := r.Group("/api/v1/bubble")
+	bubble.Use(middleware.OperatorAuth(opSvc))
+	{
+		bubbleBet := bubble.Group("")
+		bubbleBet.Use(middleware.SessionValidate(sessSvc))
+		bubbleHandler.RegisterRoutes(bubbleBet, bubble)
+	}
+
 	// ── Telegram Mini App auth + bot webhook (public — no operator HMAC) ─────
 	if cfg.Telegram.BotToken != "" {
 		tmaValidator := telegram.NewValidator(cfg.Telegram.BotToken, cfg.Telegram.AuthMaxAge)
@@ -197,6 +225,11 @@ func New(cfg *config.Config, infra *infrastructure.Infra, deps *Deps) *gin.Engin
 		tmaGranny.Use(middleware.SessionValidate(sessSvc))
 		grannyHandler.RegisterRoutes(tmaGranny, tmaGranny)
 
+		// Bubble Gum TMA routes
+		tmaBubble := tma.Group("/v1/bubble")
+		tmaBubble.Use(middleware.SessionValidate(sessSvc))
+		bubbleHandler.RegisterRoutes(tmaBubble, tmaBubble)
+
 		go func() {
 			if err := botHandler.RegisterWebhook(context.Background(), cfg.Telegram.AppURL); err != nil {
 				_ = err
@@ -207,6 +240,7 @@ func New(cfg *config.Config, infra *infrastructure.Infra, deps *Deps) *gin.Engin
 	// ── WebSocket ─────────────────────────────────────────────────────────────
 	r.GET("/ws/crash",  outlawWS.ServeWS)
 	r.GET("/ws/granny", grannyWS.ServeWS)
+	r.GET("/ws/bubble", bubbleWS.ServeWS)
 
 	// ── Frontend SPA ──────────────────────────────────────────────────────────
 	// Serve built React app from frontend/dist if it exists.
@@ -255,6 +289,19 @@ func serveFrontend(r *gin.Engine) {
 		c.Header("Expires", "0")
 		c.File(distDir + "/granny.html")
 	})
+	// bubble.html — Bubble-Gum game
+	r.GET("/bubble", func(c *gin.Context) {
+		c.Header("Cache-Control", "no-cache, no-store, must-revalidate")
+		c.Header("Pragma", "no-cache")
+		c.Header("Expires", "0")
+		c.File(distDir + "/bubble.html")
+	})
+	r.GET("/bubble.html", func(c *gin.Context) {
+		c.Header("Cache-Control", "no-cache, no-store, must-revalidate")
+		c.Header("Pragma", "no-cache")
+		c.Header("Expires", "0")
+		c.File(distDir + "/bubble.html")
+	})
 
 	// SPA catch-all: serve index.html for any non-API path
 	r.NoRoute(func(c *gin.Context) {
@@ -264,7 +311,8 @@ func serveFrontend(r *gin.Engine) {
 			strings.HasPrefix(path, "/tma/") ||
 			strings.HasPrefix(path, "/admin") ||
 			strings.HasPrefix(path, "/healthz") ||
-			strings.HasPrefix(path, "/readyz") {
+			strings.HasPrefix(path, "/readyz") ||
+			path == "/bubble" {
 			c.JSON(http.StatusNotFound, gin.H{"error": "not found"})
 			return
 		}

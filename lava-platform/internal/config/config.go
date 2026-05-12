@@ -13,6 +13,7 @@ type Config struct {
 	Log      LogConfig
 	Operator OperatorConfig
 	Telegram TelegramConfig
+	Gemini   GeminiConfig
 }
 
 type ServerConfig struct {
@@ -63,6 +64,10 @@ type TelegramConfig struct {
 	AppURL          string // TELEGRAM_APP_URL — public HTTPS URL of the Mini App
 }
 
+type GeminiConfig struct {
+	APIKey string // GEMINI_API_KEY
+}
+
 func Load() *Config {
 	return &Config{
 		Server: ServerConfig{
@@ -106,6 +111,9 @@ func Load() *Config {
 			TMAOperatorID: int64(getInt("TELEGRAM_TMA_OPERATOR_ID", 1)),
 			AuthMaxAge:    getDuration("TELEGRAM_AUTH_MAX_AGE", 24*time.Hour),
 			AppURL:        getEnv("TELEGRAM_APP_URL", ""),
+		},
+		Gemini: GeminiConfig{
+			APIKey: getEnv("GEMINI_API_KEY", ""),
 		},
 	}
 }

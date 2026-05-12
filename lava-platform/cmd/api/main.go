@@ -57,6 +57,11 @@ func main() {
 	go deps.Granny.Pub.Subscribe(bgCtx, deps.Granny.Hub)
 	go scheduler.New(deps.Granny.Engine, deps.Granny.Engine.Cfg()).Run(bgCtx)
 
+	// Bubble Gum — hub, pub/sub, scheduler.
+	go deps.Bubble.Hub.Run(bgCtx)
+	go deps.Bubble.Pub.Subscribe(bgCtx, deps.Bubble.Hub)
+	go scheduler.New(deps.Bubble.Engine, deps.Bubble.Engine.Cfg()).Run(bgCtx)
+
 	r := router.New(cfg, infra, deps)
 
 	srv := &http.Server{
