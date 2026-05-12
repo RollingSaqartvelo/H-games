@@ -6,10 +6,10 @@
   <meta name="theme-color" content="#020a03">
   <title>Granny Run — H-GAMES</title>
   <!-- Force Telegram WebView to bypass cache on stale versions -->
-  <script>if(!location.search.includes('v=3'))location.replace('/granny.html?v=3')</script>
+  <script>if(!location.search.includes('v=26'))location.replace('/granny.html?v=26')</script>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Orbitron:wght@600;700;900&family=Share+Tech+Mono&display=swap');
     *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
     :root{
       --green:      #22c55e;
@@ -62,27 +62,126 @@
     .state-badge.running { background:rgba(239,68,68,.15);color:#f87171;border:1px solid #7f1d1d }
     .state-badge.crashed { background:rgba(239,68,68,.2);color:#ef4444;border:1px solid #991b1b }
 
-    /* ── History pills ──────────────────────────────────────── */
-    .history{
-      flex-shrink:0;height:34px;
-      display:flex;align-items:center;gap:5px;padding:0 10px;
-      overflow-x:auto;scrollbar-width:none;
-      background:rgba(2,10,3,.9);border-bottom:1px solid var(--border);
+    /* ── History bar ─────────────────────────────────────────── */
+    .hist-bar{
+      flex-shrink:0;
+      display:flex;align-items:center;gap:6px;
+      padding:6px 8px 6px 6px;
+      background:rgba(2,12,5,.97);
+      border-bottom:1px solid rgba(34,197,94,.10);
+      box-shadow:inset 0 -1px 0 rgba(0,0,0,.5);
+      min-height:48px;
     }
-    .history::-webkit-scrollbar{display:none}
-    .pill{
-      flex-shrink:0;padding:2px 8px;border-radius:20px;
-      font-family:'Courier New',monospace;font-size:10px;font-weight:bold;
-    }
-    .pill.low  {background:#0d2e12;color:#4ade80}
-    .pill.med  {background:#142a00;color:#a3e635}
-    .pill.high {background:#1a2000;color:#fbbf24}
-    .pill.epic {background:#1a0a2a;color:#c084fc}
 
-    /* ── Game area ──────────────────────────────────────────── */
+    /* ── Current-round tab (left) ────────────────────────────── */
+    .hist-cur{
+      flex-shrink:0;
+      display:flex;flex-direction:column;align-items:center;gap:2px;
+    }
+    .hist-cur-pill{
+      display:flex;align-items:center;justify-content:center;
+      min-width:58px;height:30px;
+      background:rgba(4,26,10,.95);
+      border:1.5px solid var(--green);
+      border-radius:10px;
+      font-family:'Courier New',monospace;font-size:11px;font-weight:bold;
+      color:var(--green-b);
+      padding:0 10px;white-space:nowrap;letter-spacing:.5px;
+      box-shadow:0 0 10px rgba(34,197,94,.2),inset 0 1px 0 rgba(74,222,128,.08);
+      transition:border-color .25s,color .25s,box-shadow .25s;
+    }
+    .hist-cur-pill.crashed{
+      border-color:#ef4444;color:#f87171;
+      box-shadow:0 0 10px rgba(239,68,68,.3);
+    }
+    .hist-cur-ptr{
+      width:0;height:0;
+      border-left:5px solid transparent;
+      border-right:5px solid transparent;
+      border-top:5px solid var(--green);
+      transition:border-top-color .25s;
+    }
+    .hist-cur-ptr.crashed{ border-top-color:#ef4444 }
+
+    /* ── Scrollable pill strip ───────────────────────────────── */
+    .hist-scroll{
+      flex:1;min-width:0;
+      display:flex;align-items:center;gap:5px;
+      overflow-x:auto;scrollbar-width:none;
+      padding:2px 0;
+    }
+    .hist-scroll::-webkit-scrollbar{display:none}
+
+    /* ── Multiplier pills ────────────────────────────────────── */
+    .pill{
+      flex-shrink:0;
+      display:flex;align-items:center;justify-content:center;
+      min-width:50px;height:30px;
+      border-radius:10px;
+      font-family:'Courier New',monospace;font-size:11px;font-weight:bold;
+      padding:0 8px;white-space:nowrap;letter-spacing:.5px;
+      animation:pillIn .22s ease;
+    }
+    @keyframes pillIn{
+      from{opacity:0;transform:translateX(-10px)}
+      to  {opacity:1;transform:translateX(0)}
+    }
+    .pill.low{
+      background:rgba(28,4,4,.9);
+      border:1px solid #5a0e0e;
+      color:#f87171;
+      box-shadow:0 0 5px rgba(239,68,68,.18);
+    }
+    .pill.med{
+      background:rgba(4,22,8,.9);
+      border:1px solid #0d3014;
+      color:#4ade80;
+    }
+    .pill.high{
+      background:rgba(22,14,2,.9);
+      border:1px solid #3d2800;
+      color:#d97706;
+      box-shadow:0 0 6px rgba(217,119,6,.22);
+    }
+    .pill.epic{
+      background:rgba(26,10,2,.9);
+      border:1px solid #7c2d12;
+      color:#f97316;
+      box-shadow:0 0 8px rgba(249,115,22,.30),0 0 16px rgba(249,115,22,.10);
+    }
+
+    /* ── Clock / history button (right) ─────────────────────── */
+    .hist-clock{
+      flex-shrink:0;
+      width:34px;height:34px;
+      display:flex;align-items:center;justify-content:center;
+      background:rgba(4,22,8,.9);
+      border:1px solid #0d3014;
+      border-radius:10px;
+      color:var(--muted);
+      cursor:pointer;
+      transition:all .15s;
+    }
+    .hist-clock:active{
+      border-color:var(--green);color:var(--green);
+      box-shadow:0 0 8px rgba(34,197,94,.25);
+      transform:scale(.94);
+    }
+
+    /* ── Game area — compact premium panel ─────────────────── */
     .game-area{
-      flex:1;position:relative;overflow:hidden;
-      background:#030810;
+      flex-shrink:0;
+      position:relative;
+      height:200px;
+      margin:0 8px;
+      background:#020d04;
+      border:1px solid rgba(34,197,94,.25);
+      border-radius:20px;
+      box-shadow:
+        0 0 0 1px rgba(34,197,94,.05),
+        0 0 36px rgba(34,197,94,.08),
+        inset 0 0 80px rgba(0,0,0,.45);
+      overflow:hidden;
     }
 
     /* ── Scene canvas ───────────────────────────────────────── */
@@ -92,128 +191,393 @@
 
     /* ── Multiplier center display ──────────────────────────── */
     .mult-wrap{
-      position:absolute;top:50%;left:50%;transform:translate(-50%,-60%);
+      position:absolute;top:44%;left:50%;transform:translate(-50%,-50%);
       text-align:center;pointer-events:none;z-index:5;
     }
     .mult-val{
-      font-size:72px;letter-spacing:-2px;
-      text-shadow:0 0 40px var(--green-glow);
+      font-size:62px;letter-spacing:-2px;
+      text-shadow:0 0 36px var(--green-glow);
       transition:color .3s;
       line-height:1;
     }
     .mult-val.normal { color:var(--green-b) }
     .mult-val.hot    { color:#a3e635 }
-    .mult-val.epic   { color:#c084fc }
-    .mult-val.crashed{ color:var(--red);text-shadow:0 0 40px var(--red-glow) }
-    .mult-x{font-size:32px;color:var(--muted);vertical-align:super}
+    .mult-val.epic   { color:#fbbf24 }
+    .mult-val.crashed{ color:var(--red);text-shadow:0 0 36px var(--red-glow) }
+    .mult-x{font-size:26px;color:var(--muted);vertical-align:super}
 
     /* ── Countdown ──────────────────────────────────────────── */
     .countdown{
-      position:absolute;bottom:16px;left:50%;transform:translateX(-50%);
+      position:absolute;bottom:14px;left:50%;transform:translateX(-50%);
       text-align:center;pointer-events:none;z-index:5;
     }
     .countdown-label{
-      font-family:'Courier New',monospace;font-size:9px;letter-spacing:3px;
-      text-transform:uppercase;color:var(--muted);margin-bottom:4px;
+      font-family:'Courier New',monospace;font-size:8px;letter-spacing:3px;
+      text-transform:uppercase;color:var(--muted);margin-bottom:2px;
     }
     .countdown-val{
-      font-size:38px;color:var(--green-b);
-      text-shadow:0 0 20px var(--green-glow);
+      font-size:32px;color:var(--green-b);
+      text-shadow:0 0 16px var(--green-glow);
     }
 
     /* ── Crashed banner ─────────────────────────────────────── */
     .crashed-banner{
       display:none;
       position:absolute;inset:0;z-index:20;
-      background:rgba(0,0,0,.75);
-      align-items:center;justify-content:center;flex-direction:column;gap:8px;
+      background:rgba(0,0,0,.72);
+      align-items:center;justify-content:center;flex-direction:column;gap:6px;
     }
     .crashed-banner.show{display:flex}
     .crashed-title{
-      font-size:52px;color:var(--red);letter-spacing:4px;
-      text-shadow:0 0 60px var(--red-glow);
+      font-size:40px;color:var(--red);letter-spacing:4px;
+      text-shadow:0 0 50px var(--red-glow);
       animation:crashPulse .6s ease-in-out;
     }
     .crashed-point{
-      font-family:'Courier New',monospace;font-size:18px;color:#f87171;
+      font-family:'Courier New',monospace;font-size:15px;color:#f87171;
     }
     @keyframes crashPulse{0%{transform:scale(1.4)}100%{transform:scale(1)}}
 
-    /* ── Bet panel ──────────────────────────────────────────── */
+    /* ── Bet footer ─────────────────────────────────────────── */
     .bet-footer{
-      flex-shrink:0;
-      background:rgba(2,10,3,.97);
-      border-top:1px solid var(--border);
-      padding:10px;
-      padding-bottom:max(env(safe-area-inset-bottom,10px),10px);
-      display:flex;
-    }
-
-    .bet-panel{
-      width:100%;
-      background:#041008;
-      border:1px solid var(--border);
-      border-radius:14px;
-      padding:12px 14px;
+      flex:1;
+      min-height:0;
+      overflow-y:auto;
+      -webkit-overflow-scrolling:touch;
+      scrollbar-width:none;
+      background:linear-gradient(180deg,#010804 0%,#020d06 60%,#010a04 100%);
+      border-top:1px solid rgba(34,197,94,.18);
+      padding:8px 10px;
+      padding-bottom:max(env(safe-area-inset-bottom,8px),8px);
+      position:relative;z-index:1;
       display:flex;flex-direction:column;gap:8px;
     }
-    .bet-panel.active-bet { border-color:var(--green) }
-    .bet-panel.crashed-bet{ border-color:#7f1d1d }
+    .bet-footer::-webkit-scrollbar{display:none}
 
-    .bp-label{ display:none }
-    .bp-amount-row{display:flex;gap:4px;align-items:center}
+    /* ── Green Plasma Panel Card ─────────────────────────────── */
+    .bet-panel{
+      width:100%;
+      background:
+        radial-gradient(ellipse 80% 35% at 50% 0%,rgba(34,197,94,.07) 0%,transparent 65%),
+        radial-gradient(ellipse 60% 25% at 50% 100%,rgba(20,83,45,.12) 0%,transparent 70%),
+        linear-gradient(160deg,#071812 0%,#020d06 45%,#041008 100%);
+      border:1.5px solid rgba(34,197,94,.3);
+      border-radius:22px;
+      padding:12px 22px 14px 8px;
+      display:flex;flex-direction:column;gap:8px;
+      overflow:hidden;
+      flex-shrink:0;
+      box-shadow:
+        0 0 0 1px rgba(34,197,94,.06),
+        0 0 18px rgba(34,197,94,.1),
+        inset 0 1px 0 rgba(74,222,128,.1),
+        inset 0 0 50px rgba(0,0,0,.55);
+      /* Force GPU layer so overflow:hidden + border-radius clips correctly in WKWebView */
+      transform:translateZ(0);
+      -webkit-transform:translateZ(0);
+      transition:border-color .3s,box-shadow .3s;
+    }
+    .bet-panel.active-bet{
+      border-color:rgba(34,197,94,.75);
+      box-shadow:
+        0 0 0 1px rgba(34,197,94,.15),
+        0 0 28px rgba(34,197,94,.22),
+        0 0 56px rgba(34,197,94,.07),
+        inset 0 1px 0 rgba(74,222,128,.15),
+        inset 0 0 50px rgba(0,0,0,.4);
+    }
+    .bet-panel.crashed-bet{ border-color:rgba(239,68,68,.5) }
+
+    /* ── Toggle Row ──────────────────────────────────────────── */
+    .bp-toggle-row{
+      display:flex;align-items:center;gap:10px;
+    }
+    .bp-toggle-item{
+      display:flex;align-items:center;gap:6px;flex:1;
+    }
+    .bp-toggle-item--inject{ flex:1.5 }
+    .bp-toggle-label{
+      font-family:'Orbitron',sans-serif;
+      font-size:8px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
+      color:rgba(74,222,128,.55);white-space:nowrap;
+    }
+    .bp-toggle{
+      position:relative;width:40px;height:24px;flex-shrink:0;
+      background:linear-gradient(180deg,#081408 0%,#0b1c0e 100%);
+      border:1px solid rgba(34,197,94,.2);
+      border-radius:7px;cursor:pointer;padding:0;
+      box-shadow:inset 0 1px 4px rgba(0,0,0,.55);
+      transition:all .25s;
+    }
+    .bp-toggle.on{
+      background:linear-gradient(180deg,#0a3015 0%,#0e4a1c 100%);
+      border-color:var(--green);
+      box-shadow:0 0 12px rgba(34,197,94,.45),inset 0 1px 0 rgba(74,222,128,.12);
+    }
+    .bp-toggle-knob{
+      position:absolute;top:4px;left:4px;
+      width:14px;height:14px;
+      background:linear-gradient(135deg,#2e4a34 0%,#1c3022 100%);
+      border-radius:3px;
+      box-shadow:0 1px 3px rgba(0,0,0,.5);
+      transition:all .25s;display:block;
+    }
+    .bp-toggle.on .bp-toggle-knob{
+      left:20px;
+      background:linear-gradient(135deg,#4ade80 0%,#22c55e 100%);
+      box-shadow:0 0 8px rgba(34,197,94,.9),0 1px 3px rgba(0,0,0,.3);
+    }
+    .bp-inject-val{
+      flex:1;min-width:0;
+      background:linear-gradient(180deg,#020c05 0%,#030f07 100%);
+      border:1px solid rgba(34,197,94,.18);
+      border-radius:10px;padding:4px 8px;
+      font-family:'Share Tech Mono',monospace;font-size:12px;
+      color:var(--green-b);text-align:center;outline:none;
+      box-shadow:inset 0 1px 4px rgba(0,0,0,.55);
+      transition:opacity .2s;
+    }
+    .bp-inject-val:focus{ border-color:rgba(34,197,94,.5) }
+    .bp-inject-val::placeholder{ color:rgba(34,197,94,.18) }
+    .bp-inject-val:disabled{ opacity:.3 }
+
+    /* ── Stepper Row ─────────────────────────────────────────── */
+    .bp-stepper-row{
+      display:flex;align-items:center;gap:8px;
+    }
+    .bp-step-btn{
+      width:42px;height:42px;flex-shrink:0;
+      background:linear-gradient(145deg,#081a0e 0%,#0b2212 50%,#060e08 100%);
+      border:1px solid rgba(34,197,94,.28);
+      border-radius:12px;color:var(--green-b);
+      font-size:22px;line-height:1;cursor:pointer;
+      display:flex;align-items:center;justify-content:center;
+      transition:all .15s;
+      box-shadow:
+        0 0 6px rgba(34,197,94,.07),
+        inset 0 1px 0 rgba(74,222,128,.12),
+        inset 0 -1px 0 rgba(0,0,0,.35);
+    }
+    .bp-step-btn:active{
+      background:linear-gradient(145deg,#0e2e18 0%,#163a20 100%);
+      border-color:var(--green);
+      box-shadow:0 0 14px rgba(34,197,94,.4),inset 0 1px 0 rgba(74,222,128,.2);
+      transform:scale(.94);
+    }
     .bp-amount{
-      flex:1;background:#020a03;border:1px solid var(--border);
-      border-radius:7px;padding:7px 8px;
-      font-family:'Courier New',monospace;font-size:14px;color:var(--text);
-      outline:none;
+      flex:1;
+      background:linear-gradient(180deg,#010a04 0%,#020e06 100%);
+      border:1px solid rgba(34,197,94,.22);
+      border-radius:16px;padding:10px 8px;
+      font-family:'Orbitron',monospace;
+      font-size:24px;font-weight:700;color:#e8fff2;
+      text-align:center;outline:none;
+      letter-spacing:1px;
+      box-shadow:
+        inset 0 2px 10px rgba(0,0,0,.65),
+        0 0 0 1px rgba(34,197,94,.04);
     }
-    .bp-amount:focus{border-color:var(--green-dim)}
-    .bp-quick{display:flex;gap:6px}
+    .bp-amount:focus{ border-color:rgba(34,197,94,.55) }
+
+    /* ── Quick Amounts ───────────────────────────────────────── */
+    .bp-quick{ display:flex;gap:6px }
     .bp-q{
-      flex:1;padding:7px 0;font-size:11px;
-      background:#041008;border:1px solid var(--border);
-      border-radius:7px;color:var(--muted);cursor:pointer;
-      font-family:'Courier New',monospace;
+      flex:1;padding:8px 0;font-size:11px;
+      background:linear-gradient(160deg,#071610 0%,#091d12 100%);
+      border:1px solid rgba(34,197,94,.2);
+      border-radius:12px;
+      color:rgba(74,222,128,.6);
+      cursor:pointer;
+      font-family:'Orbitron',sans-serif;font-weight:600;
+      transition:all .15s;
+      box-shadow:inset 0 1px 0 rgba(74,222,128,.07),inset 0 0 16px rgba(0,0,0,.3);
     }
-    .bp-q:active{background:#0d2e12;color:var(--green)}
-
-    .bp-cashout-row{display:flex;gap:4px;align-items:center}
-    .bp-cashout-label{
-      font-family:'Courier New',monospace;font-size:8px;
-      color:var(--muted);white-space:nowrap;
-    }
-    .bp-cashout{
-      flex:1;background:#020a03;border:1px solid var(--border);
-      border-radius:7px;padding:5px 8px;
-      font-family:'Courier New',monospace;font-size:12px;color:var(--text);
-      outline:none;
+    .bp-q:active{
+      background:linear-gradient(160deg,#0a2218 0%,#0f2e1c 100%);
+      border-color:rgba(34,197,94,.6);
+      color:var(--green);
+      box-shadow:0 0 10px rgba(34,197,94,.2),inset 0 1px 0 rgba(74,222,128,.1);
     }
 
+    /* ── Payout strip ────────────────────────────────────────── */
+    .bp-payout{
+      font-family:'Orbitron',monospace;font-size:10px;font-weight:600;
+      color:var(--green);text-align:center;
+      background:linear-gradient(90deg,rgba(34,197,94,.04) 0%,rgba(34,197,94,.1) 50%,rgba(34,197,94,.04) 100%);
+      border:1px solid rgba(34,197,94,.2);
+      border-radius:10px;padding:6px;
+      box-shadow:0 0 8px rgba(34,197,94,.1);
+      letter-spacing:1px;
+    }
+
+    /* ── Image Button Pair (betting phase only) ─────────────── */
+    .bp-btn-pair{
+      display:none;width:100%;gap:8px;
+    }
+    .bp-btn-pair.visible{ display:flex }
+    .bp-img-btn{
+      flex:1;border:none;background:none;padding:0;
+      cursor:pointer;-webkit-tap-highlight-color:transparent;
+      border-radius:12px;overflow:hidden;
+      transition:transform .1s;
+    }
+    .bp-img-btn:not([disabled]):active{ transform:scale(.96) }
+    .bp-img-btn[disabled]{ cursor:default;pointer-events:none }
+    .bp-img-btn img{ width:100%;height:auto;display:block }
+
+    /* ── Main Buttons ────────────────────────────────────────── */
     .bp-btn{
-      width:100%;padding:14px;border-radius:10px;
-      font-family:'Fredoka One',sans-serif;font-size:16px;letter-spacing:1.5px;
+      width:100%;padding:16px;border-radius:20px;
+      font-family:'Orbitron',sans-serif;font-size:15px;font-weight:700;letter-spacing:2px;
       cursor:pointer;transition:all .15s;
     }
+    .bp-btn:not(:disabled):active{ transform:scale(.98) }
     .bp-btn-bet{
-      background:linear-gradient(135deg,#0a3a12,#16701f,#0a3a12);
-      border:1px solid var(--green);color:#d4ffd8;
-      box-shadow:0 0 14px var(--green-glow);
+      background:linear-gradient(160deg,#0a4018 0%,#187530 40%,#0a4018 100%);
+      border:1.5px solid rgba(34,197,94,.65);color:#d4ffd8;
+      box-shadow:
+        0 0 28px rgba(34,197,94,.3),
+        0 0 8px rgba(34,197,94,.15),
+        inset 0 1px 0 rgba(74,222,128,.22),
+        inset 0 0 24px rgba(0,0,0,.35);
     }
-    .bp-btn-bet:disabled{opacity:.35;cursor:default;box-shadow:none}
+    .bp-btn-bet:disabled{ opacity:.35;cursor:default;box-shadow:none }
+    .bp-btn-placed{
+      background:linear-gradient(160deg,#062010 0%,#0a3018 100%);
+      border:1px solid rgba(34,197,94,.28);color:#4ade80;
+      box-shadow:0 0 10px rgba(74,222,128,.12);
+      opacity:.9;cursor:default;
+    }
+    .bp-btn-next-round{
+      background:linear-gradient(160deg,#4a2d00 0%,#b45309 50%,#d97706 100%);
+      border:1.5px solid #d97706;color:#fff8e8;
+      box-shadow:0 0 20px rgba(217,119,6,.4),inset 0 1px 0 rgba(255,220,100,.18);
+      animation:btnPulse 1.8s ease-in-out infinite;
+    }
+    .bp-btn-cancel{
+      background:linear-gradient(160deg,#450a0a 0%,#991b1b 50%,#dc2626 100%);
+      border:1.5px solid #ef4444;color:#fff0f0;
+      box-shadow:0 0 20px rgba(239,68,68,.35),inset 0 1px 0 rgba(255,100,100,.15);
+      display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+    }
+    .bp-btn-cancel-sub{ font-size:9px;letter-spacing:1px;opacity:.75;font-weight:600 }
+    @keyframes btnPulse{
+      0%,100%{ box-shadow:0 0 14px rgba(217,119,6,.35) }
+      50%    { box-shadow:0 0 32px rgba(217,119,6,.75) }
+    }
     .bp-btn-cashout{
-      background:linear-gradient(135deg,#3a0a0a,#901010,#3a0a0a);
-      border:1px solid var(--red);color:#ffd4d4;
-      box-shadow:0 0 14px var(--red-glow);
+      background:linear-gradient(160deg,#062a0a 0%,#0f7020 50%,#062a0a 100%);
+      border:2px solid var(--green);color:#d4ffd8;
+      box-shadow:0 0 28px rgba(34,197,94,.5),inset 0 1px 0 rgba(74,222,128,.2);
       animation:cashoutPulse 1s ease-in-out infinite;
+      font-size:20px;
     }
     @keyframes cashoutPulse{
-      0%,100%{box-shadow:0 0 10px var(--red-glow)}
-      50%    {box-shadow:0 0 25px var(--red-glow),0 0 40px rgba(239,68,68,.2)}
+      0%,100%{ box-shadow:0 0 18px rgba(34,197,94,.4) }
+      50%    { box-shadow:0 0 36px rgba(34,197,94,.75),0 0 60px rgba(34,197,94,.2) }
     }
-    .bp-payout{
-      font-family:'Courier New',monospace;font-size:10px;
-      color:var(--green);text-align:center;
+
+    /* ── Lower Info Panel ───────────────────────────────────── */
+    .lip{
+      flex-shrink:0;
+      background:
+        radial-gradient(ellipse 70% 30% at 50% 0%,rgba(34,197,94,.06) 0%,transparent 60%),
+        linear-gradient(160deg,#071812 0%,#020d06 50%,#041008 100%);
+      border:1.5px solid rgba(34,197,94,.25);
+      border-radius:20px;overflow:hidden;
+      box-shadow:0 0 0 1px rgba(34,197,94,.05),inset 0 0 40px rgba(0,0,0,.5);
+    }
+    .lip-header{
+      display:flex;align-items:center;gap:8px;
+      padding:10px 12px 0;
+    }
+    .lip-tabs{ display:flex;gap:3px;flex:1 }
+    .lip-tab{
+      flex:1;padding:7px 4px;border-radius:10px;
+      font-family:'Orbitron',sans-serif;font-size:10px;font-weight:700;letter-spacing:1.5px;
+      background:transparent;border:1px solid rgba(34,197,94,.15);
+      color:rgba(74,222,128,.45);cursor:pointer;transition:all .2s;
+    }
+    .lip-tab--active{
+      background:linear-gradient(160deg,#0a3018 0%,#0e4020 100%);
+      border-color:rgba(34,197,94,.6);color:#d4ffd8;
+      box-shadow:0 0 10px rgba(34,197,94,.18),inset 0 1px 0 rgba(74,222,128,.12);
+    }
+    .lip-pill{
+      padding:5px 10px;border-radius:20px;
+      font-family:'Orbitron',sans-serif;font-size:8px;font-weight:700;letter-spacing:1px;
+      background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.25);
+      color:rgba(74,222,128,.7);white-space:nowrap;
+    }
+    .lip-stats{
+      display:flex;gap:0;padding:8px 12px 6px;
+      border-bottom:1px solid rgba(34,197,94,.1);
+    }
+    .lip-stat{
+      flex:1;display:flex;flex-direction:column;align-items:center;gap:1px;
+      border-right:1px solid rgba(34,197,94,.1);
+    }
+    .lip-stat:last-child{ border-right:none }
+    .lip-stat-lbl{
+      font-family:'Orbitron',sans-serif;font-size:7px;font-weight:700;
+      letter-spacing:1px;color:rgba(74,222,128,.4);
+    }
+    .lip-stat-val{
+      font-family:'Orbitron',sans-serif;font-size:11px;font-weight:700;
+      color:#d4ffd8;letter-spacing:.5px;
+    }
+    .lip-list{
+      overflow-y:auto;max-height:150px;
+      padding:4px 8px 8px;
+      scrollbar-width:none;
+    }
+    .lip-list::-webkit-scrollbar{ display:none }
+    .lip-row{
+      display:flex;align-items:center;gap:7px;
+      padding:6px 4px;
+      border-bottom:1px solid rgba(34,197,94,.07);
+    }
+    .lip-row:last-child{ border-bottom:none }
+    .lip-avatar{
+      width:26px;height:26px;flex-shrink:0;
+      border-radius:8px;
+      display:flex;align-items:center;justify-content:center;
+      font-family:'Orbitron',sans-serif;font-size:9px;font-weight:900;
+      color:#fff;
+    }
+    .lip-name{
+      flex:1;min-width:0;
+      font-family:'Share Tech Mono',monospace;font-size:11px;
+      color:rgba(212,255,216,.7);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+    }
+    .lip-bet{
+      font-family:'Share Tech Mono',monospace;font-size:10px;
+      color:rgba(212,255,216,.5);white-space:nowrap;flex-shrink:0;
+    }
+    .lip-mult{
+      font-family:'Orbitron',sans-serif;font-size:11px;font-weight:700;
+      color:#d4ffd8;white-space:nowrap;flex-shrink:0;min-width:42px;text-align:right;
+    }
+    .lip-mult--crashed{ color:rgba(239,68,68,.7) }
+    .lip-profit{
+      font-family:'Orbitron',sans-serif;font-size:10px;font-weight:700;
+      white-space:nowrap;flex-shrink:0;min-width:52px;text-align:right;
+    }
+    .lip-profit--win{ color:#4ade80 }
+    .lip-profit--loss{ color:#f87171 }
+    .lip-rank{
+      width:22px;flex-shrink:0;
+      font-family:'Orbitron',sans-serif;font-size:9px;font-weight:900;
+      text-align:center;
+    }
+    .lip-rank--1{ color:#fbbf24 }
+    .lip-rank--2{ color:#d1d5db }
+    .lip-rank--3{ color:#b45309 }
+    .lip-rank--n{ color:rgba(74,222,128,.35) }
+    .lip-empty{
+      padding:20px 0;text-align:center;
+      font-family:'Orbitron',sans-serif;font-size:9px;font-weight:600;
+      color:rgba(74,222,128,.25);letter-spacing:1px;
     }
 
     /* ── No session ─────────────────────────────────────────── */
@@ -258,13 +622,13 @@
 
     /* ── Warning overlay at ≤3 s ─────────────────────────────── */
     .bvb-warning{
-      position:absolute;inset:0;z-index:3;
-      display:flex;align-items:center;justify-content:center;
-      pointer-events:none;
+      position:absolute;bottom:0;left:50%;
+      transform:translateX(-50%) translateY(50%);
+      z-index:10;pointer-events:none;
       animation:warningPulse .55s ease-in-out infinite alternate;
     }
     .bvb-warning img{
-      max-width:85%;max-height:60%;object-fit:contain;
+      width:70vw;max-width:260px;height:auto;display:block;
     }
     .bvb-warning-text{
       font-size:30px;color:#ef4444;letter-spacing:4px;text-align:center;
@@ -306,13 +670,11 @@
     .gywi__amount{
       position:absolute;top:56%;left:50%;
       transform:translate(-50%,-50%);
-      color:#7fffd4;font-weight:900;font-size:18px;
+      color:#ffffff;font-weight:900;font-size:clamp(18px,5vw,26px);
       font-family:'Courier New',monospace;
       letter-spacing:1px;text-align:center;
-      background:rgba(8,32,28,.92);
-      padding:3px 14px;border-radius:6px;
-      white-space:nowrap;max-width:68%;overflow:hidden;
-      text-shadow:0 0 8px rgba(127,255,212,.4);
+      white-space:nowrap;max-width:70%;
+      text-shadow:0 0 12px rgba(127,255,212,.8),0 2px 4px rgba(0,0,0,.9);
     }
     .gywi__mult{
       position:absolute;top:100%;left:50%;
@@ -337,8 +699,22 @@
     <div class="state-badge betting" id="stateBadge">BETTING</div>
   </div>
 
-  <!-- History -->
-  <div class="history" id="history"></div>
+  <!-- History bar -->
+  <div class="hist-bar">
+    <!-- Left: current-round live tab -->
+    <div class="hist-cur">
+      <div class="hist-cur-pill" id="histCurPill">?</div>
+      <div class="hist-cur-ptr"  id="histCurPtr"></div>
+    </div>
+    <!-- Center: scrollable multiplier history -->
+    <div class="hist-scroll" id="history"></div>
+    <!-- Right: scroll-to-latest button -->
+    <button class="hist-clock" aria-label="Latest" onclick="histScrollStart()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+      </svg>
+    </button>
+  </div>
 
   <!-- Game area -->
   <div class="game-area">
@@ -400,10 +776,28 @@
     <div class="no-session" id="noSession" style="display:none;width:100%">
       Open via Telegram bot to play
     </div>
+
+    <!-- Panel A -->
     <div class="bet-panel" id="panel0" style="display:none">
-      <div class="bp-label">Bet A</div>
-      <div class="bp-amount-row">
+      <div class="bp-toggle-row">
+        <div class="bp-toggle-item">
+          <button class="bp-toggle" id="togAutoBet0" onclick="toggleAutoBet(0)">
+            <span class="bp-toggle-knob"></span>
+          </button>
+          <span class="bp-toggle-label">AUTO BET</span>
+        </div>
+        <div class="bp-toggle-item bp-toggle-item--inject">
+          <button class="bp-toggle" id="togAutoInject0" onclick="toggleAutoInject(0)">
+            <span class="bp-toggle-knob"></span>
+          </button>
+          <span class="bp-toggle-label">AUTO ×</span>
+          <input class="bp-inject-val" id="cashout0" type="number" min="1.1" step="0.1" placeholder="off" disabled>
+        </div>
+      </div>
+      <div class="bp-stepper-row">
+        <button class="bp-step-btn" onclick="stepAmount(0,-1)">−</button>
         <input class="bp-amount" id="amount0" type="number" min="0.1" step="0.1" value="1.00" placeholder="0.00">
+        <button class="bp-step-btn" onclick="stepAmount(0,1)">+</button>
       </div>
       <div class="bp-quick">
         <button class="bp-q" onclick="addAmount(0,1)">+1</button>
@@ -411,21 +805,103 @@
         <button class="bp-q" onclick="addAmount(0,10)">+10</button>
         <button class="bp-q" onclick="halvAmount(0)">½</button>
       </div>
-      <div class="bp-cashout-row">
-        <span class="bp-cashout-label">Auto ×</span>
-        <input class="bp-cashout" id="cashout0" type="number" min="1.1" step="0.1" placeholder="off">
-      </div>
       <div id="payout0" class="bp-payout" style="display:none"></div>
+      <!-- Betting phase: image pair -->
+      <div class="bp-btn-pair" id="btnPair0">
+        <button class="bp-img-btn" id="btnBetImg0" onclick="handleBtn(0)">
+          <img id="imgBet0" src="/assets/ui/granny%20wins/bet%20on.png" alt="BET">
+        </button>
+        <button class="bp-img-btn" id="btnCancelImg0" onclick="handleCancelBet(0)" disabled>
+          <img id="imgCancel0" src="/assets/ui/granny%20wins/cancel%20off.png" alt="CANCEL">
+        </button>
+      </div>
+      <!-- Non-betting phase: text button -->
       <button class="bp-btn bp-btn-bet" id="btn0" onclick="handleBtn(0)">BET</button>
+    </div>
+
+    <!-- Panel B -->
+    <div class="bet-panel" id="panel1" style="display:none">
+      <div class="bp-toggle-row">
+        <div class="bp-toggle-item">
+          <button class="bp-toggle" id="togAutoBet1" onclick="toggleAutoBet(1)">
+            <span class="bp-toggle-knob"></span>
+          </button>
+          <span class="bp-toggle-label">AUTO BET</span>
+        </div>
+        <div class="bp-toggle-item bp-toggle-item--inject">
+          <button class="bp-toggle" id="togAutoInject1" onclick="toggleAutoInject(1)">
+            <span class="bp-toggle-knob"></span>
+          </button>
+          <span class="bp-toggle-label">AUTO ×</span>
+          <input class="bp-inject-val" id="cashout1" type="number" min="1.1" step="0.1" placeholder="off" disabled>
+        </div>
+      </div>
+      <div class="bp-stepper-row">
+        <button class="bp-step-btn" onclick="stepAmount(1,-1)">−</button>
+        <input class="bp-amount" id="amount1" type="number" min="0.1" step="0.1" value="1.00" placeholder="0.00">
+        <button class="bp-step-btn" onclick="stepAmount(1,1)">+</button>
+      </div>
+      <div class="bp-quick">
+        <button class="bp-q" onclick="addAmount(1,1)">+1</button>
+        <button class="bp-q" onclick="addAmount(1,5)">+5</button>
+        <button class="bp-q" onclick="addAmount(1,10)">+10</button>
+        <button class="bp-q" onclick="halvAmount(1)">½</button>
+      </div>
+      <div id="payout1" class="bp-payout" style="display:none"></div>
+      <!-- Betting phase: image pair -->
+      <div class="bp-btn-pair" id="btnPair1">
+        <button class="bp-img-btn" id="btnBetImg1" onclick="handleBtn(1)">
+          <img id="imgBet1" src="/assets/ui/granny%20wins/bet%20on.png" alt="BET">
+        </button>
+        <button class="bp-img-btn" id="btnCancelImg1" onclick="handleCancelBet(1)" disabled>
+          <img id="imgCancel1" src="/assets/ui/granny%20wins/cancel%20off.png" alt="CANCEL">
+        </button>
+      </div>
+      <!-- Non-betting phase: text button -->
+      <button class="bp-btn bp-btn-bet" id="btn1" onclick="handleBtn(1)">BET</button>
+    </div>
+
+    <!-- ── Lower Info Panel ──────────────────────────────────── -->
+    <div class="lip" id="lip">
+      <div class="lip-header">
+        <div class="lip-tabs">
+          <button class="lip-tab lip-tab--active" id="lipTabAll" onclick="lipSetTab('all')">ALL</button>
+          <button class="lip-tab" id="lipTabMy"  onclick="lipSetTab('my')">MY</button>
+          <button class="lip-tab" id="lipTabTop" onclick="lipSetTab('top')">TOP</button>
+        </div>
+        <div class="lip-pill" id="lipPill">LAST ROUND</div>
+      </div>
+      <div class="lip-stats">
+        <div class="lip-stat">
+          <span class="lip-stat-lbl">BETS</span>
+          <span class="lip-stat-val" id="lipStatBets">—</span>
+        </div>
+        <div class="lip-stat">
+          <span class="lip-stat-lbl">PLAYERS</span>
+          <span class="lip-stat-val" id="lipStatPlayers">—</span>
+        </div>
+        <div class="lip-stat">
+          <span class="lip-stat-lbl">TOP WIN</span>
+          <span class="lip-stat-val" id="lipStatTop">—</span>
+        </div>
+      </div>
+      <div class="lip-list" id="lipList"></div>
     </div>
   </div>
 
-  <!-- Win overlay — centered, full-width single panel -->
+  <!-- Win overlays -->
   <div class="gywi gywi--a" id="gywi0" aria-hidden="true">
     <div class="gywi__inner">
       <img class="gywi__img" id="gywi0img" src="/assets/ui/granny%20wins/Grannywin1.png" alt="WIN" draggable="false">
       <span class="gywi__amount" id="gywi0amount"></span>
       <span class="gywi__mult" id="gywi0mult"></span>
+    </div>
+  </div>
+  <div class="gywi gywi--a" id="gywi1" aria-hidden="true">
+    <div class="gywi__inner">
+      <img class="gywi__img" id="gywi1img" src="/assets/ui/granny%20wins/Grannywin1.png" alt="WIN" draggable="false">
+      <span class="gywi__amount" id="gywi1amount"></span>
+      <span class="gywi__mult" id="gywi1mult"></span>
     </div>
   </div>
 
@@ -467,6 +943,7 @@ async function auth() {
 
 function showPanels() {
   document.getElementById('panel0').style.display = 'flex'
+  document.getElementById('panel1').style.display = 'flex'
   document.getElementById('noSession').style.display = 'none'
 }
 
@@ -489,9 +966,18 @@ let roundId    = ''
 let multiplier = 1.00
 let bets = [
   { id:'', active:false, cashedOut:false, currency:'USD', amount:1 },
+  { id:'', active:false, cashedOut:false, currency:'USD', amount:1 },
 ]
 let historyItems = []
 let startedAt = 0
+
+// ── Lower Info Panel state ────────────────────────────────────────────────────
+let lipTab          = 'all'
+let lipCurrentRound = {}   // map: playerId → {amount,currency,cashoutAt,payout,betId}
+let lipLastRound    = []   // sorted array from previous round
+let lipMyHistory    = []   // user's own bet history
+let lipTopMap       = {}   // playerId → {total, count, name}
+let lipMyPlayerId   = null // resolved on first cashout matching our bet_id
 
 // ── Canvas scene ──────────────────────────────────────────────────────────────
 const canvas = document.getElementById('scene')
@@ -500,23 +986,44 @@ let animFrame = 0
 
 // Character state
 let grannyY = 0, grannyX = 0.62, doctorY = 0, grannyOsc = 0, doctorOsc = 0, flameT = 0
+let grannyVidReady = false, doctorVidReady = false
 
 // Parallax state
 let bgOff = 0, lastTs = 0
 
-// ── Background image (preloaded during BETTING so no flicker on RUNNING) ──────
+// ── Static background image ───────────────────────────────────────────────────
 const bgImg = new Image()
 let bgImgReady = false
 bgImg.onload = () => { bgImgReady = true }
-bgImg.src = '/assets/granny%20bg/grannynewbg.jpeg'
+bgImg.src = '/assets/granny%20bg/bgran.png'
 
 // ── Character assets ──────────────────────────────────────────────────────────
-const grannyImg = new Image(), doctorImg = new Image()
-let grannyImgReady = false, doctorImgReady = false
-grannyImg.onload = () => { grannyImgReady = true }
-doctorImg.onload = () => { doctorImgReady = true }
-grannyImg.src = '/assets/granny/granny%20hero.png'
-doctorImg.src = '/assets/granny/medicin%20hero.png'
+const grannyVid = document.createElement('video')
+grannyVid.src = '/assets/granny/Granny%20hero.mp4'
+grannyVid.loop = true
+grannyVid.muted = true
+grannyVid.playsInline = true
+grannyVid.setAttribute('playsinline', '')
+grannyVid.setAttribute('webkit-playsinline', '')
+grannyVid.preload = 'auto'
+grannyVid.style.cssText = 'position:fixed;width:1px;height:1px;opacity:0;pointer-events:none;top:-9999px;left:-9999px'
+document.body.appendChild(grannyVid)
+grannyVid.addEventListener('loadeddata', () => { grannyVidReady = true; grannyVid.play().catch(()=>{}) }, { once: true })
+grannyVid.load()
+
+// Doctor — video asset (drawn onto canvas each frame)
+const doctorVid = document.createElement('video')
+doctorVid.src = '/video/medical%20hero.mp4'
+doctorVid.loop = true
+doctorVid.muted = true
+doctorVid.playsInline = true
+doctorVid.setAttribute('playsinline', '')
+doctorVid.setAttribute('webkit-playsinline', '')
+doctorVid.preload = 'auto'
+doctorVid.style.cssText = 'position:fixed;width:1px;height:1px;opacity:0;pointer-events:none;top:-9999px;left:-9999px'
+document.body.appendChild(doctorVid)
+doctorVid.addEventListener('loadeddata', () => { doctorVidReady = true; doctorVid.play().catch(()=>{}) }, { once: true })
+doctorVid.load()
 
 // ── Win overlay asset (preloaded so no lag on cashout) ────────────────────────
 const _grannyWinImg = new Image()
@@ -556,6 +1063,78 @@ window.addEventListener('resize', resizeCanvas)
 
 // ── Seeded pseudo-random (deterministic by position — no jitter on scroll) ────
 function rnd(s) { const x = Math.sin(s*9301+49297)*233280; return x - Math.floor(x) }
+
+// ── Trajectory curve — follows Granny's animated position ────────────────────
+function drawCurve(W, H) {
+  if (roundState === 'STARTING' || roundState === 'CREATED') return
+  const gX = W * grannyX
+  const gY = grannyY
+  const crashed = roundState === 'CRASHED'
+  const col  = crashed ? '#ef4444' : '#22c55e'
+  const glowA = crashed ? 'rgba(239,68,68,' : 'rgba(34,197,94,'
+  const sx = W * 0.04, sy = H * 0.94
+  const cpX = sx + (gX - sx) * 0.42, cpY = sy
+
+  ctx.save()
+  ctx.lineJoin = 'round'; ctx.lineCap = 'round'
+
+  // Wide soft glow
+  ctx.beginPath(); ctx.moveTo(sx, sy); ctx.quadraticCurveTo(cpX, cpY, gX, gY)
+  ctx.lineWidth = 14; ctx.strokeStyle = glowA + '.07)'
+  ctx.stroke()
+
+  // Mid glow
+  ctx.beginPath(); ctx.moveTo(sx, sy); ctx.quadraticCurveTo(cpX, cpY, gX, gY)
+  ctx.lineWidth = 6; ctx.strokeStyle = glowA + '.22)'; ctx.shadowColor = col; ctx.shadowBlur = 10
+  ctx.stroke()
+
+  // Core line
+  ctx.beginPath(); ctx.moveTo(sx, sy); ctx.quadraticCurveTo(cpX, cpY, gX, gY)
+  ctx.lineWidth = 2; ctx.strokeStyle = col; ctx.shadowBlur = 6
+  ctx.stroke()
+
+  // Tip dot
+  ctx.beginPath(); ctx.arc(gX, gY, 4, 0, Math.PI * 2)
+  ctx.fillStyle = col; ctx.shadowBlur = 16; ctx.fill()
+
+  ctx.shadowBlur = 0; ctx.restore()
+}
+
+// ── Toxic ground fog ─────────────────────────────────────────────────────────
+function drawFog(W, H) {
+  const fogH = H * 0.30
+  const gy = ctx.createLinearGradient(0, H - fogH, 0, H)
+  gy.addColorStop(0, 'rgba(2,18,6,0)')
+  gy.addColorStop(0.55, 'rgba(3,24,8,.28)')
+  gy.addColorStop(1, 'rgba(4,32,10,.65)')
+  ctx.fillStyle = gy; ctx.fillRect(0, H - fogH, W, fogH)
+
+  for (let i = 0; i < 5; i++) {
+    const bx = rnd(i+60) * W * 0.9 + W * 0.05
+    const by = H - 6 - rnd(i+61) * fogH * 0.55
+    const rx = 60 + rnd(i+62) * 80, ry = 13 + rnd(i+63) * 12
+    const g = ctx.createRadialGradient(bx, by, 0, bx, by, rx)
+    g.addColorStop(0, 'rgba(8,42,14,.38)'); g.addColorStop(1, 'rgba(2,12,4,0)')
+    ctx.fillStyle = g
+    ctx.save(); ctx.scale(1, ry / rx)
+    ctx.beginPath(); ctx.arc(bx, by * rx / ry, rx, 0, Math.PI * 2); ctx.fill()
+    ctx.restore()
+  }
+}
+
+// ── Floating toxic particles ─────────────────────────────────────────────────
+function drawParticles(W, H, ts) {
+  const t = ts * 0.001
+  for (let i = 0; i < 14; i++) {
+    const px = (rnd(i + 20) * W + t * 10 * (0.3 + rnd(i + 21) * 0.7)) % (W + 10)
+    const py = ((rnd(i + 22) * H - t * 7 * (0.2 + rnd(i + 23) * 0.6)) % H + H) % H
+    const a  = (0.12 + rnd(i + 24) * 0.38) * (0.5 + Math.sin(t * 2.2 + i * 0.9) * 0.5)
+    ctx.globalAlpha = a
+    ctx.fillStyle = '#4ade80'
+    ctx.fillRect(px, py, 1.5, 1.5)
+  }
+  ctx.globalAlpha = 1
+}
 
 // ── Layer 5: Night sky + stars + clouds ──────────────────────────────────────
 function drawSky(W, H) {
@@ -728,45 +1307,49 @@ function drawGround(W, H, off, ts) {
   }
 }
 
-// ── Image-based scrolling background (grannybg.jpeg mirror-loop) ──────────────
-function drawBackground(W, H, off, camY) {
+// ── Static background — cover-fit ────────────────────────────────────────────
+function drawBackground(W, H) {
   if (!bgImgReady) {
-    // Still loading — use procedural fallback so screen is never black
-    drawSky(W, H); drawStars(W, H, off); drawClouds(W, H, off)
-    drawForest(W, H, off); drawSkyline(W, H, off); drawMidground(W, H, off)
-    drawGround(W, H, off, performance.now())
-    return
+    ctx.fillStyle = '#020810'; ctx.fillRect(0, 0, W, H); return
   }
-
-  // Scale image to cover canvas height, preserve aspect ratio
-  const aspect  = bgImg.naturalWidth / bgImg.naturalHeight
-  const drawH   = H + Math.abs(camY) * 2   // extra height for pan headroom
-  const drawW   = drawH * aspect
-
-  // Mirror-loop: original tile then horizontally-flipped tile → seamless seam
-  const cycleW  = drawW * 2
-  const xOff    = off % cycleW
-  const tileY   = -camY                    // vertical camera offset
-
-  for (let i = -1; i <= Math.ceil(W / drawW) + 2; i++) {
-    const tileX = i * cycleW - xOff
-
-    // Original copy
-    if (tileX + drawW > 0 && tileX < W) {
-      ctx.drawImage(bgImg, tileX, tileY, drawW, drawH)
-    }
-
-    // Mirrored copy (flip horizontal so the seam is invisible)
-    const mX = tileX + drawW
-    if (mX + drawW > 0 && mX < W) {
-      ctx.save()
-      ctx.translate(mX + drawW, tileY)
-      ctx.scale(-1, 1)
-      ctx.drawImage(bgImg, 0, 0, drawW, drawH)
-      ctx.restore()
-    }
-  }
+  const s = Math.max(W / bgImg.naturalWidth, H / bgImg.naturalHeight)
+  const dW = bgImg.naturalWidth * s, dH = bgImg.naturalHeight * s
+  ctx.drawImage(bgImg, (W - dW) / 2, (H - dH) / 2, dW, dH)
 }
+
+
+// ── Chroma-key helpers (strips solid background from MP4 character videos) ────
+function makeChromaProc() {
+  const oc = document.createElement('canvas')
+  oc.width = 256; oc.height = 256
+  return { oc, ctx: oc.getContext('2d', { willReadFrequently: true }), color: null, lastTick: -1 }
+}
+
+function drawChromaKey(mainCtx, vid, proc, cx, cy, drawH) {
+  if (!vid || vid.readyState < 2 || !vid.videoWidth) return
+  const tick = Math.floor(vid.currentTime * 24)
+  if (tick !== proc.lastTick) {
+    proc.lastTick = tick
+    const { oc, ctx } = proc
+    ctx.clearRect(0, 0, 256, 256)
+    ctx.drawImage(vid, 0, 0, 256, 256)
+    if (!proc.color) {
+      const px = ctx.getImageData(0, 0, 1, 1).data
+      proc.color = [px[0], px[1], px[2]]
+    }
+    const id = ctx.getImageData(0, 0, 256, 256)
+    const d = id.data, [cr, cg, cb] = proc.color, tol = 40 * 3
+    for (let i = 0; i < d.length; i += 4) {
+      if (Math.abs(d[i]-cr) + Math.abs(d[i+1]-cg) + Math.abs(d[i+2]-cb) < tol) d[i+3] = 0
+    }
+    ctx.putImageData(id, 0, 0)
+  }
+  const dW = drawH * (vid.videoWidth / vid.videoHeight)
+  mainCtx.drawImage(proc.oc, cx - dW/2, cy - drawH/2, dW, drawH)
+}
+
+const grannyProc = makeChromaProc()
+const doctorProc = makeChromaProc()
 
 // ── Main draw loop ─────────────────────────────────────────────────────────────
 function drawScene(ts) {
@@ -779,6 +1362,10 @@ function drawScene(ts) {
   const running = roundState === 'RUNNING'
   const crashed = roundState === 'CRASHED'
 
+  // Keep character videos playing (muted — safe from autoplay policy)
+  if (grannyVidReady && grannyVid.paused) grannyVid.play().catch(()=>{})
+  if (doctorVidReady && doctorVid.paused) doctorVid.play().catch(()=>{})
+
   // Update parallax offset
   if (running)                    bgOff += 160 * Math.pow(Math.max(multiplier,1), 0.6) * dt
   else if (roundState==='STARTING') bgOff += 18 * dt
@@ -787,9 +1374,17 @@ function drawScene(ts) {
   grannyOsc = Math.sin(ts * 0.003) * 4
   doctorOsc = Math.sin(ts * 0.003 + 1.3) * 3  // offset phase from granny
 
-  // ── Background: grannybg.jpeg scrolling map ─────────────────────────────────
-  const camY = (1 - Math.min(grannyY, H) / H) * H * 0.10
-  drawBackground(W, H, bgOff, camY)
+  // ── Background ───────────────────────────────────────────────────────────────
+  drawBackground(W, H)
+
+  // Dark edge vignette for premium monitor feel
+  const _vig = ctx.createRadialGradient(W/2, H/2, H*0.15, W/2, H/2, H*0.85)
+  _vig.addColorStop(0, 'rgba(0,0,0,0)'); _vig.addColorStop(1, 'rgba(2,10,4,.55)')
+  ctx.fillStyle = _vig; ctx.fillRect(0, 0, W, H)
+
+  // ── Atmosphere layers ─────────────────────────────────────────────────────
+  drawParticles(W, H, ts)
+  drawFog(W, H)
 
   // ── Character Y animation ──────────────────────────────────────────────────
   if (running) {
@@ -809,31 +1404,34 @@ function drawScene(ts) {
   const gX = W * grannyX   // 0.62 — granny ahead (right)
   const dX = W * 0.28       // doctor behind (left)
 
+  // ── Trajectory curve (under characters) ─────────────────────────────────
+  drawCurve(W, H)
+
   // ── Doctor (drawn first — behind granny in z-order) ───────────────────────
+  const doctorH = Math.min(H * 0.82, 220)
   ctx.save()
   ctx.translate(dX, doctorY + doctorOsc)
   if (crashed) ctx.translate(gX - dX, grannyY - doctorY - 10)
-  if (doctorImgReady) {
-    const dH = 88, dW = dH * (doctorImg.naturalWidth / doctorImg.naturalHeight)
-    ctx.drawImage(doctorImg, -dW / 2, -dH / 2, dW, dH)
+  if (doctorVidReady) {
+    drawChromaKey(ctx, doctorVid, doctorProc, 0, 0, doctorH)
   } else {
-    ctx.font='38px serif'; ctx.textAlign='center'; ctx.textBaseline='middle'
+    ctx.font='32px serif'; ctx.textAlign='center'; ctx.textBaseline='middle'
     ctx.fillText('👨‍⚕️', 0, 0)
-    ctx.save(); ctx.rotate(-Math.PI/4); ctx.font='22px serif'; ctx.fillText('💉', -16, -16); ctx.restore()
+    ctx.save(); ctx.rotate(-Math.PI/4); ctx.font='18px serif'; ctx.fillText('💉', -14, -14); ctx.restore()
   }
   ctx.restore()
 
   // ── Granny (drawn after doctor — in front) ─────────────────────────────────
+  const grannyH = Math.min(H * 0.92, 250)
   ctx.save()
   ctx.translate(gX, grannyY + grannyOsc)
   if (crashed) ctx.rotate(Math.PI / 10)
-  if (grannyImgReady) {
-    const gH = 105, gW = gH * (grannyImg.naturalWidth / grannyImg.naturalHeight)
-    ctx.drawImage(grannyImg, -gW / 2, -gH / 2, gW, gH)
+  if (grannyVidReady) {
+    drawChromaKey(ctx, grannyVid, grannyProc, 0, 0, grannyH)
   } else {
-    ctx.font='42px serif'; ctx.textAlign='center'; ctx.textBaseline='middle'
+    ctx.font='36px serif'; ctx.textAlign='center'; ctx.textBaseline='middle'
     ctx.fillText('👵', 0, 0)
-    ctx.font='24px serif'; ctx.fillText('🚀', 10, 20)
+    ctx.font='20px serif'; ctx.fillText('🚀', 8, 18)
   }
   ctx.restore()
 
@@ -874,6 +1472,7 @@ function connectWS() {
         startedAt = Date.now()
         showCountdown()
         resetBetsOnNewRound()
+        updateHistCurrent('?', false)
         bvbOnStateChange('STARTING')   // startedAt must be set before this call
       }
       if (d.state === 'RUNNING') {
@@ -891,13 +1490,19 @@ function connectWS() {
       updateAutoCashoutPreviews()
     }
 
+    if (msg.type === 'bet_placed') {
+      lipOnBetPlaced(d.player_id, d.amount, d.currency)
+    }
+
     if (msg.type === 'cashout') {
       addSocialTick(d.player_id, d.multiplier, d.payout)
+      lipOnCashout(d.player_id, d.bet_id, d.multiplier, d.payout)
       // Auto-cashout: if this event matches one of our active bets, handle win
       bets.forEach((b, i) => {
         if (b.active && !b.cashedOut && b.id === d.bet_id) {
           b.cashedOut = true
           b.active    = false
+          lipMyPlayerId = d.player_id
           document.getElementById('panel'+i).classList.remove('active-bet')
           const payEl = document.getElementById('payout'+i)
           payEl.textContent = '💊 $' + parseFloat(d.payout).toFixed(2) + ' @ ' + d.multiplier.toFixed(2) + '×'
@@ -921,6 +1526,7 @@ function connectWS() {
       updateMult(d.crash_point, true)
       addHistory(d.crash_point)
       markLostBets()
+      lipOnCrashed()
       bvbOnStateChange('CRASHED')
       setTimeout(fetchBalance, 1500)
     }
@@ -941,7 +1547,7 @@ function updateMultVis() {
 }
 
 // ── Win overlay — mirrors YouWinOverlay.tsx timing exactly ────────────────────
-const _gywiTimers = [null]
+const _gywiTimers = [null, null]
 function showGrannyWin(i, amount, mult) {
   clearTimeout(_gywiTimers[i])
   const el  = document.getElementById('gywi' + i)
@@ -974,6 +1580,7 @@ function showGrannyWin(i, amount, mult) {
 function updateMult(v, crashed=false) {
   const el = document.getElementById('multVal')
   el.innerHTML = v.toFixed(2) + '<span class="mult-x">×</span>'
+  updateHistCurrent(v.toFixed(2)+'×', crashed)
   if (crashed) { el.className='mult-val crashed'; return }
   if (v >= 5)       el.className='mult-val epic'
   else if (v >= 2)  el.className='mult-val hot'
@@ -1010,6 +1617,20 @@ function addHistory(cp) {
   }).join('')
 }
 
+function updateHistCurrent(text, crashed) {
+  const pill = document.getElementById('histCurPill')
+  const ptr  = document.getElementById('histCurPtr')
+  if (!pill) return
+  pill.textContent = text
+  pill.classList.toggle('crashed', !!crashed)
+  ptr.classList.toggle('crashed', !!crashed)
+}
+
+function histScrollStart() {
+  const el = document.getElementById('history')
+  if (el) el.scrollLeft = 0
+}
+
 // ── Bet logic ─────────────────────────────────────────────────────────────────
 function resetBetsOnNewRound() {
   bets.forEach((b,i) => {
@@ -1020,6 +1641,18 @@ function resetBetsOnNewRound() {
       updateBtnState(i)
     }
   })
+  // Per-panel: fire queued bet (takes priority) or auto-bet
+  bets.forEach((b, i) => {
+    if (queuedNextBet[i] && roundState === 'STARTING') {
+      const q = queuedNextBet[i]
+      queuedNextBet[i] = null
+      document.getElementById('amount'+i).value = q.amount
+      if (q.autoCashout > 0) document.getElementById('cashout'+i).value = q.autoCashout
+      setTimeout(() => doBet(i), 80 + i * 80)
+    } else if (autoBetEnabled[i] && roundState === 'STARTING' && !b.active) {
+      setTimeout(() => doBet(i), 80 + i * 80)
+    }
+  })
 }
 
 function markLostBets() {
@@ -1028,29 +1661,89 @@ function markLostBets() {
       b.active = false
       document.getElementById('panel'+i).classList.add('crashed-bet')
       document.getElementById('payout'+i).style.display = 'none'
-      updateBtnState(i)
     }
+    updateBtnState(i)
   })
 }
 
-function updateBtnState(i) {
-  const btn    = document.getElementById('btn'+i)
-  const b      = bets[i]
-  const isBetting = roundState === 'STARTING'
-  const isRunning = roundState === 'RUNNING'
+// ── Next-round queued bet — per panel ────────────────────────────────────────
+let queuedNextBet = [null, null]  // { amount, autoCashout } per panel index
 
-  if (b.active && !b.cashedOut && isRunning) {
-    btn.textContent = 'CASH OUT'
-    btn.className = 'bp-btn bp-btn-cashout'
-    btn.disabled = false
-  } else if (!b.active && !b.cashedOut && isBetting) {
-    btn.textContent = 'BET'
-    btn.className = 'bp-btn bp-btn-bet'
-    btn.disabled = false
+// ── Auto bet / auto inject toggles (per-panel) ────────────────────────────────
+let autoBetEnabled    = [false, false]
+let autoInjectEnabled = [false, false]
+
+function toggleAutoBet(i) {
+  autoBetEnabled[i] = !autoBetEnabled[i]
+  document.getElementById('togAutoBet' + i).classList.toggle('on', autoBetEnabled[i])
+  tg?.HapticFeedback?.impactOccurred('light')
+}
+
+function toggleAutoInject(i) {
+  autoInjectEnabled[i] = !autoInjectEnabled[i]
+  document.getElementById('togAutoInject' + i).classList.toggle('on', autoInjectEnabled[i])
+  const inp = document.getElementById('cashout' + i)
+  if (inp) inp.disabled = !autoInjectEnabled[i]
+  tg?.HapticFeedback?.impactOccurred('light')
+}
+
+function stepAmount(i, dir) {
+  const el = document.getElementById('amount' + i)
+  const cur = parseFloat(el.value) || 1
+  el.value = Math.max(0.10, cur + dir).toFixed(2)
+}
+
+function updateBtnState(i) {
+  const btn        = document.getElementById('btn'+i)
+  const pair       = document.getElementById('btnPair'+i)
+  const btnBetImg  = document.getElementById('btnBetImg'+i)
+  const imgBet     = document.getElementById('imgBet'+i)
+  const btnCanImg  = document.getElementById('btnCancelImg'+i)
+  const imgCancel  = document.getElementById('imgCancel'+i)
+  const b          = bets[i]
+  const isBetting  = roundState === 'STARTING'
+  const isRunning  = roundState === 'RUNNING'
+
+  if (isBetting) {
+    // ── Betting phase: show image pair, hide text button ──────
+    pair.classList.add('visible')
+    btn.style.display = 'none'
+
+    if (b.active) {
+      // Bet placed → BET OFF + CANCEL ON
+      imgBet.src         = '/assets/ui/granny%20wins/bet%20off.png'
+      btnBetImg.disabled = true
+      imgCancel.src      = '/assets/ui/granny%20wins/cancel%20on.png'
+      btnCanImg.disabled = false
+    } else {
+      // No bet → BET ON + CANCEL OFF
+      imgBet.src         = '/assets/ui/granny%20wins/bet%20on.png'
+      btnBetImg.disabled = false
+      imgCancel.src      = '/assets/ui/granny%20wins/cancel%20off.png'
+      btnCanImg.disabled = true
+    }
   } else {
-    btn.textContent = b.cashedOut ? '✓ CASHED' : 'BET'
-    btn.className = 'bp-btn bp-btn-bet'
-    btn.disabled = true
+    // ── Non-betting phase: hide image pair, show text button ──
+    pair.classList.remove('visible')
+    btn.style.display = ''
+
+    if (b.active && !b.cashedOut && isRunning) {
+      btn.innerHTML = 'CASH OUT'
+      btn.className = 'bp-btn bp-btn-cashout'
+      btn.disabled  = false
+    } else if (queuedNextBet[i] && !b.active) {
+      btn.innerHTML = '<span class="bp-btn-cancel-sub">QUEUED $' + parseFloat(queuedNextBet[i].amount).toFixed(2) + '</span>CANCEL'
+      btn.className = 'bp-btn bp-btn-cancel'
+      btn.disabled  = false
+    } else if (isRunning && !b.active && !b.cashedOut) {
+      btn.innerHTML = 'NEXT ROUND BET'
+      btn.className = 'bp-btn bp-btn-next-round'
+      btn.disabled  = false
+    } else {
+      btn.innerHTML = b.cashedOut ? '✓ CASHED' : 'BET'
+      btn.className = 'bp-btn bp-btn-bet'
+      btn.disabled  = true
+    }
   }
 }
 
@@ -1058,12 +1751,37 @@ function updateAutoCashoutPreviews() {
   bets.forEach((_,i) => updateBtnState(i))
 }
 
+function handleCancelBet(i) {
+  const b = bets[i]
+  if (roundState !== 'STARTING') return
+  if (!b.active) return
+  // Reset local bet state — server has no cancel endpoint yet
+  b.active    = false
+  b.id        = ''
+  b.cashedOut = false
+  b.amount    = 0
+  document.getElementById('panel'+i).classList.remove('active-bet','crashed-bet')
+  updateBtnState(i)
+  tg?.HapticFeedback?.impactOccurred('light')
+}
+
 async function handleBtn(i) {
   const b = bets[i]
-  if (b.active && !b.cashedOut && roundState === 'RUNNING') {
+  if (queuedNextBet[i] && !b.active) {
+    queuedNextBet[i] = null
+    updateBtnState(i)
+    tg?.HapticFeedback?.impactOccurred('light')
+  } else if (b.active && !b.cashedOut && roundState === 'RUNNING') {
     await doCashout(i)
   } else if (!b.active && roundState === 'STARTING') {
     await doBet(i)
+  } else if (roundState === 'RUNNING' && !b.active && !b.cashedOut && !queuedNextBet[i]) {
+    const amount = parseFloat(document.getElementById('amount'+i).value)
+    if (!amount || amount <= 0) return
+    const autoCashout = parseFloat(document.getElementById('cashout'+i).value) || 0
+    queuedNextBet[i] = { amount, autoCashout }
+    tg?.HapticFeedback?.impactOccurred('medium')
+    updateBtnState(i)
   }
 }
 
@@ -1073,8 +1791,10 @@ async function doBet(i) {
   const autoCashout = parseFloat(document.getElementById('cashout'+i).value) || 0
   if (!amount || amount <= 0) return
 
-  const btn = document.getElementById('btn'+i)
+  const btn       = document.getElementById('btn'+i)
+  const btnBetImg = document.getElementById('btnBetImg'+i)
   btn.disabled = true
+  if (btnBetImg) btnBetImg.disabled = true
 
   try {
     const r = await fetch('/tma/v1/granny/bet', {
@@ -1083,11 +1803,12 @@ async function doBet(i) {
       body: JSON.stringify({ amount: amount.toFixed(2), currency: CURRENCY, auto_cashout: autoCashout || undefined }),
     })
     const d = await r.json()
-    if (!r.ok) { alert(d.error || 'Bet failed'); btn.disabled=false; return }
+    if (!r.ok) { alert(d.error || 'Bet failed'); btn.disabled=false; if (btnBetImg) btnBetImg.disabled=false; return }
     bets[i].id = d.bet_id
     bets[i].active = true
     bets[i].cashedOut = false
     bets[i].amount = amount
+    lipOnMyBet(d.bet_id, amount, bets[i].currency || 'USD')
     document.getElementById('panel'+i).classList.add('active-bet')
     tg?.HapticFeedback?.impactOccurred('medium')
     fetchBalance()
@@ -1137,6 +1858,172 @@ function addSocialTick(playerId, multiplier, payout) {
     el.classList.add('social-tick--out')
     setTimeout(() => el.remove(), 400)
   }, 3000)
+}
+
+// ── Lower Info Panel ─────────────────────────────────────────────────────────
+
+function lipAvatarColor(id) {
+  let h = 0
+  const s = String(id)
+  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) & 0xffff
+  const hues = [145,160,175,120,200,130,155,140,190,170]
+  const hue = hues[h % hues.length]
+  return `hsl(${hue},55%,28%)`
+}
+
+function lipMaskId(id) { return '…' + String(id).slice(-5) }
+
+function lipOnBetPlaced(playerId, amount, currency) {
+  if (!playerId) return
+  if (!lipCurrentRound[playerId]) {
+    lipCurrentRound[playerId] = { amount: parseFloat(amount), currency: currency || 'USD', cashoutAt: null, payout: null }
+  }
+}
+
+function lipOnCashout(playerId, betId, mult, payout) {
+  if (!playerId) return
+  const entry = lipCurrentRound[playerId] || { amount: 0, currency: 'USD', cashoutAt: null, payout: null }
+  entry.cashoutAt = parseFloat(mult)
+  entry.payout    = parseFloat(payout)
+  lipCurrentRound[playerId] = entry
+  // Accumulate in TOP map
+  if (!lipTopMap[playerId]) lipTopMap[playerId] = { total: 0, count: 0 }
+  lipTopMap[playerId].total += parseFloat(payout)
+  lipTopMap[playerId].count++
+  // Update MY history entry matching betId
+  const myEntry = lipMyHistory.find(x => x.betId === betId)
+  if (myEntry) { myEntry.cashoutAt = parseFloat(mult); myEntry.payout = parseFloat(payout) }
+  if (lipTab === 'all' || lipTab === 'my' || lipTab === 'top') lipRender()
+}
+
+function lipOnCrashed() {
+  // Mark all remaining current-round entries as lost
+  for (const pid in lipCurrentRound) {
+    const e = lipCurrentRound[pid]
+    if (e.cashoutAt === null) e.cashoutAt = 0
+  }
+  // Build sorted lastRound: winners first (desc payout), then losers
+  lipLastRound = Object.entries(lipCurrentRound).map(([pid, e]) => ({ pid, ...e }))
+  lipLastRound.sort((a, b) => {
+    if (a.cashoutAt > 0 && b.cashoutAt <= 0) return -1
+    if (a.cashoutAt <= 0 && b.cashoutAt > 0) return 1
+    return (b.payout || 0) - (a.payout || 0)
+  })
+  // Mark MY history entries that didn't cash out as lost
+  lipMyHistory.forEach(x => { if (x.cashoutAt === undefined || x.cashoutAt === null) x.cashoutAt = 0 })
+  lipCurrentRound = {}
+  lipRender()
+}
+
+function lipOnMyBet(betId, amount, currency) {
+  lipMyHistory.unshift({ betId, amount: parseFloat(amount), currency: currency || 'USD', cashoutAt: null, payout: null, ts: Date.now() })
+  if (lipMyHistory.length > 30) lipMyHistory.pop()
+  if (lipTab === 'my') lipRender()
+}
+
+function lipSetTab(tab) {
+  lipTab = tab
+  document.getElementById('lipTabAll').className = 'lip-tab' + (tab === 'all' ? ' lip-tab--active' : '')
+  document.getElementById('lipTabMy').className  = 'lip-tab' + (tab === 'my'  ? ' lip-tab--active' : '')
+  document.getElementById('lipTabTop').className = 'lip-tab' + (tab === 'top' ? ' lip-tab--active' : '')
+  const pills = { all: 'LAST ROUND', my: 'MY BETS', top: 'TOP PLAYERS' }
+  document.getElementById('lipPill').textContent = pills[tab]
+  lipRender()
+}
+
+function lipRender() {
+  const list = document.getElementById('lipList')
+  const statBets    = document.getElementById('lipStatBets')
+  const statPlayers = document.getElementById('lipStatPlayers')
+  const statTop     = document.getElementById('lipStatTop')
+
+  if (lipTab === 'all') {
+    const rows = lipLastRound
+    const winners = rows.filter(r => r.cashoutAt > 0)
+    const topWin  = winners.length ? Math.max(...winners.map(r => r.payout || 0)) : 0
+    statBets.textContent    = rows.length || '—'
+    statPlayers.textContent = new Set(rows.map(r => r.pid)).size || '—'
+    statTop.textContent     = topWin > 0 ? '$' + topWin.toFixed(0) : '—'
+
+    if (!rows.length) {
+      list.innerHTML = '<div class="lip-empty">WAITING FOR ROUND TO COMPLETE</div>'
+      return
+    }
+    list.innerHTML = rows.map(r => {
+      const won  = r.cashoutAt > 0
+      const profit = won ? (r.payout - r.amount) : -r.amount
+      const isMe = r.pid === lipMyPlayerId
+      const bg   = lipAvatarColor(r.pid)
+      const init = String(r.pid).slice(-1).toUpperCase()
+      return `<div class="lip-row">
+        <div class="lip-avatar${isMe ? ' lip-avatar--me' : ''}" style="background:${bg}">${isMe ? 'ME' : init}</div>
+        <span class="lip-name">${lipMaskId(r.pid)}</span>
+        <span class="lip-bet">$${r.amount.toFixed(2)}</span>
+        <span class="lip-mult ${won ? '' : 'lip-mult--crashed'}">${won ? r.cashoutAt.toFixed(2) + '×' : '✗'}</span>
+        <span class="lip-profit ${won ? 'lip-profit--win' : 'lip-profit--loss'}">${won ? '+$' + r.payout.toFixed(2) : '-$' + r.amount.toFixed(2)}</span>
+      </div>`
+    }).join('')
+
+  } else if (lipTab === 'my') {
+    statBets.textContent    = lipMyHistory.length || '—'
+    const myWins = lipMyHistory.filter(x => x.cashoutAt > 0)
+    statPlayers.textContent = myWins.length + 'W'
+    const myTop = myWins.length ? Math.max(...myWins.map(x => x.payout || 0)) : 0
+    statTop.textContent = myTop > 0 ? '$' + myTop.toFixed(2) : '—'
+
+    if (!lipMyHistory.length) {
+      list.innerHTML = '<div class="lip-empty">NO BETS YET — PLACE YOUR FIRST BET</div>'
+      return
+    }
+    list.innerHTML = lipMyHistory.map(r => {
+      const pending = r.cashoutAt === null
+      const won     = r.cashoutAt > 0
+      const profit  = won ? (r.payout - r.amount) : pending ? null : -r.amount
+      const multTxt = pending ? '<span style="color:rgba(74,222,128,.4)">…</span>' : won ? r.cashoutAt.toFixed(2) + '×' : '✗'
+      const profitTxt = pending
+        ? '<span style="color:rgba(74,222,128,.3)">LIVE</span>'
+        : won
+          ? '+$' + r.payout.toFixed(2)
+          : '-$' + r.amount.toFixed(2)
+      return `<div class="lip-row">
+        <div class="lip-avatar" style="background:#0e3020">ME</div>
+        <span class="lip-name">MY BET</span>
+        <span class="lip-bet">$${r.amount.toFixed(2)}</span>
+        <span class="lip-mult ${won ? '' : (!pending ? 'lip-mult--crashed' : '')}">${multTxt}</span>
+        <span class="lip-profit ${won ? 'lip-profit--win' : (!pending ? 'lip-profit--loss' : '')}">${profitTxt}</span>
+      </div>`
+    }).join('')
+
+  } else if (lipTab === 'top') {
+    const sorted = Object.entries(lipTopMap)
+      .map(([pid, v]) => ({ pid, ...v }))
+      .sort((a, b) => b.total - a.total)
+      .slice(0, 15)
+
+    statBets.textContent    = sorted.reduce((s, x) => s + x.count, 0) || '—'
+    statPlayers.textContent = sorted.length || '—'
+    const topTotal = sorted.length ? sorted[0].total : 0
+    statTop.textContent = topTotal > 0 ? '$' + topTotal.toFixed(0) : '—'
+
+    if (!sorted.length) {
+      list.innerHTML = '<div class="lip-empty">PLAY TO APPEAR IN RANKINGS</div>'
+      return
+    }
+    const rankClass = n => n === 1 ? 'lip-rank--1' : n === 2 ? 'lip-rank--2' : n === 3 ? 'lip-rank--3' : 'lip-rank--n'
+    const rankLabel = n => n <= 3 ? ['🥇','🥈','🥉'][n-1] : '#' + n
+    list.innerHTML = sorted.map((r, idx) => {
+      const n   = idx + 1
+      const bg  = lipAvatarColor(r.pid)
+      const init = String(r.pid).slice(-1).toUpperCase()
+      return `<div class="lip-row">
+        <span class="lip-rank ${rankClass(n)}">${rankLabel(n)}</span>
+        <div class="lip-avatar" style="background:${bg}">${init}</div>
+        <span class="lip-name">${lipMaskId(r.pid)}</span>
+        <span class="lip-bet">${r.count} bets</span>
+        <span class="lip-profit lip-profit--win">$${r.total.toFixed(2)}</span>
+      </div>`
+    }).join('')
+  }
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────

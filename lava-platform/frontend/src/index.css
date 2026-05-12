@@ -957,6 +957,34 @@ ul, li { list-style: none; }
   color: var(--red-light);
   border: 1px solid var(--red-dim);
 }
+.dbp-btn--next-round {
+  background: linear-gradient(135deg, #4a2d00 0%, #b45309 55%, #d97706 100%);
+  color: #fff8e8;
+  border: 1px solid #d97706;
+  box-shadow: 0 0 12px rgba(217,119,6,0.35);
+  font-size: 11px;
+  letter-spacing: 1px;
+  animation: gold-pulse 1.8s ease-in-out infinite;
+}
+.dbp-btn--cancel {
+  background: linear-gradient(135deg, #450a0a 0%, #991b1b 55%, #dc2626 100%);
+  color: #fff0f0;
+  border: 1px solid #ef4444;
+  box-shadow: 0 0 12px rgba(239,68,68,0.35);
+  font-size: 12px;
+  letter-spacing: 1px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+}
+.dbp-btn__sub {
+  font-size: 8px;
+  letter-spacing: 1px;
+  opacity: 0.75;
+  font-weight: normal;
+}
 .dbp-btn--waiting {
   background: var(--surface-3);
   color: var(--text-dim);
