@@ -1492,7 +1492,7 @@ function connectWS() {
     }
 
     if (msg.type === 'bet_placed') {
-      lipOnBetPlaced(d.player_id, d.amount, d.currency)
+      lipOnBetPlaced(d.player_id, d.bet_id, d.amount, d.currency)
     }
 
     if (msg.type === 'cashout') {
@@ -1634,6 +1634,7 @@ function histScrollStart() {
 
 // ── Bet logic ─────────────────────────────────────────────────────────────────
 function resetBetsOnNewRound() {
+  lipCurrentRound = {}
   bets.forEach((b,i) => {
     if (b.cashedOut || !b.active) {
       b.id = ''; b.active = false; b.cashedOut = false
@@ -1877,19 +1878,26 @@ function lipAvatarColor(id) {
 
 function lipMaskId(id) { return '…' + String(id).slice(-5) }
 
-function lipOnBetPlaced(playerId, amount, currency) {
+function lipOnBetPlaced(playerId, betId, amount, currency) {
   if (!playerId) return
-  if (!lipCurrentRound[playerId]) {
-    lipCurrentRound[playerId] = { amount: parseFloat(amount), currency: currency || 'USD', cashoutAt: null, payout: null }
+  const key = betId || playerId
+  if (!lipCurrentRound[key]) {
+    lipCurrentRound[key] = { pid: playerId, amount: parseFloat(amount), currency: currency || 'USD', cashoutAt: null, payout: null }
   }
+  lipRender()
 }
 
 function lipOnCashout(playerId, betId, mult, payout) {
   if (!playerId) return
-  const entry = lipCurrentRound[playerId] || { amount: 0, currency: 'USD', cashoutAt: null, payout: null }
+  const key = betId || playerId
+  let entry = lipCurrentRound[key] || lipCurrentRound[playerId]
+  if (!entry) {
+    entry = { pid: playerId, amount: 0, currency: 'USD', cashoutAt: null, payout: null }
+    lipCurrentRound[key] = entry
+  }
+  entry.pid     = playerId
   entry.cashoutAt = parseFloat(mult)
   entry.payout    = parseFloat(payout)
-  lipCurrentRound[playerId] = entry
   // Accumulate in TOP map
   if (!lipTopMap[playerId]) lipTopMap[playerId] = { total: 0, count: 0 }
   lipTopMap[playerId].total += parseFloat(payout)
@@ -1897,18 +1905,17 @@ function lipOnCashout(playerId, betId, mult, payout) {
   // Update MY history entry matching betId
   const myEntry = lipMyHistory.find(x => x.betId === betId)
   if (myEntry) { myEntry.cashoutAt = parseFloat(mult); myEntry.payout = parseFloat(payout) }
-  if (lipTab === 'all' || lipTab === 'my' || lipTab === 'top') lipRender()
+  lipRender()
 }
 
 function lipOnCrashed() {
   // Mark all remaining current-round entries as lost
-  for (const pid in lipCurrentRound) {
-    const e = lipCurrentRound[pid]
+  for (const key in lipCurrentRound) {
+    const e = lipCurrentRound[key]
     if (e.cashoutAt === null) e.cashoutAt = 0
   }
   // Build sorted lastRound: winners first (desc payout), then losers
-  lipLastRound = Object.entries(lipCurrentRound).map(([pid, e]) => ({ pid, ...e }))
-  lipLastRound.sort((a, b) => {
+  lipLastRound = Object.values(lipCurrentRound).sort((a, b) => {
     if (a.cashoutAt > 0 && b.cashoutAt <= 0) return -1
     if (a.cashoutAt <= 0 && b.cashoutAt > 0) return 1
     return (b.payout || 0) - (a.payout || 0)
@@ -1942,8 +1949,18 @@ function lipRender() {
   const statTop     = document.getElementById('lipStatTop')
 
   if (lipTab === 'all') {
-    const rows = lipLastRound
-    const winners = rows.filter(r => r.cashoutAt > 0)
+    const currentEntries = Object.values(lipCurrentRound)
+    const isLive = currentEntries.length > 0
+    const rows = isLive
+      ? currentEntries.slice().sort((a, b) => {
+          if ((a.cashoutAt||0) > 0 && (b.cashoutAt||0) <= 0) return -1
+          if ((a.cashoutAt||0) <= 0 && (b.cashoutAt||0) > 0) return 1
+          return (b.payout || 0) - (a.payout || 0)
+        })
+      : lipLastRound
+    const pill = document.getElementById('lipPill')
+    if (pill) pill.textContent = isLive ? 'THIS ROUND' : 'LAST ROUND'
+    const winners = rows.filter(r => (r.cashoutAt||0) > 0)
     const topWin  = winners.length ? Math.max(...winners.map(r => r.payout || 0)) : 0
     statBets.textContent    = rows.length || '—'
     statPlayers.textContent = new Set(rows.map(r => r.pid)).size || '—'
@@ -1954,17 +1971,20 @@ function lipRender() {
       return
     }
     list.innerHTML = rows.map(r => {
-      const won  = r.cashoutAt > 0
-      const profit = won ? (r.payout - r.amount) : -r.amount
-      const isMe = r.pid === lipMyPlayerId
-      const bg   = lipAvatarColor(r.pid)
-      const init = String(r.pid).slice(-1).toUpperCase()
+      const won    = (r.cashoutAt||0) > 0
+      const pending = r.cashoutAt === null
+      const isMe   = r.pid === lipMyPlayerId
+      const bg     = lipAvatarColor(r.pid)
+      const init   = String(r.pid).slice(-1).toUpperCase()
+      const multTxt   = pending ? '<span style="opacity:.4">…</span>' : won ? r.cashoutAt.toFixed(2) + '×' : '✗'
+      const profitTxt = pending ? '<span style="opacity:.35">LIVE</span>'
+        : won ? '+$' + r.payout.toFixed(2) : '-$' + r.amount.toFixed(2)
       return `<div class="lip-row">
         <div class="lip-avatar${isMe ? ' lip-avatar--me' : ''}" style="background:${bg}">${isMe ? 'ME' : init}</div>
-        <span class="lip-name">${lipMaskId(r.pid)}</span>
+        <span class="lip-name">${isMe ? 'YOU' : lipMaskId(r.pid)}</span>
         <span class="lip-bet">$${r.amount.toFixed(2)}</span>
-        <span class="lip-mult ${won ? '' : 'lip-mult--crashed'}">${won ? r.cashoutAt.toFixed(2) + '×' : '✗'}</span>
-        <span class="lip-profit ${won ? 'lip-profit--win' : 'lip-profit--loss'}">${won ? '+$' + r.payout.toFixed(2) : '-$' + r.amount.toFixed(2)}</span>
+        <span class="lip-mult ${won ? '' : (!pending ? 'lip-mult--crashed' : '')}">${multTxt}</span>
+        <span class="lip-profit ${won ? 'lip-profit--win' : (!pending ? 'lip-profit--loss' : '')}">${profitTxt}</span>
       </div>`
     }).join('')
 
