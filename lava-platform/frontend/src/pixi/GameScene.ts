@@ -137,9 +137,8 @@ export class GameScene {
     this.rider     = new HorseRider()
     this.flash     = new GunfireCrashFX(this.W, this.H)
 
-    // Draw order: buildings behind, then sheriff, then particles, then rider
+    // Draw order: sheriff behind, then particles, then rider (buildings hidden)
     this.world.addChild(
-      this.buildings.container,
       this.sheriff.container,
       this.particles.container,
       this.rider.container,
