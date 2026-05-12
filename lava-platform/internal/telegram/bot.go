@@ -37,6 +37,9 @@ func NewBotHandler(botToken, appURL string) *BotHandler {
 	}
 }
 
+// BotClient exposes the underlying botClient for use by other handlers.
+func (h *BotHandler) BotClient() *botClient { return h.bot }
+
 // ── Telegram update types ─────────────────────────────────────────────────────
 
 type Update struct {
@@ -172,6 +175,17 @@ func (b *botClient) sendPhoto(chatID int64, photoURL, caption string, replyMarku
 		body["reply_markup"] = replyMarkup
 	}
 	return b.apiCall("sendPhoto", body)
+}
+
+// SendMessage sends a plain-text (no Markdown) message.
+func (b *botClient) SendMessage(chatID int64, text string) {
+	body := map[string]interface{}{
+		"chat_id": chatID,
+		"text":    text,
+	}
+	if err := b.apiCall("sendMessage", body); err != nil {
+		log.Error().Err(err).Int64("chat_id", chatID).Msg("telegram: SendMessage failed")
+	}
 }
 
 func (b *botClient) sendMessage(chatID int64, text string, replyMarkup interface{}) {

@@ -173,10 +173,19 @@ func New(cfg *config.Config, infra *infrastructure.Infra, deps *Deps) *gin.Engin
 		tmaHandler   := telegram.NewHandler(tmaValidator, sessSvc, provider, cfg.Telegram.TMAOperatorID)
 		botHandler   := telegram.NewBotHandler(cfg.Telegram.BotToken, cfg.Telegram.AppURL)
 
+		// Telegram Login Widget handler
+		testerRepo    := telegram.NewTesterRepository(infra.DB)
+		widgetHandler := telegram.NewWidgetHandler(
+			cfg.Telegram.BotToken, sessSvc, provider,
+			cfg.Telegram.TMAOperatorID, botHandler.BotClient(), testerRepo,
+		)
+
 		tma := r.Group("/tma")
-		tma.POST("/auth",    tmaHandler.Auth)
-		tma.GET("/health",   tmaHandler.Health)
-		tma.POST("/webhook", botHandler.Webhook)
+		tma.POST("/auth",         tmaHandler.Auth)
+		tma.GET("/health",        tmaHandler.Health)
+		tma.POST("/webhook",      botHandler.Webhook)
+		tma.POST("/widget-auth",  widgetHandler.WidgetAuth)
+		tma.POST("/set-username", widgetHandler.SetGameUsername)
 
 		// Outlaw Escape TMA routes
 		tmaOutlaw := tma.Group("/v1/crash")

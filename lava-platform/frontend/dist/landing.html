@@ -295,9 +295,64 @@
     ══════════════════════════════════════════════════ */
     .desktop{ display:none }
 
+    /* ── Login widget section ──────────────────────────────── */
+    #m-login-section{
+      display:none; flex-direction:column; align-items:center; gap:10px;
+      width:100%; max-width:320px; margin-bottom:16px;
+      padding:16px;
+      background:rgba(255,255,255,.03);
+      border:1px solid var(--border);
+    }
+    .login-label{
+      font-size:8px; letter-spacing:.4em; text-transform:uppercase; color:var(--muted);
+    }
+    .login-hint{
+      font-size:9px; color:rgba(255,255,255,.3); text-align:center; line-height:1.5;
+    }
+    /* ── Username modal ────────────────────────────────────── */
+    #username-modal{
+      display:none; position:fixed; inset:0;
+      background:rgba(0,0,0,.9); z-index:9999;
+      align-items:center; justify-content:center; padding:20px;
+    }
+    .username-box{
+      background:#0a0a0a; border:1px solid rgba(0,229,255,.25);
+      padding:32px 24px; max-width:340px; width:100%;
+    }
+    .username-box h2{
+      font-family:'Orbitron',sans-serif; font-size:13px; font-weight:700;
+      letter-spacing:.2em; color:var(--c1); margin-bottom:6px; text-align:center;
+    }
+    .username-box p{
+      font-size:9px; letter-spacing:.15em; color:var(--muted);
+      text-align:center; margin-bottom:20px; line-height:1.6;
+    }
+    #username-input{
+      width:100%; background:#111; border:1px solid rgba(255,255,255,.15);
+      color:#fff; padding:10px 12px;
+      font-family:'Share Tech Mono',monospace; font-size:14px; letter-spacing:.1em;
+      outline:none; margin-bottom:8px;
+      transition:border-color .2s;
+    }
+    #username-input:focus{ border-color:rgba(0,229,255,.4) }
+    #username-error{
+      font-size:10px; color:#ff4466; min-height:18px;
+      margin-bottom:12px; text-align:center;
+    }
+    .username-submit{
+      width:100%; font-family:'Orbitron',sans-serif; font-size:11px; font-weight:700;
+      letter-spacing:.25em; padding:12px; cursor:pointer;
+      background:linear-gradient(90deg,var(--c1),var(--c2),var(--c3),var(--c4),var(--c5));
+      color:#000; border:none; text-transform:uppercase;
+      clip-path:polygon(10px 0%,100% 0%,calc(100% - 10px) 100%,0% 100%);
+    }
+
     @media (min-width:769px){
       html,body{ overflow:hidden; height:100% }
       .mobile{ display:none !important }
+      #d-login-section{
+        display:none; flex-direction:column; gap:10px; margin-bottom:20px;
+      }
 
       .desktop{
         display:flex; flex-direction:column;
@@ -552,6 +607,13 @@
     </div>
   </div>
 
+  <!-- Login widget (shown when not in Telegram and not authenticated) -->
+  <div id="m-login-section">
+    <div class="login-label">Login to unlock betting</div>
+    <div id="m-tg-widget"></div>
+    <div class="login-hint">Connect your Telegram account to access your $1,000 test balance and place bets</div>
+  </div>
+
   <!-- Offline -->
   <div id="m-offline">⚠ &nbsp;Server offline</div>
 
@@ -584,6 +646,20 @@
     </div>
   </div>
 
+</div>
+
+
+<!-- Username modal -->
+<div id="username-modal">
+  <div class="username-box">
+    <h2>CHOOSE YOUR CALLSIGN</h2>
+    <p>Your public game identity · 3–20 characters · visible to other players</p>
+    <input id="username-input" type="text" maxlength="20" placeholder="e.g. CowboyKing99"
+      autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+    <div id="username-error"></div>
+    <button class="username-submit" onclick="submitUsername()">CONFIRM CALLSIGN</button>
+    <input type="hidden" id="username-player-id">
+  </div>
 </div>
 
 
@@ -641,6 +717,12 @@
         <button class="eu-btn eu-btn--ghost" id="dGrannyBtn" onclick="goGranny()">👵 &nbsp;GRANNY RUN</button>
       </div>
 
+      <!-- Desktop login widget (shown when not authenticated) -->
+      <div id="d-login-section">
+        <div class="login-label">Login to unlock betting</div>
+        <div id="d-tg-widget"></div>
+      </div>
+
       <div class="d-info">
         <div class="d-info-dot"></div>
         Provably Fair · Cryptographic seed verification · RTP 94.0%
@@ -689,31 +771,146 @@ if (tg) {
 function goOutlaw(){ window.location.href = window.location.origin + '/play' }
 function goGranny(){ window.location.href = window.location.origin + '/granny.html?v=29' }
 
-// ── User profile ──────────────────────────────────────────────────────────────
+// ── User profile display ──────────────────────────────────────────────────────
 const user = tg?.initDataUnsafe?.user || {}
 const rawHash = tg?.initDataUnsafe?.hash || Math.random().toString(36).slice(2)
 
-document.getElementById('playerName').textContent =
-  user.first_name ? user.first_name + (user.last_name ? ' '+user.last_name : '') : 'Partner'
-document.getElementById('playerUsername').textContent =
-  user.username ? '@'+user.username : '@—'
-
-const avatarEl = document.getElementById('avatar')
-const initials = (user.first_name || 'H')[0].toUpperCase()
-if (user.photo_url) {
-  const img = document.createElement('img')
-  img.src = user.photo_url
-  img.onerror = () => { avatarEl.textContent = initials }
-  avatarEl.innerHTML = ''; avatarEl.appendChild(img)
-} else {
-  avatarEl.textContent = initials
+function renderProfile(name, username, avatarUrl) {
+  document.getElementById('playerName').textContent = name || 'Partner'
+  document.getElementById('playerUsername').textContent = username ? '@'+username : '@—'
+  const avatarEl = document.getElementById('avatar')
+  const initials = (name || 'H')[0].toUpperCase()
+  if (avatarUrl) {
+    const img = document.createElement('img')
+    img.src = avatarUrl
+    img.onerror = () => { avatarEl.textContent = initials }
+    avatarEl.innerHTML = ''; avatarEl.appendChild(img)
+  } else {
+    avatarEl.textContent = initials
+  }
 }
 
+renderProfile(
+  user.first_name ? user.first_name + (user.last_name ? ' '+user.last_name : '') : '',
+  user.username,
+  user.photo_url
+)
 const BADGES = ['ROOKIE', 'OUTLAW', 'LEGEND']
-document.getElementById('badge').textContent =
-  user.id ? BADGES[user.id % BADGES.length] : 'PLAYER'
-
+document.getElementById('badge').textContent = user.id ? BADGES[user.id % BADGES.length] : 'PLAYER'
 document.getElementById('sessionHash').textContent = rawHash.slice(0,8).toUpperCase()
+
+// ── Login widget helpers ──────────────────────────────────────────────────────
+function showLoginSections() {
+  const ms = document.getElementById('m-login-section')
+  const ds = document.getElementById('d-login-section')
+  if (ms) ms.style.display = 'flex'
+  if (ds) ds.style.display = 'flex'
+}
+function hideLoginSections() {
+  const ms = document.getElementById('m-login-section')
+  const ds = document.getElementById('d-login-section')
+  if (ms) ms.style.display = 'none'
+  if (ds) ds.style.display = 'none'
+}
+
+function applyStoredSession() {
+  const name    = sessionStorage.getItem('player_name')    || ''
+  const uname   = sessionStorage.getItem('player_username') || ''
+  const balance = sessionStorage.getItem('player_balance')  || '0.00'
+  const pid     = sessionStorage.getItem('player_id')       || ''
+  if (name) renderProfile(name, uname, null)
+  if (pid)  document.getElementById('playerId').textContent = '#'+pid
+  const fmt = '$'+parseFloat(balance).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})
+  document.getElementById('balance').textContent = fmt
+  hideLoginSections()
+}
+
+// Called by Telegram Login Widget on successful auth
+function onTelegramWidgetAuth(widgetUser) {
+  fetch('/tma/widget-auth', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({
+      id:         String(widgetUser.id),
+      first_name: widgetUser.first_name || '',
+      last_name:  widgetUser.last_name  || '',
+      username:   widgetUser.username   || '',
+      photo_url:  widgetUser.photo_url  || '',
+      auth_date:  String(widgetUser.auth_date),
+      hash:       widgetUser.hash
+    })
+  })
+  .then(r => { if (!r.ok) throw new Error(r.status); return r.json() })
+  .then(d => {
+    if (!d.token) throw new Error('no token')
+    sessionStorage.setItem('crash_token',     d.token)
+    sessionStorage.setItem('player_id',       d.player_id   || '')
+    sessionStorage.setItem('player_name',     d.first_name  || '')
+    sessionStorage.setItem('player_username', d.username    || '')
+    sessionStorage.setItem('player_balance',  d.balance     || '0.00')
+
+    renderProfile(d.first_name || '', d.username || '', null)
+    if (d.player_id) document.getElementById('playerId').textContent = '#'+d.player_id
+    if (d.balance) {
+      const fmt = '$'+parseFloat(d.balance).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})
+      document.getElementById('balance').textContent = fmt
+    }
+    if (d.needs_username) {
+      document.getElementById('username-player-id').value = d.player_id || ''
+      document.getElementById('username-modal').style.display = 'flex'
+    } else {
+      hideLoginSections()
+    }
+  })
+  .catch(err => {
+    console.error('widget auth failed', err)
+    alert('Authentication failed. Please try again.')
+  })
+}
+
+function submitUsername() {
+  const input    = document.getElementById('username-input')
+  const errorEl  = document.getElementById('username-error')
+  const playerId = document.getElementById('username-player-id').value
+  const val      = input.value.trim()
+  if (val.length < 3 || val.length > 20) {
+    errorEl.textContent = 'Must be 3–20 characters'
+    return
+  }
+  errorEl.textContent = ''
+  fetch('/tma/set-username', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ player_id: playerId, game_username: val })
+  })
+  .then(r => { if (!r.ok) throw new Error(r.status); return r.json() })
+  .then(() => {
+    document.getElementById('username-modal').style.display = 'none'
+    hideLoginSections()
+  })
+  .catch(err => {
+    console.error('set username failed', err)
+    errorEl.textContent = 'Failed to save. Try again.'
+  })
+}
+
+function loadTelegramWidget() {
+  function injectWidget(containerId) {
+    const container = document.getElementById(containerId)
+    if (!container) return
+    const s = document.createElement('script')
+    s.async = true
+    s.src = 'https://telegram.org/js/telegram-widget.js?22'
+    s.setAttribute('data-telegram-login', 'WesternCrimeGameBot')
+    s.setAttribute('data-size', 'large')
+    s.setAttribute('data-onauth', 'onTelegramWidgetAuth(user)')
+    s.setAttribute('data-request-access', 'write')
+    container.appendChild(s)
+  }
+  injectWidget('m-tg-widget')
+  injectWidget('d-tg-widget')
+  showLoginSections()
+}
 
 // ── Secondary ─────────────────────────────────────────────────────────────────
 function onFairPlay(){
@@ -749,7 +946,7 @@ async function checkServer(){
   }catch{ return false }
 }
 
-// ── Auth ──────────────────────────────────────────────────────────────────────
+// ── TMA Auth (Mini App initData) ──────────────────────────────────────────────
 async function fetchProfile(){
   try{
     const initData = tg?.initData || ''
@@ -772,13 +969,24 @@ async function fetchProfile(){
 
 // ── Boot ──────────────────────────────────────────────────────────────────────
 ;(async()=>{
-  const [online] = await Promise.all([checkServer(), fetchProfile()])
+  const storedToken = sessionStorage.getItem('crash_token')
+
+  let authPromise
+  if (tg?.initData) {
+    authPromise = fetchProfile()
+  } else if (storedToken) {
+    applyStoredSession()
+    authPromise = Promise.resolve()
+  } else {
+    loadTelegramWidget()
+    authPromise = Promise.resolve()
+  }
+
+  const [online] = await Promise.all([checkServer(), authPromise])
   if(!online){
-    // Mobile
     document.getElementById('m-offline').style.display = 'block'
     document.getElementById('joinBtn').disabled = true
     document.getElementById('grannyBtn').disabled = true
-    // Desktop
     document.getElementById('d-offline').style.display = 'block'
     const disableIds = ['dJoinBtn','dGrannyBtn','dNavBtn','dNavGhostBtn','dJoinCardBtn','dGrannyCardBtn']
     disableIds.forEach(id => { const el=document.getElementById(id); if(el) el.disabled=true })
