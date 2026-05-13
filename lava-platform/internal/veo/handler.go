@@ -57,7 +57,7 @@ var bubblePresets = []struct {
 		Prompt: "A magical pink bubblegum bubble self-inflating autonomously, floating in dark deep-purple cosmic candy space. Starts tiny like a marble, grows steadily and smoothly to fill the entire frame. Perfectly round glossy neon-pink surface, bright white specular highlight shifting as it grows, translucent bubble walls glowing hot-pink from within. No people, no hands, no characters, no text. Smooth continuous inflation motion. Neon-pink and violet ambient light. Cinematic premium mobile game animation. Clean dark background.",
 	},
 	{
-		Filename: "pop", Duration: 3, AspectRatio: "9:16",
+		Filename: "pop", Duration: 5, AspectRatio: "9:16",
 		Prompt: "A massive glossy neon-pink bubblegum bubble dramatically exploding in slow motion. Micro-cracks form on the surface then catastrophic burst — hot-pink gum shards and sticky translucent strands fly outward radially in all directions, bright shockwave ring of light, vivid neon flash. No people, no hands, no characters, no text. Dark purple-black background. Cinematic slow-motion explosion. Premium mobile game visual effect.",
 	},
 }
@@ -78,7 +78,7 @@ var outlawVideoPresets = []struct {
 	Prompt      string
 }{
 	{
-		Filename: "outlaw_run", Duration: 4, AspectRatio: "9:16",
+		Filename: "outlaw_run", Duration: 5, AspectRatio: "9:16",
 		Prompt: `Seamlessly looping side-view gallop animation.
 SUBJECT: Outlaw character riding BLACK horse, moving RIGHT across the frame.
 CHARACTER: Dark bandana across the lower face, worn wide-brim outlaw hat with feather.
@@ -90,7 +90,7 @@ Camera: Fixed side view. Character centered horizontally. Full horse + rider vis
 ` + outlawVeoStyle,
 	},
 	{
-		Filename: "sheriff_run_shoot", Duration: 4, AspectRatio: "9:16",
+		Filename: "sheriff_run_shoot", Duration: 5, AspectRatio: "9:16",
 		Prompt: `Seamlessly looping side-view gallop animation.
 SUBJECT: Sheriff/lawman character riding WHITE horse, moving RIGHT across the frame.
 CHARACTER: Wide-brim sheriff hat with visible badge on chest. Duster coat with vest detail.
@@ -104,7 +104,7 @@ Camera: Fixed side view. Full horse + rider visible.
 ` + outlawVeoStyle,
 	},
 	{
-		Filename: "outlaw_crash", Duration: 3, AspectRatio: "9:16",
+		Filename: "outlaw_crash", Duration: 5, AspectRatio: "9:16",
 		Prompt: `Dramatic crash/capture animation. Non-looping, plays once.
 SEQUENCE: Outlaw on black horse is caught by sheriff on white horse from behind.
 The black horse stumbles and collapses forward. The outlaw rider is thrown dramatically.
