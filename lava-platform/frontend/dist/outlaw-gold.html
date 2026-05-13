@@ -585,6 +585,111 @@
       font-family:'Courier New',monospace; font-size:12px; color:var(--brass);
     }
 
+    /* ── Win Celebration ─────────────────────────────────────────────── */
+    .win-celebration {
+      position:fixed; inset:0; z-index:90;
+      display:none; flex-direction:column;
+      align-items:center; justify-content:center;
+      background:rgba(0,0,0,.82);
+      cursor:pointer;
+    }
+    .win-celebration.show { display:flex }
+
+    .win-cel-video {
+      position:absolute; inset:0; width:100%; height:100%;
+      object-fit:cover; opacity:.55; pointer-events:none;
+    }
+
+    /* Tier-specific backgrounds */
+    .win-celebration.tier-nice  { background:radial-gradient(ellipse 120% 80% at 50% 60%, rgba(120,80,0,.7) 0%, rgba(0,0,0,.88) 70%) }
+    .win-celebration.tier-big   { background:radial-gradient(ellipse 120% 80% at 50% 60%, rgba(160,30,0,.75) 0%, rgba(0,0,0,.9) 70%) }
+    .win-celebration.tier-mega  { background:radial-gradient(ellipse 120% 80% at 50% 60%, rgba(80,0,160,.7) 0%, rgba(0,0,0,.92) 70%) }
+    .win-celebration.tier-epic  { background:radial-gradient(ellipse 120% 80% at 50% 60%, rgba(0,80,0,.5) 0%, rgba(200,140,0,.4) 50%, rgba(0,0,0,.95) 80%) }
+
+    /* Screen shake */
+    @keyframes screen-shake {
+      0%,100%{ transform:translateX(0) }
+      10%{ transform:translateX(-6px) rotate(-.4deg) }
+      20%{ transform:translateX(6px) rotate(.4deg) }
+      30%{ transform:translateX(-5px) rotate(-.3deg) }
+      40%{ transform:translateX(5px) rotate(.3deg) }
+      50%{ transform:translateX(-3px) }
+      60%{ transform:translateX(3px) }
+      70%{ transform:translateX(-2px) }
+      80%{ transform:translateX(2px) }
+    }
+    .shake { animation:screen-shake .55s cubic-bezier(.36,.07,.19,.97) both }
+
+    /* Tier label drop-in */
+    @keyframes tier-label-in {
+      0%  { transform:scale(3) translateY(-30px); opacity:0; filter:blur(12px) }
+      40% { transform:scale(.92) translateY(4px); opacity:1; filter:blur(0) }
+      60% { transform:scale(1.06) }
+      100%{ transform:scale(1) }
+    }
+    .win-tier-label {
+      font-family:'Orbitron',sans-serif; font-weight:900;
+      font-size:clamp(28px,8vw,48px);
+      letter-spacing:6px; text-align:center;
+      text-shadow:0 0 30px currentColor, 0 0 60px currentColor;
+      animation:tier-label-in .6s cubic-bezier(.25,1.4,.5,1) both;
+      position:relative; z-index:2; line-height:1;
+      margin-bottom:12px;
+    }
+    .tier-nice  .win-tier-label { color:#f7d44c; text-shadow:0 0 30px #f7d44c, 0 0 60px rgba(247,212,76,.5) }
+    .tier-big   .win-tier-label { color:#ff6644; text-shadow:0 0 30px #ff4422, 0 0 60px rgba(255,68,34,.6) }
+    .tier-mega  .win-tier-label { color:#cc88ff; text-shadow:0 0 30px #aa44ff, 0 0 60px rgba(170,68,255,.6) }
+    .tier-epic  .win-tier-label { color:#44ffaa; text-shadow:0 0 30px #22cc88, 0 0 80px rgba(255,200,0,.7), 0 0 120px rgba(255,200,0,.4) }
+
+    /* Count-up number */
+    @keyframes countup-appear {
+      from{ transform:scale(.5) translateY(20px); opacity:0 }
+      to  { transform:scale(1) translateY(0);     opacity:1 }
+    }
+    .win-count-up {
+      font-family:'Orbitron',sans-serif; font-weight:900;
+      font-size:clamp(38px,11vw,64px);
+      color:#fff; text-align:center;
+      text-shadow:0 0 20px rgba(255,255,255,.5);
+      position:relative; z-index:2; line-height:1;
+      animation:countup-appear .35s .4s cubic-bezier(.25,1.4,.5,1) both;
+    }
+    .tier-nice  .win-count-up { color:#fff; text-shadow:0 0 20px #f7d44c }
+    .tier-big   .win-count-up { color:#fff8f0; text-shadow:0 0 24px #ff6644 }
+    .tier-mega  .win-count-up { color:#f0e8ff; text-shadow:0 0 24px #cc88ff }
+    .tier-epic  .win-count-up { color:#efffee; text-shadow:0 0 30px #44ffaa, 0 0 60px #f7d44c }
+
+    .win-cel-sub {
+      font-size:10px; letter-spacing:3px; color:rgba(255,255,255,.45);
+      position:relative; z-index:2; margin-top:10px;
+      font-family:'Share Tech Mono',monospace;
+    }
+
+    /* Floating particles (CSS-only) */
+    @keyframes par-float {
+      0%  { transform:translateY(0) translateX(0) rotate(0deg) scale(1); opacity:1 }
+      80% { opacity:.8 }
+      100%{ transform:translateY(-280px) translateX(var(--px,0px)) rotate(var(--pr,360deg)) scale(.5); opacity:0 }
+    }
+    .win-particle {
+      position:absolute; bottom:15%; font-size:var(--ps,20px);
+      pointer-events:none; z-index:3;
+      animation:par-float var(--pd,1.5s) var(--pde,0s) ease-out forwards;
+    }
+
+    /* Tap-to-continue hint */
+    @keyframes tap-blink {
+      0%,100%{ opacity:.3 }
+      50%    { opacity:.8 }
+    }
+    .win-tap-hint {
+      position:absolute; bottom:60px; left:50%; transform:translateX(-50%);
+      font-size:9px; letter-spacing:3px; color:rgba(255,255,255,.5);
+      font-family:'Share Tech Mono',monospace;
+      animation:tap-blink 1.4s ease-in-out infinite;
+      z-index:4;
+    }
+
     /* ── Paytable button ───────────────────────────────────────────── */
     .paytable-btn {
       position:absolute; bottom:10px; right:10px; z-index:9;
@@ -741,7 +846,7 @@
           </div>
           <div style="text-align:center">
             <div class="mf-label">CLUSTER MIN</div>
-            <div class="mf-val">8 SYMBOLS</div>
+            <div class="mf-val">5 SYMBOLS</div>
           </div>
           <div style="text-align:right">
             <div class="mf-label">RTP</div>
@@ -755,7 +860,7 @@
     <!-- Paytable button -->
     <button class="paytable-btn" onclick="openPaytable()" title="Paytable">📋</button>
 
-    <!-- Win overlay -->
+    <!-- Win overlay (small, sub-5x wins) -->
     <div class="win-overlay" id="winOverlay">
       <div class="win-label" id="winLabel">WIN</div>
       <div class="win-amount" id="winAmount">$0.00</div>
@@ -768,6 +873,16 @@
       <div class="fs-count" id="fsCountBanner">10</div>
       <div class="fs-label">AWARDED</div>
     </div>
+  </div><!-- end .game-area -->
+
+  <!-- Win Celebration overlay (full-screen, fixed, 5x+ wins) -->
+  <div class="win-celebration" id="winCelebration" onclick="closeCelebration()">
+    <video class="win-cel-video" id="winCelVideo" autoplay muted playsinline loop></video>
+    <div id="winParticles"></div>
+    <div class="win-tier-label" id="winTierLabel">BIG WIN</div>
+    <div class="win-count-up" id="winCountUp">$0.00</div>
+    <div class="win-cel-sub" id="winCelSub">TOTAL WIN</div>
+    <div class="win-tap-hint">TAP TO CONTINUE</div>
   </div>
 
   <!-- Paytable modal -->
@@ -1249,34 +1364,143 @@ function updateBuyBtnPrice() {
   document.getElementById('buyBtnPrice').textContent = (bet * 100).toFixed(0) + '×'
 }
 
+// ── Win Tier Manager ──────────────────────────────────────────────────────────
+
+const WIN_TIERS = {
+  EPIC: { min:100, label:'TRAIN HEIST JACKPOT', color:'tier-epic',  duration:5500, particles:['💰','🏆','⭐','🌟','💎'] },
+  MEGA: { min:50,  label:'MEGA WIN',            color:'tier-mega',  duration:4500, particles:['💰','🔮','⚡','✨','🪙'] },
+  BIG:  { min:15,  label:'BIG WIN',             color:'tier-big',   duration:3500, particles:['🪙','🔫','💥','🎯','💰'] },
+  NICE: { min:5,   label:'NICE WIN',            color:'tier-nice',  duration:2800, particles:['🪙','⭐','💰','🤠','✨'] },
+}
+
+function getWinTier(payout, bet) {
+  if (!bet || bet <= 0) return null
+  const r = payout / bet
+  if (r >= WIN_TIERS.EPIC.min) return 'EPIC'
+  if (r >= WIN_TIERS.MEGA.min) return 'MEGA'
+  if (r >= WIN_TIERS.BIG.min)  return 'BIG'
+  if (r >= WIN_TIERS.NICE.min) return 'NICE'
+  return null
+}
+
+let _celTimer = null
+
+function showWinCelebration(tier, amount, bet) {
+  const cfg     = WIN_TIERS[tier]
+  const overlay = document.getElementById('winCelebration')
+  const video   = document.getElementById('winCelVideo')
+  const label   = document.getElementById('winTierLabel')
+  const countEl = document.getElementById('winCountUp')
+  const sub     = document.getElementById('winCelSub')
+  const parWrap = document.getElementById('winParticles')
+  const ratio   = bet > 0 ? (amount / bet).toFixed(1) : '?'
+
+  // Set tier
+  overlay.className = 'win-celebration show ' + cfg.color
+  label.textContent = cfg.label
+  sub.textContent   = `${ratio}× BET`
+
+  // Video source
+  const videoSrc = `/assets/h-slots/outlaw-gold/win_${tier.toLowerCase()}.mp4`
+  video.src = videoSrc
+  video.load()
+  video.play().catch(() => {})
+
+  // Count-up
+  countEl.textContent = '$0.00'
+  animateCountUp(countEl, 0, amount, Math.min(cfg.duration * 0.75, 3000))
+
+  // Screen shake for BIG+
+  if (tier === 'BIG' || tier === 'MEGA' || tier === 'EPIC') {
+    document.querySelector('.app').classList.add('shake')
+    setTimeout(() => document.querySelector('.app').classList.remove('shake'), 600)
+  }
+
+  // Particles
+  parWrap.innerHTML = ''
+  const emojis = cfg.particles
+  const count  = tier === 'EPIC' ? 30 : tier === 'MEGA' ? 22 : tier === 'BIG' ? 16 : 10
+  for (let i = 0; i < count; i++) {
+    setTimeout(() => {
+      const p = document.createElement('div')
+      p.className = 'win-particle'
+      p.textContent = emojis[Math.floor(Math.random() * emojis.length)]
+      const size = 14 + Math.random() * 20
+      p.style.cssText = [
+        `left:${5 + Math.random()*90}%`,
+        `--px:${(Math.random()-0.5)*120}px`,
+        `--pr:${(Math.random()>0.5?'':'- ')}${180+Math.random()*360}deg`,
+        `--ps:${size}px`,
+        `--pd:${1.2+Math.random()*.8}s`,
+        `--pde:${Math.random()*.4}s`,
+      ].join(';')
+      parWrap.appendChild(p)
+      setTimeout(() => p.remove(), 2200)
+    }, i * 60)
+  }
+
+  // Auto-dismiss
+  if (_celTimer) clearTimeout(_celTimer)
+  _celTimer = setTimeout(closeCelebration, cfg.duration)
+}
+
+function closeCelebration() {
+  if (_celTimer) { clearTimeout(_celTimer); _celTimer = null }
+  const overlay = document.getElementById('winCelebration')
+  const video   = document.getElementById('winCelVideo')
+  overlay.classList.remove('show')
+  video.pause()
+  video.src = ''
+}
+
+function animateCountUp(el, from, to, durationMs) {
+  const start = performance.now()
+  const diff  = to - from
+  function step(now) {
+    const elapsed = now - start
+    const progress = Math.min(elapsed / durationMs, 1)
+    // Ease-out cubic: fast start, slow end
+    const ease = 1 - Math.pow(1 - progress, 3)
+    el.textContent = '$' + (from + diff * ease).toFixed(2)
+    if (progress < 1) requestAnimationFrame(step)
+    else el.textContent = '$' + to.toFixed(2)
+  }
+  requestAnimationFrame(step)
+}
+
 // ── Win display ───────────────────────────────────────────────────────────────
 function showWin(amount, cascades) {
+  document.getElementById('lastWinVal').textContent = '$' + amount.toFixed(2)
+
+  const tier = getWinTier(amount, lastBet)
+  if (tier) {
+    // Premium celebration for 5x+ wins
+    showWinCelebration(tier, amount, lastBet)
+    spawnCoins(amount, lastBet)
+    return
+  }
+
+  // Standard small win overlay for sub-5x
   const overlay = document.getElementById('winOverlay')
   const amtEl   = document.getElementById('winAmount')
   const multRow = document.getElementById('winMultRow')
   const lbl     = document.getElementById('winLabel')
 
-  const ratio = amount / lastBet
-  lbl.textContent = ratio >= 50 ? 'MEGA WIN' : ratio >= 20 ? 'BIG WIN' : ratio >= 5 ? 'GREAT WIN' : 'WIN'
+  lbl.textContent   = 'WIN'
   amtEl.textContent = '$' + amount.toFixed(2)
 
-  // Show cascade chips
   multRow.innerHTML = ''
   if (cascades) {
-    const wins = cascades.filter(s => s.payout > 0)
-    wins.forEach((s, i) => {
-      if (s.payout > 0) {
-        const chip = document.createElement('div')
-        chip.className = 'win-mult-chip'
-        chip.textContent = `CASCADE ${i+1}: $${s.payout.toFixed(2)}`
-        multRow.appendChild(chip)
-      }
+    cascades.filter(s => s.payout > 0).forEach((s, i) => {
+      const chip = document.createElement('div')
+      chip.className = 'win-mult-chip'
+      chip.textContent = `CASCADE ${i+1}: $${s.payout.toFixed(2)}`
+      multRow.appendChild(chip)
     })
   }
 
-  document.getElementById('lastWinVal').textContent = '$' + amount.toFixed(2)
   overlay.classList.add('show')
-  setTimeout(() => overlay.classList.remove('show'), 2200)
+  setTimeout(() => overlay.classList.remove('show'), 2000)
 }
 
 function spawnCoins(payout, bet) {

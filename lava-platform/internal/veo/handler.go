@@ -158,6 +158,100 @@ func (h *Handler) GenerateBubbleVideos(c *gin.Context) {
 	c.JSON(http.StatusOK, results)
 }
 
+// winCelebrationStyle is mandatory art direction for win celebration videos.
+const winCelebrationStyle = `
+Art style: flat geometric bold graphic design. Western outlaw casino aesthetic.
+Premium game UI animation. Dark background with dramatic lighting and particles.
+NO photorealism. Bold geometric shapes and flat colors with strong contrast.
+Cinematic motion graphics feel. Inspired by Pragmatic Play premium slot art direction.`
+
+// winCelebrationPresets defines the 4 win-tier celebration video assets.
+var winCelebrationPresets = []struct {
+	Filename    string
+	Duration    int
+	AspectRatio string
+	Prompt      string
+}{
+	{
+		Filename: "win_nice", Duration: 5, AspectRatio: "9:16",
+		Prompt: `Premium casino win celebration animation for a western-themed mobile slot game.
+TIER: NICE WIN — warm elegant golden celebration.
+BACKGROUND: Deep black/dark brown (#0b0804) fading to warm amber at center.
+PARTICLES: Gold coins and dollar signs raining downward from the top, gently rotating.
+COINS: Flat geometric disc shapes in gold (#f7d44c) and brass (#b8860b). Tumbling and spinning.
+ATMOSPHERE: Warm golden dust particles drifting upward. Subtle radial golden glow at center.
+MOTION: 5 seconds. First 1s: particle system activates and builds. 2-4s: full golden shower. 5s: graceful fade-out.
+MOOD: Satisfying, elegant, premium — like finding a gold nugget in a river.
+NO text or typography in the video. Pure visual FX only.
+` + winCelebrationStyle,
+	},
+	{
+		Filename: "win_big", Duration: 6, AspectRatio: "9:16",
+		Prompt: `Premium casino win celebration animation for a western-themed mobile slot game.
+TIER: BIG WIN — explosive red and gold western saloon prestige.
+BACKGROUND: Deep black to dramatic deep red (#400000) burst from center outward.
+OPENING: Screen flash of warm white light, then dramatic red/gold burst.
+PARTICLES: Gold coins, paper banknotes, playing card suits (spades/hearts) flying radially outward from center.
+SHOCKWAVE: A visible ring of golden energy expanding outward from center at 0.3s.
+ADDITIONAL FX: Sparks and brass-colored fragments trailing from coin impacts.
+Subtle revolver chamber spin graphic in background (dark, barely visible).
+MOTION: 6 seconds. 0-0.3s: intense flash. 0.3-2s: explosive radial particle burst. 2-5s: golden shower settling. 5-6s: fade.
+MOOD: Powerful, explosive, premium — like a bank vault blasting open.
+NO text or typography in the video. Pure visual FX only.
+` + winCelebrationStyle,
+	},
+	{
+		Filename: "win_mega", Duration: 7, AspectRatio: "9:16",
+		Prompt: `Premium casino win celebration animation for a western-themed mobile slot game.
+TIER: MEGA WIN — cinematic full-screen western jackpot spectacle.
+BACKGROUND: Black to deep purple (#1a0040) with golden rays fanning outward from a central burst.
+OPENING: Massive golden shockwave expanding from center, filling the frame. Screen-filling flash.
+PARTICLES: Huge burst of gold bars, coins, gemstones, and dollar bags flying outward.
+STEAM FX: Thick locomotive-style steam jets erupting from both sides of frame, lit from behind in gold.
+SUNBURST: Geometric golden rays radiating from center like a train headlight breaking through.
+GOLD RAIN: After initial burst, steady heavy golden shower for the middle section.
+MOTION: 7 seconds. 0-0.5s: white flash + massive shockwave. 0.5-1.5s: explosion peak. 1.5-5s: gold shower + rays. 5-7s: fade.
+MOOD: Massive, cinematic, awe-inspiring — like a locomotive loaded with treasure crashing through.
+NO text or typography. Pure visual FX only.
+` + winCelebrationStyle,
+	},
+	{
+		Filename: "win_epic", Duration: 8, AspectRatio: "9:16",
+		Prompt: `Premium casino win celebration animation for a western-themed mobile slot game.
+TIER: EPIC / TRAIN HEIST JACKPOT — legendary highest-tier spectacle.
+BACKGROUND: Pure black to extreme multicolor burst — gold, emerald, crimson rays erupting from center.
+OPENING: The most extreme visual impact: full white flash, then the most dramatic explosion of all tiers.
+VAULT BREACH: Geometric vault door shape shattering outward with metallic fragments.
+GOLD FLOOD: Literal golden light flooding in from the breached vault — fills lower half of frame.
+PARTICLES: Maximum density — gold bars, coins, bounty scrolls, sheriff badges, treasure chests all exploding outward.
+CROWN FX: A geometric gold crown shape momentarily appears and shatters at the climax.
+RAINBOW SPARKLES: Brief multicolored sparkle storm in final 2 seconds.
+MOTION: 8 seconds. 0-0.3s: white-out. 0.3-1s: vault breach FX. 1-4s: maximum gold flood and particles. 4-6s: climax sparkles. 6-8s: fade.
+MOOD: Transcendent, legendary — the most spectacular win possible.
+NO text or typography. Pure visual FX only.
+` + winCelebrationStyle,
+	},
+}
+
+// GenerateWinCelebration handles POST /admin/v1/veo/preset/win-celebration
+func (h *Handler) GenerateWinCelebration(c *gin.Context) {
+	type result struct {
+		Filename string `json:"filename"`
+		URL      string `json:"url,omitempty"`
+		Error    string `json:"error,omitempty"`
+	}
+	results := make([]result, len(winCelebrationPresets))
+	for i, p := range winCelebrationPresets {
+		res, err := h.generateOne(c, p.Prompt, p.Filename, "h-slots/outlaw-gold", p.Duration, p.AspectRatio)
+		if err != nil {
+			results[i] = result{Filename: p.Filename, Error: err.Error()}
+		} else {
+			results[i] = result{Filename: p.Filename, URL: res["url"].(string)}
+		}
+	}
+	c.JSON(http.StatusOK, results)
+}
+
 func (h *Handler) generateOne(c *gin.Context, prompt, filename, game string, duration int, aspectRatio string) (map[string]interface{}, error) {
 	filename = strings.ToLower(strings.TrimSpace(filename))
 	game = strings.ToLower(strings.TrimSpace(game))

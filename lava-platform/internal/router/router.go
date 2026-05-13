@@ -155,9 +155,10 @@ func New(cfg *config.Config, infra *infrastructure.Infra, deps *Deps) *gin.Engin
 			admin.POST("/gemini/preset/slots-lever",     geminiH.GenerateSlotLever)
 
 			veoH := veo.NewHandler(cfg.Gemini.APIKey, "frontend/dist/assets")
-			admin.POST("/veo/generate",           veoH.Generate)
-			admin.POST("/veo/preset/bubble",      veoH.GenerateBubbleVideos)
-			admin.POST("/veo/preset/outlaw",      veoH.GenerateOutlawVideos)
+			admin.POST("/veo/generate",                veoH.Generate)
+			admin.POST("/veo/preset/bubble",           veoH.GenerateBubbleVideos)
+			admin.POST("/veo/preset/outlaw",           veoH.GenerateOutlawVideos)
+			admin.POST("/veo/preset/win-celebration",  veoH.GenerateWinCelebration)
 		}
 
 		admin.POST("/slots/weights", slotsH.UpdateWeights)
