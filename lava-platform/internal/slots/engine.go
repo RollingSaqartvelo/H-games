@@ -14,7 +14,7 @@ import (
 const (
 	NumCols    = 6
 	NumRows    = 5
-	ClusterMin = 8 // minimum cluster size for a payout
+	ClusterMin = 5 // minimum cluster size for a payout
 )
 
 // ── Symbol indices ─────────────────────────────────────────────────────────────
@@ -77,17 +77,17 @@ func DefaultConfig() *Config {
 type payoutEntry struct{ minSize int; mult float64 }
 
 var payoutTable = map[int][]payoutEntry{
-	SymHorseshoe: {{8, 0.30}, {10, 0.60}, {12, 1.00}, {15, 1.60}, {20, 2.50}, {30, 4.00}},
-	SymWhiskey:   {{8, 0.40}, {10, 0.80}, {12, 1.20}, {15, 2.00}, {20, 3.50}, {30, 6.00}},
-	SymBullet:    {{8, 0.50}, {10, 1.00}, {12, 1.60}, {15, 2.50}, {20, 4.50}, {30, 8.00}},
-	SymBadge:     {{8, 0.60}, {10, 1.20}, {12, 2.00}, {15, 3.20}, {20, 5.50}, {30, 10.00}},
-	SymLantern:   {{8, 0.80}, {10, 1.60}, {12, 2.50}, {15, 4.00}, {20, 7.00}, {30, 14.00}},
-	SymRevolver:  {{8, 1.00}, {10, 2.00}, {12, 3.50}, {15, 6.00}, {20, 10.00}, {30, 20.00}},
-	SymCowboyHat: {{8, 1.50}, {10, 3.00}, {12, 5.00}, {15, 8.00}, {20, 14.00}, {30, 30.00}},
-	SymGoldBag:   {{8, 2.00}, {10, 4.00}, {12, 7.00}, {15, 12.00}, {20, 20.00}, {30, 50.00}},
-	SymDynamite:  {{8, 3.00}, {10, 6.00}, {12, 10.00}, {15, 18.00}, {20, 35.00}, {30, 80.00}},
-	SymOutlaw:    {{8, 5.00}, {10, 10.00}, {12, 16.00}, {15, 30.00}, {20, 60.00}, {30, 200.00}},
-	SymSheriff:   {{8, 8.00}, {10, 16.00}, {12, 25.00}, {15, 50.00}, {20, 100.00}, {30, 500.00}},
+	SymHorseshoe: {{5, 0.20}, {8, 0.40}, {10, 0.70}, {12, 1.10}, {15, 1.80}, {20, 3.00}},
+	SymWhiskey:   {{5, 0.25}, {8, 0.50}, {10, 0.90}, {12, 1.40}, {15, 2.20}, {20, 4.00}},
+	SymBullet:    {{5, 0.30}, {8, 0.60}, {10, 1.10}, {12, 1.80}, {15, 2.80}, {20, 5.00}},
+	SymBadge:     {{5, 0.40}, {8, 0.80}, {10, 1.40}, {12, 2.20}, {15, 3.50}, {20, 6.50}},
+	SymLantern:   {{5, 0.50}, {8, 1.00}, {10, 1.80}, {12, 2.80}, {15, 4.50}, {20, 9.00}},
+	SymRevolver:  {{5, 0.70}, {8, 1.40}, {10, 2.50}, {12, 4.00}, {15, 7.00}, {20, 14.00}},
+	SymCowboyHat: {{5, 1.00}, {8, 2.00}, {10, 3.50}, {12, 6.00}, {15, 10.00}, {20, 20.00}},
+	SymGoldBag:   {{5, 1.50}, {8, 3.00}, {10, 5.00}, {12, 8.00}, {15, 14.00}, {20, 30.00}},
+	SymDynamite:  {{5, 2.00}, {8, 4.00}, {10, 7.00}, {12, 12.00}, {15, 22.00}, {20, 50.00}},
+	SymOutlaw:    {{5, 3.50}, {8, 7.00}, {10, 12.00}, {12, 20.00}, {15, 40.00}, {20, 120.00}},
+	SymSheriff:   {{5, 5.00}, {8, 10.00}, {10, 18.00}, {12, 30.00}, {15, 60.00}, {20, 300.00}},
 }
 
 // ── Data types ─────────────────────────────────────────────────────────────────
@@ -358,9 +358,41 @@ func HashSeed(seed string) string {
 
 // ── Main spin function ─────────────────────────────────────────────────────────
 
-func Spin(cfg *Config, serverSeed string, nonce int64, bet float64) *SpinResult {
+// forceScatters replaces random non-special cells with scatters until minCount is reached.
+// Used for bonus buy — guarantees scatter trigger while keeping RNG chain intact.
+func forceScatters(g Grid, r *rng, minCount int) Grid {
+	current := countScatter(g)
+	if current >= minCount {
+		return g
+	}
+	type pos struct{ row, col int }
+	var available []pos
+	for row := 0; row < NumRows; row++ {
+		for col := 0; col < NumCols; col++ {
+			sym := g[row][col]
+			if sym != SymScatter && sym != SymWild {
+				available = append(available, pos{row, col})
+			}
+		}
+	}
+	needed := minCount - current
+	for i := 0; i < needed && len(available) > 0; i++ {
+		idx := r.intn(len(available))
+		p := available[idx]
+		g[p.row][p.col] = SymScatter
+		available = append(available[:idx], available[idx+1:]...)
+	}
+	return g
+}
+
+// Spin runs a full spin including cascades. minForcedScatters > 0 guarantees
+// at least that many scatters on the initial grid (used for bonus buy).
+func Spin(cfg *Config, serverSeed string, nonce int64, bet float64, minForcedScatters int) *SpinResult {
 	r := newRNG(serverSeed, nonce)
 	grid := generateGrid(cfg, r)
+	if minForcedScatters > 0 {
+		grid = forceScatters(grid, r, minForcedScatters)
+	}
 
 	result := &SpinResult{
 		ServerSeedHash: HashSeed(serverSeed),

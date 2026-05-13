@@ -228,126 +228,132 @@
     .mf-label { font-size:7px; letter-spacing:2px; color:var(--brass); opacity:.7 }
     .mf-val   { font-family:'Orbitron',sans-serif; font-size:10px; font-weight:700; color:var(--gold-b) }
 
-    /* ── Train lever ───────────────────────────────────────────────── */
-    .lever-wrap {
-      width:42px; flex-shrink:0;
-      display:flex; flex-direction:column; align-items:center;
-      padding-left:6px;
-    }
-    .lever-track {
-      width:10px;
-      background:linear-gradient(180deg,#2a1c08,#0e0a04);
-      border:1px solid var(--brass);
-      border-radius:5px;
-      height:160px;
-      position:relative;
-      box-shadow:0 0 8px rgba(184,134,11,.2);
-    }
-    .lever-track::before {
-      content:''; position:absolute; left:50%; top:8px; bottom:8px;
-      width:2px; transform:translateX(-50%);
-      background:linear-gradient(180deg,var(--brass),var(--iron));
-      border-radius:1px;
-    }
-    .lever-handle {
-      position:absolute; left:50%; top:10%;
-      transform:translateX(-50%);
-      width:28px; height:28px; margin-left:-14px;
-      cursor:pointer;
-      transition:top .35s cubic-bezier(.4,0,.2,1);
-    }
-    .lever-handle.pulled {
-      top:72% !important;
-    }
-    .lever-ball {
-      width:28px; height:28px;
-      background:radial-gradient(circle at 35% 30%, #f7d44c, #b8860b 60%, #6a4800);
-      border-radius:50%;
-      border:2px solid var(--gold-b);
-      box-shadow:0 0 14px var(--gold), 0 2px 6px rgba(0,0,0,.6);
-      transition:box-shadow .15s;
-    }
-    .lever-handle:active .lever-ball,
-    .lever-handle.pulled .lever-ball {
-      box-shadow:0 0 24px var(--gold-b), 0 0 40px rgba(247,212,76,.4);
-    }
-    .lever-label {
-      font-size:6px; letter-spacing:2px; text-transform:uppercase;
-      color:var(--brass); margin-top:6px; text-align:center;
-    }
-
-    /* Steam puff */
-    @keyframes steam-puff {
-      0%  { opacity:.8; transform:translateY(0) scale(1) }
-      100%{ opacity:0;  transform:translateY(-30px) scale(2) }
-    }
-    .steam { position:absolute; top:-6px; font-size:16px; pointer-events:none }
-    .steam.active { animation:steam-puff .6s ease-out forwards }
-
     /* ── Bet panel ─────────────────────────────────────────────────── */
     .bet-panel {
       flex-shrink:0;
       background:linear-gradient(180deg,#110d06 0%,#0e0a04 100%);
       border-top:2px solid var(--brass);
-      padding:10px 12px max(env(safe-area-inset-bottom,10px),10px);
+      padding:8px 10px max(env(safe-area-inset-bottom,8px),8px);
       z-index:5;
     }
 
-    .bet-row {
-      display:flex; align-items:center; gap:8px; margin-bottom:8px;
+    /* Main bet row: numbers left, lever right */
+    .bet-main-row {
+      display:flex; align-items:stretch; gap:8px; margin-bottom:7px;
     }
-
+    .bet-left {
+      flex:1; display:flex; flex-direction:column; gap:5px;
+    }
     .bet-lbl {
-      font-size:8px; letter-spacing:2px; text-transform:uppercase;
-      color:var(--brass); flex-shrink:0;
+      font-size:7px; letter-spacing:2px; text-transform:uppercase;
+      color:var(--brass);
     }
-
     .bet-stepper {
-      display:flex; align-items:center; gap:6px; flex:1;
+      display:flex; align-items:center; gap:5px;
     }
     .step-btn {
-      width:32px; height:32px; border-radius:8px; cursor:pointer;
+      width:30px; height:30px; border-radius:7px; cursor:pointer;
       background:linear-gradient(145deg,#2a1c08,#1a1206);
       border:1px solid var(--border); color:var(--gold-b);
-      font-size:18px; display:flex; align-items:center; justify-content:center;
-      transition:all .12s;
+      font-size:17px; display:flex; align-items:center; justify-content:center;
+      transition:all .12s; flex-shrink:0;
     }
     .step-btn:active { background:#3a2810; border-color:var(--gold); transform:scale(.94) }
-
     .bet-amount {
       flex:1; background:linear-gradient(180deg,#080502,#0e0a04);
-      border:1px solid var(--border); border-radius:10px;
-      padding:8px; font-family:'Orbitron',monospace; font-size:20px;
+      border:1px solid var(--border); border-radius:9px;
+      padding:6px; font-family:'Orbitron',monospace; font-size:22px;
       font-weight:700; color:var(--gold-b); text-align:center;
-      outline:none;
-      box-shadow:inset 0 2px 8px rgba(0,0,0,.6);
+      outline:none; box-shadow:inset 0 2px 8px rgba(0,0,0,.6);
     }
 
+    /* Lever panel — right side of bet panel */
+    .bet-lever {
+      width:58px; flex-shrink:0;
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      background:linear-gradient(180deg,#1a1206,#0e0a04);
+      border:1px solid var(--brass); border-radius:10px;
+      cursor:pointer; position:relative; overflow:hidden; gap:3px;
+      transition:box-shadow .15s;
+    }
+    .bet-lever:not(.disabled):active { box-shadow:0 0 18px var(--gold) }
+    .bet-lever.disabled { opacity:.35; cursor:default }
+    .lever-img-wrap {
+      width:42px; height:72px; position:relative;
+      display:flex; align-items:center; justify-content:center;
+    }
+    .lever-img {
+      width:100%; height:100%; object-fit:contain;
+      transition:transform .35s cubic-bezier(.4,0,.2,1);
+      transform-origin:bottom center;
+    }
+    .lever-img.pulled { transform:rotate(25deg); filter:drop-shadow(0 0 6px var(--gold-b)) }
+    /* Fallback CSS lever when image not loaded */
+    .lever-fallback {
+      display:flex; flex-direction:column; align-items:center; gap:2px;
+      width:100%; height:100%; justify-content:center;
+    }
+    .lf-ball {
+      width:24px; height:24px;
+      background:radial-gradient(circle at 35% 30%,#f7d44c,#b8860b 60%,#6a4800);
+      border-radius:50%; border:2px solid var(--gold-b);
+      box-shadow:0 0 10px var(--gold);
+      flex-shrink:0;
+    }
+    .lf-rod {
+      width:4px; height:36px;
+      background:linear-gradient(180deg,#b8860b,#6a4800);
+      border-radius:2px;
+    }
+    .lf-base {
+      width:20px; height:6px;
+      background:linear-gradient(180deg,#b8860b,#6a4800);
+      border-radius:2px;
+    }
+    .lever-lbl {
+      font-size:6px; letter-spacing:2px; text-transform:uppercase;
+      color:var(--brass); padding-bottom:5px;
+    }
+
+    /* Steam puff */
+    @keyframes steam-puff {
+      0%  { opacity:.9; transform:translateX(-50%) translateY(0) scale(1) }
+      100%{ opacity:0;  transform:translateX(-50%) translateY(-28px) scale(2) }
+    }
+    .steam {
+      position:absolute; top:0; left:50%;
+      transform:translateX(-50%);
+      font-size:14px; pointer-events:none; z-index:2;
+    }
+    .steam.active { animation:steam-puff .6s ease-out forwards }
+
     .quick-bets {
-      display:flex; gap:5px; margin-bottom:8px;
+      display:flex; gap:4px; margin-bottom:6px;
     }
     .qb {
-      flex:1; padding:6px 0; font-size:10px;
+      flex:1; padding:5px 0; font-size:9px;
       background:linear-gradient(145deg,#1c1408,#120e06);
-      border:1px solid var(--border); border-radius:8px;
+      border:1px solid var(--border); border-radius:7px;
       color:var(--brass); cursor:pointer;
       font-family:'Orbitron',sans-serif; font-weight:600;
       transition:all .12s;
     }
     .qb:active { border-color:var(--gold); color:var(--gold-b); background:#2a1c08 }
 
+    /* Action row: SPIN + BUY FEATURE */
+    .action-row { display:flex; gap:7px; }
+
     .spin-btn {
-      width:100%; padding:14px;
+      flex:1; padding:13px 8px;
       background:linear-gradient(160deg,#2a1800 0%,#8b4400 40%,#2a1800 100%);
-      border:2px solid var(--gold);
-      border-radius:14px;
-      font-family:'Orbitron',sans-serif; font-size:16px; font-weight:900;
+      border:2px solid var(--gold); border-radius:12px;
+      font-family:'Orbitron',sans-serif; font-size:15px; font-weight:900;
       letter-spacing:3px; color:var(--gold-b);
       cursor:pointer; transition:all .15s;
-      box-shadow:0 0 20px rgba(212,160,23,.35), inset 0 1px 0 rgba(247,212,76,.2);
+      box-shadow:0 0 18px rgba(212,160,23,.35), inset 0 1px 0 rgba(247,212,76,.2);
     }
     .spin-btn:disabled { opacity:.35; cursor:default; box-shadow:none }
-    .spin-btn:not(:disabled):active { transform:scale(.98); box-shadow:0 0 32px var(--gold) }
+    .spin-btn:not(:disabled):active { transform:scale(.98); box-shadow:0 0 28px var(--gold) }
     .spin-btn.spinning-state {
       background:linear-gradient(160deg,#1a0e00,#4a2800,#1a0e00);
       animation:spin-btn-pulse 0.8s ease-in-out infinite;
@@ -356,6 +362,102 @@
       0%,100%{ box-shadow:0 0 14px rgba(212,160,23,.3) }
       50%    { box-shadow:0 0 32px rgba(212,160,23,.7) }
     }
+
+    /* BUY FEATURE button */
+    .buy-btn {
+      padding:6px 10px; min-width:70px;
+      background:linear-gradient(160deg,#1a0010 0%,#5a0030 40%,#1a0010 100%);
+      border:2px solid #cc44aa; border-radius:12px;
+      font-family:'Orbitron',sans-serif; font-weight:900;
+      letter-spacing:1px; color:#f48cdb;
+      cursor:pointer; transition:all .15s;
+      box-shadow:0 0 12px rgba(180,40,140,.3);
+      display:flex; flex-direction:column; align-items:center; gap:2px;
+    }
+    .buy-btn:disabled { opacity:.35; cursor:default }
+    .buy-btn:not(:disabled):active { box-shadow:0 0 22px rgba(204,68,170,.7) }
+    .buy-btn-icon { font-size:16px; line-height:1 }
+    .buy-btn-label { font-size:7px; letter-spacing:1.5px }
+    .buy-btn-price { font-size:9px; color:#f48cdb }
+
+    /* ── Bonus Buy modal ───────────────────────────────────────────── */
+    .bb-overlay {
+      display:none; position:fixed; inset:0; z-index:110;
+      background:rgba(0,0,0,.88);
+      align-items:flex-end; justify-content:center;
+    }
+    .bb-overlay.open { display:flex }
+    .bb-modal {
+      width:100%; max-width:480px;
+      background:linear-gradient(180deg,#1a0c18 0%,#110008 100%);
+      border:2px solid #cc44aa; border-bottom:none;
+      border-radius:20px 20px 0 0;
+      padding:18px 14px 28px;
+      box-shadow:0 -8px 40px rgba(180,40,140,.3);
+      animation:pt-slide .28s cubic-bezier(.25,1.4,.5,1) both;
+    }
+    .bb-header {
+      display:flex; align-items:center; justify-content:space-between;
+      margin-bottom:14px;
+    }
+    .bb-title {
+      font-family:'Orbitron',sans-serif; font-weight:900; font-size:13px;
+      letter-spacing:3px; color:#f48cdb;
+      text-shadow:0 0 14px #cc44aa;
+    }
+    .bb-close {
+      width:30px; height:30px; border-radius:8px;
+      background:rgba(0,0,0,.4); border:1px solid rgba(204,68,170,.3);
+      color:#cc44aa; font-size:14px; cursor:pointer;
+      display:flex; align-items:center; justify-content:center;
+    }
+    .bb-tiers { display:flex; flex-direction:column; gap:10px; margin-bottom:14px }
+    .bb-tier {
+      border:1px solid rgba(204,68,170,.35); border-radius:12px;
+      padding:12px 14px; cursor:pointer; transition:all .15s;
+      background:rgba(90,0,60,.1);
+      display:flex; align-items:center; gap:12px;
+    }
+    .bb-tier:hover,.bb-tier:active { border-color:#cc44aa; background:rgba(120,0,80,.22) }
+    .bb-tier.selected {
+      border-color:#f48cdb; background:rgba(140,0,90,.28);
+      box-shadow:0 0 12px rgba(244,140,219,.18);
+    }
+    .bb-tier-icon { font-size:22px; flex-shrink:0; width:30px; text-align:center }
+    .bb-tier-info { flex:1 }
+    .bb-tier-name { font-family:'Orbitron',sans-serif; font-size:10px; font-weight:700;
+      color:#f48cdb; letter-spacing:1px; margin-bottom:3px }
+    .bb-tier-desc { font-size:9px; color:rgba(244,140,219,.55); line-height:1.4 }
+    .bb-tier-cost {
+      font-family:'Orbitron',sans-serif; font-size:13px; font-weight:900;
+      color:var(--gold-b); text-align:right; white-space:nowrap; flex-shrink:0;
+    }
+    .bb-confirm {
+      width:100%; padding:13px;
+      background:linear-gradient(160deg,#3a0030 0%,#8b0055 40%,#3a0030 100%);
+      border:2px solid #cc44aa; border-radius:12px;
+      font-family:'Orbitron',sans-serif; font-size:13px; font-weight:900;
+      letter-spacing:2px; color:#f48cdb;
+      cursor:pointer; transition:all .15s;
+      box-shadow:0 0 16px rgba(180,40,140,.35);
+    }
+    .bb-confirm:disabled { opacity:.35; cursor:default }
+    .bb-confirm:not(:disabled):active { box-shadow:0 0 28px rgba(244,140,219,.6) }
+    .bb-warning {
+      font-size:8px; color:rgba(244,140,219,.4); text-align:center;
+      margin-top:10px; letter-spacing:.5px; line-height:1.6;
+    }
+
+    /* Train Heist bonus mode indicator */
+    .bonus-mode-bar {
+      display:none; position:absolute; top:4px; left:50%; transform:translateX(-50%);
+      z-index:9; background:rgba(60,0,50,.9); border:1px solid #cc44aa;
+      border-radius:20px; padding:3px 16px;
+      font-family:'Orbitron',sans-serif; font-size:9px; font-weight:700;
+      color:#f48cdb; letter-spacing:2px;
+      box-shadow:0 0 14px rgba(204,68,170,.5); white-space:nowrap;
+    }
+    .bonus-mode-bar.show { display:block }
 
     /* ── Win overlay ───────────────────────────────────────────────── */
     .win-overlay {
@@ -608,6 +710,9 @@
     <!-- Free spins indicator -->
     <div class="fs-indicator" id="fsIndicator">⚡ FREE SPINS: <span id="fsLeft">0</span></div>
 
+    <!-- Train Heist bonus mode banner -->
+    <div class="bonus-mode-bar" id="bonusModeBar">🚂 TRAIN HEIST BONUS</div>
+
     <!-- Cascade badge -->
     <div class="cascade-badge" id="cascadeBadge"></div>
 
@@ -645,16 +750,6 @@
         </div>
       </div>
 
-      <!-- Lever -->
-      <div class="lever-wrap">
-        <div class="lever-track" id="leverTrack">
-          <div class="lever-handle" id="leverHandle" onclick="onLeverPull()">
-            <div class="lever-ball"></div>
-          </div>
-          <div class="steam" id="steam">💨</div>
-        </div>
-        <div class="lever-label">PULL</div>
-      </div>
     </div>
 
     <!-- Paytable button -->
@@ -686,16 +781,79 @@
     </div>
   </div>
 
-  <!-- Bet panel -->
-  <div class="bet-panel">
-    <div class="bet-row">
-      <span class="bet-lbl">BET</span>
-      <div class="bet-stepper">
-        <button class="step-btn" onclick="adjustBet(-1)">−</button>
-        <input class="bet-amount" id="betAmount" type="number" value="1.00" min="0.10" max="1000" step="0.10">
-        <button class="step-btn" onclick="adjustBet(1)">+</button>
+  <!-- Bonus Buy modal -->
+  <div class="bb-overlay" id="bbOverlay" onclick="closeBonusBuy()">
+    <div class="bb-modal" onclick="event.stopPropagation()">
+      <div class="bb-header">
+        <span class="bb-title">WANTED FEATURE</span>
+        <button class="bb-close" onclick="closeBonusBuy()">✕</button>
+      </div>
+      <div class="bb-tiers" id="bbTiers">
+        <div class="bb-tier" onclick="selectTier(1)" data-tier="1">
+          <div class="bb-tier-icon">🔫</div>
+          <div class="bb-tier-info">
+            <div class="bb-tier-name">STANDARD BOUNTY</div>
+            <div class="bb-tier-desc">15 Free Spins · 4 Scatters guaranteed · High volatility</div>
+          </div>
+          <div class="bb-tier-cost" id="tierCost1">$100</div>
+        </div>
+        <div class="bb-tier" onclick="selectTier(2)" data-tier="2">
+          <div class="bb-tier-icon">🧨</div>
+          <div class="bb-tier-info">
+            <div class="bb-tier-name">ENHANCED HEIST</div>
+            <div class="bb-tier-desc">15 Free Spins · 5 Scatters · Better multiplier odds</div>
+          </div>
+          <div class="bb-tier-cost" id="tierCost2">$125</div>
+        </div>
+        <div class="bb-tier" onclick="selectTier(3)" data-tier="3">
+          <div class="bb-tier-icon">⭐</div>
+          <div class="bb-tier-info">
+            <div class="bb-tier-name">SUPER TRAIN HEIST</div>
+            <div class="bb-tier-desc">20 Free Spins · 6 Scatters · Maximum volatility</div>
+          </div>
+          <div class="bb-tier-cost" id="tierCost3">$150</div>
+        </div>
+      </div>
+      <button class="bb-confirm" id="bbConfirmBtn" onclick="confirmBonusBuy()" disabled>
+        SELECT A TIER
+      </button>
+      <div class="bb-warning">
+        ⚠ High volatility feature. Bonus purchase guarantees free spins entry only.<br>
+        RTP: Standard 96% · Enhanced 96.5% · Super 97% · Provably fair
       </div>
     </div>
+  </div>
+
+  <!-- Bet panel -->
+  <div class="bet-panel">
+    <!-- Main row: bet controls left + lever right -->
+    <div class="bet-main-row">
+      <div class="bet-left">
+        <div class="bet-lbl">BET AMOUNT</div>
+        <div class="bet-stepper">
+          <button class="step-btn" onclick="adjustBet(-1)">−</button>
+          <input class="bet-amount" id="betAmount" type="number" value="1.00" min="0.10" max="1000" step="0.10">
+          <button class="step-btn" onclick="adjustBet(1)">+</button>
+        </div>
+      </div>
+      <!-- Lever — right side, click to spin -->
+      <div class="bet-lever" id="betLever" onclick="onLeverPull()">
+        <div class="steam" id="steam">💨</div>
+        <div class="lever-img-wrap">
+          <img class="lever-img" id="leverImg"
+               src="/assets/h-slots/outlaw-gold/lever.png"
+               alt="PULL"
+               onerror="this.style.display='none';document.getElementById('leverFallback').style.display='flex'">
+          <div class="lever-fallback" id="leverFallback" style="display:none">
+            <div class="lf-ball"></div>
+            <div class="lf-rod"></div>
+            <div class="lf-base"></div>
+          </div>
+        </div>
+        <div class="lever-lbl">PULL</div>
+      </div>
+    </div>
+
     <div class="quick-bets">
       <button class="qb" onclick="setBet(0.1)">0.1</button>
       <button class="qb" onclick="setBet(0.5)">0.5</button>
@@ -703,7 +861,15 @@
       <button class="qb" onclick="setBet(5)">5</button>
       <button class="qb" onclick="setBet(10)">10</button>
     </div>
-    <button class="spin-btn" id="spinBtn" onclick="doSpin()">SPIN</button>
+
+    <div class="action-row">
+      <button class="spin-btn" id="spinBtn" onclick="doSpin()">SPIN</button>
+      <button class="buy-btn" id="buyBtn" onclick="openBonusBuy()">
+        <span class="buy-btn-icon">🎯</span>
+        <span class="buy-btn-label">BUY</span>
+        <span class="buy-btn-price" id="buyBtnPrice">100×</span>
+      </button>
+    </div>
     <div class="no-session" id="noSession" style="display:none">Open via Telegram to play</div>
   </div>
 
@@ -840,44 +1006,102 @@ function updateBalance(b) {
 }
 
 // ── Lever interaction ─────────────────────────────────────────────────────────
-let leverPulled = false
 function onLeverPull() {
-  if (busy || leverPulled) return
+  if (busy) return
   doSpin()
 }
 
 function animateLever() {
-  const handle = document.getElementById('leverHandle')
-  const steam  = document.getElementById('steam')
-  handle.classList.add('pulled')
+  const lever = document.getElementById('betLever')
+  const img   = document.getElementById('leverImg')
+  const steam = document.getElementById('steam')
+  lever.classList.add('disabled')
+  img.classList.add('pulled')
   steam.classList.add('active')
   setTimeout(() => {
-    handle.classList.remove('pulled')
+    img.classList.remove('pulled')
     steam.classList.remove('active')
+    lever.classList.remove('disabled')
   }, 900)
 }
 
+// ── Bonus Buy ─────────────────────────────────────────────────────────────────
+let selectedBonusTier = 0
+let bonusBuyMode = false  // true = Train Heist bonus is active
+
+const BB_COSTS = [0, 100, 125, 150]
+
+function openBonusBuy() {
+  if (busy) return
+  selectedBonusTier = 0
+  document.querySelectorAll('.bb-tier').forEach(el => el.classList.remove('selected'))
+  document.getElementById('bbConfirmBtn').disabled = true
+  document.getElementById('bbConfirmBtn').textContent = 'SELECT A TIER'
+  updateBBCosts()
+  document.getElementById('bbOverlay').classList.add('open')
+}
+function closeBonusBuy() {
+  document.getElementById('bbOverlay').classList.remove('open')
+}
+
+function updateBBCosts() {
+  const bet = parseFloat(document.getElementById('betAmount').value) || 1
+  for (let t = 1; t <= 3; t++) {
+    const el = document.getElementById('tierCost' + t)
+    if (el) el.textContent = '$' + (bet * BB_COSTS[t]).toFixed(2)
+  }
+}
+
+function selectTier(tier) {
+  selectedBonusTier = tier
+  document.querySelectorAll('.bb-tier').forEach(el => {
+    el.classList.toggle('selected', parseInt(el.dataset.tier) === tier)
+  })
+  const bet = parseFloat(document.getElementById('betAmount').value) || 1
+  const cost = (bet * BB_COSTS[tier]).toFixed(2)
+  document.getElementById('bbConfirmBtn').disabled = false
+  document.getElementById('bbConfirmBtn').textContent =
+    `BUY TRAIN HEIST — $${cost}`
+}
+
+async function confirmBonusBuy() {
+  if (!selectedBonusTier || busy) return
+  closeBonusBuy()
+  bonusBuyMode = true
+  await doSpin(selectedBonusTier)
+  bonusBuyMode = false
+}
+
 // ── Spin ──────────────────────────────────────────────────────────────────────
-async function doSpin() {
+async function doSpin(bonusTier = 0) {
   if (busy || !TOKEN) return
   busy = true
-  const btn = document.getElementById('spinBtn')
-  btn.disabled = true
+  const btn    = document.getElementById('spinBtn')
+  const buyBtn = document.getElementById('buyBtn')
+  const lever  = document.getElementById('betLever')
+  btn.disabled    = true
+  buyBtn.disabled = true
+  lever.classList.add('disabled')
   btn.classList.add('spinning-state')
-  btn.textContent = 'SPINNING…'
+  btn.textContent = bonusTier > 0 ? 'HEIST…' : 'SPINNING…'
 
-  animateLever()
+  if (bonusTier === 0) animateLever()
 
   const betVal = parseFloat(document.getElementById('betAmount').value) || 1
   lastBet = betVal
-  const isFree = freeSpinsLeft > 0
+  const isFree = freeSpinsLeft > 0 && bonusTier === 0
 
   if (isFree) {
     freeSpinsLeft--
     updateFSIndicator()
   }
 
-  // Spin animation — columns start one by one
+  // Show bonus mode bar if bonus buy
+  if (bonusTier > 0) {
+    document.getElementById('bonusModeBar').classList.add('show')
+  }
+
+  // Spin animation
   for (let c = 0; c < 6; c++) {
     setTimeout(() => {
       for (let r = 0; r < 5; r++) {
@@ -890,7 +1114,7 @@ async function doSpin() {
     const resp = await fetch('/tma/v1/slots/spin', {
       method: 'POST',
       headers: { 'Content-Type':'application/json', 'Authorization':'Bearer '+TOKEN },
-      body: JSON.stringify({ bet: betVal, free_spin: isFree })
+      body: JSON.stringify({ bet: betVal, free_spin: isFree, bonus_buy_tier: bonusTier })
     })
     const d = await resp.json()
     if (!resp.ok) {
@@ -1007,10 +1231,22 @@ async function fillGrid(newGrid) {
 
 function resetSpinBtn(isFreeMode) {
   busy = false
-  const btn = document.getElementById('spinBtn')
-  btn.disabled = false
+  const btn    = document.getElementById('spinBtn')
+  const buyBtn = document.getElementById('buyBtn')
+  const lever  = document.getElementById('betLever')
+  btn.disabled    = false
+  buyBtn.disabled = false
+  lever.classList.remove('disabled')
   btn.classList.remove('spinning-state')
   btn.textContent = isFreeMode ? `FREE SPIN (${freeSpinsLeft})` : 'SPIN'
+  if (!isFreeMode) {
+    document.getElementById('bonusModeBar').classList.remove('show')
+  }
+}
+
+function updateBuyBtnPrice() {
+  const bet = parseFloat(document.getElementById('betAmount').value) || 1
+  document.getElementById('buyBtnPrice').textContent = (bet * 100).toFixed(0) + '×'
 }
 
 // ── Win display ───────────────────────────────────────────────────────────────

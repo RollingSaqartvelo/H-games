@@ -40,7 +40,7 @@ const CHAR_X_FRAC = 0.38
 // Level 0 (ground) is computed dynamically as H - FLOOR_TILE_H so hooves land exactly on tile top.
 const FLOOR_Y_FRACS = [0.705, 0.545, 0.390, 0.248] as const
 // Must match FloorLayer DISPLAY_HEIGHT
-const FLOOR_TILE_H = 220
+const FLOOR_TILE_H = 80
 
 // Sheriff starts 260px behind, gap closes as time passes
 function getSheriffTargetGap(elapsedMs: number): number {

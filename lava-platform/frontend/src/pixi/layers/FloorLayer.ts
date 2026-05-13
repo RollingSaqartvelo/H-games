@@ -17,7 +17,7 @@ import { ASSET_PATHS } from '../../game/config'
  * floor2 / floor3 fall back to floor1 if the PNG is not yet in cache.
  */
 
-const DISPLAY_HEIGHT = 220
+const DISPLAY_HEIGHT = 80
 
 const FLOOR_SEQUENCE = [
   'floor', 'floor', 'floor2', 'floor', 'floor', 'floor3', 'floor', 'floor', 'floor4',

@@ -271,8 +271,9 @@ Style keywords: WPA poster, gouache painting, flat color shapes, mural art, nati
 No soft shadows. No texture. No gradients. Pure flat paint color shapes only.`
 
 // outlawFloorPanels defines 4 seamlessly-continuable floor tiles.
-// These are GROUND STRIP textures — no sky, just the desert ground surface.
-// Displayed as the bottom 220px of the screen. Hooves land at the top edge.
+// These are GROUND STRIP textures — only the TOP SURFACE of the desert road is visible.
+// Displayed as the bottom 80px of the screen. Hooves land at the top edge.
+// NO underground cross-section — only the sandy road surface is shown.
 var outlawFloorPanels = []struct {
 	Filename string
 	Prompt   string
@@ -281,93 +282,91 @@ var outlawFloorPanels = []struct {
 		Filename: "seamless_desert_floor",
 		Prompt: outlawStyle + `
 
-GROUND STRIP TEXTURE — 2048×512 pixels. Horizontal floor tile for side-scrolling mobile game.
-This is the DESERT GROUND seen from the side — the strip of earth the characters run along.
-Inspired by the lower ground portion of a flat geometric low-poly western desert illustration.
+DESERT ROAD SURFACE STRIP — 2048×512 pixels. Horizontal tile for side-scrolling mobile game.
+This is the SANDY ROAD SURFACE as seen from the side — like a thin ribbon of desert trail.
+IMPORTANT: You are looking at the GROUND FROM THE SIDE — only the TOP SURFACE is visible.
+There is NO underground cross-section. NO soil layers. NO strata bands. NO earth cuts.
+
+VISUAL CONCEPT: Imagine a thin horizontal strip of dusty desert road — like a dirt track.
+The surface has a flat sandy/terracotta texture. Hooves run along the top edge.
 
 STRICT RULES:
-- NO SKY. NO CLOUDS. NO SUN. NO MOUNTAINS. NO HORIZON VISIBLE. EARTH ONLY.
-- The TOP EDGE of this image is the running surface — perfectly flat horizontal line.
-- Characters' hooves touch exactly this top edge.
+- NO sky. NO clouds. NO mountains. NO horizon.
+- NO underground layers. NO soil cross-sections. NO strata bands.
+- The ENTIRE IMAGE fills with the sandy road surface texture from top to bottom.
+- Top edge = perfectly flat horizontal running surface.
+- ENTIRE IMAGE is sandy terracotta surface — uniform warm sand/dust tones throughout.
 
-COMPOSITION top→bottom:
-  TOP 10%: Running surface. Flat hard edge of terracotta earth (#C05828).
-    3-4 tiny low angular scrub-bush shapes (#3A3A22) sitting right on the surface edge.
-    2 small angular rock shards at the surface.
-  MIDDLE 55%: Stacked flat-color earth strata bands.
-    Band 1 (just below surface): Terracotta #C05828 — wide band.
-    Band 2: Rust-orange #9A4220 — medium band.
-    Band 3: Sand highlight #D4904A — thin bright stripe.
-    Band 4: Dark rust #7A3A18 — wide band.
-    Each band is a perfectly flat horizontal shape with sharp angular edges.
-  BOTTOM 35%: Deep earth. Dark brown #4A2810 fading to near-black #2A1800.
+SURFACE TEXTURE details (distributed evenly across full image height):
+  - Flat sandy terracotta base color: #C87840, #D49050, #B86830
+  - 8-10 small angular pebble/rock shapes scattered on surface: #8A5828, #6A4018
+  - Thin horizontal dust/track lines showing hoof prints: subtle parallel marks
+  - 3-4 tiny flat angular scrub-grass tufts (#4A4A20) along the surface
+  - Slight color variation across width — left cooler (#B86830), right warmer (#D49050)
 
 Seamless tile: left and right edges match perfectly for infinite horizontal repeat.
-NO gradients inside shapes. Hard flat polygon edges only. Low-poly vector style.`,
+Flat polygon art style. No gradients. Hard color edges only.`,
 	},
 	{
 		Filename: "seamless_desert_floor2",
 		Prompt: outlawStyle + `
 
-GROUND STRIP TEXTURE — 2048×512 pixels. Horizontal floor tile, panel 2 of 4, side-scrolling game.
-Must continue seamlessly from the reference image provided (left edge of this panel = right edge of panel 1).
+DESERT ROAD SURFACE STRIP — 2048×512 pixels. Panel 2 of 4. Side-scrolling game floor tile.
+Must continue seamlessly from the reference image (left edge of this panel = right edge of panel 1).
 
-STRICT RULES: NO SKY. NO CLOUDS. NO MOUNTAINS. EARTH ONLY. Top edge = running surface.
+IMPORTANT: Only the ROAD SURFACE is visible. NO underground. NO strata. NO soil layers.
+The ENTIRE IMAGE is sandy/dusty road surface texture — warm terracotta tones throughout.
 
-COMPOSITION top→bottom:
-  TOP 10%: Running surface. Same flat terracotta level (#C05828) as reference left edge.
-    FEATURE: Angular wooden signpost shape rising from ground, center-left.
-    Bleached skull shape (#D8C8A0) mounted on top of post.
-    One flat angular tumbleweed (#8A7848) on the ground surface, center.
-    1-2 small rock shards.
-  MIDDLE 55%: Flat strata bands matching reference color palette.
-    Terracotta #C05828, rust #9A4220, sand #D4904A, dark rust #7A3A18 — horizontal band layers.
-  BOTTOM 35%: Deep dark earth #4A2810 to #2A1800.
+SURFACE TEXTURE same as reference. FEATURE this panel:
+  CENTER of image: A WOODEN SIGNPOST shape rising upward from the road surface.
+  Post: narrow vertical rectangle, weathered brown #6A3A10. Height ≈ 60% of image height.
+  On top: bleached skull shape, flat polygon, #D8C8A0.
+  Left of post: one flat angular tumbleweed shape on the road surface, #8A7848.
+  RIGHT SIDE: 2-3 scattered pebbles, a small rock cluster.
+  Ground surface fills entire image — same sandy terracotta as panel 1.
 
-Right edge designed to flow into panel 3. Hard flat polygons only. No gradients.`,
+Seamless right edge flows into panel 3. Flat polygon art. No gradients.`,
 	},
 	{
 		Filename: "seamless_desert_floor3",
 		Prompt: outlawStyle + `
 
-GROUND STRIP TEXTURE — 2048×512 pixels. Horizontal floor tile, panel 3 of 4, side-scrolling game.
-Must continue seamlessly from the reference image provided (left edge = right edge of panel 2).
+DESERT ROAD SURFACE STRIP — 2048×512 pixels. Panel 3 of 4. Side-scrolling game floor tile.
+Must continue seamlessly from the reference image (left edge = right edge of panel 2).
 
-STRICT RULES: NO SKY. NO CLOUDS. NO MOUNTAINS. EARTH ONLY. Top edge = running surface.
+IMPORTANT: Only the ROAD SURFACE is visible. NO underground. NO strata. NO soil layers.
+The ENTIRE IMAGE is sandy/dusty road surface texture — warm terracotta/orange sand tones.
 
-COMPOSITION top→bottom:
-  TOP 10%: Running surface. Same flat terracotta level as reference left edge.
-    FEATURE: 2 tall saguaro cactus silhouettes rising from the ground surface.
-    Cactus color: dark olive #3A3A22. Simplified geometric: vertical trunk + 2 arm branches.
-    Hard angular flat-color polygon shapes only — no gradients, no outlines.
-    2 small angular rock clusters at surface.
-  MIDDLE 55%: Earth strata. Warmer orange tones this panel.
-    Sand #D4904A prominent band. Terracotta #C05828 and rust #9A4220 beneath.
-    Dark rust #7A3A18 lower.
-  BOTTOM 35%: Deep dark earth #4A2810 to near-black #2A1800.
+SURFACE TEXTURE same as reference. FEATURE this panel:
+  TWO TALL SAGUARO CACTUS SHAPES rising upward from the road surface.
+  Each cactus: dark olive #3A4A20, vertical trunk + 2 arm branches.
+  Simplified geometric flat polygon shapes — chunky and bold.
+  Left cactus: taller, positioned at ~30% from left.
+  Right cactus: slightly shorter, positioned at ~70% from left.
+  Between cacti: small rock cluster, a few pebbles on road surface.
+  Road surface fills entire image — slightly warmer/brighter orange-sand #D49050 this panel.
 
-Right edge designed to flow into panel 4. Hard flat polygons only. No gradients.`,
+Seamless right edge flows into panel 4. Flat polygon art. No gradients.`,
 	},
 	{
 		Filename: "seamless_desert_floor4",
 		Prompt: outlawStyle + `
 
-GROUND STRIP TEXTURE — 2048×512 pixels. Horizontal floor tile, panel 4 of 4, side-scrolling game.
-Must continue seamlessly from the reference image provided (left edge = right edge of panel 3).
-RIGHT EDGE must also be designed to loop back seamlessly into panel 1.
+DESERT ROAD SURFACE STRIP — 2048×512 pixels. Panel 4 of 4. Side-scrolling game floor tile.
+Must continue seamlessly from the reference image (left edge = right edge of panel 3).
+RIGHT EDGE must also loop back seamlessly into panel 1.
 
-STRICT RULES: NO SKY. NO CLOUDS. NO MOUNTAINS. EARTH ONLY. Top edge = running surface.
+IMPORTANT: Only the ROAD SURFACE is visible. NO underground. NO strata. NO soil layers.
+The ENTIRE IMAGE is sandy/dusty road surface texture — warm sun-baked sand tones.
 
-COMPOSITION top→bottom:
-  TOP 10%: Running surface. Bright hot desert sand #D4904A — sunbaked exposed earth.
-    3 more saguaro cactus shapes continuing from left. Sparse desert feel.
-    1 angular rock shard.
-  MIDDLE 55%: Sunbaked earth strata. Bright orange-sand #D4904A dominant.
-    Terracotta #C05828 and rust #9A4220 beneath. Transitioning back toward cooler rust on right.
-  BOTTOM 35%: Deep dark earth #4A2810. Slightly cooler than panel 3.
+SURFACE TEXTURE same as reference. FEATURES this panel:
+  LEFT SIDE: continuation of cacti from panel 3 (partial cactus trunk at left edge).
+  CENTER: A flat angular BULL SKULL lying on the road surface. Pale bone color #E0D0A8.
+  Scattered: 3 small rocks, 1 tumbleweed fragment, 2 scrub-grass tufts.
+  RIGHT SIDE: clean sandy road surface, slightly cooler terracotta — designed to loop back to panel 1.
+  Road surface fills entire image — sunny bright sand #D49050 gradually cooling to #C87840 at right edge.
 
-Right edge transitions back toward cooler terracotta tones to loop back to panel 1.
-Hard flat polygons only. No gradients. Low-poly vector style.`,
+Seamless left AND right edges for infinite loop. Flat polygon art. No gradients.`,
 	},
 }
 
@@ -573,6 +572,50 @@ var slotsSymbolPrompts = []slotSymbolItem{
 		Filename: "scatter",
 		Prompt:   slotsSymbolStyle + "\n\nSYMBOL: A SCATTER bonus symbol. A gold coin with a sheriff star stamped on its face. Round circle, bold flat gold color. Stamped star emblem in darker gold. Small flat rays/sparkles around the coin edge. Bold 'SCATTER' text in small bold letters below. Premium slot game icon. Isolated on pure white background.",
 	},
+}
+
+// GenerateSlotLever handles POST /admin/v1/gemini/preset/slots-lever.
+// Generates the interactive spin lever image for the slot bet panel.
+func (h *Handler) GenerateSlotLever(c *gin.Context) {
+	const prompt = `A large industrial train brake lever / throttle handle, front-facing view.
+STYLE: Flat geometric illustration, vintage western industrial poster art. Bold flat color shapes, NO gradients, NO drop shadows.
+Pure white background, completely isolated object, clean crisp edges for background removal.
+
+COMPOSITION: Vertical lever handle. Tall iron rod, dark gunmetal grey flat color (#2A2A2A).
+At the TOP: a large round heavy cast-iron ball grip — dark iron sphere (#3A3A3A) with subtle highlight (#5A5A5A flat shape).
+At the BOTTOM: a heavy rectangular flat iron bracket base, bolted.
+In the MIDDLE: a notched locking plate/slot mechanism in dark iron, with 3-4 flat notch positions visible.
+Warm brass/gold accent bolts (#B8860B) on the bracket.
+
+The entire object is tall, centered, occupying full height of the frame.
+Bold iconic silhouette. Western steam-era industrial aesthetic.
+Isolated on pure white background, no background, no shadow.`
+
+	imgBytes, _, err := h.client.GenerateImage(c.Request.Context(), prompt)
+	if err != nil {
+		c.JSON(http.StatusBadGateway, gin.H{"error": err.Error()})
+		return
+	}
+	imgBytes, err = postProcess(imgBytes, true, 256)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	dir := filepath.Join(h.baseDir, "h-slots", "outlaw-gold")
+	if err := os.MkdirAll(dir, 0o755); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	outPath := filepath.Join(dir, "lever.png")
+	if err := os.WriteFile(outPath, imgBytes, 0o644); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"url":  "/assets/h-slots/outlaw-gold/lever.png",
+		"path": outPath,
+		"size": len(imgBytes),
+	})
 }
 
 // GenerateSlotSymbols handles POST /admin/v1/gemini/preset/slots-symbols.
