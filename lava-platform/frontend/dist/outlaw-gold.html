@@ -21,8 +21,6 @@
       --panel:  #110d06;
       --border: rgba(212,160,23,.22);
       --glow:   rgba(212,160,23,.45);
-
-      /* Safe-area insets */
       --sat: env(safe-area-inset-top,    0px);
       --sab: env(safe-area-inset-bottom, 0px);
       --sal: env(safe-area-inset-left,   0px);
@@ -39,10 +37,8 @@
       -moz-osx-font-smoothing:grayscale;
     }
 
-    /* Pause all CSS animations on hidden tab */
     .tab-hidden * { animation-play-state:paused !important }
 
-    /* ── App shell ─────────────────────────────────────────────────── */
     .app {
       display:flex; flex-direction:column;
       width:100%; height:100%; height:100dvh;
@@ -55,6 +51,7 @@
     .topbar {
       display:flex; align-items:center; justify-content:space-between;
       padding:10px 12px;
+      padding-top:max(10px, var(--sat));
       background:linear-gradient(180deg,#1c1406 0%,#110d06 100%);
       border-bottom:1px solid var(--border);
       flex-shrink:0; z-index:10;
@@ -85,14 +82,12 @@
       contain:layout paint;
     }
 
-    /* Background illustration */
     .game-bg {
       position:absolute; inset:0;
       background:
         radial-gradient(ellipse 80% 50% at 50% 80%, rgba(180,80,0,.18) 0%, transparent 70%),
         radial-gradient(ellipse 120% 60% at 50% 100%, rgba(100,40,0,.35) 0%, transparent 60%),
         url('/assets/outlaw/bg_betting_dawn.png') center/cover no-repeat;
-      background-blend-mode: normal, normal, normal;
     }
     .game-bg::after {
       content:''; position:absolute; inset:0;
@@ -103,13 +98,12 @@
     .machine {
       position:relative; z-index:1;
       display:flex; align-items:center; gap:0;
-      padding:0 8px;
+      padding:0 8px; width:100%;
     }
 
     .machine-body {
       flex:1;
-      background:
-        linear-gradient(180deg,#1e1408 0%,#110d06 50%,#0e0a04 100%);
+      background:linear-gradient(180deg,#1e1408 0%,#110d06 50%,#0e0a04 100%);
       border:2px solid var(--brass);
       border-radius:16px;
       box-shadow:
@@ -120,7 +114,6 @@
       overflow:hidden;
     }
 
-    /* Machine header */
     .machine-header {
       background:linear-gradient(180deg,#2a1c08 0%,#1a1206 100%);
       border-bottom:2px solid var(--brass);
@@ -128,10 +121,8 @@
       text-align:center;
       position:relative;
     }
-    .machine-header::before,
-    .machine-header::after {
-      content:'✦';
-      position:absolute; top:50%; transform:translateY(-50%);
+    .machine-header::before,.machine-header::after {
+      content:'✦'; position:absolute; top:50%; transform:translateY(-50%);
       color:var(--gold); opacity:.5; font-size:12px;
     }
     .machine-header::before { left:12px }
@@ -147,11 +138,41 @@
       color:var(--brass); margin-top:2px; opacity:.8;
     }
 
-    /* ── Reel grid ─────────────────────────────────────────────────── */
-    .reels-wrap {
-      padding:10px 8px 8px;
-      position:relative;
+    /* ── Bonus multiplier persistent bar ──────────────────────────── */
+    .bonus-mult-bar {
+      display:none;
+      background:linear-gradient(90deg,#1a0830 0%,#2a0a50 50%,#1a0830 100%);
+      border-bottom:1px solid rgba(160,80,255,.4);
+      padding:5px 12px;
+      align-items:center; justify-content:space-between;
     }
+    .bonus-mult-bar.show { display:flex }
+    .bm-info { display:flex; flex-direction:column; gap:1px }
+    .bm-label {
+      font-size:6px; letter-spacing:2px; text-transform:uppercase;
+      color:rgba(160,80,255,.7);
+    }
+    .bm-value {
+      font-family:'Orbitron',sans-serif; font-size:16px; font-weight:900;
+      color:#c090ff;
+      text-shadow:0 0 12px rgba(160,80,255,.8);
+    }
+    .bm-spins {
+      font-family:'Orbitron',sans-serif; font-size:10px; font-weight:700;
+      color:#a060ff; letter-spacing:1px; text-align:right;
+    }
+    .bm-spins-sub {
+      font-size:6px; letter-spacing:2px; color:rgba(160,80,255,.5); text-align:right;
+    }
+    @keyframes mult-pop {
+      0%  { transform:scale(1) }
+      30% { transform:scale(1.4); color:#fff; text-shadow:0 0 20px #fff }
+      100%{ transform:scale(1) }
+    }
+    .bm-value.pop { animation:mult-pop .5s ease-out }
+
+    /* ── Reel grid ─────────────────────────────────────────────────── */
+    .reels-wrap { padding:10px 8px 8px; position:relative; }
 
     .reels-grid {
       display:grid;
@@ -179,59 +200,64 @@
       will-change:transform;
     }
 
-    /* Spin animation */
+    /* Board lock flash — full grid revealed, brief pause before evaluation */
+    @keyframes board-lock {
+      0%,100% { box-shadow:none }
+      50%     { box-shadow:0 0 0 2px rgba(212,160,23,.5), inset 0 0 8px rgba(212,160,23,.12) }
+    }
+    .reels-grid.locked .reel-cell {
+      animation:board-lock .4s ease-in-out;
+    }
+
     @keyframes reel-spin {
       0%   { transform:translateY(-100%) scaleY(0.8); opacity:0 }
       30%  { opacity:1 }
       100% { transform:translateY(0)     scaleY(1);   opacity:1 }
     }
-    .reel-cell.spinning .sym-img {
-      animation:reel-spin 0.18s ease-out both;
-    }
+    .reel-cell.spinning .sym-img { animation:reel-spin 0.18s ease-out both }
 
-    /* Win cluster highlight */
     .reel-cell.win {
       border-color:var(--gold-b) !important;
       box-shadow:0 0 14px var(--gold), inset 0 0 12px rgba(247,212,76,.25) !important;
       z-index:2;
     }
-    @keyframes win-pulse {
-      0%,100%{ transform:scale(1) }
-      50%    { transform:scale(1.08) }
-    }
-    .reel-cell.win .sym-img {
-      animation:win-pulse .55s ease-in-out infinite;
-    }
+    @keyframes win-pulse { 0%,100%{ transform:scale(1) } 50%{ transform:scale(1.08) } }
+    .reel-cell.win .sym-img { animation:win-pulse .55s ease-in-out infinite }
 
-    /* Remove animation */
-    @keyframes cell-shrink {
-      from{ transform:scale(1); opacity:1 }
-      to  { transform:scale(0); opacity:0 }
-    }
-    .reel-cell.removing .sym-img {
-      animation:cell-shrink .3s ease-in both;
-    }
+    @keyframes cell-shrink { from{ transform:scale(1); opacity:1 } to{ transform:scale(0); opacity:0 } }
+    .reel-cell.removing .sym-img { animation:cell-shrink .3s ease-in both }
 
-    /* Fall-in animation */
     @keyframes cell-fall {
       from{ transform:translateY(-40px); opacity:0 }
       to  { transform:translateY(0);     opacity:1 }
     }
-    .reel-cell.falling .sym-img {
-      animation:cell-fall .35s cubic-bezier(.25,1.4,.5,1) both;
-    }
+    .reel-cell.falling .sym-img { animation:cell-fall .35s cubic-bezier(.25,1.4,.5,1) both }
 
-    /* Scatter glow */
-    .reel-cell.scatter-glow {
-      border-color:#44aaff !important;
-      box-shadow:0 0 16px rgba(68,170,255,.7) !important;
-    }
+    .reel-cell.scatter-glow { border-color:#44aaff !important; box-shadow:0 0 16px rgba(68,170,255,.7) !important }
+    .reel-cell.wild-glow    { border-color:var(--red-b) !important; box-shadow:0 0 14px var(--red) !important }
 
-    /* Wild glow */
-    .reel-cell.wild-glow {
-      border-color:var(--red-b) !important;
-      box-shadow:0 0 14px var(--red) !important;
+    /* ── Multiplier cell overlay ───────────────────────────────────── */
+    .mult-badge {
+      position:absolute; bottom:3px; right:3px; z-index:4;
+      font-family:'Orbitron',sans-serif; font-size:7px; font-weight:900;
+      padding:2px 4px; border-radius:4px;
+      letter-spacing:.5px; pointer-events:none; line-height:1;
     }
+    .mult-bronze { background:rgba(160,80,20,.92); border:1px solid #cd7f32; color:#ffd4a0 }
+    .mult-silver { background:rgba(100,100,120,.92); border:1px solid #c0c0d0; color:#f0f0ff }
+    .mult-gold   { background:rgba(160,120,0,.92); border:1px solid #ffd700; color:#fff8e0 }
+    .mult-blood  { background:rgba(120,0,0,.92); border:1px solid #dd2200; color:#ffbbaa }
+    .mult-mythic {
+      background:linear-gradient(135deg,rgba(255,255,255,.22),rgba(255,240,210,.18));
+      border:1px solid rgba(255,255,255,.8); color:#fff;
+      box-shadow:0 0 8px rgba(255,255,255,.5);
+    }
+    @keyframes mult-collect {
+      0%   { transform:scale(1); opacity:1 }
+      60%  { transform:scale(2.2) translateY(-4px); opacity:1 }
+      100% { transform:scale(3) translateY(-8px); opacity:0 }
+    }
+    .mult-badge.collecting { animation:mult-collect .7s ease-out forwards; z-index:10 }
 
     /* ── Machine footer strip ──────────────────────────────────────── */
     .machine-footer {
@@ -254,20 +280,12 @@
       z-index:5;
     }
 
-    /* Main bet row: numbers left, lever right */
     .bet-main-row {
       display:flex; align-items:stretch; gap:8px; margin-bottom:7px;
     }
-    .bet-left {
-      flex:1; display:flex; flex-direction:column; gap:5px;
-    }
-    .bet-lbl {
-      font-size:7px; letter-spacing:2px; text-transform:uppercase;
-      color:var(--brass);
-    }
-    .bet-stepper {
-      display:flex; align-items:center; gap:5px;
-    }
+    .bet-left { flex:1; display:flex; flex-direction:column; gap:5px }
+    .bet-lbl  { font-size:7px; letter-spacing:2px; text-transform:uppercase; color:var(--brass) }
+    .bet-stepper { display:flex; align-items:center; gap:5px }
     .step-btn {
       width:30px; height:30px; border-radius:7px; cursor:pointer;
       background:linear-gradient(145deg,#2a1c08,#1a1206);
@@ -284,7 +302,7 @@
       outline:none; box-shadow:inset 0 2px 8px rgba(0,0,0,.6);
     }
 
-    /* Lever panel — right side of bet panel */
+    /* Lever panel */
     .bet-lever {
       width:58px; flex-shrink:0;
       display:flex; flex-direction:column; align-items:center; justify-content:center;
@@ -295,58 +313,30 @@
     }
     .bet-lever:not(.disabled):active { box-shadow:0 0 18px var(--gold) }
     .bet-lever.disabled { opacity:.35; cursor:default }
-    .lever-img-wrap {
-      width:42px; height:72px; position:relative;
-      display:flex; align-items:center; justify-content:center;
-    }
+    .lever-img-wrap { width:42px; height:72px; position:relative; display:flex; align-items:center; justify-content:center }
     .lever-img {
       width:100%; height:100%; object-fit:contain;
       transition:transform .35s cubic-bezier(.4,0,.2,1);
       transform-origin:bottom center;
     }
     .lever-img.pulled { transform:rotate(25deg); filter:drop-shadow(0 0 6px var(--gold-b)) }
-    /* Fallback CSS lever when image not loaded */
     .lever-fallback {
       display:flex; flex-direction:column; align-items:center; gap:2px;
       width:100%; height:100%; justify-content:center;
     }
-    .lf-ball {
-      width:24px; height:24px;
-      background:radial-gradient(circle at 35% 30%,#f7d44c,#b8860b 60%,#6a4800);
-      border-radius:50%; border:2px solid var(--gold-b);
-      box-shadow:0 0 10px var(--gold);
-      flex-shrink:0;
-    }
-    .lf-rod {
-      width:4px; height:36px;
-      background:linear-gradient(180deg,#b8860b,#6a4800);
-      border-radius:2px;
-    }
-    .lf-base {
-      width:20px; height:6px;
-      background:linear-gradient(180deg,#b8860b,#6a4800);
-      border-radius:2px;
-    }
-    .lever-lbl {
-      font-size:6px; letter-spacing:2px; text-transform:uppercase;
-      color:var(--brass); padding-bottom:5px;
-    }
+    .lf-ball  { width:24px; height:24px; background:radial-gradient(circle at 35% 30%,#f7d44c,#b8860b 60%,#6a4800); border-radius:50%; border:2px solid var(--gold-b); box-shadow:0 0 10px var(--gold); flex-shrink:0 }
+    .lf-rod   { width:4px; height:36px; background:linear-gradient(180deg,#b8860b,#6a4800); border-radius:2px }
+    .lf-base  { width:20px; height:6px; background:linear-gradient(180deg,#b8860b,#6a4800); border-radius:2px }
+    .lever-lbl { font-size:6px; letter-spacing:2px; text-transform:uppercase; color:var(--brass); padding-bottom:5px }
 
-    /* Steam puff */
     @keyframes steam-puff {
       0%  { opacity:.9; transform:translateX(-50%) translateY(0) scale(1) }
       100%{ opacity:0;  transform:translateX(-50%) translateY(-28px) scale(2) }
     }
-    .steam {
-      position:absolute; top:0; left:50%;
-      transform:translateX(-50%);
-      font-size:14px; pointer-events:none; z-index:2;
-    }
+    .steam { position:absolute; top:0; left:50%; transform:translateX(-50%); font-size:14px; pointer-events:none; z-index:2 }
     .steam.active { animation:steam-puff .6s ease-out forwards }
 
-    .quick-bets {
-      display:flex; gap:4px; margin-bottom:6px;
-    }
+    .quick-bets { display:flex; gap:4px; margin-bottom:6px }
     .qb {
       flex:1; padding:5px 0; font-size:9px;
       background:linear-gradient(145deg,#1c1408,#120e06);
@@ -357,8 +347,8 @@
     }
     .qb:active { border-color:var(--gold); color:var(--gold-b); background:#2a1c08 }
 
-    /* Action row: SPIN + BUY FEATURE */
-    .action-row { display:flex; gap:7px; }
+    /* Action row */
+    .action-row { display:flex; gap:7px }
 
     .spin-btn {
       flex:1; padding:13px 8px;
@@ -380,22 +370,36 @@
       50%    { box-shadow:0 0 32px rgba(212,160,23,.7) }
     }
 
+    /* BONUS IN PROGRESS button */
+    .spin-btn.bonus-mode {
+      background:linear-gradient(160deg,#1a0030 0%,#5a0080 40%,#1a0030 100%);
+      border-color:#a060ff;
+      color:#c090ff;
+      cursor:default;
+      animation:bonus-btn-pulse 1.2s ease-in-out infinite;
+    }
+    @keyframes bonus-btn-pulse {
+      0%,100% { box-shadow:0 0 14px rgba(160,80,255,.3) }
+      50%     { box-shadow:0 0 32px rgba(160,80,255,.8) }
+    }
+
     /* BUY FEATURE button */
     .buy-btn {
-      padding:6px 10px; min-width:70px;
+      padding:8px 12px; min-width:76px;
       background:linear-gradient(160deg,#1a0010 0%,#5a0030 40%,#1a0010 100%);
       border:2px solid #cc44aa; border-radius:12px;
       font-family:'Orbitron',sans-serif; font-weight:900;
       letter-spacing:1px; color:#f48cdb;
       cursor:pointer; transition:all .15s;
       box-shadow:0 0 12px rgba(180,40,140,.3);
-      display:flex; flex-direction:column; align-items:center; gap:2px;
+      display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px;
+      touch-action:manipulation;
     }
     .buy-btn:disabled { opacity:.35; cursor:default }
-    .buy-btn:not(:disabled):active { box-shadow:0 0 22px rgba(204,68,170,.7) }
-    .buy-btn-icon { font-size:16px; line-height:1 }
+    .buy-btn:not(:disabled):active { box-shadow:0 0 22px rgba(204,68,170,.7); transform:scale(.97) }
+    .buy-btn-icon  { font-size:16px; line-height:1 }
     .buy-btn-label { font-size:7px; letter-spacing:1.5px }
-    .buy-btn-price { font-size:9px; color:#f48cdb }
+    .buy-btn-price { font-size:9px; color:#f7d44c; font-weight:700 }
 
     /* ── Bonus Buy modal ───────────────────────────────────────────── */
     .bb-overlay {
@@ -409,48 +413,24 @@
       background:linear-gradient(180deg,#1a0c18 0%,#110008 100%);
       border:2px solid #cc44aa; border-bottom:none;
       border-radius:20px 20px 0 0;
-      padding:18px 14px 28px;
+      padding:18px 14px max(calc(var(--sab) + 18px), 28px);
       box-shadow:0 -8px 40px rgba(180,40,140,.3);
       animation:pt-slide .28s cubic-bezier(.25,1.4,.5,1) both;
     }
-    .bb-header {
-      display:flex; align-items:center; justify-content:space-between;
-      margin-bottom:14px;
-    }
-    .bb-title {
-      font-family:'Orbitron',sans-serif; font-weight:900; font-size:13px;
-      letter-spacing:3px; color:#f48cdb;
-      text-shadow:0 0 14px #cc44aa;
-    }
-    .bb-close {
-      width:30px; height:30px; border-radius:8px;
-      background:rgba(0,0,0,.4); border:1px solid rgba(204,68,170,.3);
-      color:#cc44aa; font-size:14px; cursor:pointer;
-      display:flex; align-items:center; justify-content:center;
-    }
+    .bb-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px }
+    .bb-title { font-family:'Orbitron',sans-serif; font-weight:900; font-size:13px; letter-spacing:3px; color:#f48cdb; text-shadow:0 0 14px #cc44aa }
+    .bb-close { width:30px; height:30px; border-radius:8px; background:rgba(0,0,0,.4); border:1px solid rgba(204,68,170,.3); color:#cc44aa; font-size:14px; cursor:pointer; display:flex; align-items:center; justify-content:center }
     .bb-tiers { display:flex; flex-direction:column; gap:10px; margin-bottom:14px }
-    .bb-tier {
-      border:1px solid rgba(204,68,170,.35); border-radius:12px;
-      padding:12px 14px; cursor:pointer; transition:all .15s;
-      background:rgba(90,0,60,.1);
-      display:flex; align-items:center; gap:12px;
-    }
+    .bb-tier { border:1px solid rgba(204,68,170,.35); border-radius:12px; padding:12px 14px; cursor:pointer; transition:all .15s; background:rgba(90,0,60,.1); display:flex; align-items:center; gap:12px }
     .bb-tier:hover,.bb-tier:active { border-color:#cc44aa; background:rgba(120,0,80,.22) }
-    .bb-tier.selected {
-      border-color:#f48cdb; background:rgba(140,0,90,.28);
-      box-shadow:0 0 12px rgba(244,140,219,.18);
-    }
+    .bb-tier.selected { border-color:#f48cdb; background:rgba(140,0,90,.28); box-shadow:0 0 12px rgba(244,140,219,.18) }
     .bb-tier-icon { font-size:22px; flex-shrink:0; width:30px; text-align:center }
     .bb-tier-info { flex:1 }
-    .bb-tier-name { font-family:'Orbitron',sans-serif; font-size:10px; font-weight:700;
-      color:#f48cdb; letter-spacing:1px; margin-bottom:3px }
+    .bb-tier-name { font-family:'Orbitron',sans-serif; font-size:10px; font-weight:700; color:#f48cdb; letter-spacing:1px; margin-bottom:3px }
     .bb-tier-desc { font-size:9px; color:rgba(244,140,219,.55); line-height:1.4 }
-    .bb-tier-cost {
-      font-family:'Orbitron',sans-serif; font-size:13px; font-weight:900;
-      color:var(--gold-b); text-align:right; white-space:nowrap; flex-shrink:0;
-    }
+    .bb-tier-cost { font-family:'Orbitron',sans-serif; font-size:13px; font-weight:900; color:var(--gold-b); text-align:right; white-space:nowrap; flex-shrink:0 }
     .bb-confirm {
-      width:100%; padding:13px;
+      width:100%; padding:14px;
       background:linear-gradient(160deg,#3a0030 0%,#8b0055 40%,#3a0030 100%);
       border:2px solid #cc44aa; border-radius:12px;
       font-family:'Orbitron',sans-serif; font-size:13px; font-weight:900;
@@ -460,23 +440,99 @@
     }
     .bb-confirm:disabled { opacity:.35; cursor:default }
     .bb-confirm:not(:disabled):active { box-shadow:0 0 28px rgba(244,140,219,.6) }
-    .bb-warning {
-      font-size:8px; color:rgba(244,140,219,.4); text-align:center;
-      margin-top:10px; letter-spacing:.5px; line-height:1.6;
-    }
+    .bb-warning { font-size:8px; color:rgba(244,140,219,.4); text-align:center; margin-top:10px; letter-spacing:.5px; line-height:1.6 }
 
-    /* Train Heist bonus mode indicator */
-    .bonus-mode-bar {
-      display:none; position:absolute; top:4px; left:50%; transform:translateX(-50%);
-      z-index:9; background:rgba(60,0,50,.9); border:1px solid #cc44aa;
-      border-radius:20px; padding:3px 16px;
+    /* ── Bonus Game reveal banner ──────────────────────────────────── */
+    .bonus-game-banner {
+      display:none; position:absolute; top:38%; left:50%;
+      transform:translate(-50%,-50%) scale(0);
+      z-index:35;
+      background:linear-gradient(135deg,#1a003a 0%,#3a0060 50%,#1a003a 100%);
+      border:2px solid #a060ff;
+      border-radius:20px; padding:18px 36px;
+      text-align:center;
+      box-shadow:0 0 60px rgba(160,80,255,.6);
+    }
+    .bonus-game-banner.show {
+      display:block;
+      animation:banner-pop .55s cubic-bezier(.34,1.56,.64,1) both;
+    }
+    @keyframes banner-pop {
+      from{ transform:translate(-50%,-50%) scale(0) }
+      to  { transform:translate(-50%,-50%) scale(1) }
+    }
+    .bg-title {
+      font-family:'Orbitron',sans-serif; font-weight:900; font-size:10px;
+      letter-spacing:5px; color:#a060ff; margin-bottom:6px;
+    }
+    .bg-label {
+      font-family:'Orbitron',sans-serif; font-weight:900; font-size:28px;
+      color:#f0e0ff; text-shadow:0 0 24px #a060ff, 0 0 48px rgba(160,80,255,.4);
+      letter-spacing:3px;
+    }
+    .bg-spins {
+      font-family:'Orbitron',sans-serif; font-size:14px; font-weight:700;
+      color:#c090ff; margin-top:4px; letter-spacing:2px;
+    }
+    .bg-sub { font-size:8px; letter-spacing:3px; color:rgba(160,80,255,.5); margin-top:2px }
+
+    /* ── Overlays (fs indicator, cascade badge, hist bar) ──────────── */
+    .fs-indicator {
+      display:none;
+      position:absolute; top:8px; left:50%; transform:translateX(-50%);
+      z-index:8; background:rgba(20,0,50,.88); border:1px solid #a060ff;
+      border-radius:20px; padding:4px 16px;
+      font-family:'Orbitron',sans-serif; font-size:10px; font-weight:700;
+      color:#a060ff;
+      box-shadow:0 0 14px rgba(160,80,255,.5);
+      white-space:nowrap;
+    }
+    .fs-indicator.show { display:block }
+
+    .cascade-badge {
+      display:none; position:absolute; top:8px; left:8px; z-index:8;
+      background:rgba(20,0,40,.88); border:1px solid #a060ff;
+      border-radius:20px; padding:3px 12px;
       font-family:'Orbitron',sans-serif; font-size:9px; font-weight:700;
-      color:#f48cdb; letter-spacing:2px;
-      box-shadow:0 0 14px rgba(204,68,170,.5); white-space:nowrap;
+      color:#c090ff;
     }
-    .bonus-mode-bar.show { display:block }
+    .cascade-badge.show { display:block }
 
-    /* ── Win overlay ───────────────────────────────────────────────── */
+    .hist-bar {
+      position:absolute; top:8px; right:8px; z-index:8;
+      display:flex; gap:4px; flex-direction:column; align-items:flex-end;
+    }
+    .hist-pill {
+      font-family:'Orbitron',sans-serif; font-size:9px; font-weight:700;
+      padding:3px 7px; border-radius:10px; letter-spacing:.5px;
+      animation:pillIn .3s ease;
+    }
+    @keyframes pillIn{ from{opacity:0;transform:translateX(10px)}to{opacity:1;transform:translateX(0)} }
+    .hp-0   { background:rgba(60,60,60,.8); border:1px solid #555; color:#aaa }
+    .hp-win { background:rgba(30,20,0,.9);  border:1px solid var(--gold); color:var(--gold-b) }
+    .hp-big { background:rgba(40,10,0,.9);  border:1px solid var(--red-b); color:var(--red-b); box-shadow:0 0 8px rgba(255,68,34,.3) }
+
+    /* Turbo toggle */
+    .turbo-row {
+      display:none; align-items:center; justify-content:flex-end;
+      gap:6px; margin-bottom:5px;
+      font-size:8px; letter-spacing:1.5px; color:var(--brass);
+    }
+    .turbo-row.show { display:flex }
+    .turbo-toggle {
+      width:34px; height:18px; border-radius:9px; position:relative;
+      background:#1a1206; border:1px solid rgba(184,134,11,.3);
+      cursor:pointer; transition:background .2s;
+    }
+    .turbo-toggle.on { background:#4a2800; border-color:var(--gold) }
+    .turbo-toggle::after {
+      content:''; position:absolute; top:2px; left:2px;
+      width:12px; height:12px; border-radius:50%;
+      background:var(--brass); transition:transform .2s;
+    }
+    .turbo-toggle.on::after { transform:translateX(16px); background:var(--gold-b) }
+
+    /* ── Win overlay (small wins) ──────────────────────────────────── */
     .win-overlay {
       position:absolute; inset:0; z-index:30;
       display:none; flex-direction:column;
@@ -491,11 +547,7 @@
       65% { transform:scale(1.1);                   opacity:1 }
       100%{ transform:scale(1);                     opacity:1 }
     }
-    .win-label {
-      font-family:'Orbitron',sans-serif; font-weight:900;
-      font-size:12px; letter-spacing:5px; color:var(--gold);
-      margin-bottom:4px; text-transform:uppercase;
-    }
+    .win-label  { font-family:'Orbitron',sans-serif; font-weight:900; font-size:12px; letter-spacing:5px; color:var(--gold); margin-bottom:4px; text-transform:uppercase }
     .win-amount {
       font-family:'Orbitron',sans-serif; font-weight:900;
       font-size:clamp(32px,9vw,52px); color:var(--gold-b);
@@ -503,9 +555,7 @@
       animation:win-drop .5s cubic-bezier(.25,1.4,.5,1) both;
       line-height:1;
     }
-    .win-mult-row {
-      display:flex; gap:8px; margin-top:8px; flex-wrap:wrap; justify-content:center;
-    }
+    .win-mult-row { display:flex; gap:8px; margin-top:8px; flex-wrap:wrap; justify-content:center }
     .win-mult-chip {
       padding:3px 10px; border-radius:20px;
       font-family:'Orbitron',sans-serif; font-size:9px; font-weight:700;
@@ -514,13 +564,9 @@
     }
 
     /* Coin burst */
-    .coins-wrap {
-      position:absolute; inset:0; pointer-events:none; z-index:31;
-      overflow:hidden;
-    }
+    .coins-wrap { position:absolute; inset:0; pointer-events:none; z-index:31; overflow:hidden }
     .coin {
-      position:absolute; bottom:30%;
-      font-size:20px;
+      position:absolute; bottom:30%; font-size:20px;
       animation:coin-fly 1.2s cubic-bezier(.25,1,.5,1) forwards;
     }
     @keyframes coin-fly {
@@ -529,80 +575,7 @@
       100%{ transform:translateY(-200px) rotate(720deg) scale(1.2); opacity:0 }
     }
 
-    /* Free spins banner */
-    .free-spins-banner {
-      display:none; position:absolute; top:40%; left:50%;
-      transform:translate(-50%,-50%) scale(0);
-      z-index:35;
-      background:linear-gradient(135deg,#0a1a40 0%,#1a3080 50%,#0a1a40 100%);
-      border:2px solid #44aaff;
-      border-radius:16px; padding:16px 32px;
-      text-align:center;
-      box-shadow:0 0 40px rgba(68,170,255,.6);
-    }
-    .free-spins-banner.show {
-      display:block;
-      animation:banner-pop .5s cubic-bezier(.34,1.56,.64,1) both;
-    }
-    @keyframes banner-pop {
-      from{ transform:translate(-50%,-50%) scale(0) }
-      to  { transform:translate(-50%,-50%) scale(1) }
-    }
-    .fs-title {
-      font-family:'Orbitron',sans-serif; font-weight:900; font-size:11px;
-      letter-spacing:4px; color:#44aaff; margin-bottom:4px;
-    }
-    .fs-count {
-      font-family:'Orbitron',sans-serif; font-weight:900; font-size:36px;
-      color:#fff; text-shadow:0 0 20px #44aaff;
-    }
-    .fs-label { font-size:8px; letter-spacing:3px; color:#88ccff; margin-top:2px }
-
-    /* Free spins indicator */
-    .fs-indicator {
-      display:none;
-      position:absolute; top:8px; left:50%; transform:translateX(-50%);
-      z-index:8; background:rgba(0,20,60,.85); border:1px solid #44aaff;
-      border-radius:20px; padding:4px 14px;
-      font-family:'Orbitron',sans-serif; font-size:10px; font-weight:700;
-      color:#44aaff;
-      box-shadow:0 0 12px rgba(68,170,255,.4);
-    }
-    .fs-indicator.show { display:block }
-
-    /* History bar */
-    .hist-bar {
-      position:absolute; top:8px; right:8px; z-index:8;
-      display:flex; gap:4px; flex-direction:column; align-items:flex-end;
-    }
-    .hist-pill {
-      font-family:'Orbitron',sans-serif; font-size:9px; font-weight:700;
-      padding:3px 7px; border-radius:10px; letter-spacing:.5px;
-      animation:pillIn .3s ease;
-    }
-    @keyframes pillIn{ from{opacity:0;transform:translateX(10px)}to{opacity:1;transform:translateX(0)} }
-    .hp-0   { background:rgba(60,60,60,.8); border:1px solid #555; color:#aaa }
-    .hp-win { background:rgba(30,20,0,.9);  border:1px solid var(--gold); color:var(--gold-b) }
-    .hp-big { background:rgba(40,10,0,.9);  border:1px solid var(--red-b); color:var(--red-b);
-              box-shadow:0 0 8px rgba(255,68,34,.3) }
-
-    /* Cascade counter */
-    .cascade-badge {
-      display:none; position:absolute; top:8px; left:8px; z-index:8;
-      background:rgba(20,0,40,.85); border:1px solid #a060ff;
-      border-radius:20px; padding:3px 12px;
-      font-family:'Orbitron',sans-serif; font-size:9px; font-weight:700;
-      color:#c090ff;
-    }
-    .cascade-badge.show { display:block }
-
-    /* No session */
-    .no-session {
-      text-align:center; padding:40px 20px;
-      font-family:'Courier New',monospace; font-size:12px; color:var(--brass);
-    }
-
-    /* ── Win Celebration ─────────────────────────────────────────────── */
+    /* ── Win Celebration overlay (full-screen) ─────────────────────── */
     .win-celebration {
       position:fixed; inset:0; z-index:90;
       display:none; flex-direction:column;
@@ -617,13 +590,11 @@
       object-fit:cover; opacity:.55; pointer-events:none;
     }
 
-    /* Tier-specific backgrounds */
-    .win-celebration.tier-nice  { background:radial-gradient(ellipse 120% 80% at 50% 60%, rgba(120,80,0,.7) 0%, rgba(0,0,0,.88) 70%) }
-    .win-celebration.tier-big   { background:radial-gradient(ellipse 120% 80% at 50% 60%, rgba(160,30,0,.75) 0%, rgba(0,0,0,.9) 70%) }
-    .win-celebration.tier-mega  { background:radial-gradient(ellipse 120% 80% at 50% 60%, rgba(80,0,160,.7) 0%, rgba(0,0,0,.92) 70%) }
-    .win-celebration.tier-epic  { background:radial-gradient(ellipse 120% 80% at 50% 60%, rgba(0,80,0,.5) 0%, rgba(200,140,0,.4) 50%, rgba(0,0,0,.95) 80%) }
+    .win-celebration.tier-nice     { background:radial-gradient(ellipse 120% 80% at 50% 60%, rgba(120,80,0,.7) 0%, rgba(0,0,0,.88) 70%) }
+    .win-celebration.tier-big      { background:radial-gradient(ellipse 120% 80% at 50% 60%, rgba(160,30,0,.75) 0%, rgba(0,0,0,.9) 70%) }
+    .win-celebration.tier-massive  { background:radial-gradient(ellipse 120% 80% at 50% 60%, rgba(80,0,160,.7) 0%, rgba(0,0,0,.92) 70%) }
+    .win-celebration.tier-legendary{ background:radial-gradient(ellipse 120% 80% at 50% 60%, rgba(0,80,0,.5) 0%, rgba(200,140,0,.4) 50%, rgba(0,0,0,.95) 80%) }
 
-    /* Screen shake */
     @keyframes screen-shake {
       0%,100%{ transform:translateX(0) }
       10%{ transform:translateX(-6px) rotate(-.4deg) }
@@ -637,7 +608,6 @@
     }
     .shake { animation:screen-shake .55s cubic-bezier(.36,.07,.19,.97) both }
 
-    /* Tier label drop-in */
     @keyframes tier-label-in {
       0%  { transform:scale(3) translateY(-30px); opacity:0; filter:blur(12px) }
       40% { transform:scale(.92) translateY(4px); opacity:1; filter:blur(0) }
@@ -653,12 +623,11 @@
       position:relative; z-index:2; line-height:1;
       margin-bottom:12px;
     }
-    .tier-nice  .win-tier-label { color:#f7d44c; text-shadow:0 0 30px #f7d44c, 0 0 60px rgba(247,212,76,.5) }
-    .tier-big   .win-tier-label { color:#ff6644; text-shadow:0 0 30px #ff4422, 0 0 60px rgba(255,68,34,.6) }
-    .tier-mega  .win-tier-label { color:#cc88ff; text-shadow:0 0 30px #aa44ff, 0 0 60px rgba(170,68,255,.6) }
-    .tier-epic  .win-tier-label { color:#44ffaa; text-shadow:0 0 30px #22cc88, 0 0 80px rgba(255,200,0,.7), 0 0 120px rgba(255,200,0,.4) }
+    .tier-nice      .win-tier-label { color:#f7d44c; text-shadow:0 0 30px #f7d44c, 0 0 60px rgba(247,212,76,.5) }
+    .tier-big       .win-tier-label { color:#ff6644; text-shadow:0 0 30px #ff4422, 0 0 60px rgba(255,68,34,.6) }
+    .tier-massive   .win-tier-label { color:#cc88ff; text-shadow:0 0 30px #aa44ff, 0 0 60px rgba(170,68,255,.6) }
+    .tier-legendary .win-tier-label { color:#44ffaa; text-shadow:0 0 30px #22cc88, 0 0 80px rgba(255,200,0,.7), 0 0 120px rgba(255,200,0,.4) }
 
-    /* Count-up number */
     @keyframes countup-appear {
       from{ transform:scale(.5) translateY(20px); opacity:0 }
       to  { transform:scale(1) translateY(0);     opacity:1 }
@@ -671,18 +640,21 @@
       position:relative; z-index:2; line-height:1;
       animation:countup-appear .35s .4s cubic-bezier(.25,1.4,.5,1) both;
     }
-    .tier-nice  .win-count-up { color:#fff; text-shadow:0 0 20px #f7d44c }
-    .tier-big   .win-count-up { color:#fff8f0; text-shadow:0 0 24px #ff6644 }
-    .tier-mega  .win-count-up { color:#f0e8ff; text-shadow:0 0 24px #cc88ff }
-    .tier-epic  .win-count-up { color:#efffee; text-shadow:0 0 30px #44ffaa, 0 0 60px #f7d44c }
+    .tier-nice      .win-count-up { color:#fff; text-shadow:0 0 20px #f7d44c }
+    .tier-big       .win-count-up { color:#fff8f0; text-shadow:0 0 24px #ff6644 }
+    .tier-massive   .win-count-up { color:#f0e8ff; text-shadow:0 0 24px #cc88ff }
+    .tier-legendary .win-count-up { color:#efffee; text-shadow:0 0 30px #44ffaa, 0 0 60px #f7d44c }
 
-    .win-cel-sub {
-      font-size:10px; letter-spacing:3px; color:rgba(255,255,255,.45);
-      position:relative; z-index:2; margin-top:10px;
-      font-family:'Share Tech Mono',monospace;
+    /* Bonus total shown during celebration */
+    .win-bonus-mult {
+      font-family:'Orbitron',sans-serif; font-size:11px; font-weight:700;
+      color:#c090ff; letter-spacing:3px;
+      position:relative; z-index:2; margin-top:8px;
+      text-shadow:0 0 10px rgba(160,80,255,.6);
     }
 
-    /* Floating particles (CSS-only) */
+    .win-cel-sub { font-size:10px; letter-spacing:3px; color:rgba(255,255,255,.45); position:relative; z-index:2; margin-top:10px; font-family:'Share Tech Mono',monospace }
+
     @keyframes par-float {
       0%  { transform:translateY(0) translateX(0) rotate(0deg) scale(1); opacity:1 }
       80% { opacity:.8 }
@@ -694,11 +666,7 @@
       animation:par-float var(--pd,1.5s) var(--pde,0s) ease-out forwards;
     }
 
-    /* Tap-to-continue hint */
-    @keyframes tap-blink {
-      0%,100%{ opacity:.3 }
-      50%    { opacity:.8 }
-    }
+    @keyframes tap-blink { 0%,100%{ opacity:.3 } 50%{ opacity:.8 } }
     .win-tap-hint {
       position:absolute; bottom:60px; left:50%; transform:translateX(-50%);
       font-size:9px; letter-spacing:3px; color:rgba(255,255,255,.5);
@@ -707,7 +675,7 @@
       z-index:4;
     }
 
-    /* ── Paytable button ───────────────────────────────────────────── */
+    /* ── Paytable button + modal ───────────────────────────────────── */
     .paytable-btn {
       position:absolute; bottom:10px; right:10px; z-index:9;
       width:34px; height:34px; border-radius:50%;
@@ -719,135 +687,69 @@
       transition:all .15s;
     }
     .paytable-btn:active { transform:scale(.92); box-shadow:0 0 18px var(--gold) }
-
-    /* ── Paytable modal ────────────────────────────────────────────── */
-    .pt-overlay {
-      display:none; position:fixed; inset:0; z-index:100;
-      background:rgba(0,0,0,.82);
-      align-items:flex-end; justify-content:center;
-    }
+    .pt-overlay { display:none; position:fixed; inset:0; z-index:100; background:rgba(0,0,0,.82); align-items:flex-end; justify-content:center }
     .pt-overlay.open { display:flex }
-    .pt-modal {
-      width:100%; max-width:480px; max-height:88vh;
-      background:linear-gradient(180deg,#1e1408 0%,#110d06 100%);
-      border:2px solid var(--brass); border-bottom:none;
-      border-radius:20px 20px 0 0;
-      display:flex; flex-direction:column;
-      box-shadow:0 -8px 40px rgba(212,160,23,.2);
-      animation:pt-slide .28s cubic-bezier(.25,1.4,.5,1) both;
-    }
-    @keyframes pt-slide {
-      from{ transform:translateY(100%) }
-      to  { transform:translateY(0) }
-    }
-    .pt-header {
-      display:flex; align-items:center; justify-content:space-between;
-      padding:14px 16px 10px;
-      border-bottom:1px solid var(--border);
-      flex-shrink:0;
-    }
-    .pt-title {
-      font-family:'Orbitron',sans-serif; font-weight:900; font-size:13px;
-      letter-spacing:3px; color:var(--gold-b);
-      text-shadow:0 0 12px var(--gold);
-    }
-    .pt-close {
-      width:30px; height:30px; border-radius:8px;
-      background:rgba(0,0,0,.4); border:1px solid var(--border);
-      color:var(--gold); font-size:14px; cursor:pointer;
-      display:flex; align-items:center; justify-content:center;
-    }
-    .pt-body {
-      overflow-y:auto; padding:10px 12px 24px;
-      -webkit-overflow-scrolling:touch;
-    }
-    .pt-section-title {
-      font-family:'Orbitron',sans-serif; font-size:8px; letter-spacing:3px;
-      color:var(--brass); text-transform:uppercase; margin:14px 0 8px;
-      padding-bottom:4px; border-bottom:1px solid var(--border);
-    }
-    .pt-row {
-      display:flex; align-items:center; gap:10px;
-      padding:7px 0; border-bottom:1px solid rgba(212,160,23,.07);
-    }
-    .pt-sym-img {
-      width:40px; height:40px; object-fit:contain; flex-shrink:0;
-      border:1px solid rgba(184,134,11,.3); border-radius:8px;
-      background:linear-gradient(145deg,#1c1508,#100c04);
-      padding:4px;
-    }
-    .pt-sym-name {
-      font-family:'Orbitron',sans-serif; font-size:9px; font-weight:700;
-      color:var(--gold-b); letter-spacing:1px; min-width:72px; flex-shrink:0;
-    }
-    .pt-pays {
-      display:flex; flex-wrap:wrap; gap:4px; flex:1;
-    }
-    .pt-pay-chip {
-      padding:2px 6px; border-radius:6px;
-      font-family:'Orbitron',sans-serif; font-size:8px; font-weight:700;
-      background:rgba(212,160,23,.1); border:1px solid rgba(212,160,23,.3);
-      color:var(--gold-b); white-space:nowrap;
-    }
-    .pt-pay-chip.big {
-      background:rgba(255,68,34,.12); border-color:rgba(255,68,34,.4);
-      color:var(--red-b);
-    }
-    .pt-special-row {
-      display:flex; align-items:flex-start; gap:10px;
-      padding:8px 0; border-bottom:1px solid rgba(212,160,23,.07);
-    }
-    .pt-special-desc {
-      flex:1; font-size:9px; line-height:1.6; color:rgba(212,160,23,.7);
-    }
+    .pt-modal { width:100%; max-width:480px; max-height:88vh; background:linear-gradient(180deg,#1e1408 0%,#110d06 100%); border:2px solid var(--brass); border-bottom:none; border-radius:20px 20px 0 0; display:flex; flex-direction:column; box-shadow:0 -8px 40px rgba(212,160,23,.2); animation:pt-slide .28s cubic-bezier(.25,1.4,.5,1) both }
+    @keyframes pt-slide { from{ transform:translateY(100%) } to{ transform:translateY(0) } }
+    .pt-header { display:flex; align-items:center; justify-content:space-between; padding:14px 16px 10px; border-bottom:1px solid var(--border); flex-shrink:0 }
+    .pt-title { font-family:'Orbitron',sans-serif; font-weight:900; font-size:13px; letter-spacing:3px; color:var(--gold-b); text-shadow:0 0 12px var(--gold) }
+    .pt-close { width:30px; height:30px; border-radius:8px; background:rgba(0,0,0,.4); border:1px solid var(--border); color:var(--gold); font-size:14px; cursor:pointer; display:flex; align-items:center; justify-content:center }
+    .pt-body { overflow-y:auto; padding:10px 12px 24px; -webkit-overflow-scrolling:touch }
+    .pt-section-title { font-family:'Orbitron',sans-serif; font-size:8px; letter-spacing:3px; color:var(--brass); text-transform:uppercase; margin:14px 0 8px; padding-bottom:4px; border-bottom:1px solid var(--border) }
+    .pt-row { display:flex; align-items:center; gap:10px; padding:7px 0; border-bottom:1px solid rgba(212,160,23,.07) }
+    .pt-sym-img { width:40px; height:40px; object-fit:contain; flex-shrink:0; border:1px solid rgba(184,134,11,.3); border-radius:8px; background:linear-gradient(145deg,#1c1508,#100c04); padding:4px }
+    .pt-sym-name { font-family:'Orbitron',sans-serif; font-size:9px; font-weight:700; color:var(--gold-b); letter-spacing:1px; min-width:72px; flex-shrink:0 }
+    .pt-pays { display:flex; flex-wrap:wrap; gap:4px; flex:1 }
+    .pt-pay-chip { padding:2px 6px; border-radius:6px; font-family:'Orbitron',sans-serif; font-size:8px; font-weight:700; background:rgba(212,160,23,.1); border:1px solid rgba(212,160,23,.3); color:var(--gold-b); white-space:nowrap }
+    .pt-pay-chip.big { background:rgba(255,68,34,.12); border-color:rgba(255,68,34,.4); color:var(--red-b) }
+    .pt-special-row { display:flex; align-items:flex-start; gap:10px; padding:8px 0; border-bottom:1px solid rgba(212,160,23,.07) }
+    .pt-special-desc { flex:1; font-size:9px; line-height:1.6; color:rgba(212,160,23,.7) }
     .pt-special-desc b { color:var(--gold-b) }
-    .pt-note {
-      margin-top:14px; padding:8px 12px;
-      background:rgba(212,160,23,.06); border:1px solid rgba(212,160,23,.15);
-      border-radius:8px; font-size:8px; line-height:1.7;
-      color:rgba(212,160,23,.6); letter-spacing:.5px;
-    }
+    .pt-note { margin-top:14px; padding:8px 12px; background:rgba(212,160,23,.06); border:1px solid rgba(212,160,23,.15); border-radius:8px; font-size:8px; line-height:1.7; color:rgba(212,160,23,.6); letter-spacing:.5px }
     .pt-note b { color:var(--gold-b) }
+
+    .no-session { text-align:center; padding:40px 20px; font-family:'Courier New',monospace; font-size:12px; color:var(--brass) }
   </style>
 </head>
 <body>
 <div class="app">
 
-  <!-- Coins layer -->
   <div class="coins-wrap" id="coinsWrap"></div>
 
   <!-- TopBar -->
   <div class="topbar">
     <button class="tb-back" onclick="window.location.href='/'">&#8592;</button>
     <div class="tb-title">OUTLAW GOLD</div>
-    <div class="tb-balance">
-      <span>$</span><span id="balance">—</span>
-    </div>
+    <div class="tb-balance"><span>$</span><span id="balance">—</span></div>
   </div>
 
   <!-- Game area -->
   <div class="game-area">
     <div class="game-bg"></div>
 
-    <!-- Free spins indicator -->
-    <div class="fs-indicator" id="fsIndicator">⚡ FREE SPINS: <span id="fsLeft">0</span></div>
-
-    <!-- Train Heist bonus mode banner -->
-    <div class="bonus-mode-bar" id="bonusModeBar">🚂 TRAIN HEIST BONUS</div>
-
-    <!-- Cascade badge -->
+    <div class="fs-indicator" id="fsIndicator">⚡ BONUS GAME: <span id="fsLeft">0</span></div>
     <div class="cascade-badge" id="cascadeBadge"></div>
-
-    <!-- History pills -->
     <div class="hist-bar" id="histBar"></div>
 
     <!-- Machine -->
     <div class="machine">
       <div class="machine-body">
-        <!-- Header -->
+
         <div class="machine-header">
           <div class="machine-title">OUTLAW GOLD</div>
           <div class="machine-subtitle">H-GAMES · WESTERN CLUSTER PAYS</div>
+        </div>
+
+        <!-- Persistent bonus multiplier bar -->
+        <div class="bonus-mult-bar" id="bonusMultBar">
+          <div class="bm-info">
+            <div class="bm-label">TOTAL BONUS MULTIPLIER</div>
+            <div class="bm-value" id="bonusMultValue">×0</div>
+          </div>
+          <div>
+            <div class="bm-spins" id="bonusSpinsDisp">—</div>
+            <div class="bm-spins-sub">SPINS LEFT</div>
+          </div>
         </div>
 
         <!-- Reels -->
@@ -855,7 +757,7 @@
           <div class="reels-grid" id="reelsGrid"></div>
         </div>
 
-        <!-- Footer info strip -->
+        <!-- Footer -->
         <div class="machine-footer">
           <div>
             <div class="mf-label">LAST WIN</div>
@@ -871,33 +773,33 @@
           </div>
         </div>
       </div>
-
     </div>
 
-    <!-- Paytable button -->
     <button class="paytable-btn" onclick="openPaytable()" title="Paytable">📋</button>
 
-    <!-- Win overlay (small, sub-5x wins) -->
+    <!-- Small win overlay -->
     <div class="win-overlay" id="winOverlay">
       <div class="win-label" id="winLabel">WIN</div>
       <div class="win-amount" id="winAmount">$0.00</div>
       <div class="win-mult-row" id="winMultRow"></div>
     </div>
 
-    <!-- Free spins banner -->
-    <div class="free-spins-banner" id="fsBanner">
-      <div class="fs-title">FREE SPINS</div>
-      <div class="fs-count" id="fsCountBanner">10</div>
-      <div class="fs-label">AWARDED</div>
+    <!-- Bonus Game reveal banner -->
+    <div class="bonus-game-banner" id="bonusGameBanner">
+      <div class="bg-title">H-GAMES WESTERN</div>
+      <div class="bg-label">BONUS GAME</div>
+      <div class="bg-spins" id="bgSpinsCount">10 SPINS</div>
+      <div class="bg-sub">MULTIPLIERS ACTIVE</div>
     </div>
-  </div><!-- end .game-area -->
+  </div>
 
-  <!-- Win Celebration overlay (full-screen, fixed, 5x+ wins) -->
+  <!-- Win Celebration overlay -->
   <div class="win-celebration" id="winCelebration" onclick="closeCelebration()">
     <video class="win-cel-video" id="winCelVideo" autoplay muted playsinline loop></video>
     <div id="winParticles"></div>
     <div class="win-tier-label" id="winTierLabel">BIG WIN</div>
     <div class="win-count-up" id="winCountUp">$0.00</div>
+    <div class="win-bonus-mult" id="winBonusMult" style="display:none"></div>
     <div class="win-cel-sub" id="winCelSub">TOTAL WIN</div>
     <div class="win-tap-hint">TAP TO CONTINUE</div>
   </div>
@@ -917,7 +819,7 @@
   <div class="bb-overlay" id="bbOverlay" onclick="closeBonusBuy()">
     <div class="bb-modal" onclick="event.stopPropagation()">
       <div class="bb-header">
-        <span class="bb-title">WANTED FEATURE</span>
+        <span class="bb-title">BONUS GAME PURCHASE</span>
         <button class="bb-close" onclick="closeBonusBuy()">✕</button>
       </div>
       <div class="bb-tiers" id="bbTiers">
@@ -925,7 +827,7 @@
           <div class="bb-tier-icon">🔫</div>
           <div class="bb-tier-info">
             <div class="bb-tier-name">STANDARD BOUNTY</div>
-            <div class="bb-tier-desc">15 Free Spins · 4 Scatters guaranteed · High volatility</div>
+            <div class="bb-tier-desc">10 Bonus Spins · 4 Scatters guaranteed · Multipliers active</div>
           </div>
           <div class="bb-tier-cost" id="tierCost1">$100</div>
         </div>
@@ -933,15 +835,15 @@
           <div class="bb-tier-icon">🧨</div>
           <div class="bb-tier-info">
             <div class="bb-tier-name">ENHANCED HEIST</div>
-            <div class="bb-tier-desc">15 Free Spins · 5 Scatters · Better multiplier odds</div>
+            <div class="bb-tier-desc">15 Bonus Spins · 5 Scatters · Better multiplier odds</div>
           </div>
           <div class="bb-tier-cost" id="tierCost2">$125</div>
         </div>
         <div class="bb-tier" onclick="selectTier(3)" data-tier="3">
           <div class="bb-tier-icon">⭐</div>
           <div class="bb-tier-info">
-            <div class="bb-tier-name">SUPER TRAIN HEIST</div>
-            <div class="bb-tier-desc">20 Free Spins · 6 Scatters · Maximum volatility</div>
+            <div class="bb-tier-name">SUPER HEIST</div>
+            <div class="bb-tier-desc">20 Bonus Spins · 6 Scatters · Maximum multiplier volatility</div>
           </div>
           <div class="bb-tier-cost" id="tierCost3">$150</div>
         </div>
@@ -950,7 +852,7 @@
         SELECT A TIER
       </button>
       <div class="bb-warning">
-        ⚠ High volatility feature. Bonus purchase guarantees free spins entry only.<br>
+        ⚠ High volatility. Guarantees Bonus Game entry only.<br>
         RTP: Standard 96% · Enhanced 96.5% · Super 97% · Provably fair
       </div>
     </div>
@@ -958,7 +860,10 @@
 
   <!-- Bet panel -->
   <div class="bet-panel">
-    <!-- Main row: bet controls left + lever right -->
+    <div class="turbo-row" id="turboRow">
+      <span>FAST BONUS</span>
+      <div class="turbo-toggle" id="turboToggle" onclick="toggleTurbo()"></div>
+    </div>
     <div class="bet-main-row">
       <div class="bet-left">
         <div class="bet-lbl">BET AMOUNT</div>
@@ -968,7 +873,6 @@
           <button class="step-btn" onclick="adjustBet(1)">+</button>
         </div>
       </div>
-      <!-- Lever — right side, click to spin -->
       <div class="bet-lever" id="betLever" onclick="onLeverPull()">
         <div class="steam" id="steam">💨</div>
         <div class="lever-img-wrap">
@@ -998,7 +902,7 @@
       <button class="spin-btn" id="spinBtn" onclick="doSpin()">SPIN</button>
       <button class="buy-btn" id="buyBtn" onclick="openBonusBuy()">
         <span class="buy-btn-icon">🎯</span>
-        <span class="buy-btn-label">BUY</span>
+        <span class="buy-btn-label">BUY BONUS</span>
         <span class="buy-btn-price" id="buyBtnPrice">100×</span>
       </button>
     </div>
@@ -1022,25 +926,22 @@ if (tg) {
   }
 }
 
-// ── Tab visibility: pause CSS animations ─────────────────────────────────────
 document.addEventListener('visibilitychange', () => {
   document.body.classList.toggle('tab-hidden', document.hidden)
 })
 
-// ── QA Mode (?qa=1) ───────────────────────────────────────────────────────────
 if (new URLSearchParams(location.search).get('qa') === '1') {
   const qa = document.createElement('div')
   qa.style.cssText = 'position:fixed;top:0;right:0;z-index:99999;background:rgba(0,0,0,.75);color:#fd0;font-family:monospace;font-size:11px;padding:6px 10px;pointer-events:none;border-left:1px solid #fd0;border-bottom:1px solid #fd0'
   document.body.appendChild(qa)
   let frames=0, lastT=performance.now(), fps=60, drops=0
-  const rafLoop = (t) => {
+  const rafLoop = t => {
     frames++
     if (t - lastT >= 1000) {
       fps = Math.round(frames * 1000 / (t - lastT))
       if (fps < 30) drops++
       frames = 0; lastT = t
-      const dpr = window.devicePixelRatio.toFixed(1)
-      qa.innerHTML = `FPS:${fps} DPR:${dpr}<br>${window.innerWidth}×${window.innerHeight} drops:${drops}`
+      qa.innerHTML = `FPS:${fps} DPR:${window.devicePixelRatio.toFixed(1)}<br>${window.innerWidth}×${window.innerHeight} drops:${drops}`
     }
     requestAnimationFrame(rafLoop)
   }
@@ -1048,39 +949,36 @@ if (new URLSearchParams(location.search).get('qa') === '1') {
 }
 
 // ── State ─────────────────────────────────────────────────────────────────────
-let TOKEN = localStorage.getItem('outlaw_gold_token') || localStorage.getItem('crash_token') || ''
+let TOKEN     = localStorage.getItem('outlaw_gold_token') || localStorage.getItem('crash_token') || ''
 let PLAYER_ID = ''
-let CURRENCY = 'USD'
-let busy = false
-let freeSpinsLeft = 0
-let lastBet = 1.00
-let history = []
+let CURRENCY  = 'USD'
+let busy      = false
+let lastBet   = 1.00
+let history   = []
 
-// Symbol metadata
+// Bonus state (client-side mirror of server state)
+let bonusSpinsLeft  = 0
+let bonusMultTotal  = 0
+let bonusActive     = false
+let consecutiveMiss = 0
+let turboMode       = false
+let bonusAutoTimer  = null
+
 const SYMS = [
-  { name:'horseshoe', tier:'low'  },
-  { name:'whiskey',   tier:'low'  },
-  { name:'bullet',    tier:'low'  },
-  { name:'badge',     tier:'low'  },
-  { name:'lantern',   tier:'low'  },
-  { name:'revolver',  tier:'mid'  },
-  { name:'cowboy_hat',tier:'mid'  },
-  { name:'gold_bag',  tier:'mid'  },
-  { name:'dynamite',  tier:'high' },
-  { name:'outlaw',    tier:'high' },
-  { name:'sheriff',   tier:'high' },
-  { name:'wild',      tier:'wild' },
-  { name:'scatter',   tier:'scatter' },
+  { name:'horseshoe' }, { name:'whiskey' }, { name:'bullet' },
+  { name:'badge' },     { name:'lantern' }, { name:'revolver' },
+  { name:'cowboy_hat'},{ name:'gold_bag' }, { name:'dynamite' },
+  { name:'outlaw' },    { name:'sheriff' },  { name:'wild' },
+  { name:'scatter' },
 ]
-const SYM_IMG = (id) => `/assets/h-slots/outlaw-gold/symbols/${SYMS[id].name}.png`
-const SYM_FALLBACK = ['🧲','🥃','🔹','⭐','🪔','🔫','🤠','💰','🧨','🕵️','⚖️','🔥','🚂']
+const SYM_IMG = id => `/assets/h-slots/outlaw-gold/symbols/${SYMS[id].name}.png`
 
 // ── Grid init ─────────────────────────────────────────────────────────────────
-const grid = document.getElementById('reelsGrid')
-const cells = []
+const gridEl = document.getElementById('reelsGrid')
+const cells  = []
 
 function initGrid() {
-  grid.innerHTML = ''
+  gridEl.innerHTML = ''
   cells.length = 0
   for (let r = 0; r < 5; r++) {
     for (let c = 0; c < 6; c++) {
@@ -1092,16 +990,12 @@ function initGrid() {
       const img = document.createElement('img')
       img.className = 'sym-img'
       img.alt = ''
-      img.src = SYM_IMG(Math.floor(Math.random() * 11)) // random init
-      img.onerror = function(){ this.style.display='none'; this.nextSibling && (this.nextSibling.textContent = '') }
-
-      const fallback = document.createElement('span')
-      fallback.style.cssText = 'font-size:clamp(16px,4vw,24px);position:absolute'
+      img.src = SYM_IMG(Math.floor(Math.random() * 11))
+      img.onerror = () => { img.style.display = 'none' }
 
       cell.appendChild(img)
-      cell.appendChild(fallback)
       cells.push(cell)
-      grid.appendChild(cell)
+      gridEl.appendChild(cell)
     }
   }
 }
@@ -1110,32 +1004,19 @@ function cellIdx(row, col) { return row * 6 + col }
 
 function setSymbol(row, col, symId, animate) {
   const cell = cells[cellIdx(row, col)]
-  const img = cell.querySelector('.sym-img')
-  const fb  = cell.querySelector('span')
+  const img  = cell.querySelector('.sym-img')
   img.src = SYM_IMG(symId)
   img.style.display = 'block'
-  fb.textContent = ''
 
-  // special glows
   cell.classList.remove('scatter-glow','wild-glow','win','removing','falling','spinning')
   if (symId === 12) cell.classList.add('scatter-glow')
   if (symId === 11) cell.classList.add('wild-glow')
 
   if (animate === 'spin') {
-    cell.classList.add('spinning')
-    void cell.offsetWidth
+    cell.classList.add('spinning'); void cell.offsetWidth
   } else if (animate === 'fall') {
-    cell.classList.add('falling')
-    void cell.offsetWidth
+    cell.classList.add('falling'); void cell.offsetWidth
     setTimeout(() => cell.classList.remove('falling'), 400)
-  }
-}
-
-function applyGrid(rows, animate) {
-  for (let r = 0; r < 5; r++) {
-    for (let c = 0; c < 6; c++) {
-      setSymbol(r, c, rows[r][c], animate)
-    }
   }
 }
 
@@ -1173,9 +1054,9 @@ function updateBalance(b) {
   document.getElementById('balance').textContent = b.toFixed(2)
 }
 
-// ── Lever interaction ─────────────────────────────────────────────────────────
+// ── Lever ─────────────────────────────────────────────────────────────────────
 function onLeverPull() {
-  if (busy) return
+  if (busy || bonusActive) return
   doSpin()
 }
 
@@ -1193,14 +1074,18 @@ function animateLever() {
   }, 900)
 }
 
+// ── Turbo toggle ──────────────────────────────────────────────────────────────
+function toggleTurbo() {
+  turboMode = !turboMode
+  document.getElementById('turboToggle').classList.toggle('on', turboMode)
+}
+
 // ── Bonus Buy ─────────────────────────────────────────────────────────────────
 let selectedBonusTier = 0
-let bonusBuyMode = false  // true = Train Heist bonus is active
-
 const BB_COSTS = [0, 100, 125, 150]
 
 function openBonusBuy() {
-  if (busy) return
+  if (busy || bonusActive) return
   selectedBonusTier = 0
   document.querySelectorAll('.bb-tier').forEach(el => el.classList.remove('selected'))
   document.getElementById('bbConfirmBtn').disabled = true
@@ -1211,7 +1096,6 @@ function openBonusBuy() {
 function closeBonusBuy() {
   document.getElementById('bbOverlay').classList.remove('open')
 }
-
 function updateBBCosts() {
   const bet = parseFloat(document.getElementById('betAmount').value) || 1
   for (let t = 1; t <= 3; t++) {
@@ -1219,134 +1103,163 @@ function updateBBCosts() {
     if (el) el.textContent = '$' + (bet * BB_COSTS[t]).toFixed(2)
   }
 }
-
 function selectTier(tier) {
   selectedBonusTier = tier
-  document.querySelectorAll('.bb-tier').forEach(el => {
-    el.classList.toggle('selected', parseInt(el.dataset.tier) === tier)
-  })
-  const bet = parseFloat(document.getElementById('betAmount').value) || 1
+  document.querySelectorAll('.bb-tier').forEach(el =>
+    el.classList.toggle('selected', parseInt(el.dataset.tier) === tier))
+  const bet  = parseFloat(document.getElementById('betAmount').value) || 1
   const cost = (bet * BB_COSTS[tier]).toFixed(2)
   document.getElementById('bbConfirmBtn').disabled = false
-  document.getElementById('bbConfirmBtn').textContent =
-    `BUY TRAIN HEIST — $${cost}`
+  document.getElementById('bbConfirmBtn').textContent = `BUY BONUS GAME — $${cost}`
 }
-
 async function confirmBonusBuy() {
   if (!selectedBonusTier || busy) return
   closeBonusBuy()
-  bonusBuyMode = true
   await doSpin(selectedBonusTier)
-  bonusBuyMode = false
 }
 
-// ── Spin ──────────────────────────────────────────────────────────────────────
+// ── Core spin ─────────────────────────────────────────────────────────────────
 async function doSpin(bonusTier = 0) {
   if (busy || !TOKEN) return
   busy = true
+
   const btn    = document.getElementById('spinBtn')
   const buyBtn = document.getElementById('buyBtn')
-  const lever  = document.getElementById('betLever')
   btn.disabled    = true
   buyBtn.disabled = true
-  lever.classList.add('disabled')
   btn.classList.add('spinning-state')
-  btn.textContent = bonusTier > 0 ? 'HEIST…' : 'SPINNING…'
 
-  if (bonusTier === 0) animateLever()
-
-  const betVal = parseFloat(document.getElementById('betAmount').value) || 1
-  lastBet = betVal
-  const isFree = freeSpinsLeft > 0 && bonusTier === 0
+  const isFree   = bonusActive && bonusTier === 0
+  const betVal   = parseFloat(document.getElementById('betAmount').value) || 1
+  lastBet        = betVal
 
   if (isFree) {
-    freeSpinsLeft--
-    updateFSIndicator()
+    btn.classList.add('bonus-mode')
+    btn.textContent = 'BONUS IN PROGRESS…'
+  } else {
+    btn.textContent = bonusTier > 0 ? 'HEIST…' : 'SPINNING…'
   }
 
-  // Show bonus mode bar if bonus buy
-  if (bonusTier > 0) {
-    document.getElementById('bonusModeBar').classList.add('show')
-  }
+  if (!isFree && bonusTier === 0) animateLever()
 
-  // Spin animation
+  // Spin columns visually
   for (let c = 0; c < 6; c++) {
     setTimeout(() => {
-      for (let r = 0; r < 5; r++) {
-        cells[cellIdx(r, c)].classList.add('spinning')
-      }
+      for (let r = 0; r < 5; r++) cells[cellIdx(r,c)].classList.add('spinning')
     }, c * 60)
   }
 
+  let d
   try {
     const resp = await fetch('/tma/v1/slots/spin', {
       method: 'POST',
       headers: { 'Content-Type':'application/json', 'Authorization':'Bearer '+TOKEN },
       body: JSON.stringify({ bet: betVal, free_spin: isFree, bonus_buy_tier: bonusTier })
     })
-    const d = await resp.json()
-    if (!resp.ok) {
-      alert(d.error || 'Spin failed')
-      resetSpinBtn()
-      return
-    }
-
-    // Stop spinning columns left→right
-    await stopReels(d.initial_grid)
-
-    // Play cascade sequence
-    let totalPayout = 0
-    let cascadeCount = 0
-    for (const step of d.cascades) {
-      if (step.clusters && step.clusters.length > 0) {
-        cascadeCount++
-        if (cascadeCount > 1) showCascadeBadge(cascadeCount)
-
-        await highlightClusters(step.clusters)
-        totalPayout += step.payout
-        await sleep(700)
-
-        await removeWinners(step.clusters)
-        await sleep(300)
-
-        // Show next grid state (after tumble)
-        const nextStep = d.cascades[d.cascades.indexOf(step) + 1]
-        if (nextStep) {
-          await fillGrid(nextStep.grid)
-          await sleep(300)
-        }
-      }
-    }
-
-    hideCascadeBadge()
-    clearAllHighlights()
-
-    // Update balance
-    if (d.balance != null) updateBalance(d.balance)
-
-    // Show win
-    if (d.total_payout > 0) {
-      showWin(d.total_payout, d.cascades)
-      addHistory(d.total_payout, betVal)
-      spawnCoins(d.total_payout, betVal)
-    } else {
-      addHistory(0, betVal)
-    }
-
-    // Free spins awarded
-    if (d.free_spins_awarded > 0) {
-      freeSpinsLeft += d.free_spins_awarded
-      updateFSIndicator()
-      await showFSBanner(d.free_spins_awarded)
-    }
-
+    d = await resp.json()
+    if (!resp.ok) { alert(d.error || 'Spin failed'); resetSpinBtn(); return }
   } catch(e) {
-    console.error(e)
+    console.error(e); resetSpinBtn(); return
   }
 
-  resetSpinBtn(isFree && freeSpinsLeft > 0)
+  // ── Section 1: FULL GRID must land before ANY evaluation ─────────────────
+  await stopReels(d.initial_grid)
+
+  // Show multiplier cells immediately if in bonus
+  if (d.multiplier_cells && d.multiplier_cells.length > 0) {
+    showMultiplierCells(d.multiplier_cells)
+  }
+
+  // Brief "board lock" pause — player reads full grid
+  gridEl.classList.add('locked')
+  await sleep(isFree ? 600 : 350)
+  gridEl.classList.remove('locked')
+
+  // ── Cascade sequence ──────────────────────────────────────────────────────
+  let totalPayout  = 0
+  let cascadeCount = 0
+  const hasWin = d.cascades.some(s => s.clusters && s.clusters.length > 0)
+
+  for (const step of d.cascades) {
+    if (step.clusters && step.clusters.length > 0) {
+      cascadeCount++
+      if (cascadeCount > 1) showCascadeBadge(cascadeCount)
+
+      await highlightClusters(step.clusters)
+
+      // Collect multiplier cells if win
+      if (d.mult_collected > 0 && cascadeCount === 1) {
+        await collectMultiplierCells()
+      }
+
+      totalPayout += step.payout
+      await sleep(turboMode ? 500 : 700)
+
+      await removeWinners(step.clusters)
+      await sleep(turboMode ? 200 : 300)
+
+      const nextStep = d.cascades[d.cascades.indexOf(step) + 1]
+      if (nextStep) {
+        await fillGrid(nextStep.grid)
+        await sleep(turboMode ? 200 : 300)
+      }
+    }
+  }
+
+  hideCascadeBadge()
+  clearAllHighlights()
+  clearMultiplierCells()
+
+  // Update server-side bonus state
+  if (d.bonus_spins_left !== undefined) {
+    bonusSpinsLeft = d.bonus_spins_left
+    bonusMultTotal = d.bonus_mult_total || 0
+  }
+  if (d.free_spins_awarded > 0 && !bonusActive) {
+    bonusSpinsLeft = d.bonus_spins_left || d.free_spins_awarded
+    bonusMultTotal = 0
+  }
+
+  // Update balance
+  if (d.balance != null) updateBalance(d.balance)
+
+  // Show win
+  if (d.total_payout > 0) {
+    document.getElementById('lastWinVal').textContent = '$' + d.total_payout.toFixed(2)
+    addHistory(d.total_payout, betVal)
+    spawnCoins(d.total_payout, betVal)
+    const tier = getWinTier(d.total_payout, betVal)
+    if (tier) {
+      await showWinCelebration(tier, d.total_payout, betVal, bonusMultTotal)
+    } else {
+      showSmallWin(d.total_payout, d.cascades)
+    }
+  } else {
+    addHistory(0, betVal)
+  }
+
+  // Start bonus game if newly awarded
+  if (d.free_spins_awarded > 0 && !bonusActive) {
+    await showBonusGameBanner(bonusSpinsLeft)
+    enterBonusMode()
+    return // enterBonusMode calls resetSpinBtn + schedules auto-spin
+  }
+
+  // Update bonus UI
+  updateBonusUI()
+
+  // Reset button
+  resetSpinBtn()
+
+  // Schedule next auto-spin if bonus is still active
+  if (bonusActive && bonusSpinsLeft > 0) {
+    scheduleNextBonusSpin(hasWin)
+  } else if (bonusActive && bonusSpinsLeft <= 0) {
+    exitBonusMode()
+  }
 }
 
+// ── Grid animation helpers ────────────────────────────────────────────────────
 async function stopReels(grid) {
   return new Promise(resolve => {
     for (let c = 0; c < 6; c++) {
@@ -1397,19 +1310,146 @@ async function fillGrid(newGrid) {
   }
 }
 
-function resetSpinBtn(isFreeMode) {
+// ── Multiplier cell overlays ──────────────────────────────────────────────────
+function multClass(value) {
+  if (value >= 500) return 'mult-mythic'
+  if (value >= 100) return 'mult-blood'
+  if (value >= 25)  return 'mult-gold'
+  if (value >= 8)   return 'mult-silver'
+  return 'mult-bronze'
+}
+
+function showMultiplierCells(multCells) {
+  clearMultiplierCells()
+  for (const mc of multCells) {
+    const cell  = cells[cellIdx(mc.row, mc.col)]
+    const badge = document.createElement('div')
+    badge.className = `mult-badge ${multClass(mc.value)}`
+    badge.textContent = `×${mc.value}`
+    badge.dataset.multVal = mc.value
+    cell.appendChild(badge)
+  }
+}
+
+async function collectMultiplierCells() {
+  const badges = gridEl.querySelectorAll('.mult-badge')
+  if (!badges.length) return
+  badges.forEach(b => b.classList.add('collecting'))
+  await sleep(750)
+}
+
+function clearMultiplierCells() {
+  gridEl.querySelectorAll('.mult-badge').forEach(b => b.remove())
+}
+
+// ── Bonus mode lifecycle ──────────────────────────────────────────────────────
+function enterBonusMode() {
+  bonusActive     = true
+  consecutiveMiss = 0
+
+  const btn    = document.getElementById('spinBtn')
+  const buyBtn = document.getElementById('buyBtn')
+  btn.classList.add('bonus-mode')
+  btn.textContent = 'BONUS IN PROGRESS…'
+  buyBtn.disabled = true
+
+  document.getElementById('turboRow').classList.add('show')
+  updateBonusUI()
+  resetSpinBtn()
+
+  scheduleNextBonusSpin(false)
+}
+
+function exitBonusMode() {
+  bonusActive    = false
+  bonusMultTotal = 0
+  bonusSpinsLeft = 0
+  consecutiveMiss = 0
+
+  const btn    = document.getElementById('spinBtn')
+  btn.classList.remove('bonus-mode')
+  document.getElementById('turboRow').classList.remove('show')
+  document.getElementById('bonusMultBar').classList.remove('show')
+  document.getElementById('fsIndicator').classList.remove('show')
+  updateBonusUI()
+  resetSpinBtn()
+}
+
+function scheduleNextBonusSpin(lastHadWin) {
+  if (bonusAutoTimer) clearTimeout(bonusAutoTimer)
+  let delay
+  if (turboMode) {
+    delay = lastHadWin ? 1000 : 700
+  } else {
+    // Standard: 4-5s no-win, 6-7s after win
+    // Anti-fatigue: shorten after 3 consecutive misses
+    if (lastHadWin) {
+      consecutiveMiss = 0
+      delay = 6000 + Math.random() * 1000  // 6–7s
+    } else {
+      consecutiveMiss++
+      const base = consecutiveMiss >= 3 ? 3500 : 4000
+      delay = base + Math.random() * 1000
+    }
+  }
+
+  bonusAutoTimer = setTimeout(() => {
+    if (bonusActive && bonusSpinsLeft > 0 && !busy) {
+      doSpin()
+    } else if (bonusActive && bonusSpinsLeft <= 0) {
+      exitBonusMode()
+    }
+  }, delay)
+}
+
+function updateBonusUI() {
+  const bar = document.getElementById('bonusMultBar')
+  const val = document.getElementById('bonusMultValue')
+  const sps = document.getElementById('bonusSpinsDisp')
+  const ind = document.getElementById('fsIndicator')
+  const lft = document.getElementById('fsLeft')
+
+  if (bonusActive) {
+    bar.classList.add('show')
+    ind.classList.add('show')
+    lft.textContent  = bonusSpinsLeft
+    sps.textContent  = bonusSpinsLeft
+    val.textContent  = '×' + bonusMultTotal
+  } else {
+    bar.classList.remove('show')
+    ind.classList.remove('show')
+  }
+}
+
+function animateBonusMultUpdate(newMult) {
+  const val = document.getElementById('bonusMultValue')
+  val.textContent = '×' + newMult
+  val.classList.remove('pop')
+  void val.offsetWidth
+  val.classList.add('pop')
+  setTimeout(() => val.classList.remove('pop'), 600)
+}
+
+// ── Spin button reset ─────────────────────────────────────────────────────────
+function resetSpinBtn() {
   busy = false
   const btn    = document.getElementById('spinBtn')
   const buyBtn = document.getElementById('buyBtn')
-  const lever  = document.getElementById('betLever')
-  btn.disabled    = false
-  buyBtn.disabled = false
-  lever.classList.remove('disabled')
   btn.classList.remove('spinning-state')
-  btn.textContent = isFreeMode ? `FREE SPIN (${freeSpinsLeft})` : 'SPIN'
-  if (!isFreeMode) {
-    document.getElementById('bonusModeBar').classList.remove('show')
+
+  if (bonusActive) {
+    btn.classList.add('bonus-mode')
+    btn.textContent = 'BONUS IN PROGRESS…'
+    btn.disabled    = true
+    buyBtn.disabled = true
+  } else {
+    btn.classList.remove('bonus-mode')
+    btn.disabled    = false
+    buyBtn.disabled = false
+    btn.textContent = 'SPIN'
   }
+
+  document.getElementById('betLever').classList.remove('disabled')
 }
 
 function updateBuyBtnPrice() {
@@ -1417,84 +1457,90 @@ function updateBuyBtnPrice() {
   document.getElementById('buyBtnPrice').textContent = (bet * 100).toFixed(0) + '×'
 }
 
-// ── Win Tier Manager ──────────────────────────────────────────────────────────
-
+// ── Win tiers ─────────────────────────────────────────────────────────────────
+// Section 7: 5×=NICE, 15×=BIG, 50×=MASSIVE, 100×=LEGENDARY
 const WIN_TIERS = {
-  EPIC: { min:100, label:'TRAIN HEIST JACKPOT', color:'tier-epic',  duration:5500, particles:['💰','🏆','⭐','🌟','💎'] },
-  MEGA: { min:50,  label:'MEGA WIN',            color:'tier-mega',  duration:4500, particles:['💰','🔮','⚡','✨','🪙'] },
-  BIG:  { min:15,  label:'BIG WIN',             color:'tier-big',   duration:3500, particles:['🪙','🔫','💥','🎯','💰'] },
-  NICE: { min:5,   label:'NICE WIN',            color:'tier-nice',  duration:2800, particles:['🪙','⭐','💰','🤠','✨'] },
+  LEGENDARY: { min:100, label:'LEGENDARY WIN',  color:'tier-legendary', duration:6000, particles:['💰','🏆','⭐','🌟','💎','✨'] },
+  MASSIVE:   { min:50,  label:'MASSIVE WIN',    color:'tier-massive',   duration:4800, particles:['💰','🔮','⚡','✨','🪙'] },
+  BIG:       { min:15,  label:'BIG WIN',        color:'tier-big',       duration:3800, particles:['🪙','🔫','💥','🎯','💰'] },
+  NICE:      { min:5,   label:'NICE WIN',       color:'tier-nice',      duration:2800, particles:['🪙','⭐','💰','🤠','✨'] },
 }
 
 function getWinTier(payout, bet) {
   if (!bet || bet <= 0) return null
   const r = payout / bet
-  if (r >= WIN_TIERS.EPIC.min) return 'EPIC'
-  if (r >= WIN_TIERS.MEGA.min) return 'MEGA'
-  if (r >= WIN_TIERS.BIG.min)  return 'BIG'
-  if (r >= WIN_TIERS.NICE.min) return 'NICE'
+  if (r >= WIN_TIERS.LEGENDARY.min) return 'LEGENDARY'
+  if (r >= WIN_TIERS.MASSIVE.min)   return 'MASSIVE'
+  if (r >= WIN_TIERS.BIG.min)       return 'BIG'
+  if (r >= WIN_TIERS.NICE.min)      return 'NICE'
   return null
 }
 
 let _celTimer = null
+let _celResolve = null // resolves when celebration finishes (for bonus pause)
 
-function showWinCelebration(tier, amount, bet) {
-  const cfg     = WIN_TIERS[tier]
-  const overlay = document.getElementById('winCelebration')
-  const video   = document.getElementById('winCelVideo')
-  const label   = document.getElementById('winTierLabel')
-  const countEl = document.getElementById('winCountUp')
-  const sub     = document.getElementById('winCelSub')
-  const parWrap = document.getElementById('winParticles')
-  const ratio   = bet > 0 ? (amount / bet).toFixed(1) : '?'
+function showWinCelebration(tier, amount, bet, bonusMult) {
+  return new Promise(resolve => {
+    _celResolve = resolve
+    const cfg     = WIN_TIERS[tier]
+    const overlay = document.getElementById('winCelebration')
+    const video   = document.getElementById('winCelVideo')
+    const label   = document.getElementById('winTierLabel')
+    const countEl = document.getElementById('winCountUp')
+    const sub     = document.getElementById('winCelSub')
+    const bm      = document.getElementById('winBonusMult')
+    const parWrap = document.getElementById('winParticles')
+    const ratio   = bet > 0 ? (amount / bet).toFixed(1) : '?'
 
-  // Set tier
-  overlay.className = 'win-celebration show ' + cfg.color
-  label.textContent = cfg.label
-  sub.textContent   = `${ratio}× BET`
+    overlay.className = 'win-celebration show ' + cfg.color
+    label.textContent = cfg.label
+    sub.textContent   = `${ratio}× BET`
 
-  // Video source
-  const videoSrc = `/assets/h-slots/outlaw-gold/win_${tier.toLowerCase()}.mp4`
-  video.src = videoSrc
-  video.load()
-  video.play().catch(() => {})
+    if (bonusMult > 0) {
+      bm.style.display = 'block'
+      bm.textContent   = `TOTAL BONUS: ×${bonusMult}`
+    } else {
+      bm.style.display = 'none'
+    }
 
-  // Count-up
-  countEl.textContent = '$0.00'
-  animateCountUp(countEl, 0, amount, Math.min(cfg.duration * 0.75, 3000))
+    const videoSrc = `/assets/h-slots/outlaw-gold/win_${tier.toLowerCase()}.mp4`
+    video.src = videoSrc
+    video.load()
+    video.play().catch(() => {})
 
-  // Screen shake for BIG+
-  if (tier === 'BIG' || tier === 'MEGA' || tier === 'EPIC') {
-    document.querySelector('.app').classList.add('shake')
-    setTimeout(() => document.querySelector('.app').classList.remove('shake'), 600)
-  }
+    countEl.textContent = '$0.00'
+    animateCountUp(countEl, 0, amount, Math.min(cfg.duration * 0.75, 3500))
 
-  // Particles
-  parWrap.innerHTML = ''
-  const emojis = cfg.particles
-  const count  = tier === 'EPIC' ? 30 : tier === 'MEGA' ? 22 : tier === 'BIG' ? 16 : 10
-  for (let i = 0; i < count; i++) {
-    setTimeout(() => {
-      const p = document.createElement('div')
-      p.className = 'win-particle'
-      p.textContent = emojis[Math.floor(Math.random() * emojis.length)]
-      const size = 14 + Math.random() * 20
-      p.style.cssText = [
-        `left:${5 + Math.random()*90}%`,
-        `--px:${(Math.random()-0.5)*120}px`,
-        `--pr:${(Math.random()>0.5?'':'- ')}${180+Math.random()*360}deg`,
-        `--ps:${size}px`,
-        `--pd:${1.2+Math.random()*.8}s`,
-        `--pde:${Math.random()*.4}s`,
-      ].join(';')
-      parWrap.appendChild(p)
-      setTimeout(() => p.remove(), 2200)
-    }, i * 60)
-  }
+    if (tier !== 'NICE') {
+      document.querySelector('.app').classList.add('shake')
+      setTimeout(() => document.querySelector('.app').classList.remove('shake'), 600)
+    }
 
-  // Auto-dismiss
-  if (_celTimer) clearTimeout(_celTimer)
-  _celTimer = setTimeout(closeCelebration, cfg.duration)
+    parWrap.innerHTML = ''
+    const emojis = cfg.particles
+    const count  = tier === 'LEGENDARY' ? 30 : tier === 'MASSIVE' ? 22 : tier === 'BIG' ? 16 : 10
+    for (let i = 0; i < count; i++) {
+      setTimeout(() => {
+        const p = document.createElement('div')
+        p.className = 'win-particle'
+        p.textContent = emojis[Math.floor(Math.random() * emojis.length)]
+        const size = 14 + Math.random() * 20
+        p.style.cssText = [
+          `left:${5 + Math.random()*90}%`,
+          `--px:${(Math.random()-0.5)*120}px`,
+          `--pr:${(Math.random()>0.5?'':'- ')}${180+Math.random()*360}deg`,
+          `--ps:${size}px`,
+          `--pd:${1.2+Math.random()*.8}s`,
+          `--pde:${Math.random()*.4}s`,
+        ].join(';')
+        parWrap.appendChild(p)
+        setTimeout(() => p.remove(), 2200)
+      }, i * 60)
+    }
+
+    if (_celTimer) clearTimeout(_celTimer)
+    _celTimer = setTimeout(() => closeCelebration(), cfg.duration)
+  })
 }
 
 function closeCelebration() {
@@ -1502,18 +1548,17 @@ function closeCelebration() {
   const overlay = document.getElementById('winCelebration')
   const video   = document.getElementById('winCelVideo')
   overlay.classList.remove('show')
-  video.pause()
-  video.src = ''
+  video.pause(); video.src = ''
+  if (_celResolve) { _celResolve(); _celResolve = null }
 }
 
 function animateCountUp(el, from, to, durationMs) {
   const start = performance.now()
   const diff  = to - from
   function step(now) {
-    const elapsed = now - start
+    const elapsed  = now - start
     const progress = Math.min(elapsed / durationMs, 1)
-    // Ease-out cubic: fast start, slow end
-    const ease = 1 - Math.pow(1 - progress, 3)
+    const ease     = 1 - Math.pow(1 - progress, 3)
     el.textContent = '$' + (from + diff * ease).toFixed(2)
     if (progress < 1) requestAnimationFrame(step)
     else el.textContent = '$' + to.toFixed(2)
@@ -1521,32 +1566,17 @@ function animateCountUp(el, from, to, durationMs) {
   requestAnimationFrame(step)
 }
 
-// ── Win display ───────────────────────────────────────────────────────────────
-function showWin(amount, cascades) {
-  document.getElementById('lastWinVal').textContent = '$' + amount.toFixed(2)
-
-  const tier = getWinTier(amount, lastBet)
-  if (tier) {
-    // Premium celebration for 5x+ wins
-    showWinCelebration(tier, amount, lastBet)
-    spawnCoins(amount, lastBet)
-    return
-  }
-
-  // Standard small win overlay for sub-5x
+function showSmallWin(amount, cascades) {
   const overlay = document.getElementById('winOverlay')
-  const amtEl   = document.getElementById('winAmount')
+  document.getElementById('winLabel').textContent   = 'WIN'
+  document.getElementById('winAmount').textContent  = '$' + amount.toFixed(2)
+
   const multRow = document.getElementById('winMultRow')
-  const lbl     = document.getElementById('winLabel')
-
-  lbl.textContent   = 'WIN'
-  amtEl.textContent = '$' + amount.toFixed(2)
-
   multRow.innerHTML = ''
   if (cascades) {
     cascades.filter(s => s.payout > 0).forEach((s, i) => {
       const chip = document.createElement('div')
-      chip.className = 'win-mult-chip'
+      chip.className   = 'win-mult-chip'
       chip.textContent = `CASCADE ${i+1}: $${s.payout.toFixed(2)}`
       multRow.appendChild(chip)
     })
@@ -1556,10 +1586,47 @@ function showWin(amount, cascades) {
   setTimeout(() => overlay.classList.remove('show'), 2000)
 }
 
+// ── Bonus Game banner ─────────────────────────────────────────────────────────
+async function showBonusGameBanner(spins) {
+  const banner = document.getElementById('bonusGameBanner')
+  document.getElementById('bgSpinsCount').textContent = spins + ' SPINS'
+  banner.classList.add('show')
+  await sleep(2800)
+  banner.classList.remove('show')
+}
+
+// ── Cascade badge ─────────────────────────────────────────────────────────────
+function showCascadeBadge(n) {
+  const el = document.getElementById('cascadeBadge')
+  el.textContent = `CASCADE ×${n}`; el.classList.add('show')
+}
+function hideCascadeBadge() {
+  document.getElementById('cascadeBadge').classList.remove('show')
+}
+
+// ── History ───────────────────────────────────────────────────────────────────
+function addHistory(payout, bet) {
+  history.unshift({ payout, bet })
+  if (history.length > 8) history.pop()
+  renderHistory()
+}
+function renderHistory() {
+  const bar = document.getElementById('histBar')
+  bar.innerHTML = ''
+  history.slice(0, 5).forEach(h => {
+    const pill  = document.createElement('div')
+    const ratio = h.payout / h.bet
+    pill.className   = 'hist-pill ' + (h.payout === 0 ? 'hp-0' : ratio >= 10 ? 'hp-big' : 'hp-win')
+    pill.textContent = h.payout === 0 ? '—' : ratio.toFixed(1) + '×'
+    bar.appendChild(pill)
+  })
+}
+
+// ── Coins ─────────────────────────────────────────────────────────────────────
 function spawnCoins(payout, bet) {
   const ratio = payout / bet
   const count = Math.min(20, Math.ceil(ratio * 2))
-  const wrap = document.getElementById('coinsWrap')
+  const wrap  = document.getElementById('coinsWrap')
   for (let i = 0; i < count; i++) {
     setTimeout(() => {
       const coin = document.createElement('div')
@@ -1573,58 +1640,6 @@ function spawnCoins(payout, bet) {
   }
 }
 
-// ── Cascade badge ─────────────────────────────────────────────────────────────
-function showCascadeBadge(n) {
-  const el = document.getElementById('cascadeBadge')
-  el.textContent = `CASCADE ×${n}`
-  el.classList.add('show')
-}
-function hideCascadeBadge() {
-  document.getElementById('cascadeBadge').classList.remove('show')
-}
-
-// ── Free spins ────────────────────────────────────────────────────────────────
-function updateFSIndicator() {
-  const el  = document.getElementById('fsIndicator')
-  const lft = document.getElementById('fsLeft')
-  const btn = document.getElementById('spinBtn')
-  if (freeSpinsLeft > 0) {
-    el.classList.add('show')
-    lft.textContent = freeSpinsLeft
-    btn.textContent = `FREE SPIN (${freeSpinsLeft})`
-  } else {
-    el.classList.remove('show')
-    btn.textContent = 'SPIN'
-  }
-}
-
-async function showFSBanner(n) {
-  const banner = document.getElementById('fsBanner')
-  document.getElementById('fsCountBanner').textContent = n
-  banner.classList.add('show')
-  await sleep(2000)
-  banner.classList.remove('show')
-}
-
-// ── History ───────────────────────────────────────────────────────────────────
-function addHistory(payout, bet) {
-  history.unshift({ payout, bet })
-  if (history.length > 8) history.pop()
-  renderHistory()
-}
-
-function renderHistory() {
-  const bar = document.getElementById('histBar')
-  bar.innerHTML = ''
-  history.slice(0, 5).forEach(h => {
-    const pill = document.createElement('div')
-    const ratio = h.payout / h.bet
-    pill.className = 'hist-pill ' + (h.payout === 0 ? 'hp-0' : ratio >= 10 ? 'hp-big' : 'hp-win')
-    pill.textContent = h.payout === 0 ? '—' : ratio.toFixed(1) + '×'
-    bar.appendChild(pill)
-  })
-}
-
 // ── Bet controls ──────────────────────────────────────────────────────────────
 function adjustBet(dir) {
   const inp = document.getElementById('betAmount')
@@ -1632,9 +1647,11 @@ function adjustBet(dir) {
   if (dir > 0) v = v < 1 ? Math.round((v + 0.10) * 10) / 10 : Math.round(v + 1)
   else         v = v <= 1 ? Math.max(0.10, Math.round((v - 0.10) * 10) / 10) : Math.round(v - 1)
   inp.value = v.toFixed(2)
+  updateBuyBtnPrice()
 }
 function setBet(v) {
   document.getElementById('betAmount').value = v.toFixed(2)
+  updateBuyBtnPrice()
 }
 
 // ── Util ──────────────────────────────────────────────────────────────────────
@@ -1642,18 +1659,17 @@ function sleep(ms) { return new Promise(r => setTimeout(r, ms)) }
 
 // ── Paytable ──────────────────────────────────────────────────────────────────
 const PAYTABLE = [
-  // [symId, displayName, tier, payouts: [[minSize, mult], ...]]
-  [10, 'SHERIFF',     'high',    [[8,8],[10,16],[12,25],[15,50],[20,100],[30,500]]],
-  [9,  'OUTLAW',      'high',    [[8,5],[10,10],[12,16],[15,30],[20,60],[30,200]]],
-  [8,  'DYNAMITE',    'high',    [[8,3],[10,6],[12,10],[15,18],[20,35],[30,80]]],
-  [7,  'GOLD BAG',    'mid',     [[8,2],[10,4],[12,7],[15,12],[20,20],[30,50]]],
-  [6,  'COWBOY HAT',  'mid',     [[8,1.5],[10,3],[12,5],[15,8],[20,14],[30,30]]],
-  [5,  'REVOLVER',    'mid',     [[8,1],[10,2],[12,3.5],[15,6],[20,10],[30,20]]],
-  [4,  'LANTERN',     'low',     [[8,0.8],[10,1.6],[12,2.5],[15,4],[20,7],[30,14]]],
-  [3,  'BADGE',       'low',     [[8,0.6],[10,1.2],[12,2],[15,3.2],[20,5.5],[30,10]]],
-  [2,  'BULLET',      'low',     [[8,0.5],[10,1],[12,1.6],[15,2.5],[20,4.5],[30,8]]],
-  [1,  'WHISKEY',     'low',     [[8,0.4],[10,0.8],[12,1.2],[15,2],[20,3.5],[30,6]]],
-  [0,  'HORSESHOE',   'low',     [[8,0.3],[10,0.6],[12,1],[15,1.6],[20,2.5],[30,4]]],
+  [10,'SHERIFF',    [[8,8],  [10,16], [12,25],[15,50],[20,100],[30,500]]],
+  [9, 'OUTLAW',    [[8,5],  [10,10], [12,16],[15,30],[20,60], [30,200]]],
+  [8, 'DYNAMITE',  [[8,3],  [10,6],  [12,10],[15,18],[20,35], [30,80] ]],
+  [7, 'GOLD BAG',  [[8,2],  [10,4],  [12,7], [15,12],[20,20], [30,50] ]],
+  [6, 'COWBOY HAT',[[8,1.5],[10,3],  [12,5], [15,8], [20,14], [30,30] ]],
+  [5, 'REVOLVER',  [[8,1],  [10,2],  [12,3.5],[15,6],[20,10], [30,20] ]],
+  [4, 'LANTERN',   [[8,0.8],[10,1.6],[12,2.5],[15,4],[20,7],  [30,14] ]],
+  [3, 'BADGE',     [[8,0.6],[10,1.2],[12,2], [15,3.2],[20,5.5],[30,10]]],
+  [2, 'BULLET',    [[8,0.5],[10,1],  [12,1.6],[15,2.5],[20,4.5],[30,8]]],
+  [1, 'WHISKEY',   [[8,0.4],[10,0.8],[12,1.2],[15,2],[20,3.5],[30,6] ]],
+  [0, 'HORSESHOE', [[8,0.3],[10,0.6],[12,1], [15,1.6],[20,2.5],[30,4] ]],
 ]
 
 function buildPaytable() {
@@ -1662,18 +1678,13 @@ function buildPaytable() {
   body._built = true
 
   let html = '<div class="pt-section-title">Symbol Payouts · Bet Multiplier</div>'
-
-  for (const [id, name, , pays] of PAYTABLE) {
-    const imgSrc = SYM_IMG(id)
-    const isBig = pays.some(([,m]) => m >= 50)
-    const chips = pays.map(([sz, m]) => {
-      const big = m >= 50 ? ' big' : ''
-      const val = m % 1 === 0 ? m + '×' : m + '×'
-      return `<span class="pt-pay-chip${big}">${sz}+&nbsp;${val}</span>`
-    }).join('')
+  for (const [id, name, pays] of PAYTABLE) {
+    const chips = pays.map(([sz, m]) =>
+      `<span class="pt-pay-chip${m >= 50 ? ' big' : ''}">${sz}+&nbsp;${m}×</span>`
+    ).join('')
     html += `
       <div class="pt-row">
-        <img class="pt-sym-img" src="${imgSrc}" alt="${name}" onerror="this.style.opacity='.3'">
+        <img class="pt-sym-img" src="${SYM_IMG(id)}" alt="${name}" onerror="this.style.opacity='.3'">
         <span class="pt-sym-name">${name}</span>
         <div class="pt-pays">${chips}</div>
       </div>`
@@ -1683,39 +1694,66 @@ function buildPaytable() {
   html += `
     <div class="pt-special-row">
       <img class="pt-sym-img" src="${SYM_IMG(11)}" alt="WILD" onerror="this.style.opacity='.3'">
-      <div class="pt-special-desc"><b>WILD</b> — substitutes for all regular symbols in any cluster.</div>
+      <div class="pt-special-desc"><b>WILD</b> — substitutes for all regular symbols.</div>
     </div>
     <div class="pt-special-row">
       <img class="pt-sym-img" src="${SYM_IMG(12)}" alt="SCATTER" onerror="this.style.opacity='.3'">
+      <div class="pt-special-desc"><b>SCATTER</b> — triggers Bonus Game:<br>
+        <b>4 Scatters</b> → 10 Bonus Spins<br>
+        <b>5 Scatters</b> → 15 Bonus Spins<br>
+        <b>6 Scatters</b> → 20 Bonus Spins
+      </div>
+    </div>
+    <div class="pt-section-title">Bonus Multipliers</div>
+    <div class="pt-special-row">
+      <div style="font-size:22px;width:40px;text-align:center">✦</div>
       <div class="pt-special-desc">
-        <b>SCATTER</b> — triggers Free Spins anywhere on grid:<br>
-        <b>4 Scatters</b> → 10 Free Spins<br>
-        <b>5 Scatters</b> → 15 Free Spins<br>
-        <b>6 Scatters</b> → 20 Free Spins
+        <b>MULTIPLIER SYMBOLS</b> drop during Bonus Game spins.<br>
+        Values: <span style="color:#cd7f32">×2–×5</span> ·
+                <span style="color:#c0c0c0">×8–×15</span> ·
+                <span style="color:#ffd700">×25–×50</span> ·
+                <span style="color:#dd2200">×100–×250</span> ·
+                <span style="color:#fff">×500–×1000</span><br>
+        Multipliers <b>only accumulate</b> when the spin has a winning cluster.<br>
+        <b>Total Bonus Multiplier</b> persists the entire Bonus Game.
       </div>
     </div>`
 
   html += `
     <div class="pt-note">
-      <b>Cluster Pays</b> — 8 or more adjacent matching symbols (horizontal/vertical) form a winning cluster.<br>
-      After each win, symbols are removed and new ones fall in — cascades continue until no clusters remain.<br>
-      All payouts multiply your current bet amount.
+      <b>Cluster Pays</b> — 8+ adjacent matching symbols form a winning cluster.<br>
+      Winning symbols are removed and new ones fall in — cascades continue until no clusters remain.<br>
+      Win thresholds: <b>5×</b>=NICE WIN · <b>15×</b>=BIG WIN · <b>50×</b>=MASSIVE WIN · <b>100×</b>=LEGENDARY WIN
     </div>`
 
   body.innerHTML = html
 }
 
-function openPaytable() {
-  buildPaytable()
-  document.getElementById('ptOverlay').classList.add('open')
-}
-function closePaytable() {
-  document.getElementById('ptOverlay').classList.remove('open')
+function openPaytable()  { buildPaytable(); document.getElementById('ptOverlay').classList.add('open') }
+function closePaytable() { document.getElementById('ptOverlay').classList.remove('open') }
+
+// ── Bonus state restore on page load ─────────────────────────────────────────
+// Server keeps session in memory; query config endpoint to check for active bonus
+async function checkBonusRestore() {
+  if (!TOKEN) return
+  try {
+    const r = await fetch('/tma/v1/slots/config', {
+      method:'GET', headers:{'Authorization':'Bearer '+TOKEN}
+    })
+    if (!r.ok) return
+    const d = await r.json()
+    // Server returns bonus_spins_left and bonus_mult_total in config if active
+    if (d.bonus_spins_left > 0) {
+      bonusSpinsLeft = d.bonus_spins_left
+      bonusMultTotal = d.bonus_mult_total || 0
+      enterBonusMode()
+    }
+  } catch {}
 }
 
 // ── Boot ──────────────────────────────────────────────────────────────────────
 initGrid()
-auth()
+auth().then(() => checkBonusRestore())
 </script>
 </body>
 </html>

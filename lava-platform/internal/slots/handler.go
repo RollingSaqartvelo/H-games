@@ -254,16 +254,26 @@ func (h *Handler) Config(c *gin.Context) {
 		bal, _ = balResp.Balance.Float64()
 	}
 
+	// Include active bonus session state so the frontend can restore auto-spin on reload
+	bsLeft := 0
+	bsMult := 0
+	if bs := h.getBonusSession(sess.UserID); bs != nil {
+		bsLeft = bs.SpinsLeft
+		bsMult = bs.MultTotal
+	}
+
 	c.JSON(http.StatusOK, gin.H{
-		"balance":      bal,
-		"currency":     sess.Currency,
-		"min_bet":      0.10,
-		"max_bet":      1000.0,
-		"default_bet":  1.00,
-		"grid_cols":    NumCols,
-		"grid_rows":    NumRows,
-		"cluster_min":  ClusterMin,
-		"symbols":      symbolsInfo(),
+		"balance":          bal,
+		"currency":         sess.Currency,
+		"min_bet":          0.10,
+		"max_bet":          1000.0,
+		"default_bet":      1.00,
+		"grid_cols":        NumCols,
+		"grid_rows":        NumRows,
+		"cluster_min":      ClusterMin,
+		"symbols":          symbolsInfo(),
+		"bonus_spins_left": bsLeft,
+		"bonus_mult_total": bsMult,
 	})
 }
 

@@ -1732,9 +1732,26 @@ function buildPaytable() {
 function openPaytable()  { buildPaytable(); document.getElementById('ptOverlay').classList.add('open') }
 function closePaytable() { document.getElementById('ptOverlay').classList.remove('open') }
 
+// ── Bonus state restore on page load ─────────────────────────────────────────
+async function checkBonusRestore() {
+  if (!TOKEN) return
+  try {
+    const r = await fetch('/tma/v1/slots/config', {
+      method:'GET', headers:{'Authorization':'Bearer '+TOKEN}
+    })
+    if (!r.ok) return
+    const d = await r.json()
+    if (d.bonus_spins_left > 0) {
+      bonusSpinsLeft = d.bonus_spins_left
+      bonusMultTotal = d.bonus_mult_total || 0
+      enterBonusMode()
+    }
+  } catch {}
+}
+
 // ── Boot ──────────────────────────────────────────────────────────────────────
 initGrid()
-auth()
+auth().then(() => checkBonusRestore())
 </script>
 </body>
 </html>
