@@ -12,7 +12,7 @@ import { Container, Sprite, Texture, VideoSource, Filter, GlProgram, Graphics } 
 const VIDEO_SRC = '/assets/outlaw/sheriff_run_shoot.mp4'
 
 const SHERIFF_DISPLAY_H   = 300
-const SHERIFF_HOOF_ANCHOR = 0.59
+const SHERIFF_HOOF_ANCHOR = 0.88
 
 // ── Luma-key filter (removes black background from video) ─────────────────────
 

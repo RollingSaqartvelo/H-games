@@ -12,7 +12,7 @@ import { Container, Graphics, Sprite, Assets, Texture, VideoSource, Filter, GlPr
 import { ASSET_PATHS, HORSE_SCALE, HORSE_HOOF_OFFSET_Y } from '../../game/config'
 
 const OUTLAW_DISPLAY_H    = 300
-const OUTLAW_HOOF_ANCHOR  = 0.59
+const OUTLAW_HOOF_ANCHOR  = 0.88
 
 // Luma-key shader — matches SheriffRider exactly (removes black background from video)
 const LUMA_VERT = `
