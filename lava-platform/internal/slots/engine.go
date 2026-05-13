@@ -103,24 +103,105 @@ type Cluster struct {
 	Symbol int     `json:"symbol"`
 	Size   int     `json:"size"`
 	Cells  []Cell  `json:"cells"`
-	Mult   float64 `json:"mult"` // payout multiplier (before bet scaling)
+	Mult   float64 `json:"mult"`
 }
 
 type CascadeStep struct {
 	Grid     Grid      `json:"grid"`
 	Clusters []Cluster `json:"clusters"`
-	Payout   float64   `json:"payout"` // sum of cluster payouts * bet
+	Payout   float64   `json:"payout"`
+}
+
+// MultiplierCell — bonus-mode overlay cell with a persistent multiplier value.
+// Appears on top of regular symbols; value accumulates into BonusMultTotal when a win occurs.
+type MultiplierCell struct {
+	Row   int `json:"row"`
+	Col   int `json:"col"`
+	Value int `json:"value"`
 }
 
 type SpinResult struct {
-	ServerSeedHash string        `json:"server_seed_hash"`
-	Nonce          int64         `json:"nonce"`
-	InitialGrid    Grid          `json:"initial_grid"`
-	Cascades       []CascadeStep `json:"cascades"`
-	TotalPayout    float64       `json:"total_payout"`
-	ScatterCount   int           `json:"scatter_count"`
-	FreeSpinsAwarded int         `json:"free_spins_awarded"`
-	Bet            float64       `json:"bet"`
+	ServerSeedHash   string           `json:"server_seed_hash"`
+	Nonce            int64            `json:"nonce"`
+	InitialGrid      Grid             `json:"initial_grid"`
+	Cascades         []CascadeStep    `json:"cascades"`
+	TotalPayout      float64          `json:"total_payout"`
+	ScatterCount     int              `json:"scatter_count"`
+	FreeSpinsAwarded int              `json:"free_spins_awarded"`
+	Bet              float64          `json:"bet"`
+	// Bonus multiplier fields (only populated during free-spin mode)
+	MultiplierCells  []MultiplierCell `json:"multiplier_cells,omitempty"`
+	MultCollected    int              `json:"mult_collected,omitempty"` // sum of cells collected this spin (if win)
+}
+
+// ── Multiplier tier weights ─────────────────────────────────────────────────────
+
+var multTiers = []struct {
+	Value  int
+	Weight int
+}{
+	{2, 500}, {3, 350}, {4, 250}, {5, 180}, // common
+	{8, 80}, {10, 60}, {12, 40}, {15, 28},  // uncommon
+	{25, 12}, {50, 6},                       // rare
+	{100, 3}, {250, 1},                      // epic
+	{500, 1}, {1000, 0},                     // legendary (effectively disabled)
+}
+
+func pickMultiplierValue(r *rng) int {
+	total := 0
+	for _, t := range multTiers {
+		total += t.Weight
+	}
+	if total == 0 {
+		return 2
+	}
+	roll := r.intn(total)
+	cum := 0
+	for _, t := range multTiers {
+		cum += t.Weight
+		if roll < cum {
+			return t.Value
+		}
+	}
+	return 2
+}
+
+// placeMultiplierCells randomly places 0–3 multiplier overlays on unique grid cells.
+func placeMultiplierCells(r *rng) []MultiplierCell {
+	// Distribution: 55% → 0 cells, 30% → 1, 12% → 2, 3% → 3
+	roll := r.intn(100)
+	var count int
+	switch {
+	case roll < 55:
+		count = 0
+	case roll < 85:
+		count = 1
+	case roll < 97:
+		count = 2
+	default:
+		count = 3
+	}
+	if count == 0 {
+		return nil
+	}
+
+	type pos struct{ row, col int }
+	pool := make([]pos, NumRows*NumCols)
+	for i := range pool {
+		pool[i] = pos{i / NumCols, i % NumCols}
+	}
+
+	cells := make([]MultiplierCell, 0, count)
+	for i := 0; i < count; i++ {
+		j := i + r.intn(len(pool)-i)
+		pool[i], pool[j] = pool[j], pool[i]
+		cells = append(cells, MultiplierCell{
+			Row:   pool[i].row,
+			Col:   pool[i].col,
+			Value: pickMultiplierValue(r),
+		})
+	}
+	return cells
 }
 
 // ── RNG from HMAC-SHA256 ───────────────────────────────────────────────────────
@@ -385,9 +466,11 @@ func forceScatters(g Grid, r *rng, minCount int) Grid {
 	return g
 }
 
-// Spin runs a full spin including cascades. minForcedScatters > 0 guarantees
-// at least that many scatters on the initial grid (used for bonus buy).
-func Spin(cfg *Config, serverSeed string, nonce int64, bet float64, minForcedScatters int) *SpinResult {
+// Spin runs a full spin including cascades.
+// minForcedScatters > 0 guarantees scatter trigger (bonus buy).
+// isFreeSpin = true places multiplier cells on the grid (bonus round mechanic).
+// currentBonusMult is the accumulated bonus multiplier from previous free spins.
+func Spin(cfg *Config, serverSeed string, nonce int64, bet float64, minForcedScatters int, isFreeSpin bool, currentBonusMult int) *SpinResult {
 	r := newRNG(serverSeed, nonce)
 	grid := generateGrid(cfg, r)
 	if minForcedScatters > 0 {
@@ -399,6 +482,11 @@ func Spin(cfg *Config, serverSeed string, nonce int64, bet float64, minForcedSca
 		Nonce:          nonce,
 		InitialGrid:    grid,
 		Bet:            bet,
+	}
+
+	// Place multiplier cells during free spin mode
+	if isFreeSpin {
+		result.MultiplierCells = placeMultiplierCells(r)
 	}
 
 	// Count scatters on initial grid
@@ -428,13 +516,30 @@ func Spin(cfg *Config, serverSeed string, nonce int64, bet float64, minForcedSca
 		current = applyTumble(current, clusters, cfg, r)
 	}
 
-	// If no cascades, store the final grid as the only step (for frontend reference)
+	// If no cascades, store initial grid as the only step
 	if len(result.Cascades) == 0 {
 		result.Cascades = append(result.Cascades, CascadeStep{
 			Grid:     grid,
 			Clusters: nil,
 			Payout:   0,
 		})
+	}
+
+	// Collect multiplier cells if there was any win this spin
+	if result.TotalPayout > 0 && len(result.MultiplierCells) > 0 {
+		for _, mc := range result.MultiplierCells {
+			result.MultCollected += mc.Value
+		}
+	}
+
+	// Apply accumulated bonus multiplier to payout
+	effectiveMult := currentBonusMult + result.MultCollected
+	if effectiveMult > 1 && result.TotalPayout > 0 {
+		result.TotalPayout = result.TotalPayout * float64(effectiveMult)
+		// Re-scale cascade steps proportionally so frontend display is consistent
+		for i := range result.Cascades {
+			result.Cascades[i].Payout = result.Cascades[i].Payout * float64(effectiveMult)
+		}
 	}
 
 	return result

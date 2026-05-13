@@ -16,6 +16,12 @@ import (
 	"github.com/shopspring/decimal"
 )
 
+// bonusSession tracks persistent bonus-round state per player.
+type bonusSession struct {
+	SpinsLeft int
+	MultTotal int // accumulated bonus multiplier (starts at 0, grows with wins)
+}
+
 // Handler handles H-SLOTS HTTP requests.
 type Handler struct {
 	wallet *walletSvc.InternalWalletProvider
@@ -23,6 +29,8 @@ type Handler struct {
 
 	mu      sync.Mutex
 	nonces  map[string]int64 // userID → next nonce
+
+	bonusSessions sync.Map // userID → *bonusSession
 }
 
 func NewHandler(wallet *walletSvc.InternalWalletProvider) *Handler {
@@ -30,6 +38,22 @@ func NewHandler(wallet *walletSvc.InternalWalletProvider) *Handler {
 		wallet: wallet,
 		cfg:    DefaultConfig(),
 		nonces: make(map[string]int64),
+	}
+}
+
+func (h *Handler) getBonusSession(userID string) *bonusSession {
+	val, ok := h.bonusSessions.Load(userID)
+	if !ok {
+		return nil
+	}
+	return val.(*bonusSession)
+}
+
+func (h *Handler) setBonusSession(userID string, bs *bonusSession) {
+	if bs == nil || bs.SpinsLeft <= 0 {
+		h.bonusSessions.Delete(userID)
+	} else {
+		h.bonusSessions.Store(userID, bs)
 	}
 }
 
@@ -126,6 +150,15 @@ func (h *Handler) Spin(c *gin.Context) {
 		balanceAfterBet = balResp.Balance
 	}
 
+	// ── Bonus session lookup ──────────────────────────────────────────────────
+	bs := h.getBonusSession(sess.UserID)
+	isFree := req.FreeSpin && bs != nil && bs.SpinsLeft > 0
+	currentMult := 0
+	if isFree && bs != nil {
+		currentMult = bs.MultTotal
+		bs.SpinsLeft--
+	}
+
 	// ── Run spin ──────────────────────────────────────────────────────────────
 	seed := serverSeed()
 	nonce := h.nextNonce(sess.UserID)
@@ -135,27 +168,40 @@ func (h *Handler) Spin(c *gin.Context) {
 		minScatters = minScattersForTier[tier]
 	}
 
-	result := Spin(h.cfg, seed, nonce, req.Bet, minScatters)
+	result := Spin(h.cfg, seed, nonce, req.Bet, minScatters, isFree, currentMult)
+
+	// ── Update bonus session with collected multipliers ───────────────────────
+	if isFree && bs != nil {
+		bs.MultTotal = currentMult + result.MultCollected
+		h.setBonusSession(sess.UserID, bs)
+	}
+
+	// ── Award new free spins (scatter trigger or re-trigger) ──────────────────
+	bonusSpinsLeft := 0
+	bonusMultTotal := 0
+	if result.FreeSpinsAwarded > 0 {
+		existing := h.getBonusSession(sess.UserID)
+		newBS := &bonusSession{SpinsLeft: result.FreeSpinsAwarded, MultTotal: 0}
+		if existing != nil {
+			newBS.SpinsLeft += existing.SpinsLeft
+			newBS.MultTotal = existing.MultTotal
+		}
+		h.setBonusSession(sess.UserID, newBS)
+	}
+	if final := h.getBonusSession(sess.UserID); final != nil {
+		bonusSpinsLeft = final.SpinsLeft
+		bonusMultTotal = final.MultTotal
+	}
 
 	// ── Credit winnings ───────────────────────────────────────────────────────
 	finalBalance := balanceAfterBet
-	if result.TotalPayout > 0 && !req.FreeSpin {
+	if result.TotalPayout > 0 {
 		winDec := decimal.NewFromFloat(result.TotalPayout)
-		winTxID := fmt.Sprintf("slot-win-%s-%d", sess.UserID, time.Now().UnixNano())
-		creditResp, err := h.wallet.Credit(c.Request.Context(), &domain.CreditRequest{
-			UserID:        sess.UserID,
-			Amount:        winDec,
-			Currency:      sess.Currency,
-			TransactionID: winTxID,
-			RoundID:       roundID,
-		})
-		if err == nil {
-			finalBalance = creditResp.Balance
+		txSuffix := "win"
+		if isFree {
+			txSuffix = "freewin"
 		}
-	} else if result.TotalPayout > 0 && req.FreeSpin {
-		// Free spin win: credit the full win
-		winDec := decimal.NewFromFloat(result.TotalPayout)
-		winTxID := fmt.Sprintf("slot-freewin-%s-%d", sess.UserID, time.Now().UnixNano())
+		winTxID := fmt.Sprintf("slot-%s-%s-%d", txSuffix, sess.UserID, time.Now().UnixNano())
 		creditResp, err := h.wallet.Credit(c.Request.Context(), &domain.CreditRequest{
 			UserID:        sess.UserID,
 			Amount:        winDec,
@@ -171,18 +217,22 @@ func (h *Handler) Spin(c *gin.Context) {
 	// ── Build response ────────────────────────────────────────────────────────
 	balF, _ := finalBalance.Float64()
 	c.JSON(http.StatusOK, gin.H{
-		"spin_id":            roundID,
-		"server_seed_hash":   result.ServerSeedHash,
-		"nonce":              result.Nonce,
-		"initial_grid":       gridToSlice(result.InitialGrid),
-		"cascades":           cascadesToJSON(result.Cascades),
-		"total_payout":       result.TotalPayout,
-		"scatter_count":      result.ScatterCount,
-		"free_spins_awarded": result.FreeSpinsAwarded,
-		"balance":            balF,
-		"bet":                req.Bet,
-		"bonus_buy_tier":     tier,
-		"effective_cost":     effectiveBet,
+		"spin_id":              roundID,
+		"server_seed_hash":     result.ServerSeedHash,
+		"nonce":                result.Nonce,
+		"initial_grid":         gridToSlice(result.InitialGrid),
+		"cascades":             cascadesToJSON(result.Cascades),
+		"total_payout":         result.TotalPayout,
+		"scatter_count":        result.ScatterCount,
+		"free_spins_awarded":   result.FreeSpinsAwarded,
+		"multiplier_cells":     result.MultiplierCells,
+		"mult_collected":       result.MultCollected,
+		"bonus_mult_total":     bonusMultTotal,
+		"bonus_spins_left":     bonusSpinsLeft,
+		"balance":              balF,
+		"bet":                  req.Bet,
+		"bonus_buy_tier":       tier,
+		"effective_cost":       effectiveBet,
 	})
 }
 
