@@ -482,6 +482,108 @@
       text-align:center; padding:40px 20px;
       font-family:'Courier New',monospace; font-size:12px; color:var(--brass);
     }
+
+    /* ── Paytable button ───────────────────────────────────────────── */
+    .paytable-btn {
+      position:absolute; bottom:10px; right:10px; z-index:9;
+      width:34px; height:34px; border-radius:50%;
+      background:linear-gradient(145deg,#2a1c08,#1a1206);
+      border:1px solid var(--gold);
+      color:var(--gold-b); font-size:15px; cursor:pointer;
+      display:flex; align-items:center; justify-content:center;
+      box-shadow:0 0 10px rgba(212,160,23,.35);
+      transition:all .15s;
+    }
+    .paytable-btn:active { transform:scale(.92); box-shadow:0 0 18px var(--gold) }
+
+    /* ── Paytable modal ────────────────────────────────────────────── */
+    .pt-overlay {
+      display:none; position:fixed; inset:0; z-index:100;
+      background:rgba(0,0,0,.82);
+      align-items:flex-end; justify-content:center;
+    }
+    .pt-overlay.open { display:flex }
+    .pt-modal {
+      width:100%; max-width:480px; max-height:88vh;
+      background:linear-gradient(180deg,#1e1408 0%,#110d06 100%);
+      border:2px solid var(--brass); border-bottom:none;
+      border-radius:20px 20px 0 0;
+      display:flex; flex-direction:column;
+      box-shadow:0 -8px 40px rgba(212,160,23,.2);
+      animation:pt-slide .28s cubic-bezier(.25,1.4,.5,1) both;
+    }
+    @keyframes pt-slide {
+      from{ transform:translateY(100%) }
+      to  { transform:translateY(0) }
+    }
+    .pt-header {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:14px 16px 10px;
+      border-bottom:1px solid var(--border);
+      flex-shrink:0;
+    }
+    .pt-title {
+      font-family:'Orbitron',sans-serif; font-weight:900; font-size:13px;
+      letter-spacing:3px; color:var(--gold-b);
+      text-shadow:0 0 12px var(--gold);
+    }
+    .pt-close {
+      width:30px; height:30px; border-radius:8px;
+      background:rgba(0,0,0,.4); border:1px solid var(--border);
+      color:var(--gold); font-size:14px; cursor:pointer;
+      display:flex; align-items:center; justify-content:center;
+    }
+    .pt-body {
+      overflow-y:auto; padding:10px 12px 24px;
+      -webkit-overflow-scrolling:touch;
+    }
+    .pt-section-title {
+      font-family:'Orbitron',sans-serif; font-size:8px; letter-spacing:3px;
+      color:var(--brass); text-transform:uppercase; margin:14px 0 8px;
+      padding-bottom:4px; border-bottom:1px solid var(--border);
+    }
+    .pt-row {
+      display:flex; align-items:center; gap:10px;
+      padding:7px 0; border-bottom:1px solid rgba(212,160,23,.07);
+    }
+    .pt-sym-img {
+      width:40px; height:40px; object-fit:contain; flex-shrink:0;
+      border:1px solid rgba(184,134,11,.3); border-radius:8px;
+      background:linear-gradient(145deg,#1c1508,#100c04);
+      padding:4px;
+    }
+    .pt-sym-name {
+      font-family:'Orbitron',sans-serif; font-size:9px; font-weight:700;
+      color:var(--gold-b); letter-spacing:1px; min-width:72px; flex-shrink:0;
+    }
+    .pt-pays {
+      display:flex; flex-wrap:wrap; gap:4px; flex:1;
+    }
+    .pt-pay-chip {
+      padding:2px 6px; border-radius:6px;
+      font-family:'Orbitron',sans-serif; font-size:8px; font-weight:700;
+      background:rgba(212,160,23,.1); border:1px solid rgba(212,160,23,.3);
+      color:var(--gold-b); white-space:nowrap;
+    }
+    .pt-pay-chip.big {
+      background:rgba(255,68,34,.12); border-color:rgba(255,68,34,.4);
+      color:var(--red-b);
+    }
+    .pt-special-row {
+      display:flex; align-items:flex-start; gap:10px;
+      padding:8px 0; border-bottom:1px solid rgba(212,160,23,.07);
+    }
+    .pt-special-desc {
+      flex:1; font-size:9px; line-height:1.6; color:rgba(212,160,23,.7);
+    }
+    .pt-special-desc b { color:var(--gold-b) }
+    .pt-note {
+      margin-top:14px; padding:8px 12px;
+      background:rgba(212,160,23,.06); border:1px solid rgba(212,160,23,.15);
+      border-radius:8px; font-size:8px; line-height:1.7;
+      color:rgba(212,160,23,.6); letter-spacing:.5px;
+    }
+    .pt-note b { color:var(--gold-b) }
   </style>
 </head>
 <body>
@@ -555,6 +657,9 @@
       </div>
     </div>
 
+    <!-- Paytable button -->
+    <button class="paytable-btn" onclick="openPaytable()" title="Paytable">📋</button>
+
     <!-- Win overlay -->
     <div class="win-overlay" id="winOverlay">
       <div class="win-label" id="winLabel">WIN</div>
@@ -567,6 +672,17 @@
       <div class="fs-title">FREE SPINS</div>
       <div class="fs-count" id="fsCountBanner">10</div>
       <div class="fs-label">AWARDED</div>
+    </div>
+  </div>
+
+  <!-- Paytable modal -->
+  <div class="pt-overlay" id="ptOverlay" onclick="closePaytable()">
+    <div class="pt-modal" onclick="event.stopPropagation()">
+      <div class="pt-header">
+        <span class="pt-title">PAYTABLE</span>
+        <button class="pt-close" onclick="closePaytable()">✕</button>
+      </div>
+      <div class="pt-body" id="ptBody"></div>
     </div>
   </div>
 
@@ -1010,6 +1126,79 @@ function setBet(v) {
 
 // ── Util ──────────────────────────────────────────────────────────────────────
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)) }
+
+// ── Paytable ──────────────────────────────────────────────────────────────────
+const PAYTABLE = [
+  // [symId, displayName, tier, payouts: [[minSize, mult], ...]]
+  [10, 'SHERIFF',     'high',    [[8,8],[10,16],[12,25],[15,50],[20,100],[30,500]]],
+  [9,  'OUTLAW',      'high',    [[8,5],[10,10],[12,16],[15,30],[20,60],[30,200]]],
+  [8,  'DYNAMITE',    'high',    [[8,3],[10,6],[12,10],[15,18],[20,35],[30,80]]],
+  [7,  'GOLD BAG',    'mid',     [[8,2],[10,4],[12,7],[15,12],[20,20],[30,50]]],
+  [6,  'COWBOY HAT',  'mid',     [[8,1.5],[10,3],[12,5],[15,8],[20,14],[30,30]]],
+  [5,  'REVOLVER',    'mid',     [[8,1],[10,2],[12,3.5],[15,6],[20,10],[30,20]]],
+  [4,  'LANTERN',     'low',     [[8,0.8],[10,1.6],[12,2.5],[15,4],[20,7],[30,14]]],
+  [3,  'BADGE',       'low',     [[8,0.6],[10,1.2],[12,2],[15,3.2],[20,5.5],[30,10]]],
+  [2,  'BULLET',      'low',     [[8,0.5],[10,1],[12,1.6],[15,2.5],[20,4.5],[30,8]]],
+  [1,  'WHISKEY',     'low',     [[8,0.4],[10,0.8],[12,1.2],[15,2],[20,3.5],[30,6]]],
+  [0,  'HORSESHOE',   'low',     [[8,0.3],[10,0.6],[12,1],[15,1.6],[20,2.5],[30,4]]],
+]
+
+function buildPaytable() {
+  const body = document.getElementById('ptBody')
+  if (body._built) return
+  body._built = true
+
+  let html = '<div class="pt-section-title">Symbol Payouts · Bet Multiplier</div>'
+
+  for (const [id, name, , pays] of PAYTABLE) {
+    const imgSrc = SYM_IMG(id)
+    const isBig = pays.some(([,m]) => m >= 50)
+    const chips = pays.map(([sz, m]) => {
+      const big = m >= 50 ? ' big' : ''
+      const val = m % 1 === 0 ? m + '×' : m + '×'
+      return `<span class="pt-pay-chip${big}">${sz}+&nbsp;${val}</span>`
+    }).join('')
+    html += `
+      <div class="pt-row">
+        <img class="pt-sym-img" src="${imgSrc}" alt="${name}" onerror="this.style.opacity='.3'">
+        <span class="pt-sym-name">${name}</span>
+        <div class="pt-pays">${chips}</div>
+      </div>`
+  }
+
+  html += '<div class="pt-section-title">Special Symbols</div>'
+  html += `
+    <div class="pt-special-row">
+      <img class="pt-sym-img" src="${SYM_IMG(11)}" alt="WILD" onerror="this.style.opacity='.3'">
+      <div class="pt-special-desc"><b>WILD</b> — substitutes for all regular symbols in any cluster.</div>
+    </div>
+    <div class="pt-special-row">
+      <img class="pt-sym-img" src="${SYM_IMG(12)}" alt="SCATTER" onerror="this.style.opacity='.3'">
+      <div class="pt-special-desc">
+        <b>SCATTER</b> — triggers Free Spins anywhere on grid:<br>
+        <b>4 Scatters</b> → 10 Free Spins<br>
+        <b>5 Scatters</b> → 15 Free Spins<br>
+        <b>6 Scatters</b> → 20 Free Spins
+      </div>
+    </div>`
+
+  html += `
+    <div class="pt-note">
+      <b>Cluster Pays</b> — 8 or more adjacent matching symbols (horizontal/vertical) form a winning cluster.<br>
+      After each win, symbols are removed and new ones fall in — cascades continue until no clusters remain.<br>
+      All payouts multiply your current bet amount.
+    </div>`
+
+  body.innerHTML = html
+}
+
+function openPaytable() {
+  buildPaytable()
+  document.getElementById('ptOverlay').classList.add('open')
+}
+function closePaytable() {
+  document.getElementById('ptOverlay').classList.remove('open')
+}
 
 // ── Boot ──────────────────────────────────────────────────────────────────────
 initGrid()
