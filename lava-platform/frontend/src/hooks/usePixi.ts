@@ -14,6 +14,17 @@ export function usePixi(mountRef: React.RefObject<HTMLDivElement | null>): void 
 
     let canvas: HTMLCanvasElement | null = null
 
+    const handleVisibility = () => {
+      const engine = engineRef.current
+      if (!engine) return
+      if (document.hidden) {
+        engine.app.ticker.stop()
+      } else {
+        engine.app.ticker.start()
+      }
+    }
+    document.addEventListener('visibilitychange', handleVisibility)
+
     const initEngine = () => {
       GameEngine.create(el)
         .then((engine) => {
@@ -42,6 +53,7 @@ export function usePixi(mountRef: React.RefObject<HTMLDivElement | null>): void 
 
     return () => {
       destroyedRef.current = true
+      document.removeEventListener('visibilitychange', handleVisibility)
       engineRef.current?.destroy()
       engineRef.current = null
       useGame.getState().setPixiReady(false)

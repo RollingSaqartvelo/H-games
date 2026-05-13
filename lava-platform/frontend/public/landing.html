@@ -20,6 +20,18 @@
       --text: #d0d0d8;
       --muted: #444450;
       --border: rgba(255,255,255,.07);
+
+      /* Safe-area insets (iOS notch / Android nav) */
+      --sat: env(safe-area-inset-top,    0px);
+      --sab: env(safe-area-inset-bottom, 0px);
+      --sal: env(safe-area-inset-left,   0px);
+      --sar: env(safe-area-inset-right,  0px);
+
+      /* Fluid type scale */
+      --fs-xs:  clamp(7px,  1.5vw, 9px);
+      --fs-sm:  clamp(9px,  2vw,  11px);
+      --fs-md:  clamp(11px, 2.5vw,13px);
+      --fs-lg:  clamp(13px, 3vw,  15px);
     }
 
     html, body {
@@ -28,6 +40,9 @@
       color:var(--text);
       font-family:'Share Tech Mono','Courier New',monospace;
       overflow-x:hidden;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
     }
 
     /* ── 5-stripe Euphoria text ─────────────────────────────── */
@@ -61,8 +76,10 @@
     @keyframes blink2          { 0%,100%{ opacity:1 } 50%{ opacity:.2 } }
     @keyframes nav-border-sweep{ 0%{ background-position:0% 0 } 100%{ background-position:300% 0 } }
 
+    /* Pause ALL CSS animations when tab is hidden */
+    .tab-hidden * { animation-play-state:paused !important }
+
     /* ── Gradient border utility ────────────────────────────── */
-    /* Applied to any element that needs animated gradient outline */
     .gb {
       position:relative;
     }
@@ -71,6 +88,7 @@
       background:linear-gradient(135deg,var(--c1),var(--c2),var(--c3),var(--c4),var(--c5));
       background-size:300% 300%;
       animation:grad-flow 6s ease infinite;
+      will-change:background-position;
       padding:1px;
       -webkit-mask:linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
       -webkit-mask-composite:xor; mask-composite:exclude;
@@ -87,6 +105,8 @@
       position:relative; overflow:hidden;
       display:inline-flex; align-items:center; justify-content:center;
       white-space:nowrap; gap:8px;
+      -webkit-tap-highlight-color:transparent;
+      touch-action:manipulation;
     }
     .eu-btn > span { position:relative; z-index:2 }
     .eu-btn:active { transform:scale(.97) }
@@ -99,6 +119,7 @@
       color:#000;
       clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);
       animation:grad-flow 4s ease infinite;
+      will-change:background-position;
     }
     .eu-btn--primary:hover { opacity:.88 }
 
@@ -112,6 +133,7 @@
       background:linear-gradient(90deg,var(--c1),var(--c3),var(--c5),var(--c3),var(--c1));
       background-size:300% 100%;
       animation:border-spin 3s linear infinite;
+      will-change:background-position;
     }
     .eu-btn--outline::after {
       content:''; position:absolute; inset:1px; z-index:1;
@@ -153,6 +175,8 @@
     .bg-wrap {
       position:fixed; inset:0; z-index:0;
       background:url('/assets/bg/1.png') center/cover no-repeat;
+      transform:translateZ(0);
+      will-change:transform;
     }
     .bg-wrap::after {
       content:''; position:absolute; inset:0;
@@ -164,8 +188,8 @@
     ════════════════════════════════════════════════════ */
     .mobile {
       display:flex; flex-direction:column; align-items:center;
-      min-height:100vh;
-      padding:max(env(safe-area-inset-top,20px),20px) 20px 40px;
+      min-height:100vh; min-height:100svh;
+      padding:max(var(--sat),20px) max(var(--sar),20px) max(calc(var(--sab) + 20px),40px) max(var(--sal),20px);
       position:relative; z-index:1;
     }
 
@@ -236,11 +260,14 @@
       position:relative; overflow:hidden;
       transition:transform .15s; border:none; background:transparent;
       clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);
+      -webkit-tap-highlight-color:transparent;
+      touch-action:manipulation;
     }
     .m-game-btn::before {
       content:''; position:absolute; inset:0; z-index:0;
       background:linear-gradient(90deg,var(--c1),var(--c3),var(--c5),var(--c3),var(--c1));
       background-size:300% 100%; animation:border-spin 4s linear infinite;
+      will-change:background-position;
     }
     .m-game-btn::after {
       content:''; position:absolute; inset:1px; z-index:1;
@@ -352,7 +379,7 @@
 
       .desktop {
         display:flex; flex-direction:column;
-        width:100vw; height:100vh;
+        width:100vw; height:100vh; height:100dvh;
         background:transparent;
         position:relative; overflow:hidden;
       }
@@ -1128,6 +1155,40 @@ if (tg) {
   tg.disableVerticalSwipes?.()
   tg.setHeaderColor?.('#000000')
   tg.setBackgroundColor?.('#000000')
+  // Force viewport height fix for iOS Telegram WebApp
+  if (tg.viewportHeight) {
+    document.documentElement.style.setProperty('--tg-vh', tg.viewportHeight + 'px')
+    tg.onEvent('viewportChanged', () => {
+      document.documentElement.style.setProperty('--tg-vh', tg.viewportHeight + 'px')
+    })
+  }
+}
+
+// ── Tab visibility: pause CSS animations ─────────────────────────────────────
+document.addEventListener('visibilitychange', () => {
+  document.body.classList.toggle('tab-hidden', document.hidden)
+})
+
+// ── QA Mode (append ?qa=1) ────────────────────────────────────────────────────
+if (new URLSearchParams(location.search).get('qa') === '1') {
+  const qa = document.createElement('div')
+  qa.id = 'qa-overlay'
+  qa.style.cssText = 'position:fixed;top:0;right:0;z-index:99999;background:rgba(0,0,0,.75);color:#0f6;font-family:monospace;font-size:11px;padding:6px 10px;pointer-events:none;border-left:1px solid #0f6;border-bottom:1px solid #0f6'
+  document.body.appendChild(qa)
+  let frames=0, lastT=performance.now(), fps=60, drops=0
+  const rafLoop = (t) => {
+    frames++
+    if (t - lastT >= 1000) {
+      fps = Math.round(frames * 1000 / (t - lastT))
+      if (fps < 30) drops++
+      frames = 0; lastT = t
+      const dpr = window.devicePixelRatio.toFixed(1)
+      const w = window.innerWidth, h = window.innerHeight
+      qa.innerHTML = `FPS: ${fps}  DPR: ${dpr}<br>${w}×${h}  drops: ${drops}<br>${navigator.userAgent.includes('iPhone')?'iOS':navigator.userAgent.includes('Android')?'Android':'Desktop'}`
+    }
+    requestAnimationFrame(rafLoop)
+  }
+  requestAnimationFrame(rafLoop)
 }
 
 // ── Navigation ────────────────────────────────────────────────────────────────

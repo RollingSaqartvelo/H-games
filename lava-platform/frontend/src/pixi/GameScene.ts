@@ -248,7 +248,8 @@ export class GameScene {
   // ── Main tick ─────────────────────────────────────────────────────────────
 
   private tick = ({ deltaMS }: { deltaMS: number }): void => {
-    const dt  = deltaMS / 1000
+    // Cap at 50ms (20fps floor) to prevent spiral-of-death after tab switch
+    const dt  = Math.min(deltaMS / 1000, 0.05)
     const now = Date.now()
 
     const { roundState, elapsedMs, lastTickAt } = useGame.getState()
