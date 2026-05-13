@@ -256,6 +256,20 @@
     .lip-empty{padding:20px 0;text-align:center;font-family:'Orbitron',sans-serif;font-size:9px;font-weight:600;color:rgba(251,125,232,.25);letter-spacing:1px}
     .no-session{text-align:center;padding:16px;font-family:'Courier New',monospace;font-size:11px;color:var(--muted)}
 
+    /* ── Pop burst explosion ─────────────────────────────── */
+    @keyframes pop-burst{
+      0%  {transform:scale(0.05) rotate(-8deg);opacity:0}
+      12% {transform:scale(1.45) rotate(3deg); opacity:1}
+      40% {transform:scale(1.20) rotate(-2deg);opacity:1}
+      100%{transform:scale(2.00) rotate(5deg); opacity:0}
+    }
+    @keyframes game-flash{
+      0%  {box-shadow:inset 0 0 0 6px rgba(255,60,180,1),0 0 60px rgba(255,60,180,.6)}
+      100%{box-shadow:0 0 0 1px rgba(244,114,182,.05),0 0 36px rgba(244,114,182,.08),inset 0 0 80px rgba(0,0,0,.45)}
+    }
+    .game-area.popping{animation:game-flash .55s ease-out}
+    #popBurst.popping{display:block!important;animation:pop-burst 1.1s cubic-bezier(.22,1,.36,1) forwards}
+
     /* ── Social ticker ─────────────────────────────────────── */
     .social-ticker{position:absolute;top:8px;right:8px;z-index:6;display:flex;flex-direction:column;gap:4px;pointer-events:none;max-width:175px}
     .social-tick{background:rgba(10,0,20,0.88);border:1px solid var(--pink-dim);border-radius:8px;padding:4px 8px;font-family:'Courier New',monospace;font-size:10px;color:var(--pink-b);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;animation:tickIn .3s ease}
@@ -307,15 +321,14 @@
   </div>
 
   <!-- Game area -->
-  <div class="game-area">
-    <!-- Idle frame (during countdown) -->
-    <img  id="idleImg"  class="scene-img" src="/assets/bubble/char_idle.png" alt="">
+  <div class="game-area" id="gameArea">
+    <!-- Idle frame hidden (black screen during betting) -->
+    <img  id="idleImg"  class="scene-img" src="/assets/bubble/char_idle.png" alt="" style="display:none">
     <!-- Bubble grow video (during round) -->
     <video id="growVid" class="scene-vid" src="/assets/bubble/grow.mp4"
            playsinline muted loop preload="auto"></video>
-    <!-- Pop video (on crash) -->
-    <video id="popVid"  class="scene-vid" src="/assets/bubble/pop.mp4"
-           playsinline muted preload="auto"></video>
+    <!-- Pop burst image (on crash, replaces missing pop.mp4) -->
+    <img id="popBurst" class="scene-img" src="/assets/bubble/pop_burst.png" alt="" style="object-fit:contain;display:none">
 
     <!-- Multiplier -->
     <div class="mult-wrap">
@@ -490,20 +503,23 @@ let queuedNextBet   = [null, null]
 
 // ── Video scene ───────────────────────────────────────────────────────────────
 const growVid = document.getElementById('growVid')
-const popVid  = document.getElementById('popVid')
 const idleImg = document.getElementById('idleImg')
 
 function sceneShowIdle() {
   growVid.classList.remove('wobbling')
   growVid.pause()
   growVid.style.display = 'none'
-  popVid.style.display  = 'none'
-  idleImg.style.display = 'block'
+  idleImg.style.display = 'none'
+  const pb = document.getElementById('popBurst')
+  pb.classList.remove('popping')
+  pb.style.display = 'none'
 }
 
 function sceneShowGrow() {
   idleImg.style.display = 'none'
-  popVid.style.display  = 'none'
+  const pb = document.getElementById('popBurst')
+  pb.classList.remove('popping')
+  pb.style.display = 'none'
   growVid.style.display = 'block'
   growVid.loop = true
   if (growVid.paused) growVid.play().catch(() => {})
@@ -514,9 +530,15 @@ function sceneShowPop() {
   growVid.style.display = 'none'
   growVid.classList.remove('wobbling')
   growVid.pause()
-  popVid.style.display  = 'block'
-  popVid.currentTime = 0
-  popVid.play().catch(() => {})
+  // Burst animation using static image
+  const ga = document.getElementById('gameArea')
+  const pb = document.getElementById('popBurst')
+  pb.classList.remove('popping')
+  ga.classList.remove('popping')
+  void pb.offsetWidth
+  pb.classList.add('popping')
+  ga.classList.add('popping')
+  setTimeout(() => ga.classList.remove('popping'), 600)
 }
 
 function sceneUpdateWobble(mult) {

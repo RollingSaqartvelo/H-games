@@ -152,7 +152,7 @@
     ════════════════════════════════════════════════════ */
     .bg-wrap {
       position:fixed; inset:0; z-index:0;
-      background:url('/assets/bg/newlogo.png') center/cover no-repeat;
+      background:url('/assets/bg/1.png') center/cover no-repeat;
     }
     .bg-wrap::after {
       content:''; position:absolute; inset:0;
@@ -171,7 +171,7 @@
 
     .m-logo { margin-bottom:4px; display:block }
     .m-logo img { width:220px; max-width:80vw; display:block; margin:0 auto }
-    .m-sub { font-size:8px; letter-spacing:.5em; text-transform:uppercase; color:var(--muted); margin-bottom:24px }
+    .m-sub { font-size:8px; letter-spacing:.5em; text-transform:uppercase; color:#ffffff; margin-bottom:24px }
 
     /* Player card */
     .m-card {
@@ -224,7 +224,7 @@
     .m-games-lbl {
       width:100%; max-width:320px;
       font-size:8px; letter-spacing:.4em; text-transform:uppercase;
-      color:var(--muted); margin-bottom:12px; text-align:center;
+      color:#ffffff; margin-bottom:12px; text-align:center;
     }
 
     /* Mobile game buttons — outline gradient */
@@ -273,11 +273,14 @@
     }
     .m-sec-row { display:flex; gap:6px; width:100%; max-width:320px; margin-bottom:24px }
     .m-sec-btn {
-      flex:1; padding:8px 4px; background:transparent; border:1px solid var(--border);
-      color:var(--muted); font-size:8px; letter-spacing:.15em; text-transform:uppercase;
+      flex:1; padding:9px 4px; background:rgba(0,0,0,.45);
+      border:1px solid; font-size:8px; letter-spacing:.15em; text-transform:uppercase;
       cursor:pointer; font-family:'Share Tech Mono',monospace; transition:all .2s;
     }
-    .m-sec-btn:active { color:var(--c1); border-color:rgba(0,229,255,.4) }
+    .m-sec-btn:nth-child(1){border-color:rgba(0,229,255,.55);color:rgba(0,229,255,.8);box-shadow:0 0 10px rgba(0,229,255,.2),inset 0 0 8px rgba(0,229,255,.06)}
+    .m-sec-btn:nth-child(2){border-color:rgba(119,0,255,.55);color:rgba(180,110,255,.8);box-shadow:0 0 10px rgba(119,0,255,.2),inset 0 0 8px rgba(119,0,255,.06)}
+    .m-sec-btn:nth-child(3){border-color:rgba(204,0,187,.55);color:rgba(230,100,215,.8);box-shadow:0 0 10px rgba(204,0,187,.2),inset 0 0 8px rgba(204,0,187,.06)}
+    .m-sec-btn:active { opacity:.7; transform:scale(.97) }
 
     .m-footer { width:100%; max-width:320px; border-top:1px solid var(--border); padding-top:12px }
     .m-f-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px }
@@ -558,7 +561,7 @@
 <div class="mobile">
 
   <div class="m-logo">
-    <img src="/assets/hgames-logo.jpg" alt="H-GAMES">
+    <img src="/assets/bg/newlogo.png" alt="H-GAMES">
   </div>
   <div class="m-sub">Premium Game Provider</div>
 
@@ -646,7 +649,7 @@
 
   <nav class="d-nav">
     <div class="d-nav__logo">
-      <img src="/assets/hgames-logo.jpg" alt="H-GAMES">
+      <img src="/assets/bg/newlogo.png" alt="H-GAMES">
     </div>
     <div class="d-nav__links">
       <a onclick="onFairPlay()">Provably Fair</a>
@@ -664,7 +667,7 @@
     <div class="d-left">
       <div class="d-logo-wrap">
         <div class="d-logo">
-          <img src="/assets/hgames-logo.jpg" alt="H-GAMES">
+          <img src="/assets/bg/newlogo.png" alt="H-GAMES">
         </div>
       </div>
       <div class="d-provider eu-tag">Premium Crash Game Provider</div>

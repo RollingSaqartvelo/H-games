@@ -247,14 +247,17 @@ func isNearWhite(c color.RGBA) bool {
 // ── Outlaw Escape asset generation ───────────────────────────────────────────
 
 // outlawStyle is the exact visual DNA extracted from the reference images.
-// Flat geometric low-poly vector illustration — NO gradients, NO outlines.
+// Flat geometric painted style — bold flat color shapes like a WPA mural.
 const outlawStyle = `MANDATORY ART STYLE — match EXACTLY, no deviation:
-Flat geometric low-poly vector illustration. Travel poster / WPA mural aesthetic.
-All shapes are hard-edged flat-color polygons. ZERO gradients inside any single shape.
-No cartoon outlines. Shape edges defined purely by adjacent flat color contrast.
-Strong bold simplified geometric silhouettes. Limited tonal range per object.
+PAINTED FLAT-COLOR STYLE. Like a WPA New Deal mural or national park travel poster painted with gouache.
+Everything looks hand-painted with broad flat brush strokes forming geometric shapes.
+NO photorealism. NO 3D rendering. NO gradients inside any shape.
+Each shape = one solid flat paint color. Hard sharp edges between adjacent colors.
+Looks like illustration art painted on a flat surface — bold, graphic, mural-style.
+Angular geometric simplified shapes for everything: clouds, mountains, earth, plants.
+Rich deep saturated colors typical of 1930s-40s poster art.
 
-MANDATORY COLOR PALETTE — exact values, do not substitute:
+MANDATORY COLOR PALETTE — exact values:
   Sky clear:       #5A7FA8 / #3A5070 (deep)
   Cloud cream:     #E0CFA8 (highlight), #C8B890 (mid), #8A7888 (shadow), #6A5868 (dark)
   Mountain slate:  #4A5F78, #2A3848 (dark), #8A4A28 (warm), #C4622D (accent russet)
@@ -264,12 +267,12 @@ MANDATORY COLOR PALETTE — exact values, do not substitute:
   Tumbleweed:      #8A7848 (straw brown)
   Skull/bone:      #D8C8A0 (bleached)
 
-No photorealism. No texture maps. No soft shadows. Geometric hard-edge only.`
+Style keywords: WPA poster, gouache painting, flat color shapes, mural art, national park poster.
+No soft shadows. No texture. No gradients. Pure flat paint color shapes only.`
 
 // outlawFloorPanels defines 4 seamlessly-continuable floor tiles.
-// These are GROUND STRIP textures — no sky, no horizon, just the desert ground surface.
-// Displayed as the bottom 220px of the screen in a side-scrolling game.
-// The characters' hooves land at the very top edge of these tiles.
+// These are GROUND STRIP textures — no sky, just the desert ground surface.
+// Displayed as the bottom 220px of the screen. Hooves land at the top edge.
 var outlawFloorPanels = []struct {
 	Filename string
 	Prompt   string
@@ -278,81 +281,93 @@ var outlawFloorPanels = []struct {
 		Filename: "seamless_desert_floor",
 		Prompt: outlawStyle + `
 
-GROUND STRIP TEXTURE — 2048×512 pixels. Wide horizontal ground tile for a side-scrolling game.
-NO SKY. NO CLOUDS. NO HORIZON LINE. NO MOUNTAINS. GROUND ONLY.
+GROUND STRIP TEXTURE — 2048×512 pixels. Horizontal floor tile for side-scrolling mobile game.
+This is the DESERT GROUND seen from the side — the strip of earth the characters run along.
+Inspired by the lower ground portion of a flat geometric low-poly western desert illustration.
 
-This is the desert FLOOR SURFACE viewed from the side, close-up.
-The top edge of this image IS the ground surface — the line where earth meets air.
-Characters run along this top edge with their feet touching it.
+STRICT RULES:
+- NO SKY. NO CLOUDS. NO SUN. NO MOUNTAINS. NO HORIZON VISIBLE. EARTH ONLY.
+- The TOP EDGE of this image is the running surface — perfectly flat horizontal line.
+- Characters' hooves touch exactly this top edge.
 
-COMPOSITION (top to bottom):
-  TOP 15%: Ground surface edge. Hard flat terracotta (#C05828) ground top.
-    Small angular rock shard silhouettes and 2-3 low scrub-bush shapes breaking the edge.
-  MIDDLE 50%: Packed desert earth. Geometric flat-color strata bands.
-    Alternating terracotta (#9A4220), rust-brown (#7A3A18), and orange-sand (#D4904A) layers.
-    Angular rock formations embedded in earth. Geometric shapes only.
-  BOTTOM 35%: Deep earth shadow. Dark rust (#4A2810) with near-black (#2A1800) base.
+COMPOSITION top→bottom:
+  TOP 10%: Running surface. Flat hard edge of terracotta earth (#C05828).
+    3-4 tiny low angular scrub-bush shapes (#3A3A22) sitting right on the surface edge.
+    2 small angular rock shards at the surface.
+  MIDDLE 55%: Stacked flat-color earth strata bands.
+    Band 1 (just below surface): Terracotta #C05828 — wide band.
+    Band 2: Rust-orange #9A4220 — medium band.
+    Band 3: Sand highlight #D4904A — thin bright stripe.
+    Band 4: Dark rust #7A3A18 — wide band.
+    Each band is a perfectly flat horizontal shape with sharp angular edges.
+  BOTTOM 35%: Deep earth. Dark brown #4A2810 fading to near-black #2A1800.
 
-DETAILS: 3-4 small angular rock clusters scattered along the top surface.
-2-3 dark scrub-bush silhouettes (#3A3A22) at ground level.
-Seamless: left and right edges must tile perfectly horizontally.`,
+Seamless tile: left and right edges match perfectly for infinite horizontal repeat.
+NO gradients inside shapes. Hard flat polygon edges only. Low-poly vector style.`,
 	},
 	{
 		Filename: "seamless_desert_floor2",
 		Prompt: outlawStyle + `
 
-GROUND STRIP TEXTURE — 2048×512 pixels. Wide horizontal ground tile for a side-scrolling game.
-NO SKY. NO CLOUDS. NO HORIZON LINE. NO MOUNTAINS. GROUND ONLY.
-LEFT EDGE MUST MATCH THE PROVIDED REFERENCE IMAGE EXACTLY — continue terrain seamlessly from it.
+GROUND STRIP TEXTURE — 2048×512 pixels. Horizontal floor tile, panel 2 of 4, side-scrolling game.
+Must continue seamlessly from the reference image provided (left edge of this panel = right edge of panel 1).
 
-COMPOSITION (top to bottom):
-  TOP 15%: Ground surface edge. Same terracotta level as reference left edge.
-    FEATURE: Angular wooden post with bleached skull (#D8C8A0) mounted on top, left-of-center.
-    One flat tumbleweed shape (#8A7848) rolling on the ground surface, center area.
-    2-3 small angular rock silhouettes at the surface edge.
-  MIDDLE 50%: Packed desert earth strata. Same color bands as left reference.
-    Terracotta (#9A4220), rust-brown (#7A3A18), sand highlight (#D4904A) geometric layers.
-  BOTTOM 35%: Deep dark earth (#4A2810, #2A1800).
+STRICT RULES: NO SKY. NO CLOUDS. NO MOUNTAINS. EARTH ONLY. Top edge = running surface.
 
-Seamless: left edge matches reference exactly; right edge must tile with Panel 3.`,
+COMPOSITION top→bottom:
+  TOP 10%: Running surface. Same flat terracotta level (#C05828) as reference left edge.
+    FEATURE: Angular wooden signpost shape rising from ground, center-left.
+    Bleached skull shape (#D8C8A0) mounted on top of post.
+    One flat angular tumbleweed (#8A7848) on the ground surface, center.
+    1-2 small rock shards.
+  MIDDLE 55%: Flat strata bands matching reference color palette.
+    Terracotta #C05828, rust #9A4220, sand #D4904A, dark rust #7A3A18 — horizontal band layers.
+  BOTTOM 35%: Deep dark earth #4A2810 to #2A1800.
+
+Right edge designed to flow into panel 3. Hard flat polygons only. No gradients.`,
 	},
 	{
 		Filename: "seamless_desert_floor3",
 		Prompt: outlawStyle + `
 
-GROUND STRIP TEXTURE — 2048×512 pixels. Wide horizontal ground tile for a side-scrolling game.
-NO SKY. NO CLOUDS. NO HORIZON LINE. NO MOUNTAINS. GROUND ONLY.
-LEFT EDGE MUST MATCH THE PROVIDED REFERENCE IMAGE EXACTLY — continue terrain seamlessly from it.
+GROUND STRIP TEXTURE — 2048×512 pixels. Horizontal floor tile, panel 3 of 4, side-scrolling game.
+Must continue seamlessly from the reference image provided (left edge = right edge of panel 2).
 
-COMPOSITION (top to bottom):
-  TOP 15%: Ground surface edge. Same terracotta level as reference left edge.
-    FEATURE: 2 tall saguaro cactus shapes (#3A3A22, dark olive green) rising FROM the ground surface.
-    Simplified geometric cactus: vertical trunk + 2 upward-angled arms. Flat color polygons only.
-    2-3 angular rock clusters along the top surface edge.
-  MIDDLE 50%: Desert earth strata bands. Slightly warmer tone than Panel 2.
-    More orange-sand (#D4904A) layers visible, terracotta and rust beneath.
-  BOTTOM 35%: Deep dark earth (#4A2810, #2A1800).
+STRICT RULES: NO SKY. NO CLOUDS. NO MOUNTAINS. EARTH ONLY. Top edge = running surface.
 
-Seamless: left edge matches reference; right edge designed to continue to Panel 4.`,
+COMPOSITION top→bottom:
+  TOP 10%: Running surface. Same flat terracotta level as reference left edge.
+    FEATURE: 2 tall saguaro cactus silhouettes rising from the ground surface.
+    Cactus color: dark olive #3A3A22. Simplified geometric: vertical trunk + 2 arm branches.
+    Hard angular flat-color polygon shapes only — no gradients, no outlines.
+    2 small angular rock clusters at surface.
+  MIDDLE 55%: Earth strata. Warmer orange tones this panel.
+    Sand #D4904A prominent band. Terracotta #C05828 and rust #9A4220 beneath.
+    Dark rust #7A3A18 lower.
+  BOTTOM 35%: Deep dark earth #4A2810 to near-black #2A1800.
+
+Right edge designed to flow into panel 4. Hard flat polygons only. No gradients.`,
 	},
 	{
 		Filename: "seamless_desert_floor4",
 		Prompt: outlawStyle + `
 
-GROUND STRIP TEXTURE — 2048×512 pixels. Wide horizontal ground tile for a side-scrolling game.
-NO SKY. NO CLOUDS. NO HORIZON LINE. NO MOUNTAINS. GROUND ONLY.
-LEFT EDGE MUST MATCH THE PROVIDED REFERENCE IMAGE EXACTLY — continue terrain seamlessly from it.
+GROUND STRIP TEXTURE — 2048×512 pixels. Horizontal floor tile, panel 4 of 4, side-scrolling game.
+Must continue seamlessly from the reference image provided (left edge = right edge of panel 3).
+RIGHT EDGE must also be designed to loop back seamlessly into panel 1.
 
-COMPOSITION (top to bottom):
-  TOP 15%: Ground surface edge. Bright warm desert sand (#D4904A) — sunbaked, hot.
-    FEATURES: 3 more saguaro cactus shapes continuing from left edge. Sparse open look.
-    Minimal rocks: 1-2 flat angular shapes.
-  MIDDLE 50%: Hot sunbaked desert earth. Bright orange-sand (#D4904A) dominant layer.
-    Deeper terracotta (#C05828) and rust (#9A4220) strata beneath.
-  BOTTOM 35%: Deep earth shadow (#4A2810). Slightly cooler than middle.
+STRICT RULES: NO SKY. NO CLOUDS. NO MOUNTAINS. EARTH ONLY. Top edge = running surface.
 
-Seamless: left edge matches reference; RIGHT EDGE must be designed to loop back to Panel 1
-— transition back toward cooler rust-brown terracotta, a few angular rocks reappearing.`,
+COMPOSITION top→bottom:
+  TOP 10%: Running surface. Bright hot desert sand #D4904A — sunbaked exposed earth.
+    3 more saguaro cactus shapes continuing from left. Sparse desert feel.
+    1 angular rock shard.
+  MIDDLE 55%: Sunbaked earth strata. Bright orange-sand #D4904A dominant.
+    Terracotta #C05828 and rust #9A4220 beneath. Transitioning back toward cooler rust on right.
+  BOTTOM 35%: Deep dark earth #4A2810. Slightly cooler than panel 3.
+
+Right edge transitions back toward cooler terracotta tones to loop back to panel 1.
+Hard flat polygons only. No gradients. Low-poly vector style.`,
 	},
 }
 

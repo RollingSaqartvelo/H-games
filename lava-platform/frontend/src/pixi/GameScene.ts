@@ -53,11 +53,6 @@ function getRunSpeed(elapsedMs: number): number {
   return Math.min(420, 190 + (elapsedMs / 1000) * 3.4)
 }
 
-// Floor transition interval shortens over time for rising tension
-function getFloorInterval(elapsedMs: number): number {
-  return Math.max(2.2, 5.8 - (elapsedMs / 1000) * 0.045)
-}
-
 // Approximate integral of getRunSpeed for position sync on late join
 function estimateWorldX(elapsedMs: number): number {
   const t = elapsedMs / 1000
@@ -65,18 +60,6 @@ function estimateWorldX(elapsedMs: number): number {
 }
 
 type RunPhase = 'idle' | 'running' | 'captured'
-
-// Floor picking: pick adjacent floor, bias upward with time
-function pickNextFloor(current: number, elapsedMs: number, rng: number): number {
-  const t = elapsedMs / 1000
-  const maxFloor = Math.min(3, Math.floor(t / 9))
-  const candidates: number[] = [current]
-  if (current > 0)        candidates.push(current - 1)
-  if (current < maxFloor) candidates.push(current + 1)
-  // Bias toward higher floor when going higher is possible
-  if (current < maxFloor) candidates.push(current + 1)
-  return candidates[Math.floor(rng * candidates.length)]
-}
 
 export class GameScene {
   readonly container: Container
@@ -98,11 +81,7 @@ export class GameScene {
   private cameraX    = 0
   private shakeAmt   = 0
 
-  // Floor system
-  private targetFloorIdx      = 0
-  private floorY              = 0          // current smooth Y
-  private floorTransitionTimer = 3.5       // seconds until next floor change
-  private floorRng            = 0.31       // deterministic rng seed for floor picks
+  private floorY = 0
 
   // Sheriff approach
   private sheriffGap       = 260          // current visual gap (world px)
@@ -209,9 +188,6 @@ export class GameScene {
     this.captureDone        = false
     this.shakeAmt           = 0
     this.charWorldX         = 0
-    this.targetFloorIdx     = 0
-    this.floorTransitionTimer = 3.5
-    this.floorRng           = 0.31
     this.sheriffGap         = 260
     this.sheriffTargetGap   = 260
     this.dustTimer          = 0
@@ -311,19 +287,8 @@ export class GameScene {
     const speed = getRunSpeed(interpMs)
     this.charWorldX += speed * dt
 
-    // Floor transition countdown
-    this.floorTransitionTimer -= dt
-    if (this.floorTransitionTimer <= 0) {
-      this.floorRng = (this.floorRng * 9301 + 49297) % 233280 / 233280  // LCG
-      const next = pickNextFloor(this.targetFloorIdx, interpMs, this.floorRng)
-      if (next !== this.targetFloorIdx) {
-        this.targetFloorIdx = next
-      }
-      this.floorTransitionTimer = getFloorInterval(interpMs)
-    }
-
-    // Smooth Y lerp toward target floor
-    const targetY = this.getFloorY(this.targetFloorIdx)
+    // Floor is always ground level (level 0 = H - FLOOR_TILE_H)
+    const targetY = this.getFloorY(0)
     this.floorY = expLerp(this.floorY, targetY, 3.5, dt)
 
     // Position outlaw
@@ -404,7 +369,7 @@ export class GameScene {
   resize(w: number, h: number): void {
     this.W = w; this.H = h
     this.charScreenX = w * CHAR_X_FRAC
-    this.floorY = h * FLOOR_Y_FRACS[this.targetFloorIdx]
+    this.floorY = this.getFloorY(0)
     this.desert.resize(w, h)
     this.floor.resize(w, h)
     this.buildings.resize(w, h)
