@@ -49,9 +49,16 @@ func serverSeed() string {
 
 // ── POST /tma/v1/slots/spin ───────────────────────────────────────────────────
 
+// BonusBuy tiers: 0=disabled, 1=standard(100×), 2=enhanced(125×), 3=super(150×)
+var bonusBuyCost = [4]float64{0, 100, 125, 150}
+
+// minScattersForTier guarantees free-spin triggers: tier1→4, tier2→5, tier3→6
+var minScattersForTier = [4]int{0, 4, 5, 6}
+
 type spinReq struct {
-	Bet      float64 `json:"bet"      binding:"required,min=0.01,max=10000"`
-	FreeSpin bool    `json:"free_spin"`
+	Bet           float64 `json:"bet"            binding:"required,min=0.01,max=10000"`
+	FreeSpin      bool    `json:"free_spin"`
+	BonusBuyTier  int     `json:"bonus_buy_tier"` // 0=normal, 1/2/3=bonus tiers
 }
 
 func (h *Handler) Spin(c *gin.Context) {
@@ -67,9 +74,26 @@ func (h *Handler) Spin(c *gin.Context) {
 		return
 	}
 
-	betDec := decimal.NewFromFloat(req.Bet)
-	betTxID := fmt.Sprintf("slot-bet-%s-%d", sess.UserID, time.Now().UnixNano())
-	roundID := betTxID // slots use spin ID as round ID
+	// ── Validate bonus buy tier ───────────────────────────────────────────────
+	tier := req.BonusBuyTier
+	if tier < 0 || tier > 3 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid bonus_buy_tier"})
+		return
+	}
+
+	// For bonus buy the actual debit amount = bet × cost multiplier
+	effectiveBet := req.Bet
+	if tier > 0 {
+		effectiveBet = req.Bet * bonusBuyCost[tier]
+	}
+
+	betDec := decimal.NewFromFloat(effectiveBet)
+	txLabel := "slot-bet"
+	if tier > 0 {
+		txLabel = fmt.Sprintf("slot-bonus-%d", tier)
+	}
+	betTxID := fmt.Sprintf("%s-%s-%d", txLabel, sess.UserID, time.Now().UnixNano())
+	roundID := betTxID
 
 	// ── Debit wallet (skip for free spin) ────────────────────────────────────
 	var balanceAfterBet decimal.Decimal
@@ -91,7 +115,6 @@ func (h *Handler) Spin(c *gin.Context) {
 		}
 		balanceAfterBet = debitResp.Balance
 	} else {
-		// Free spin: just fetch balance
 		balResp, err := h.wallet.GetBalance(c.Request.Context(), &domain.BalanceRequest{
 			UserID:   sess.UserID,
 			Currency: sess.Currency,
@@ -106,12 +129,13 @@ func (h *Handler) Spin(c *gin.Context) {
 	// ── Run spin ──────────────────────────────────────────────────────────────
 	seed := serverSeed()
 	nonce := h.nextNonce(sess.UserID)
-	bet := req.Bet
-	if req.FreeSpin {
-		bet = req.Bet // bet amount still used for payout scaling in free spins
+
+	minScatters := 0
+	if tier > 0 {
+		minScatters = minScattersForTier[tier]
 	}
 
-	result := Spin(h.cfg, seed, nonce, bet)
+	result := Spin(h.cfg, seed, nonce, req.Bet, minScatters)
 
 	// ── Credit winnings ───────────────────────────────────────────────────────
 	finalBalance := balanceAfterBet
@@ -157,6 +181,8 @@ func (h *Handler) Spin(c *gin.Context) {
 		"free_spins_awarded": result.FreeSpinsAwarded,
 		"balance":            balF,
 		"bet":                req.Bet,
+		"bonus_buy_tier":     tier,
+		"effective_cost":     effectiveBet,
 	})
 }
 

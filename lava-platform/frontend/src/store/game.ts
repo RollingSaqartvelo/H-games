@@ -7,6 +7,7 @@ import type {
   TickData,
   CrashedData,
   CashoutData,
+  BetPlacedData,
 } from '../ws/types'
 
 // ─── Shape ────────────────────────────────────────────────────────────────────
@@ -75,6 +76,9 @@ interface GameState {
   // ── Last cashout event — used by DualBetPanel to detect auto-cashout ─────────
   lastCashoutEvent: CashoutData | null
 
+  // ── Last bet_placed broadcast — consumed by BetsViewer ───────────────────────
+  lastBetPlaced: BetPlacedData | null
+
   // ── Form ────────────────────────────────────────────────────────────────────
   betAmount: string
   autoCashout: string
@@ -90,6 +94,7 @@ interface GameActions {
   applyTick(d: TickData): void
   applyCrashed(d: CrashedData): void
   applyCashoutMsg(d: CashoutData, myPlayerId: string): void
+  applyBetPlaced(d: BetPlacedData): void
   setBetActive(bet: ActiveBet): void
   setBetAmount(v: string): void
   setAutoCashout(v: string): void
@@ -123,6 +128,7 @@ export const useGame = create<GameState & GameActions>()(
     history: [],
     recentCashouts: [],
     lastCashoutEvent: null,
+    lastBetPlaced: null,
     betAmount: '1.00',
     autoCashout: '',
     balance: null,
@@ -149,6 +155,7 @@ export const useGame = create<GameState & GameActions>()(
           cashedOutCount:    newRound ? 0     : prev.cashedOutCount,
           anyBetLost:        newRound ? false : prev.anyBetLost,
           lastCashoutEvent:  newRound ? null  : prev.lastCashoutEvent,
+          lastBetPlaced:     newRound ? null  : prev.lastBetPlaced,
           crashPoint: null,
           serverSeed: null,
         }
@@ -204,5 +211,6 @@ export const useGame = create<GameState & GameActions>()(
     setBalance: (balance) => set({ balance }),
     addActiveBet:    () => set((s) => ({ activeBetCount: s.activeBetCount + 1 })),
     addCashedOutBet: () => set((s) => ({ cashedOutCount: s.cashedOutCount + 1 })),
+    applyBetPlaced:  (d) => set({ lastBetPlaced: d }),
   })),
 )

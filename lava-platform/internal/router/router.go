@@ -152,6 +152,7 @@ func New(cfg *config.Config, infra *infrastructure.Infra, deps *Deps) *gin.Engin
 			admin.POST("/gemini/preset/outlaw-floors",   geminiH.GenerateOutlawFloors)
 			admin.POST("/gemini/preset/outlaw-bg",       geminiH.GenerateOutlawBGs)
 			admin.POST("/gemini/preset/slots-symbols",   geminiH.GenerateSlotSymbols)
+			admin.POST("/gemini/preset/slots-lever",     geminiH.GenerateSlotLever)
 
 			veoH := veo.NewHandler(cfg.Gemini.APIKey, "frontend/dist/assets")
 			admin.POST("/veo/generate",           veoH.Generate)
