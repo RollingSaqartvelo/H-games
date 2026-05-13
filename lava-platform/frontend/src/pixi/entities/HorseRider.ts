@@ -128,7 +128,7 @@ export class HorseRider {
 
       this.heroSprite = new Sprite(heroTex)
       this.heroSprite.anchor.set(0.5, 1.0)
-      this.heroSprite.scale.set(-HORSE_SCALE, HORSE_SCALE)
+      this.heroSprite.scale.set(HORSE_SCALE, HORSE_SCALE)
       this.heroSprite.y = HORSE_HOOF_OFFSET_Y
       this.container.addChild(this.heroSprite)
     } else {
@@ -234,7 +234,7 @@ export class HorseRider {
     switch (this.state) {
       case 'idle': {
         // Gentle idle sway
-        this.heroSprite.scale.set(-HORSE_SCALE, HORSE_SCALE)
+        this.heroSprite.scale.set(HORSE_SCALE, HORSE_SCALE)
         this.heroSprite.y = HORSE_HOOF_OFFSET_Y + Math.sin(this.time * 1.8) * 1.5
         this.container.rotation = 0
         break
@@ -244,7 +244,7 @@ export class HorseRider {
       case 'impact':
       case 'airborne': {
         // Running: fast vertical bob, slight forward lean
-        this.heroSprite.scale.set(-HORSE_SCALE, HORSE_SCALE)
+        this.heroSprite.scale.set(HORSE_SCALE, HORSE_SCALE)
         const bob = Math.sin(this.time * 9.5) * 3.5
         this.heroSprite.y = HORSE_HOOF_OFFSET_Y + bob
         // Lean forward based on bob cycle (feels like sprinting)

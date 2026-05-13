@@ -37,7 +37,10 @@ import { playKnutSound }  from '../audio/KnutSound'
 const CHAR_X_FRAC = 0.38
 
 // Floor Y positions as fraction of canvas height (world Y = screen Y, no vertical scroll)
+// Level 0 (ground) is computed dynamically as H - FLOOR_TILE_H so hooves land exactly on tile top.
 const FLOOR_Y_FRACS = [0.705, 0.545, 0.390, 0.248] as const
+// Must match FloorLayer DISPLAY_HEIGHT
+const FLOOR_TILE_H = 220
 
 // Sheriff starts 260px behind, gap closes as time passes
 function getSheriffTargetGap(elapsedMs: number): number {
@@ -151,7 +154,7 @@ export class GameScene {
       this.flash.container,
     )
 
-    this.floorY = this.H * FLOOR_Y_FRACS[0]
+    this.floorY = this.getFloorY(0)
     this.rider.container.x = this.charWorldX
     this.rider.container.y = this.floorY
     this.sheriff.container.x = this.charWorldX - this.sheriffGap
@@ -217,7 +220,7 @@ export class GameScene {
     this.buildings.ensureGenerated(8, 0)
     this.floor.reset()
 
-    this.floorY = this.H * FLOOR_Y_FRACS[0]
+    this.floorY = this.getFloorY(0)
     this.rider.container.x = this.charWorldX
     this.rider.container.y = this.floorY
     this.updateCameraSnap()
@@ -232,7 +235,7 @@ export class GameScene {
     const interp = elapsedMs + (Date.now() - lastTickAt)
 
     this.charWorldX = estimateWorldX(interp)
-    this.floorY     = this.H * FLOOR_Y_FRACS[0]
+    this.floorY     = this.getFloorY(0)
 
     this.buildings.ensureGenerated(Math.ceil(this.charWorldX / 300) + 10, interp)
 
@@ -256,6 +259,12 @@ export class GameScene {
     this.sheriff.startAttack(this.sheriffGap, 0)
     this.particles.spawnCrashBurst(this.charWorldX, this.floorY)
     this.triggerShake(15)
+  }
+
+  private getFloorY(idx: number): number {
+    // Level 0 = exact top of floor tile so hooves touch ground on any screen height
+    if (idx === 0) return this.H - FLOOR_TILE_H
+    return this.H * FLOOR_Y_FRACS[idx]
   }
 
   private updateCameraSnap(): void {
@@ -314,7 +323,7 @@ export class GameScene {
     }
 
     // Smooth Y lerp toward target floor
-    const targetY = this.H * FLOOR_Y_FRACS[this.targetFloorIdx]
+    const targetY = this.getFloorY(this.targetFloorIdx)
     this.floorY = expLerp(this.floorY, targetY, 3.5, dt)
 
     // Position outlaw
