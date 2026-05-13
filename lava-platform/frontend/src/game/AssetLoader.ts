@@ -6,7 +6,9 @@ const ALL_ASSETS: string[] = [
   ...Object.values(ASSET_PATHS.horse),
   ...Object.values(ASSET_PATHS.hero),
   ...Object.values(ASSET_PATHS.platforms),
-  ...Object.values(ASSET_PATHS.bg),
+  ASSET_PATHS.bg.dawn,
+  ASSET_PATHS.bg.sunset,
+  ...ASSET_PATHS.bg.panels,
 ]
 
 // Loads all game sprites into the Assets cache before the scene is created.

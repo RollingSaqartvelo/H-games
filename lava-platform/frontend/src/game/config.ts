@@ -32,6 +32,16 @@ export const ASSET_PATHS = {
   bg: {
     dawn:   '/assets/bg/bg_betting_dawn.png',
     sunset: '/assets/bg/bg_running_sunset.png',
+    panels: [
+      '/assets/bg/panel_1.jpg',
+      '/assets/bg/panel_2.jpg',
+      '/assets/bg/panel_3.jpg',
+      '/assets/bg/panel_4.jpg',
+      '/assets/bg/panel_5.jpg',
+      '/assets/bg/panel_6.jpg',
+      '/assets/bg/panel_7.jpg',
+      '/assets/bg/panel_8.jpeg',
+    ] as readonly string[],
   },
   // Veo-generated character videos (luma-keyed: black bg → transparent via shader)
   video: {
