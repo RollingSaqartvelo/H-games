@@ -12,6 +12,7 @@ import (
 	"github.com/lava-platform/internal/config"
 	"github.com/lava-platform/internal/gemini"
 	healthHandler "github.com/lava-platform/internal/handler"
+	"github.com/lava-platform/internal/veo"
 	"github.com/lava-platform/internal/infrastructure"
 	"github.com/lava-platform/internal/lock"
 	"github.com/lava-platform/internal/middleware"
@@ -138,12 +139,16 @@ func New(cfg *config.Config, infra *infrastructure.Infra, deps *Deps) *gin.Engin
 		admin.GET("/rtp-profiles",         opHandler.ListRTPProfiles)
 		admin.GET("/stats",                adm.Stats)
 
-		// Gemini asset generation (admin-only, server-side key)
+		// Gemini image + Veo video generation (admin-only, server-side key)
 		if cfg.Gemini.APIKey != "" {
 			geminiH := gemini.NewHandler(cfg.Gemini.APIKey, "frontend/dist/assets")
 			admin.POST("/gemini/generate",        geminiH.Generate)
 			admin.POST("/gemini/batch",           geminiH.Batch)
 			admin.POST("/gemini/preset/bubble",   geminiH.GenerateBubbleFrames)
+
+			veoH := veo.NewHandler(cfg.Gemini.APIKey, "frontend/dist/assets")
+			admin.POST("/veo/generate",           veoH.Generate)
+			admin.POST("/veo/preset/bubble",      veoH.GenerateBubbleVideos)
 		}
 	}
 

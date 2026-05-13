@@ -120,7 +120,15 @@
       box-shadow:0 0 0 1px rgba(244,114,182,.05),0 0 36px rgba(244,114,182,.08),inset 0 0 80px rgba(0,0,0,.45);
       overflow:hidden;
     }
-    #scene{position:absolute;inset:0;width:100%;height:100%}
+    /* video-based scene */
+    .scene-vid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none}
+    .scene-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none}
+    @keyframes vid-wobble{
+      0%,100%{transform:scaleX(1) scaleY(1)}
+      30%{transform:scaleX(1.06) scaleY(0.95)}
+      70%{transform:scaleX(0.95) scaleY(1.06)}
+    }
+    .scene-vid.wobbling{animation:vid-wobble .45s ease-in-out infinite}
 
     /* ── Multiplier ─────────────────────────────────────────── */
     .mult-wrap{position:absolute;top:44%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none;z-index:5}
@@ -300,7 +308,14 @@
 
   <!-- Game area -->
   <div class="game-area">
-    <canvas id="scene"></canvas>
+    <!-- Idle frame (during countdown) -->
+    <img  id="idleImg"  class="scene-img" src="/assets/bubble/char_idle.png" alt="">
+    <!-- Bubble grow video (during round) -->
+    <video id="growVid" class="scene-vid" src="/assets/bubble/grow.mp4"
+           playsinline muted loop preload="auto"></video>
+    <!-- Pop video (on crash) -->
+    <video id="popVid"  class="scene-vid" src="/assets/bubble/pop.mp4"
+           playsinline muted preload="auto"></video>
 
     <!-- Multiplier -->
     <div class="mult-wrap">
@@ -473,105 +488,55 @@ let autoBetEnabled  = [false, false]
 let autoInjectEnabled = [false, false]
 let queuedNextBet   = [null, null]
 
-// ── Canvas setup ──────────────────────────────────────────────────────────────
-const canvas = document.getElementById('scene')
-const ctx    = canvas.getContext('2d')
-let W = 0, H = 0
+// ── Video scene ───────────────────────────────────────────────────────────────
+const growVid = document.getElementById('growVid')
+const popVid  = document.getElementById('popVid')
+const idleImg = document.getElementById('idleImg')
 
-function resizeCanvas() {
-  const rect = canvas.parentElement.getBoundingClientRect()
-  W = canvas.width  = rect.width
-  H = canvas.height = rect.height
-}
-resizeCanvas()
-window.addEventListener('resize', resizeCanvas)
-
-// ── Bubble PNG frames ─────────────────────────────────────────────────────────
-const frames = {}
-const FRAME_NAMES = ['bg','char_idle','stage_01','stage_02','stage_03','stage_04','stage_05','stage_06','stage_07','stage_08','stage_09','stage_10','wobble_a','wobble_b','pop_crack','pop_burst','pop_splat']
-
-FRAME_NAMES.forEach(name => {
-  const img = new Image()
-  img.src = `/assets/bubble/${name}.png`
-  frames[name] = img
-})
-
-// multiplier → stage frame
-function getStageFrame(mult) {
-  if (mult < 1.3)  return 'stage_01'
-  if (mult < 1.8)  return 'stage_02'
-  if (mult < 2.5)  return 'stage_03'
-  if (mult < 3.5)  return 'stage_04'
-  if (mult < 5.0)  return 'stage_05'
-  if (mult < 7.0)  return 'stage_06'
-  if (mult < 10.0) return 'stage_07'
-  if (mult < 15.0) return 'stage_08'
-  if (mult < 22.0) return 'stage_09'
-  return 'stage_10'
+function sceneShowIdle() {
+  growVid.classList.remove('wobbling')
+  growVid.pause()
+  growVid.style.display = 'none'
+  popVid.style.display  = 'none'
+  idleImg.style.display = 'block'
 }
 
-// crash animation state
-let crashPhase = 0  // 0=none, 1=crack, 2=burst, 3=splat
-let crashTimer = 0
-let wobbleT = 0
+function sceneShowGrow() {
+  idleImg.style.display = 'none'
+  popVid.style.display  = 'none'
+  growVid.style.display = 'block'
+  growVid.loop = true
+  if (growVid.paused) growVid.play().catch(() => {})
+}
 
-let animFrame = 0
-function drawScene(ts) {
-  animFrame = requestAnimationFrame(drawScene)
-  ctx.clearRect(0, 0, W, H)
+function sceneShowPop() {
+  idleImg.style.display = 'none'
+  growVid.style.display = 'none'
+  growVid.classList.remove('wobbling')
+  growVid.pause()
+  popVid.style.display  = 'block'
+  popVid.currentTime = 0
+  popVid.play().catch(() => {})
+}
 
-  // Background
-  if (frames.bg.complete) {
-    ctx.drawImage(frames.bg, 0, 0, W, H)
+function sceneUpdateWobble(mult) {
+  if (mult >= 8) {
+    growVid.classList.add('wobbling')
   } else {
-    const g = ctx.createLinearGradient(0, 0, 0, H)
-    g.addColorStop(0,'#0a0010'); g.addColorStop(1,'#1a0030')
-    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H)
-  }
-
-  // Pink particle ambient (simple CSS-like glitter effect)
-  if (roundState === 'RUNNING') {
-    ctx.save()
-    ctx.globalAlpha = 0.06 + 0.04 * Math.sin(ts * 0.002)
-    const rg = ctx.createRadialGradient(W*0.5, H*0.5, 0, W*0.5, H*0.5, W*0.6)
-    rg.addColorStop(0,'rgba(244,114,182,0.4)'); rg.addColorStop(1,'transparent')
-    ctx.fillStyle = rg; ctx.fillRect(0, 0, W, H)
-    ctx.restore()
-  }
-
-  const cx = W * 0.5, cy = H * 0.52
-
-  if (roundState === 'RUNNING') {
-    // Wobble at high multiplier
-    wobbleT += 0.08
-    const wobbleFr = (multiplier >= 8 && Math.sin(wobbleT * 3) > 0.3)
-      ? (Math.sin(wobbleT * 4) > 0 ? 'wobble_a' : 'wobble_b')
-      : getStageFrame(multiplier)
-
-    drawCenteredFrame(wobbleFr, cx, cy)
-
-  } else if (roundState === 'CRASHED') {
-    // crash sequence
-    const dt = (Date.now() - crashTimer) / 1000
-    let fr = 'pop_crack'
-    if (dt > 0.4) fr = 'pop_burst'
-    if (dt > 1.0) fr = 'pop_splat'
-    drawCenteredFrame(fr, cx, cy)
-
-  } else {
-    // STARTING / WAITING: show idle character
-    drawCenteredFrame('char_idle', cx, cy)
+    growVid.classList.remove('wobbling')
   }
 }
 
-function drawCenteredFrame(name, cx, cy) {
-  const img = frames[name]
-  if (!img || !img.complete || !img.naturalWidth) return
-  const size = Math.min(W, H) * 0.88
-  ctx.drawImage(img, cx - size/2, cy - size/2, size, size)
+// Seek grow video to match multiplier (8s video covers 1x→20x range)
+function sceneSeek(mult) {
+  if (growVid.readyState >= 2 && growVid.duration) {
+    const t = Math.min((mult - 1) / 19, 1) * growVid.duration
+    // Only seek if delta is large enough to avoid stuttering
+    if (Math.abs(growVid.currentTime - t) > 0.15) growVid.currentTime = t
+  }
 }
 
-requestAnimationFrame(drawScene)
+sceneShowIdle()
 
 // ── History bar ───────────────────────────────────────────────────────────────
 function addHistory(cp) {
@@ -999,16 +964,19 @@ function connectWS() {
         document.getElementById('crashedBanner').classList.remove('show')
         startedAt=Date.now(); showCountdown()
         resetBetsOnNewRound(); updateHistCurrent('?',false)
+        sceneShowIdle()
       }
       if (d.state==='RUNNING') {
         document.getElementById('countdown').style.display='none'
         document.getElementById('crashedBanner').classList.remove('show')
         updateMultVis()
+        sceneShowGrow()
       }
     }
 
     if (msg.type==='tick') {
       multiplier=d.multiplier; updateMult(d.multiplier)
+      sceneSeek(d.multiplier); sceneUpdateWobble(d.multiplier)
       updateAllBtns()
     }
 
@@ -1043,7 +1011,7 @@ function connectWS() {
       document.getElementById('crashedBanner').classList.add('show')
       updateMult(d.crash_point, true)
       addHistory(d.crash_point)
-      crashTimer = Date.now()  // trigger crash animation
+      sceneShowPop()
       markLostBets(); lipOnCrashed()
       updateAllBtns()
       setTimeout(fetchBalance, 1500)
