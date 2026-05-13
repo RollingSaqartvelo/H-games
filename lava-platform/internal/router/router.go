@@ -146,9 +146,13 @@ func New(cfg *config.Config, infra *infrastructure.Infra, deps *Deps) *gin.Engin
 			admin.POST("/gemini/batch",           geminiH.Batch)
 			admin.POST("/gemini/preset/bubble",   geminiH.GenerateBubbleFrames)
 
+			admin.POST("/gemini/preset/outlaw-floors", geminiH.GenerateOutlawFloors)
+			admin.POST("/gemini/preset/outlaw-bg",    geminiH.GenerateOutlawBGs)
+
 			veoH := veo.NewHandler(cfg.Gemini.APIKey, "frontend/dist/assets")
 			admin.POST("/veo/generate",           veoH.Generate)
 			admin.POST("/veo/preset/bubble",      veoH.GenerateBubbleVideos)
+			admin.POST("/veo/preset/outlaw",      veoH.GenerateOutlawVideos)
 		}
 	}
 

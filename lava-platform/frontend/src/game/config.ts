@@ -1,4 +1,3 @@
-// Asset paths — all filenames use double extensions as they exist on disk
 export const ASSET_PATHS = {
   environment: {
     floor:  '/assets/environment/floor/seamless_desert_floor.png',
@@ -31,8 +30,14 @@ export const ASSET_PATHS = {
     desertBrokenRight:  '/assets/platforms/platform_desert_broken_right.png',
   },
   bg: {
-    dawn:   '/assets/bg/bg_betting_dawn.png.jpeg',
-    sunset: '/assets/bg/bg_running_sunset.png.jpeg',
+    dawn:   '/assets/bg/bg_betting_dawn.png',
+    sunset: '/assets/bg/bg_running_sunset.png',
+  },
+  // Veo-generated character videos (luma-keyed: black bg → transparent via shader)
+  video: {
+    outlawRun:     '/assets/outlaw/outlaw_run.mp4',
+    sheriffRun:    '/assets/outlaw/sheriff_run_shoot.mp4',
+    outlawCrash:   '/assets/outlaw/outlaw_crash.mp4',
   },
 } as const
 

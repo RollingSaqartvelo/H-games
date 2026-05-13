@@ -1,15 +1,57 @@
 /**
  * OutlawRunner — the player's escaped outlaw running through the western town.
  *
- * Uses hero PNG sprites when available, falls back to procedural graphics.
+ * Priority: Veo video (luma-keyed, black bg → transparent) → PNG sprites → procedural.
  * States:
  *   idle    — standing, light sway (before round starts)
  *   running — forward sprint, arm swing, dust kick, coat flapping
  *   fall    — captured / shot, tumbling forward with coat spread
  */
 
-import { Container, Graphics, Sprite, Assets, Texture } from 'pixi.js'
+import { Container, Graphics, Sprite, Assets, Texture, VideoSource, Filter, GlProgram } from 'pixi.js'
 import { ASSET_PATHS, HORSE_SCALE, HORSE_HOOF_OFFSET_Y } from '../../game/config'
+
+const OUTLAW_DISPLAY_H    = 300
+const OUTLAW_HOOF_ANCHOR  = 0.59
+
+// Luma-key shader — matches SheriffRider exactly (removes black background from video)
+const LUMA_VERT = `
+in vec2 aPosition;
+out vec2 vTextureCoord;
+uniform vec4 uInputSize;
+uniform vec4 uOutputFrame;
+uniform vec4 uOutputTexture;
+vec4 filterVertexPosition(void) {
+  vec2 position = aPosition * uOutputFrame.zw + uOutputFrame.xy;
+  position.x = position.x * (2.0 / uOutputTexture.x) - 1.0;
+  position.y = position.y * (2.0 * uOutputTexture.z / uOutputTexture.y) - uOutputTexture.z;
+  return vec4(position, 0.0, 1.0);
+}
+vec2 filterTextureCoord(void) {
+  return aPosition * (uOutputFrame.zw * uInputSize.zw);
+}
+void main(void) {
+  gl_Position = filterVertexPosition();
+  vTextureCoord = filterTextureCoord();
+}
+`
+const LUMA_FRAG = `
+in vec2 vTextureCoord;
+out vec4 finalColor;
+uniform sampler2D uTexture;
+void main(void) {
+  vec4 color = texture(uTexture, vTextureCoord);
+  float luma = dot(color.rgb, vec3(0.299, 0.587, 0.114));
+  float alpha = smoothstep(0.02, 0.10, luma);
+  finalColor = vec4(color.rgb, alpha);
+}
+`
+function makeLumaKeyFilter(): Filter {
+  return new Filter({
+    glProgram: new GlProgram({ vertex: LUMA_VERT, fragment: LUMA_FRAG }),
+    resources: {},
+  })
+}
 
 export type RiderState = 'idle' | 'running' | 'fall' |
   // Legacy states (kept for type-safety, mapped to nearest equivalent)
@@ -27,6 +69,12 @@ const HERO_TEX_MAP: Record<RiderState, string> = {
 
 export class HorseRider {
   readonly container: Container
+
+  // Video-based rendering (highest priority)
+  private videoSprite:  Sprite
+  private videoEl:      HTMLVideoElement | null = null
+  private videoSource:  VideoSource | null = null
+  private hasVideo      = false
 
   private heroSprite?: Sprite
   private readonly useSprites: boolean
@@ -55,7 +103,17 @@ export class HorseRider {
     this.arms   = new Graphics()
     this.legs   = new Graphics()
     this.dust   = new Graphics()
-    this.container.addChild(this.shadow, this.dust, this.legs, this.coat, this.body, this.arms)
+
+    // Video sprite on top (luma-key removes black background)
+    this.videoSprite = new Sprite()
+    this.videoSprite.anchor.set(0.5, OUTLAW_HOOF_ANCHOR)
+    this.videoSprite.filters = [makeLumaKeyFilter()]
+    this.videoSprite.visible = false
+
+    this.container.addChild(this.shadow, this.dust, this.legs, this.coat, this.body, this.arms, this.videoSprite)
+
+    // Try to load Veo video first
+    this.loadVideo()
 
     const heroTex = Assets.get<Texture>(ASSET_PATHS.hero.idle)
     this.useSprites = !!heroTex
@@ -78,6 +136,44 @@ export class HorseRider {
     }
   }
 
+  // ── Video loading ─────────────────────────────────────────────────────────
+
+  private loadVideo(): void {
+    const v = document.createElement('video')
+    v.src         = ASSET_PATHS.video.outlawRun
+    v.loop        = true
+    v.muted       = true
+    v.volume      = 0
+    v.playsInline = true
+    v.preload     = 'auto'
+    v.setAttribute('muted', '')
+    v.setAttribute('webkit-playsinline', 'true')
+    v.style.cssText = 'position:fixed;width:1px;height:1px;opacity:0;pointer-events:none;top:-9999px;left:-9999px;'
+    document.body.appendChild(v)
+
+    const apply = () => {
+      if (!v.videoWidth || !v.videoHeight) return
+      this.videoSource = new VideoSource({ resource: v, autoPlay: false, loop: true, width: v.videoWidth, height: v.videoHeight })
+      const tex = new Texture({ source: this.videoSource })
+      this.videoSprite.texture = tex
+      const scale = OUTLAW_DISPLAY_H / v.videoHeight
+      this.videoSprite.scale.set(scale)
+      this.videoEl  = v
+      this.hasVideo = true
+      // Hide sprite/procedural layers — video takes over
+      if (this.heroSprite) this.heroSprite.visible = false
+      this.body.visible = false; this.coat.visible = false
+      this.arms.visible = false; this.legs.visible = false
+      this.dust.visible = false; this.shadow.visible = false
+      this.videoSprite.visible = true
+      if (this.state === 'running' || this.state === 'idle') void v.play().catch(() => {})
+    }
+
+    v.addEventListener('loadedmetadata', apply, { once: true })
+    v.addEventListener('canplay', () => { if (!this.videoEl) apply() }, { once: true })
+    v.load()
+  }
+
   setState(state: RiderState): void {
     if (this.state === state) return
     if (state === 'fall') this.fallEntryRot = this.container.rotation
@@ -86,7 +182,13 @@ export class HorseRider {
     this.fallSpin  = 0
     this.flashOn   = false
 
-    if (this.useSprites && this.heroSprite) {
+    if (this.hasVideo) {
+      if (state === 'idle' || state === 'running') {
+        void this.videoEl?.play().catch(() => {})
+      } else if (state === 'fall' || state === 'tumble') {
+        this.videoEl?.pause()
+      }
+    } else if (this.useSprites && this.heroSprite) {
       const tex = Assets.get<Texture>(HERO_TEX_MAP[state])
       if (tex) this.heroSprite.texture = tex
     }
@@ -100,7 +202,18 @@ export class HorseRider {
     this.time      += dt
     this.phaseTime += dt
 
-    if (this.useSprites) {
+    if (this.hasVideo) {
+      // Video handles animation; just apply gentle bob in running state
+      if (this.state === 'running' || this.state === 'idle') {
+        this.videoSprite.y = Math.sin(this.time * 9.5) * 2.5
+        this.container.rotation = this.state === 'running'
+          ? -0.08 + Math.sin(this.time * 9.5) * 0.03
+          : 0
+      } else if (this.state === 'fall' || this.state === 'tumble') {
+        this.fallSpin += dt * 4
+        this.container.rotation = this.fallEntryRot + this.fallSpin
+      }
+    } else if (this.useSprites) {
       this.updateSprite(dt)
     } else {
       this.updateProcedural(dt)
@@ -108,6 +221,8 @@ export class HorseRider {
   }
 
   destroy(): void {
+    this.videoEl?.pause()
+    this.videoEl?.remove()
     this.container.destroy({ children: true })
   }
 

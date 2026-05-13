@@ -35,7 +35,13 @@ type gcontent struct {
 }
 
 type gpart struct {
-	Text string `json:"text"`
+	Text       string      `json:"text,omitempty"`
+	InlineData *inlineData `json:"inlineData,omitempty"`
+}
+
+type inlineData struct {
+	MimeType string `json:"mimeType"`
+	Data     string `json:"data"` // base64
 }
 
 type generationConfig struct {
@@ -56,10 +62,23 @@ type generateResponse struct {
 	} `json:"candidates"`
 }
 
-// GenerateImage calls Gemini 2.5 Flash Image and returns raw image bytes + mime type.
+// GenerateImage calls Gemini with a text-only prompt.
 func (c *Client) GenerateImage(ctx context.Context, prompt string) ([]byte, string, error) {
+	return c.generateWithParts(ctx, []gpart{{Text: prompt}})
+}
+
+// GenerateImageWithRef calls Gemini with an inline image reference (e.g. seam edge) plus a text prompt.
+func (c *Client) GenerateImageWithRef(ctx context.Context, prompt string, refImg []byte, refMime string) ([]byte, string, error) {
+	parts := []gpart{
+		{InlineData: &inlineData{MimeType: refMime, Data: base64.StdEncoding.EncodeToString(refImg)}},
+		{Text: prompt},
+	}
+	return c.generateWithParts(ctx, parts)
+}
+
+func (c *Client) generateWithParts(ctx context.Context, parts []gpart) ([]byte, string, error) {
 	reqBody := generateRequest{
-		Contents:         []gcontent{{Parts: []gpart{{Text: prompt}}}},
+		Contents:         []gcontent{{Parts: parts}},
 		GenerationConfig: generationConfig{ResponseModalities: []string{"IMAGE"}},
 	}
 

@@ -9,7 +9,7 @@
 
 import { Container, Sprite, Texture, VideoSource, Filter, GlProgram, Graphics } from 'pixi.js'
 
-const VIDEO_SRC = '/video/sheriff_run3.mp4'
+const VIDEO_SRC = '/assets/outlaw/sheriff_run_shoot.mp4'
 
 const SHERIFF_DISPLAY_H   = 300
 const SHERIFF_HOOF_ANCHOR = 0.59

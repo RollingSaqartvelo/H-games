@@ -62,6 +62,80 @@ var bubblePresets = []struct {
 	},
 }
 
+// outlawVeoStyle is the mandatory art direction for all outlaw character videos.
+const outlawVeoStyle = `
+Art style: flat geometric low-poly vector illustration. Travel poster / WPA mural aesthetic.
+Bold flat color blocking. Geometric simplified western characters and horses.
+Zero photorealism. Sharp angular shapes defining silhouettes. Limited color palette.
+Background: PURE PITCH BLACK (#000000) — required for luma-key compositing in game engine.
+No background scenery whatsoever. Character and horse only, on pure black.`
+
+// outlawVideoPresets defines the 3 video assets for the Outlaw Escape game visual rebuild.
+var outlawVideoPresets = []struct {
+	Filename    string
+	Duration    int
+	AspectRatio string
+	Prompt      string
+}{
+	{
+		Filename: "outlaw_run", Duration: 4, AspectRatio: "9:16",
+		Prompt: `Seamlessly looping side-view gallop animation.
+SUBJECT: Outlaw character riding BLACK horse, moving RIGHT across the frame.
+CHARACTER: Dark bandana across the lower face, worn wide-brim outlaw hat with feather.
+Dusty duster/trail coat. Dark shirt. Side profile, full body visible.
+HORSE: Pure black stallion. Full side-profile gallop cycle — all four hooves in motion.
+Powerful muscular silhouette. Mane and tail flowing back from speed.
+MOTION: Seamless loop, continuous full-gallop. No jump. No weapon. Pure escape running.
+Camera: Fixed side view. Character centered horizontally. Full horse + rider visible.
+` + outlawVeoStyle,
+	},
+	{
+		Filename: "sheriff_run_shoot", Duration: 4, AspectRatio: "9:16",
+		Prompt: `Seamlessly looping side-view gallop animation.
+SUBJECT: Sheriff/lawman character riding WHITE horse, moving RIGHT across the frame.
+CHARACTER: Wide-brim sheriff hat with visible badge on chest. Duster coat with vest detail.
+Side profile, full body visible.
+HORSE: Pure white stallion. Full side-profile gallop cycle — all four hooves in motion.
+Flowing white mane and tail.
+ACTION: Right arm extended forward holding and firing a revolver. Left hand holds reins.
+Occasional muzzle flash at barrel tip. Determined pursuing posture.
+MOTION: Seamless loop, full-gallop pursuit. Shooting while riding.
+Camera: Fixed side view. Full horse + rider visible.
+` + outlawVeoStyle,
+	},
+	{
+		Filename: "outlaw_crash", Duration: 3, AspectRatio: "9:16",
+		Prompt: `Dramatic crash/capture animation. Non-looping, plays once.
+SEQUENCE: Outlaw on black horse is caught by sheriff on white horse from behind.
+The black horse stumbles and collapses forward. The outlaw rider is thrown dramatically.
+Both characters visible: sheriff pulling alongside from right, outlaw falling left-forward.
+TIMING: 0-1s: horses at full gallop, sheriff closing gap. 1-2s: impact, horse collapse begins.
+2-3s: outlaw rider thrown forward, coat spreading, dramatic fall moment.
+No comedy. Serious cinematic crash. Dusty impact.
+Camera: Fixed side view. Both characters visible.
+` + outlawVeoStyle,
+	},
+}
+
+// GenerateOutlawVideos handles POST /admin/v1/veo/preset/outlaw
+func (h *Handler) GenerateOutlawVideos(c *gin.Context) {
+	type result struct {
+		Filename string `json:"filename"`
+		URL      string `json:"url,omitempty"`
+		Error    string `json:"error,omitempty"`
+	}
+	results := make([]result, len(outlawVideoPresets))
+	for i, p := range outlawVideoPresets {
+		res, err := h.generateOne(c, p.Prompt, p.Filename, "outlaw", p.Duration, p.AspectRatio)
+		if err != nil {
+			results[i] = result{Filename: p.Filename, Error: err.Error()}
+		} else {
+			results[i] = result{Filename: p.Filename, URL: res["url"].(string)}
+		}
+	}
+	c.JSON(http.StatusOK, results)
+}
+
 // GenerateBubbleVideos handles POST /admin/v1/veo/preset/bubble
 func (h *Handler) GenerateBubbleVideos(c *gin.Context) {
 	type result struct {
