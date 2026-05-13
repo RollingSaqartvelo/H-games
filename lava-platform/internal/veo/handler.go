@@ -53,11 +53,11 @@ var bubblePresets = []struct {
 	Prompt      string
 }{
 	{
-		Filename: "grow", Duration: 8, AspectRatio: "1:1",
+		Filename: "grow", Duration: 8, AspectRatio: "9:16",
 		Prompt: "A magical pink bubblegum bubble self-inflating autonomously, floating in dark deep-purple cosmic candy space. Starts tiny like a marble, grows steadily and smoothly to fill the entire frame. Perfectly round glossy neon-pink surface, bright white specular highlight shifting as it grows, translucent bubble walls glowing hot-pink from within. No people, no hands, no characters, no text. Smooth continuous inflation motion. Neon-pink and violet ambient light. Cinematic premium mobile game animation. Clean dark background.",
 	},
 	{
-		Filename: "pop", Duration: 3, AspectRatio: "1:1",
+		Filename: "pop", Duration: 3, AspectRatio: "9:16",
 		Prompt: "A massive glossy neon-pink bubblegum bubble dramatically exploding in slow motion. Micro-cracks form on the surface then catastrophic burst — hot-pink gum shards and sticky translucent strands fly outward radially in all directions, bright shockwave ring of light, vivid neon flash. No people, no hands, no characters, no text. Dark purple-black background. Cinematic slow-motion explosion. Premium mobile game visual effect.",
 	},
 }

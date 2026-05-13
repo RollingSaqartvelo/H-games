@@ -41,7 +41,6 @@ type instance struct {
 type params struct {
 	AspectRatio     string `json:"aspectRatio"`
 	DurationSeconds int    `json:"durationSeconds"`
-	NumberOfVideos  int    `json:"numberOfVideos"`
 }
 
 type operationResp struct {
@@ -67,7 +66,7 @@ type operationResp struct {
 func (c *Client) GenerateVideo(ctx context.Context, prompt string, durationSecs int, aspectRatio string) ([]byte, error) {
 	body, err := json.Marshal(generateRequest{
 		Instances:  []instance{{Prompt: prompt}},
-		Parameters: params{AspectRatio: aspectRatio, DurationSeconds: durationSecs, NumberOfVideos: 1},
+		Parameters: params{AspectRatio: aspectRatio, DurationSeconds: durationSecs},
 	})
 	if err != nil {
 		return nil, err
