@@ -39,8 +39,6 @@ const CHAR_X_FRAC = 0.38
 // Floor Y positions as fraction of canvas height (world Y = screen Y, no vertical scroll)
 // Level 0 (ground) is computed dynamically as H - FLOOR_TILE_H so hooves land exactly on tile top.
 const FLOOR_Y_FRACS = [0.705, 0.545, 0.390, 0.248] as const
-// Must match FloorLayer DISPLAY_HEIGHT
-const FLOOR_TILE_H = 80
 
 // Sheriff starts 260px behind, gap closes as time passes
 function getSheriffTargetGap(elapsedMs: number): number {
@@ -129,7 +127,6 @@ export class GameScene {
     this.container.addChild(
       this.desert.container,
       this.world,
-      this.floor.container,    // floor tiles on top for ground-in-front effect
       this.flash.container,
     )
 
@@ -238,8 +235,7 @@ export class GameScene {
   }
 
   private getFloorY(idx: number): number {
-    // Level 0 = exact top of floor tile so hooves touch ground on any screen height
-    if (idx === 0) return this.H - FLOOR_TILE_H
+    if (idx === 0) return this.H * 0.82
     return this.H * FLOOR_Y_FRACS[idx]
   }
 
