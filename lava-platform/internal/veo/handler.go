@@ -67,8 +67,11 @@ const outlawVeoStyle = `
 Art style: flat geometric low-poly vector illustration. Travel poster / WPA mural aesthetic.
 Bold flat color blocking. Geometric simplified western characters and horses.
 Zero photorealism. Sharp angular shapes defining silhouettes. Limited color palette.
+NO white outlines. NO bright edge highlights. NO glow effects. NO halos around shapes.
+All shape edges defined ONLY by adjacent flat color contrast — no white border lines.
 Background: PURE PITCH BLACK (#000000) — required for luma-key compositing in game engine.
-No background scenery whatsoever. Character and horse only, on pure black.`
+No background scenery whatsoever. Character and horse only, on pure black.
+The character must appear as a clean flat-color silhouette with NO white stripes or edge artifacts.`
 
 // outlawVideoPresets defines the 3 video assets for the Outlaw Escape game visual rebuild.
 var outlawVideoPresets = []struct {

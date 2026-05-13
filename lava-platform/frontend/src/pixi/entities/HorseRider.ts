@@ -42,8 +42,8 @@ uniform sampler2D uTexture;
 void main(void) {
   vec4 color = texture(uTexture, vTextureCoord);
   float luma = dot(color.rgb, vec3(0.299, 0.587, 0.114));
-  float alpha = smoothstep(0.02, 0.10, luma);
-  finalColor = vec4(color.rgb, alpha);
+  float alpha = smoothstep(0.10, 0.30, luma);
+  finalColor = vec4(color.rgb * alpha, alpha);
 }
 `
 function makeLumaKeyFilter(): Filter {
@@ -157,7 +157,7 @@ export class HorseRider {
       const tex = new Texture({ source: this.videoSource })
       this.videoSprite.texture = tex
       const scale = OUTLAW_DISPLAY_H / v.videoHeight
-      this.videoSprite.scale.set(scale)
+      this.videoSprite.scale.set(-scale, scale)  // negative X = face right
       this.videoEl  = v
       this.hasVideo = true
       // Hide sprite/procedural layers — video takes over
