@@ -224,6 +224,10 @@ export class GameScene {
     this.rider.setState('running')
     this.sheriff.startRunning()
     this.triggerShake(6)
+
+    // TEMP: keep characters hidden after state changes re-show them
+    this.rider.container.visible   = false
+    this.sheriff.container.visible = false
   }
 
   private startCapture(): void {
@@ -236,6 +240,8 @@ export class GameScene {
     this.sheriff.startAttack(this.sheriffGap, 0)
     this.particles.spawnCrashBurst(this.charWorldX, this.floorY)
     this.triggerShake(15)
+    this.rider.container.visible   = false
+    this.sheriff.container.visible = false
   }
 
   private getFloorY(idx: number): number {
