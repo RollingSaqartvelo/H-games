@@ -27,6 +27,7 @@ import (
 	sessionRepo "github.com/lava-platform/internal/session/repository"
 	sessionSvc "github.com/lava-platform/internal/session/service"
 	"github.com/lava-platform/internal/telegram"
+	slotsHandler "github.com/lava-platform/internal/slots"
 	walletHandler "github.com/lava-platform/internal/wallet/handler"
 	walletRepo "github.com/lava-platform/internal/wallet/repository"
 	walletSvc "github.com/lava-platform/internal/wallet/service"
@@ -126,6 +127,8 @@ func New(cfg *config.Config, infra *infrastructure.Infra, deps *Deps) *gin.Engin
 
 	bubbleHandler := roundHandler.New(deps.Bubble.Engine, rRepo, "bubble_gum")
 
+	slotsH := slotsHandler.NewHandler(provider)
+
 	// ── Admin API (X-SYSTEM-KEY) ──────────────────────────────────────────────
 	adm := adminHandler.New(infra.DB)
 	r.GET("/admin", adm.Dashboard)
@@ -146,14 +149,17 @@ func New(cfg *config.Config, infra *infrastructure.Infra, deps *Deps) *gin.Engin
 			admin.POST("/gemini/batch",           geminiH.Batch)
 			admin.POST("/gemini/preset/bubble",   geminiH.GenerateBubbleFrames)
 
-			admin.POST("/gemini/preset/outlaw-floors", geminiH.GenerateOutlawFloors)
-			admin.POST("/gemini/preset/outlaw-bg",    geminiH.GenerateOutlawBGs)
+			admin.POST("/gemini/preset/outlaw-floors",   geminiH.GenerateOutlawFloors)
+			admin.POST("/gemini/preset/outlaw-bg",       geminiH.GenerateOutlawBGs)
+			admin.POST("/gemini/preset/slots-symbols",   geminiH.GenerateSlotSymbols)
 
 			veoH := veo.NewHandler(cfg.Gemini.APIKey, "frontend/dist/assets")
 			admin.POST("/veo/generate",           veoH.Generate)
 			admin.POST("/veo/preset/bubble",      veoH.GenerateBubbleVideos)
 			admin.POST("/veo/preset/outlaw",      veoH.GenerateOutlawVideos)
 		}
+
+		admin.POST("/slots/weights", slotsH.UpdateWeights)
 	}
 
 	// ── Provider API (HMAC signed) ────────────────────────────────────────────
@@ -241,6 +247,12 @@ func New(cfg *config.Config, infra *infrastructure.Infra, deps *Deps) *gin.Engin
 		tmaBubble.Use(middleware.SessionValidate(sessSvc))
 		bubbleHandler.RegisterRoutes(tmaBubble, tmaBubble)
 
+		// H-SLOTS TMA routes
+		tmaSlots := tma.Group("/v1/slots")
+		tmaSlots.Use(middleware.SessionValidate(sessSvc))
+		tmaSlots.POST("/spin",   slotsH.Spin)
+		tmaSlots.GET("/config",  slotsH.Config)
+
 		go func() {
 			if err := botHandler.RegisterWebhook(context.Background(), cfg.Telegram.AppURL); err != nil {
 				_ = err
@@ -312,6 +324,20 @@ func serveFrontend(r *gin.Engine) {
 		c.Header("Pragma", "no-cache")
 		c.Header("Expires", "0")
 		c.File(distDir + "/bubble.html")
+	})
+
+	// outlaw-gold.html — H-SLOTS slot game
+	r.GET("/outlaw-gold", func(c *gin.Context) {
+		c.Header("Cache-Control", "no-cache, no-store, must-revalidate")
+		c.Header("Pragma", "no-cache")
+		c.Header("Expires", "0")
+		c.File(distDir + "/outlaw-gold.html")
+	})
+	r.GET("/outlaw-gold.html", func(c *gin.Context) {
+		c.Header("Cache-Control", "no-cache, no-store, must-revalidate")
+		c.Header("Pragma", "no-cache")
+		c.Header("Expires", "0")
+		c.File(distDir + "/outlaw-gold.html")
 	})
 
 	// SPA catch-all: serve index.html for any non-API path

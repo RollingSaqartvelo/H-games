@@ -506,6 +506,109 @@ func (h *Handler) GenerateOutlawBGs(c *gin.Context) {
 	c.JSON(http.StatusOK, results)
 }
 
+// ── H-SLOTS: Outlaw Gold symbol generation ───────────────────────────────────
+
+const slotsSymbolStyle = `ART STYLE: Bold flat geometric illustration, vintage western casino poster style.
+Pure white background, completely isolated symbol, clean crisp edges for background removal.
+NO gradients inside any shape. NO drop shadows. NO 3D effects. NO photorealism.
+Each shape = one solid flat color. Hard sharp edges between adjacent colors.
+Premium casino slot game icon quality. Symbol centered, fills ~80% of frame.
+Color palette: rich saturated western poster colors — deep reds, gold, warm brown, ivory.`
+
+type slotSymbolItem struct {
+	Filename string
+	Prompt   string
+}
+
+var slotsSymbolPrompts = []slotSymbolItem{
+	{
+		Filename: "horseshoe",
+		Prompt:   slotsSymbolStyle + "\n\nSYMBOL: A large lucky horseshoe. Thick bold U-shape, bright warm gold color. Two round nail holes on each arm. Simple bold outline style. Isolated on pure white background. Classic western luck symbol.",
+	},
+	{
+		Filename: "whiskey",
+		Prompt:   slotsSymbolStyle + "\n\nSYMBOL: A whiskey bottle. Dark brown bottle silhouette, amber flat-color liquid block inside. Round cork stopper. Small white rectangular label with a red diagonal stripe. Bold flat graphic shapes. Isolated on pure white background.",
+	},
+	{
+		Filename: "bullet",
+		Prompt:   slotsSymbolStyle + "\n\nSYMBOL: A single large bullet cartridge, pointing upward. Brass-gold cylindrical body, silver-grey pointed tip. Clean bold silhouette. Two flat-color shapes only: gold body + silver tip. Isolated on pure white background.",
+	},
+	{
+		Filename: "badge",
+		Prompt:   slotsSymbolStyle + "\n\nSYMBOL: A western sheriff badge, five-pointed star shape inside a circle. Bold thick outline, flat gold color. The star is solid gold with a slightly darker ring border. Engraved lines on star points. Simple bold iconic design. Isolated on pure white background.",
+	},
+	{
+		Filename: "lantern",
+		Prompt:   slotsSymbolStyle + "\n\nSYMBOL: An old western oil lantern. Bold geometric trapezoid glass body, flat amber-orange glow color inside. Dark metal top handle and base, flat black shapes. Warm yellow glow flat disc behind lantern. Bold iconic silhouette. Isolated on pure white background.",
+	},
+	{
+		Filename: "revolver",
+		Prompt:   slotsSymbolStyle + "\n\nSYMBOL: A classic western revolver gun, pointing diagonally left-up. Bold side-view silhouette. Dark gunmetal grey flat color body, warm brown flat handle/grip. Cylinder visible as small circle. Bold iconic shape. Isolated on pure white background.",
+	},
+	{
+		Filename: "cowboy_hat",
+		Prompt:   slotsSymbolStyle + "\n\nSYMBOL: A classic cowboy hat, front view. Wide flat brim, tall crown with center crease, flat warm brown color. Simple bold silhouette shape. Decorative flat band strip in a slightly darker brown around base of crown. Isolated on pure white background.",
+	},
+	{
+		Filename: "gold_bag",
+		Prompt:   slotsSymbolStyle + "\n\nSYMBOL: A bulging moneybag filled with gold coins. Round plump bag shape, flat warm sandy-gold color. Tied at top with flat dark rope. Dollar sign or gold star embossed on front as a flat darker-gold shape. Bold iconic silhouette. Isolated on pure white background.",
+	},
+	{
+		Filename: "dynamite",
+		Prompt:   slotsSymbolStyle + "\n\nSYMBOL: A bundle of three dynamite sticks tied together. Bold cylindrical red sticks, flat red color. Wrapped with flat brown paper band around middle. Black fuse rope sticking up, curling slightly. Bold dramatic icon. Isolated on pure white background.",
+	},
+	{
+		Filename: "outlaw",
+		Prompt:   slotsSymbolStyle + "\n\nSYMBOL: A WANTED poster framed rectangle. Aged cream/ivory paper flat background. Bold black text 'WANTED' at top. Simple flat-color silhouette of a cowboy outlaw face/bust in center — dark hat, bandana mask covering lower face, dark coat. Red '$' symbol below. Bold vintage poster style. Isolated on pure white background.",
+	},
+	{
+		Filename: "sheriff",
+		Prompt:   slotsSymbolStyle + "\n\nSYMBOL: A sheriff's star badge with 'SHERIFF' text on a ribbon banner below. Large five-pointed star, flat gold color with dark outline. Bold engraved star points. Cream-colored ribbon banner beneath, bold black 'SHERIFF' lettering. Premium casino icon quality. Isolated on pure white background.",
+	},
+	{
+		Filename: "wild",
+		Prompt:   slotsSymbolStyle + "\n\nSYMBOL: A WILD bonus symbol for a slot game. Bold stylized text 'WILD' in large western-style letters. Each letter a bold flat gold color with dark outline. Surrounded by flat glowing rays/spikes in deep red and gold alternating. Like a gold star burst frame. Premium slot WILD symbol. Isolated on pure white background.",
+	},
+	{
+		Filename: "scatter",
+		Prompt:   slotsSymbolStyle + "\n\nSYMBOL: A SCATTER bonus symbol. A gold coin with a sheriff star stamped on its face. Round circle, bold flat gold color. Stamped star emblem in darker gold. Small flat rays/sparkles around the coin edge. Bold 'SCATTER' text in small bold letters below. Premium slot game icon. Isolated on pure white background.",
+	},
+}
+
+// GenerateSlotSymbols handles POST /admin/v1/gemini/preset/slots-symbols.
+func (h *Handler) GenerateSlotSymbols(c *gin.Context) {
+	subDir := filepath.Join("h-slots", "outlaw-gold", "symbols")
+	dir := filepath.Join(h.baseDir, subDir)
+	if err := os.MkdirAll(dir, 0o755); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "mkdir: " + err.Error()})
+		return
+	}
+
+	results := make([]batchResult, len(slotsSymbolPrompts))
+	for i, item := range slotsSymbolPrompts {
+		imgBytes, _, err := h.client.GenerateImage(c.Request.Context(), item.Prompt)
+		if err != nil {
+			results[i] = batchResult{Filename: item.Filename, Error: err.Error()}
+			continue
+		}
+		imgBytes, err = postProcess(imgBytes, true, 512)
+		if err != nil {
+			results[i] = batchResult{Filename: item.Filename, Error: err.Error()}
+			continue
+		}
+		outPath := filepath.Join(dir, item.Filename+".png")
+		if err := os.WriteFile(outPath, imgBytes, 0o644); err != nil {
+			results[i] = batchResult{Filename: item.Filename, Error: err.Error()}
+			continue
+		}
+		results[i] = batchResult{
+			Filename: item.Filename,
+			URL:      fmt.Sprintf("/assets/h-slots/outlaw-gold/symbols/%s.png", item.Filename),
+		}
+	}
+	c.JSON(http.StatusOK, results)
+}
+
 // cropRightEdge extracts the right `fraction` of a PNG as a reference for seam continuity.
 func cropRightEdge(data []byte, fraction float64) ([]byte, error) {
 	src, _, err := image.Decode(bytes.NewReader(data))

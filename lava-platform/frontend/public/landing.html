@@ -265,6 +265,11 @@
       background:linear-gradient(90deg,#a855f7,#e879f9,#f472b6,#e879f9,#a855f7);
       background-size:300% 100%;
     }
+    .m-game-btn--slots { color:#F5C842 }
+    .m-game-btn--slots::before {
+      background:linear-gradient(90deg,#8B6914,#D4A017,#F5C842,#D4A017,#8B6914);
+      background-size:300% 100%;
+    }
 
     .m-coming {
       width:100%; max-width:320px; font-size:7px; letter-spacing:.4em;
@@ -445,7 +450,7 @@
 
       /* Right column */
       .d-right { flex:1; display:flex; flex-direction:column; align-items:flex-end; justify-content:center; gap:20px; padding-left:60px }
-      .d-cards { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; width:100% }
+      .d-cards { display:grid; grid-template-columns:1fr 1fr; gap:16px; width:100% }
 
       /* Game card — premium line-art */
       .d-card {
@@ -484,6 +489,11 @@
         background-size:300% 300%;
       }
       .d-card--bubble::after { background:linear-gradient(90deg,transparent,#f472b6,transparent) }
+      .d-card--slots::before {
+        background:linear-gradient(135deg,#8B6914,#D4A017,#F5C842,#D4A017,#8B6914);
+        background-size:300% 300%;
+      }
+      .d-card--slots::after { background:linear-gradient(90deg,transparent,#D4A017,transparent) }
       .d-card:hover { transform:translateY(-5px) }
 
       /* Card icon (geometric diamond frame) */
@@ -498,12 +508,14 @@
       .d-card--outlaw .d-card-icon { color:var(--c1) }
       .d-card--granny .d-card-icon { color:var(--c4) }
       .d-card--bubble .d-card-icon { color:#f472b6 }
+      .d-card--slots .d-card-icon  { color:#D4A017 }
       .d-card-icon svg { width:22px; height:22px }
 
       .d-card-name { font-family:'Orbitron',sans-serif; font-size:11px; font-weight:700; letter-spacing:.2em; text-align:center }
       .d-card--outlaw .d-card-name { color:var(--c1) }
       .d-card--granny .d-card-name { color:var(--c4) }
       .d-card--bubble .d-card-name { color:#f472b6 }
+      .d-card--slots  .d-card-name { color:#F5C842 }
       .d-card-desc { font-size:9px; letter-spacing:.2em; text-transform:uppercase; color:var(--muted); text-align:center }
       .d-card-rtp { font-size:8px; letter-spacing:.3em; padding:2px 8px; border:1px solid var(--border); color:var(--muted) }
 
@@ -535,6 +547,9 @@
       .d-card--bubble .d-card-play { color:#f472b6 }
       .d-card--bubble .d-card-play::after { background:rgba(0,0,0,.88) }
       .d-card--bubble .d-card-play::before { background:linear-gradient(90deg,#a855f7,#e879f9,#f472b6,#e879f9,#a855f7); background-size:300% 100% }
+      .d-card--slots  .d-card-play { color:#F5C842 }
+      .d-card--slots  .d-card-play::after { background:rgba(0,0,0,.88) }
+      .d-card--slots  .d-card-play::before { background:linear-gradient(90deg,#8B6914,#D4A017,#F5C842,#D4A017,#8B6914); background-size:300% 100% }
       .d-card-play:hover { opacity:.8; transform:translateY(-1px) }
       .d-card-play:disabled { opacity:.25; cursor:default }
 
@@ -598,7 +613,8 @@
   <button id="joinBtn" class="m-game-btn m-game-btn--outlaw"><span>OUTLAW ESCAPE</span></button>
   <button id="grannyBtn" class="m-game-btn m-game-btn--granny"><span>GRANNY RUN</span></button>
   <button id="bubbleBtn" class="m-game-btn m-game-btn--bubble"><span>BUBBLE GUM</span></button>
-  <div class="m-coming">· Three games, one platform ·</div>
+  <button id="slotsBtn" class="m-game-btn m-game-btn--slots" onclick="goSlots()"><span>OUTLAW GOLD</span></button>
+  <div class="m-coming">· Four games, one platform ·</div>
 
   <div class="m-sec-row">
     <button class="m-sec-btn" onclick="onFairPlay()">Fair Play</button>
@@ -748,8 +764,25 @@
           <button class="d-card-play" id="dBubbleCardBtn" onclick="event.stopPropagation();goBubble()"><span>PLAY</span></button>
         </div>
 
+        <div class="d-card d-card--slots" onclick="goSlots()">
+          <div class="d-card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="7" width="18" height="11" rx="1.5"/>
+              <path d="M7 7V5h10v2"/>
+              <line x1="9" y1="12" x2="9" y2="14"/>
+              <line x1="12" y1="11" x2="12" y2="15"/>
+              <line x1="15" y1="12" x2="15" y2="14"/>
+              <circle cx="12" cy="19.5" r="1" fill="currentColor"/>
+            </svg>
+          </div>
+          <div class="d-card-name">OUTLAW GOLD</div>
+          <div class="d-card-desc">Cluster pays slots</div>
+          <div class="d-card-rtp">RTP 96%</div>
+          <button class="d-card-play" onclick="event.stopPropagation();goSlots()"><span>PLAY</span></button>
+        </div>
+
       </div>
-      <div class="d-cards-sub">· Three games, one platform ·</div>
+      <div class="d-cards-sub">· Four games, one platform ·</div>
     </div>
 
   </div>
@@ -770,6 +803,7 @@ if (tg) {
 function goOutlaw(){ window.location.href = window.location.origin + '/play' }
 function goGranny(){ window.location.href = window.location.origin + '/granny.html?v=29' }
 function goBubble(){ window.location.href = window.location.origin + '/bubble.html' }
+function goSlots() { window.location.href = window.location.origin + '/outlaw-gold.html' }
 
 // ── User profile display ──────────────────────────────────────────────────────
 const user = tg?.initDataUnsafe?.user || {}
