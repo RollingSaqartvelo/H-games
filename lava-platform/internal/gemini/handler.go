@@ -89,53 +89,54 @@ func (h *Handler) Batch(c *gin.Context) {
 }
 
 // styleBase is appended to every bubble asset prompt for visual consistency.
-const styleBase = `Premium dark luxury game art style. Pure white background, completely isolated subject, no shadows on background, clean edges for background removal. High detail, professional illustration, suitable for mobile game.`
+const styleBase = `NO people, NO humans, NO characters, NO hands, NO faces. Pure white background, completely isolated subject, no shadows on background, clean crisp edges for background removal. Premium candy game art style, vibrant neon colors, high detail, professional illustration, suitable for mobile game.`
 
 // bubbleFramePrompts — all frames needed for Bubble-Gum game, 512x512, white bg.
+// The bubble inflates by itself — no characters, no people at all.
 var bubbleFramePrompts = []batchItem{
-	// Background — no bg removal, landscape-ish
+	// Background — dark candy world, no bg removal
 	{Filename: "bg", Size: 1024, Game: "bubble", RemoveBg: false,
-		Prompt: "Dark luxury candy city skyline at night. Neon pink and magenta glowing buildings. Deep purple-black sky. Candy cane streetlights. Shiny gum road. Cinematic premium game background. No characters, no text, no UI. Wide panoramic view."},
+		Prompt: "Dark luxury candy dreamworld at night. Neon pink and magenta glowing candy mountains. Deep purple-black sky with sugar-crystal stars. Giant lollipop trees. Shiny gum river. Cinematic premium mobile game background. No people, no characters, no text, no UI. Wide panoramic view."},
 
-	// Character
+	// Idle state — a small flat piece of gum before inflation
 	{Filename: "char_idle", Size: 512, Game: "bubble", RemoveBg: true,
-		Prompt: "A stylish confident teenager in dark luxury streetwear, standing upright, mouth closed chewing gum, no bubble yet, full body portrait, centered on pure white background, premium cartoon game art. " + styleBase},
+		Prompt: "A single small round flat piece of shiny pink bubblegum candy, glossy like a jewel, soft neon-pink color with a subtle highlight, cute minimal candy style, centered perfectly, isolated on pure white background. No people, no hands. " + styleBase},
 
-	// Bubble growth stages
+	// Bubble growth stages — the bubble inflates by itself, floating in air
 	{Filename: "stage_01", Size: 512, Game: "bubble", RemoveBg: true,
-		Prompt: "A stylish teenager blowing a tiny grape-sized glossy pink bubblegum bubble, full body portrait, bubble clearly visible, pure white background. " + styleBase},
+		Prompt: "A tiny grape-sized self-inflating pink bubblegum bubble floating in air, glossy surface, soft specular highlight, magical glow, no people, no hands, isolated on pure white background. " + styleBase},
 	{Filename: "stage_02", Size: 512, Game: "bubble", RemoveBg: true,
-		Prompt: "A stylish teenager blowing a small tennis-ball-sized glossy magenta bubblegum bubble, full body portrait, pure white background. " + styleBase},
+		Prompt: "A small tennis-ball-sized self-inflating glossy magenta bubblegum bubble floating in air, beautiful specular highlight, magical inner glow, no people, no hands, isolated on pure white background. " + styleBase},
 	{Filename: "stage_03", Size: 512, Game: "bubble", RemoveBg: true,
-		Prompt: "A stylish teenager blowing a softball-sized glossy neon-pink bubblegum bubble with specular highlight, full body portrait, pure white background. " + styleBase},
+		Prompt: "A softball-sized self-inflating glossy neon-pink bubblegum bubble floating in air, strong specular highlight, subtle inner luminance, translucent surface, no people, no hands, isolated on pure white background. " + styleBase},
 	{Filename: "stage_04", Size: 512, Game: "bubble", RemoveBg: true,
-		Prompt: "A stylish teenager blowing a volleyball-sized glossy hot-pink bubblegum bubble, gum slightly stretched, full body portrait, pure white background. " + styleBase},
+		Prompt: "A volleyball-sized self-inflating glossy hot-pink bubblegum bubble floating in air, gum surface slightly stretched, vivid inner glow, no people, no hands, isolated on pure white background. " + styleBase},
 	{Filename: "stage_05", Size: 512, Game: "bubble", RemoveBg: true,
-		Prompt: "A stylish teenager blowing a basketball-sized glossy neon-pink bubblegum bubble expanding upward-right, gum visibly thin and stretched, full body portrait, pure white background. " + styleBase},
+		Prompt: "A basketball-sized self-inflating glossy neon-pink bubblegum bubble floating in air, surface visibly thinning, bright inner light, expanding upward, no people, no hands, isolated on pure white background. " + styleBase},
 	{Filename: "stage_06", Size: 512, Game: "bubble", RemoveBg: true,
-		Prompt: "A stylish teenager struggling with a huge glossy translucent pink bubblegum bubble bigger than their head, expanding diagonally upper-right, full body portrait, pure white background. " + styleBase},
+		Prompt: "A large head-sized self-inflating glossy translucent pink bubblegum bubble floating in air, glowing neon-pink from within, surface tension beginning to show, no people, no hands, isolated on pure white background. " + styleBase},
 	{Filename: "stage_07", Size: 512, Game: "bubble", RemoveBg: true,
-		Prompt: "A stylish teenager with an enormous double-head-sized glossy translucent pink bubblegum bubble, extreme diagonal expansion upper-right, surface tension visible, full body portrait, pure white background. " + styleBase},
+		Prompt: "A huge double-head-sized self-inflating glossy translucent pink bubblegum bubble floating in air, bright neon core glow, surface tension veins forming, rainbow refraction at edges, no people, no hands, isolated on pure white background. " + styleBase},
 	{Filename: "stage_08", Size: 512, Game: "bubble", RemoveBg: true,
-		Prompt: "A stylish teenager barely controlling a colossal triple-head-sized pink bubblegum bubble with stress lines on surface, rainbow refraction, extreme diagonal upper-right, full body portrait, pure white background. " + styleBase},
+		Prompt: "A colossal triple-sized self-inflating glossy translucent pink bubblegum bubble floating in air, stress lines on surface, intense rainbow refraction, white-hot core glow, no people, no hands, isolated on pure white background. " + styleBase},
 	{Filename: "stage_09", Size: 512, Game: "bubble", RemoveBg: true,
-		Prompt: "A stylish teenager with a massive unstable pink bubblegum bubble four times head size, veins of stress, glowing from within, about to pop, diagonal upper-right at maximum, full body portrait, pure white background. " + styleBase},
+		Prompt: "A massive self-inflating pink bubblegum bubble at critical size, deep stress cracks forming on surface, blinding neon-pink inner glow, veins of tension spreading, about to burst, no people, no hands, isolated on pure white background. " + styleBase},
 	{Filename: "stage_10", Size: 512, Game: "bubble", RemoveBg: true,
-		Prompt: "A stylish teenager with a colossal critical pink bubblegum bubble filling most of frame, micro-cracks forming, extreme neon glow, maximum tension, pure white background. " + styleBase},
+		Prompt: "A colossal self-inflating pink bubblegum bubble filling almost the entire frame, micro-fractures spreading across surface, extreme neon glow, maximum tension, ghostly translucent walls, no people, no hands, isolated on pure white background. " + styleBase},
 
-	// Wobble frames
+	// Wobble frames — bubble sways side to side
 	{Filename: "wobble_a", Size: 512, Game: "bubble", RemoveBg: true,
-		Prompt: "A huge neon-pink glossy bubblegum bubble deformed slightly to the left, wobbling, extreme tension, gloss highlights shifting left, isolated on pure white background. " + styleBase},
+		Prompt: "A huge neon-pink glossy bubblegum bubble gently deformed squashed to the left, wobbling mid-air, gloss highlight shifted left, extreme surface tension, no people, no hands, isolated on pure white background. " + styleBase},
 	{Filename: "wobble_b", Size: 512, Game: "bubble", RemoveBg: true,
-		Prompt: "A huge neon-pink glossy bubblegum bubble deformed slightly to the right, wobbling, extreme tension, gloss highlights shifting right, isolated on pure white background. " + styleBase},
+		Prompt: "A huge neon-pink glossy bubblegum bubble gently deformed squashed to the right, wobbling mid-air, gloss highlight shifted right, extreme surface tension, no people, no hands, isolated on pure white background. " + styleBase},
 
-	// Crash sequence
+	// Crash sequence — the bubble pops on its own
 	{Filename: "pop_crack", Size: 512, Game: "bubble", RemoveBg: true,
-		Prompt: "A huge pink bubblegum bubble with a visible micro-crack splitting open, pink glow escaping, surface rupturing, dramatic tension, isolated on pure white background. " + styleBase},
+		Prompt: "A massive pink bubblegum bubble with a dramatic crack splitting open, hot-pink glow escaping through the rupture, surface tearing apart, no people, no hands, isolated on pure white background. " + styleBase},
 	{Filename: "pop_burst", Size: 512, Game: "bubble", RemoveBg: true,
-		Prompt: "Explosive pink bubblegum bubble POP, neon-pink gum fragments flying outward in all directions, shockwave ring, dramatic burst explosion, isolated on pure white background. " + styleBase},
+		Prompt: "Explosive pink bubblegum bubble POP mid-air, neon-pink gum shards and sticky strands flying outward in all directions, bright shockwave ring, dramatic burst explosion, no people, no hands, isolated on pure white background. " + styleBase},
 	{Filename: "pop_splat", Size: 512, Game: "bubble", RemoveBg: true,
-		Prompt: "A stylish teenager completely covered in sticky pink bubblegum after a bubble explosion, shocked expression, pink gum splattered on face and clothes, pure white background. " + styleBase},
+		Prompt: "Pink bubblegum explosion aftermath — scattered sticky pink gum blobs and strands splattered in all directions, dripping gum droplets, candy fragments, no people, no hands, isolated on pure white background. " + styleBase},
 }
 
 // GenerateBubbleFrames handles POST /admin/v1/gemini/preset/bubble
