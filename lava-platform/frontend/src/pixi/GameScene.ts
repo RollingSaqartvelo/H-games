@@ -124,6 +124,10 @@ export class GameScene {
       this.rider.container,
     )
 
+    // TEMP: hide characters to preview background
+    this.rider.container.visible   = false
+    this.sheriff.container.visible = false
+
     this.container.addChild(
       this.desert.container,
       this.world,
