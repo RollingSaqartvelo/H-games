@@ -63,6 +63,7 @@ export function GifCharacters() {
     width: size,
     height: 'auto',
     display: 'block',
+    transform: 'translateY(18%)',
   }
 
   return (

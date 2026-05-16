@@ -36,7 +36,7 @@ export function Multiplier() {
   const value = isCrashed && crashPoint !== null ? crashPoint : liveMult
 
   return (
-    <div className={`mult ${colorClass}`}>
+    <div className={`mult ${colorClass}${label ? ' mult--label-only' : ''}`}>
       {label ? (
         <div className="mult__label">{label}</div>
       ) : (
