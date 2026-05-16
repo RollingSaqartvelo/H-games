@@ -5,11 +5,21 @@ const SHERIFF_IDLE = '/assets/sheriff/%D1%88%D0%B5%D1%80%D0%B8%D1%84.gif'
 const SHERIFF_SHOT = '/assets/sheriff/%D0%92%D1%8B%D1%81%D1%82%D1%80%D0%B5%D0%BB.gif'
 const HERO_SRC     = '/assets/hero/%D0%B3%D0%B5%D1%80%D0%BE%D0%B9.gif'
 
-const SHOT_MS      = 5000  // interval between shots
-const SHOT_SHOW_MS = 800   // how long shot GIF shows
+const SHOT_MS      = 5000
+const SHOT_SHOW_MS = 800
 
-// Responsive size: 38% of viewport width, capped at 600px desktop
-const SIZE = 'min(600px, 38vw)'
+function useCharSize(): string {
+  const [size, setSize] = useState(() =>
+    window.innerWidth < 768 ? '444px' : 'min(600px, 38vw)'
+  )
+  useEffect(() => {
+    const update = () =>
+      setSize(window.innerWidth < 768 ? '444px' : 'min(600px, 38vw)')
+    window.addEventListener('resize', update)
+    return () => window.removeEventListener('resize', update)
+  }, [])
+  return size
+}
 
 export function GifCharacters() {
   const roundState = useGame((s) => s.roundState)
@@ -17,7 +27,9 @@ export function GifCharacters() {
   const [shotKey, setShotKey] = useState(0)
   const intervalRef = useRef<number | undefined>(undefined)
   const hideRef     = useRef<number | undefined>(undefined)
+  const size = useCharSize()
 
+  // Only visible during active game round
   const running = roundState === 'RUNNING'
 
   useEffect(() => {
@@ -42,13 +54,14 @@ export function GifCharacters() {
     }
   }, [running])
 
-  if (roundState === null) return null
+  // Hidden during betting — video plays instead
+  if (!running) return null
 
   const charStyle: React.CSSProperties = {
     position: 'absolute',
     bottom: 0,
-    width: SIZE,
-    height: SIZE,
+    width: size,
+    height: size,
     objectFit: 'contain',
     objectPosition: 'bottom center',
     display: 'block',
@@ -65,15 +78,12 @@ export function GifCharacters() {
         overflow: 'hidden',
       }}
     >
-      {/* Sheriff — far left, fires every 5s */}
       <img
         key={firing ? `shot-${shotKey}` : 'idle'}
         src={firing ? SHERIFF_SHOT : SHERIFF_IDLE}
         alt=""
         style={{ ...charStyle, left: 0 }}
       />
-
-      {/* Hero — past centre */}
       <img
         src={HERO_SRC}
         alt=""
