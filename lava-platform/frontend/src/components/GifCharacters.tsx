@@ -61,9 +61,7 @@ export function GifCharacters() {
     position: 'absolute',
     bottom: 0,
     width: size,
-    height: size,
-    objectFit: 'contain',
-    objectPosition: 'bottom center',
+    height: 'auto',
     display: 'block',
   }
 
