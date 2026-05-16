@@ -124,9 +124,10 @@ export class GameScene {
       this.rider.container,
     )
 
-    // TEMP: hide characters to preview background
-    this.rider.container.visible   = false
-    this.sheriff.container.visible = false
+    // Characters replaced by GIF overlays — hide Pixi characters + particles
+    this.rider.container.visible      = false
+    this.sheriff.container.visible    = false
+    this.particles.container.visible  = false
 
     this.container.addChild(
       this.desert.container,
