@@ -112,6 +112,15 @@ ul, li { list-style: none; }
   );
 }
 
+/* Mobile: limit game-area to ~45% of viewport so betting panels get more room */
+@media (max-width: 768px) {
+  .game-area {
+    flex: 0 0 auto;
+    height: 45dvh;
+    height: 45vh;
+  }
+}
+
 /* Canvas overlays — stacked above video(z:2) and siren(z:3) */
 .game-overlay { position: absolute; }
 .game-overlay--top-right  { top: 6px; right: 6px; max-width: 148px; pointer-events: none; z-index: 6; }

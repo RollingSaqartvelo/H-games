@@ -10,11 +10,11 @@ const SHOT_SHOW_MS = 800
 
 function useCharSize(): string {
   const [size, setSize] = useState(() =>
-    window.innerWidth < 768 ? '150px' : 'min(600px, 38vw)'
+    window.innerWidth < 768 ? '375px' : 'min(600px, 38vw)'
   )
   useEffect(() => {
     const update = () =>
-      setSize(window.innerWidth < 768 ? '150px' : 'min(600px, 38vw)')
+      setSize(window.innerWidth < 768 ? '375px' : 'min(600px, 38vw)')
     window.addEventListener('resize', update)
     return () => window.removeEventListener('resize', update)
   }, [])
