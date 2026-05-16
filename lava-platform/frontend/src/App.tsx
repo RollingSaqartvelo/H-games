@@ -8,6 +8,7 @@ import { DualBetPanel }      from './components/DualBetPanel'
 import { BettingVideo }      from './components/BettingVideo'
 import { WastedOverlay }    from './components/WastedOverlay'
 import { GifCharacters }   from './components/GifCharacters'
+import { RunningVideo }    from './components/RunningVideo'
 import { useSocket }         from './hooks/useSocket'
 import { usePixi }           from './hooks/usePixi'
 import { useTMAAuth }        from './hooks/useTMAAuth'
@@ -73,8 +74,11 @@ export function App() {
         {/* z:1 — PixiJS canvas mount (stable ref, never swapped) */}
         <div ref={pixiMount} className="pixi-mount" aria-hidden="true" />
 
-        {/* z:2 — Cinematic video bg for WAITING/BETTING; fades out on RUNNING */}
+        {/* z:2 — betting-loop2.mp4 during WAITING/BETTING; fades out on RUNNING */}
         <BettingVideo />
+
+        {/* z:2 — comp1.mp4 background during RUNNING */}
+        <RunningVideo />
 
         {/* z:5-6 — Absolute overlays on top of canvas / video */}
         <div className="game-overlay game-overlay--top-right">
