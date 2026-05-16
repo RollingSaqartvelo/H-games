@@ -8,17 +8,18 @@ const HERO_SRC     = '/assets/hero/%D0%B3%D0%B5%D1%80%D0%BE%D0%B9.gif'
 const SHOT_MS      = 5000
 const SHOT_SHOW_MS = 800
 
-function useCharSize(): string {
-  const [size, setSize] = useState(() =>
-    window.innerWidth < 768 ? '375px' : 'min(600px, 38vw)'
-  )
+function useCharLayout(): { size: string; isMobile: boolean } {
+  const mobile = () => window.innerWidth < 768
+  const [isMobile, setIsMobile] = useState(mobile)
   useEffect(() => {
-    const update = () =>
-      setSize(window.innerWidth < 768 ? '375px' : 'min(600px, 38vw)')
+    const update = () => setIsMobile(mobile())
     window.addEventListener('resize', update)
     return () => window.removeEventListener('resize', update)
   }, [])
-  return size
+  return {
+    size: isMobile ? '375px' : 'min(600px, 38vw)',
+    isMobile,
+  }
 }
 
 export function GifCharacters() {
@@ -27,7 +28,7 @@ export function GifCharacters() {
   const [shotKey, setShotKey] = useState(0)
   const intervalRef = useRef<number | undefined>(undefined)
   const hideRef     = useRef<number | undefined>(undefined)
-  const size = useCharSize()
+  const { size, isMobile } = useCharLayout()
 
   // Only visible during active game round
   const running = roundState === 'RUNNING'
@@ -81,12 +82,12 @@ export function GifCharacters() {
         key={firing ? `shot-${shotKey}` : 'idle'}
         src={firing ? SHERIFF_SHOT : SHERIFF_IDLE}
         alt=""
-        style={{ ...charStyle, left: 0 }}
+        style={{ ...charStyle, left: isMobile ? '-10%' : 0 }}
       />
       <img
         src={HERO_SRC}
         alt=""
-        style={{ ...charStyle, left: '55%' }}
+        style={{ ...charStyle, left: isMobile ? '25%' : '55%' }}
       />
     </div>
   )
