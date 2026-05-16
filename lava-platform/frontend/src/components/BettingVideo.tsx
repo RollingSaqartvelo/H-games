@@ -8,7 +8,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useGame } from '../store/game'
 
-const VIDEO_SRC    = '/video/Comp%201.mp4'
+const VIDEO_SRC    = '/video/comp1.mp4'
 const FADE_OUT_MS  = 600
 const SIREN_THRESH = 2
 
