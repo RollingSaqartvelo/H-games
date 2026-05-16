@@ -221,6 +221,7 @@ func (h *Handler) Spin(c *gin.Context) {
 		"server_seed_hash":     result.ServerSeedHash,
 		"nonce":                result.Nonce,
 		"initial_grid":         gridToSlice(result.InitialGrid),
+		"final_grid":           gridToSlice(result.FinalGrid),
 		"cascades":             cascadesToJSON(result.Cascades),
 		"total_payout":         result.TotalPayout,
 		"scatter_count":        result.ScatterCount,

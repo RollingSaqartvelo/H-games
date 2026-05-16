@@ -39,7 +39,7 @@ export class GameEngine {
           this.scene.resize(w, h)
           // Re-apply after PixiJS autoDensity overrides width/height with px values
           const canvas = this.app.canvas as HTMLCanvasElement
-          canvas.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;display:block;'
+          canvas.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;display:block;z-index:1;'
         }
       })
     })
@@ -69,7 +69,7 @@ export class GameEngine {
 
     // Style the canvas
     const canvas = app.canvas as HTMLCanvasElement
-    canvas.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;display:block;'
+    canvas.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;display:block;z-index:1;'
 
     mount.appendChild(canvas)
 

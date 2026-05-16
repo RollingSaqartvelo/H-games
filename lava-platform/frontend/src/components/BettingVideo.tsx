@@ -8,7 +8,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useGame } from '../store/game'
 
-const VIDEO_SRC    = '/video/betting-loop2.mp4'
+const VIDEO_SRC    = '/video/Comp%201.mp4'
 const FADE_OUT_MS  = 600
 const SIREN_THRESH = 2
 
@@ -97,6 +97,20 @@ export function BettingVideo() {
     document.addEventListener('visibilitychange', onVis)
     return () => document.removeEventListener('visibilitychange', onVis)
   }, [phase])
+
+  // ── Seamless loop (prevent black frame at natural end) ───────────────────
+
+  useEffect(() => {
+    const vid = videoRef.current
+    if (!vid) return
+    const onTimeUpdate = () => {
+      if (vid.duration && vid.currentTime >= vid.duration - 0.08) {
+        vid.currentTime = 0
+      }
+    }
+    vid.addEventListener('timeupdate', onTimeUpdate)
+    return () => vid.removeEventListener('timeupdate', onTimeUpdate)
+  }, [])
 
   // ── CSS ───────────────────────────────────────────────────────────────────
 

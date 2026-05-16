@@ -124,6 +124,7 @@ type SpinResult struct {
 	ServerSeedHash   string           `json:"server_seed_hash"`
 	Nonce            int64            `json:"nonce"`
 	InitialGrid      Grid             `json:"initial_grid"`
+	FinalGrid        Grid             `json:"final_grid"`
 	Cascades         []CascadeStep    `json:"cascades"`
 	TotalPayout      float64          `json:"total_payout"`
 	ScatterCount     int              `json:"scatter_count"`
@@ -180,6 +181,42 @@ func placeMultiplierCells(r *rng) []MultiplierCell {
 		count = 2
 	default:
 		count = 3
+	}
+	if count == 0 {
+		return nil
+	}
+
+	type pos struct{ row, col int }
+	pool := make([]pos, NumRows*NumCols)
+	for i := range pool {
+		pool[i] = pos{i / NumCols, i % NumCols}
+	}
+
+	cells := make([]MultiplierCell, 0, count)
+	for i := 0; i < count; i++ {
+		j := i + r.intn(len(pool)-i)
+		pool[i], pool[j] = pool[j], pool[i]
+		cells = append(cells, MultiplierCell{
+			Row:   pool[i].row,
+			Col:   pool[i].col,
+			Value: pickMultiplierValue(r),
+		})
+	}
+	return cells
+}
+
+// placeMultiplierCellsRare places 0–2 multiplier cells with very low probability for normal spins.
+// Distribution: 95% → 0, 4% → 1, 1% → 2
+func placeMultiplierCellsRare(r *rng) []MultiplierCell {
+	roll := r.intn(100)
+	var count int
+	switch {
+	case roll < 95:
+		count = 0
+	case roll < 99:
+		count = 1
+	default:
+		count = 2
 	}
 	if count == 0 {
 		return nil
@@ -484,9 +521,11 @@ func Spin(cfg *Config, serverSeed string, nonce int64, bet float64, minForcedSca
 		Bet:            bet,
 	}
 
-	// Place multiplier cells during free spin mode
+	// Place multiplier cells — always possible, but rare in normal spins
 	if isFreeSpin {
 		result.MultiplierCells = placeMultiplierCells(r)
+	} else {
+		result.MultiplierCells = placeMultiplierCellsRare(r)
 	}
 
 	// Count scatters on initial grid
@@ -515,6 +554,8 @@ func Spin(cfg *Config, serverSeed string, nonce int64, bet float64, minForcedSca
 
 		current = applyTumble(current, clusters, cfg, r)
 	}
+
+	result.FinalGrid = current
 
 	// If no cascades, store initial grid as the only step
 	if len(result.Cascades) == 0 {

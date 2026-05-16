@@ -7,6 +7,7 @@ import { SocialTicker }      from './components/SocialTicker'
 import { DualBetPanel }      from './components/DualBetPanel'
 import { BettingVideo }      from './components/BettingVideo'
 import { WastedOverlay }    from './components/WastedOverlay'
+import { GifCharacters }   from './components/GifCharacters'
 import { useSocket }         from './hooks/useSocket'
 import { usePixi }           from './hooks/usePixi'
 import { useTMAAuth }        from './hooks/useTMAAuth'
@@ -87,6 +88,9 @@ export function App() {
         <div className="game-overlay game-overlay--bottom">
           <RoundCountdown />
         </div>
+
+        {/* z:10 — GIF characters: sheriff (left) + hero (center-right) + shot */}
+        <GifCharacters />
 
         {/* z:99 — Wasted cinematic slam on crash */}
         <WastedOverlay />
