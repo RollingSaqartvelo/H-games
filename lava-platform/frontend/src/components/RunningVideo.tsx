@@ -1,11 +1,31 @@
 import { useEffect, useRef } from 'react'
 import { useGame } from '../store/game'
 
+// How many seconds before the natural end to loop back — bigger = safer, wastes less if video is seamless
+const LOOP_GUARD_S = 0.15
+
 export function RunningVideo() {
   const roundState = useGame((s) => s.roundState)
   const videoRef   = useRef<HTMLVideoElement>(null)
+  const rafRef     = useRef<number>(0)
 
   const visible = roundState === 'RUNNING'
+
+  // rAF loop: poll currentTime every frame for tightest possible loop
+  useEffect(() => {
+    const vid = videoRef.current
+    if (!vid) return
+
+    const tick = () => {
+      if (vid.duration && vid.currentTime >= vid.duration - LOOP_GUARD_S) {
+        vid.currentTime = 0
+      }
+      rafRef.current = requestAnimationFrame(tick)
+    }
+
+    rafRef.current = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(rafRef.current)
+  }, [])
 
   useEffect(() => {
     const vid = videoRef.current
@@ -18,18 +38,13 @@ export function RunningVideo() {
     }
   }, [visible])
 
-  // Seamless loop — jump back 80ms before natural end
-  useEffect(() => {
+  const handleEnded = () => {
     const vid = videoRef.current
-    if (!vid) return
-    const onTime = () => {
-      if (vid.duration && vid.currentTime >= vid.duration - 0.08) {
-        vid.currentTime = 0
-      }
+    if (vid && visible) {
+      vid.currentTime = 0
+      vid.play().catch(() => {})
     }
-    vid.addEventListener('timeupdate', onTime)
-    return () => vid.removeEventListener('timeupdate', onTime)
-  }, [])
+  }
 
   return (
     <video
@@ -47,9 +62,9 @@ export function RunningVideo() {
         pointerEvents: 'none',
       }}
       muted
-      loop
       playsInline
       preload="auto"
+      onEnded={handleEnded}
       {...{ 'webkit-playsinline': 'true' }}
     />
   )
