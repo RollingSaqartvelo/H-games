@@ -22,7 +22,7 @@ export function BettingVideo() {
   const timerRef = useRef<number | undefined>(undefined)
   const tickRef  = useRef<number | undefined>(undefined)
 
-  const [phase, setPhase] = useState<Phase>('visible')
+  const [phase, setPhase] = useState<Phase>('hidden')
   const [siren, setSiren] = useState(false)
   const [, setDbgInfo] = useState('init')
 
@@ -41,7 +41,7 @@ export function BettingVideo() {
       return
     }
 
-    if (roundState === 'STARTING' || roundState === null || roundState === 'CREATED') {
+    if (roundState === 'STARTING' || roundState === 'CREATED') {
       setPhase('visible')
 
       const vid = videoRef.current
