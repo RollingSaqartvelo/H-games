@@ -82,7 +82,7 @@ export function GifCharacters() {
         key={firing ? `shot-${shotKey}` : 'idle'}
         src={firing ? SHERIFF_SHOT : SHERIFF_IDLE}
         alt=""
-        style={{ ...charStyle, left: isMobile ? '-10%' : 0 }}
+        style={{ ...charStyle, left: isMobile ? '-35%' : 0 }}
       />
       <img
         src={HERO_SRC}
