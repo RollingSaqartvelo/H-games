@@ -11,7 +11,7 @@ import (
 // ── Symbols ───────────────────────────────────────────────────────────────────
 
 const (
-	SymDice    = 0
+	SymDice    = 0 // loss symbol
 	SymShades  = 1
 	SymSneaker = 2
 	SymChain   = 3
@@ -19,32 +19,24 @@ const (
 	SymKeyFob  = 5
 	SymCard    = 6
 	NumSyms    = 7
-	SymBlank   = -1
 )
 
-// ── Payout multipliers ────────────────────────────────────────────────────────
-// Calibrated for 94.3% RTP.
-// 3-of-a-kind: all 3 center reels match same symbol  (× bet)
-// 2-of-a-kind: exactly 2 center reels match          (× bet)
+// ── Payout multipliers (× bet) ────────────────────────────────────────────────
+// Calibrated for 94% RTP.
+// Dice = ×0 (loss). Shades–Card scale up.
+// RTP = 0.319×1.5 + 0.030×3 + 0.012×8 + 0.005×20 + 0.001×75 + 0.0002×500 ≈ 0.940
+var RouletteMultipliers = [NumSyms]float64{0, 1.5, 3, 8, 20, 75, 500}
 
-var Mult3 = [NumSyms]float64{2.0, 5.0, 10.0, 25.0, 60.0, 150.0, 500.0}
-var Mult2 = [NumSyms]float64{0.6, 1.2, 2.0, 4.0, 9.0, 23.0, 62.0}
-
-// ── Reel stop weights (out of 1000) ──────────────────────────────────────────
-// [blank, sym-0..6]
-// P(sym-0)=0.450, P(sym-1)=0.250, P(sym-2)=0.150,
-// P(sym-3)=0.080, P(sym-4)=0.035, P(sym-5)=0.020, P(sym-6)=0.010
-// RTP: 3× sum ≈ 31.1%, 2× sum ≈ 63.2% → total ≈ 94.3%
-var reelWeights = [NumSyms + 1]int{
-	5,   // blank
-	450, // sym-0
-	250, // sym-1
-	150, // sym-2
-	80,  // sym-3
-	35,  // sym-4
-	20,  // sym-5
-	10,  // sym-6
-} // total = 1000
+// ── Reel weights (out of 100000) ─────────────────────────────────────────────
+var rouletteWeights = [NumSyms]int{
+	63280, // sym-0 Dice  (63.28% loss)
+	31900, // sym-1 Shades
+	3000,  // sym-2 Sneaker
+	1200,  // sym-3 Chain
+	500,   // sym-4 Watch
+	100,   // sym-5 KeyFob
+	20,    // sym-6 Card
+} // total = 100000
 
 // ── RNG (HMAC-SHA256) ─────────────────────────────────────────────────────────
 
@@ -95,38 +87,14 @@ func HashSeed(seed string) string {
 	return hex.EncodeToString(h[:])
 }
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
-
-func pickStop(r *rng) int {
-	total := 0
-	for _, w := range reelWeights {
-		total += w
-	}
-	roll := r.intn(total)
-	cum := 0
-	for i, w := range reelWeights {
-		cum += w
-		if roll < cum {
-			if i == 0 {
-				return SymBlank
-			}
-			return i - 1 // sym-0..6
-		}
-	}
-	return SymBlank
-}
-
 // ── Spin result ───────────────────────────────────────────────────────────────
 
 type SpinResult struct {
-	ServerSeedHash string    `json:"server_seed_hash"`
-	Nonce          int64     `json:"nonce"`
-	Reels          [3][3]int `json:"reels"`   // [reel 0-2][row 0=top,1=center,2=bot]
-	Center         [3]int    `json:"center"`  // reels[0][1], reels[1][1], reels[2][1]
-	WinSym         int       `json:"win_sym"` // -1 if no win
-	WinType        int       `json:"win_type"` // 0=none, 2=pair, 3=triple
-	Payout         float64   `json:"payout"`
-	Bet            float64   `json:"bet"`
+	ServerSeedHash string  `json:"server_seed_hash"`
+	Nonce          int64   `json:"nonce"`
+	WinSym         int     `json:"win_sym"` // 0-6; Dice = loss (×0)
+	Payout         float64 `json:"payout"`
+	Bet            float64 `json:"bet"`
 }
 
 // ── Spin ──────────────────────────────────────────────────────────────────────
@@ -134,58 +102,27 @@ type SpinResult struct {
 func Spin(serverSeed string, nonce int64, bet float64) *SpinResult {
 	r := newRNG(serverSeed, nonce)
 
-	// Pick 3 reels × 3 rows (top/center/bottom)
-	var reels [3][3]int
-	for reel := 0; reel < 3; reel++ {
-		for row := 0; row < 3; row++ {
-			reels[reel][row] = pickStop(r)
+	total := 0
+	for _, w := range rouletteWeights {
+		total += w
+	}
+	roll := r.intn(total)
+	winSym := 0
+	cum := 0
+	for i, w := range rouletteWeights {
+		cum += w
+		if roll < cum {
+			winSym = i
+			break
 		}
 	}
 
-	// Center payline: middle row of each reel
-	center := [3]int{reels[0][1], reels[1][1], reels[2][1]}
-
-	// Count center symbols
-	counts := [NumSyms]int{}
-	for _, s := range center {
-		if s >= 0 {
-			counts[s]++
-		}
-	}
-
-	// Find best match
-	winSym := -1
-	maxCount := 0
-	for s, cnt := range counts {
-		if cnt > maxCount {
-			maxCount = cnt
-			winSym = s
-		}
-	}
-	if maxCount < 2 {
-		winSym = -1
-	}
-
-	winType := 0
-	if maxCount >= 2 {
-		winType = maxCount
-	}
-
-	payout := 0.0
-	switch winType {
-	case 3:
-		payout = Mult3[winSym] * bet
-	case 2:
-		payout = Mult2[winSym] * bet
-	}
+	payout := RouletteMultipliers[winSym] * bet
 
 	return &SpinResult{
 		ServerSeedHash: HashSeed(serverSeed),
 		Nonce:          nonce,
-		Reels:          reels,
-		Center:         center,
 		WinSym:         winSym,
-		WinType:        winType,
 		Payout:         payout,
 		Bet:            bet,
 	}

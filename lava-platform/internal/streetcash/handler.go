@@ -97,10 +97,7 @@ func (h *Handler) Spin(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"server_seed_hash": result.ServerSeedHash,
 		"nonce":            result.Nonce,
-		"reels":            result.Reels,
-		"center":           result.Center,
 		"win_sym":          result.WinSym,
-		"win_type":         result.WinType,
 		"payout":           result.Payout,
 		"bet":              result.Bet,
 		"balance":          balF,
@@ -127,7 +124,6 @@ func (h *Handler) Config(c *gin.Context) {
 		"currency": sess.Currency,
 		"min_bet":  0.10,
 		"max_bet":  1000.0,
-		"mult3":    Mult3,
-		"mult2":    Mult2,
+		"mults":    RouletteMultipliers,
 	})
 }
