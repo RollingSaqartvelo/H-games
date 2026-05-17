@@ -18,4 +18,8 @@ jobs:
             cd /root/lava-platform
             git fetch origin
             git reset --hard origin/master
+            pkill -9 -f "lava-platform/server" || true
+            sleep 1
+            cp lava-platform/server_linux lava-platform/server
+            cd /root/lava-platform && nohup lava-platform/server >> /root/server.log 2>&1 &
             echo "Deployed at $(date)"
