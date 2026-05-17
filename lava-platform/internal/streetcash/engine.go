@@ -11,30 +11,29 @@ import (
 // ── Symbols ───────────────────────────────────────────────────────────────────
 
 const (
-	SymDice    = 0 // loss symbol (replaces bomb)
-	SymShades  = 1
-	SymSneaker = 2
-	SymChain   = 3
-	SymWatch   = 4
-	SymKeyFob  = 5
-	SymCard    = 6
+	SymTNT     = 0 // loss symbol — cursor or reel TNT = loss
+	SymDice    = 1 // ×2
+	SymShades  = 2 // ×3
+	SymSneaker = 3 // ×8
+	SymChain   = 4 // ×20
+	SymWatch   = 5 // ×75
+	SymCard    = 6 // ×500
 	NumSyms    = 7
 )
 
 // ── Payout multipliers (× bet) ────────────────────────────────────────────────
-// Dice = ×0 (loss). RTP ≈ 94%.
-var RouletteMultipliers = [NumSyms]float64{0, 1.5, 3, 8, 20, 75, 500}
+// RTP ≈ 94%: 0.215×2 + 0.030×3 + 0.015×8 + 0.007×20 + 0.0008×75 + 0.0002×500 = 0.940
+var RouletteMultipliers = [NumSyms]float64{0, 2, 3, 8, 20, 75, 500}
 
 // ── Cursor weights (out of 100000) ───────────────────────────────────────────
-// Cursor stops on these symbols; if it matches a reel symbol → win.
 var rouletteWeights = [NumSyms]int{
-	63280, // sym-0 Dice  — loss (63.28%)
-	31900, // sym-1 Shades
-	3000,  // sym-2 Sneaker
-	1200,  // sym-3 Chain
-	500,   // sym-4 Watch
-	100,   // sym-5 KeyFob
-	20,    // sym-6 Card
+	73200, // sym-0 TNT   — loss  (73.2%)
+	21500, // sym-1 Dice  — ×2
+	3000,  // sym-2 Shades— ×3
+	1500,  // sym-3 Sneaker×8
+	700,   // sym-4 Chain ×20
+	80,    // sym-5 Watch ×75
+	20,    // sym-6 Card  ×500
 } // total = 100000
 
 // ── RNG (HMAC-SHA256) ─────────────────────────────────────────────────────────
@@ -91,9 +90,9 @@ func HashSeed(seed string) string {
 type SpinResult struct {
 	ServerSeedHash string  `json:"server_seed_hash"`
 	Nonce          int64   `json:"nonce"`
-	CursorSym      int     `json:"cursor_sym"` // symbol cursor lands on; 0=Dice=loss
-	Reels          [3]int  `json:"reels"`       // center symbol on each of the 3 reels
-	WinReel        int     `json:"win_reel"`    // which reel matched cursor (-1 = loss)
+	CursorSym      int     `json:"cursor_sym"` // symbol cursor lands on; 0=TNT=loss
+	Reels          [3]int  `json:"reels"`       // center symbol on each reel
+	WinReel        int     `json:"win_reel"`    // which reel matched cursor (-1=loss)
 	Payout         float64 `json:"payout"`
 	Bet            float64 `json:"bet"`
 }
@@ -124,20 +123,25 @@ func Spin(serverSeed string, nonce int64, bet float64) *SpinResult {
 	var reels [3]int
 	winReel := -1
 
-	if cursorSym == SymDice {
-		// Loss: random symbols on all reels (cursor landed on dice)
+	if cursorSym == SymTNT {
+		// Loss: show TNT on at least one reel for visual clarity
+		tntReel := r.intn(3)
 		for i := range reels {
-			reels[i] = r.intn(NumSyms)
+			if i == tntReel {
+				reels[i] = SymTNT
+			} else {
+				reels[i] = r.intn(NumSyms)
+			}
 		}
 	} else {
-		// Win: place cursorSym on one random reel, others get different symbols
+		// Win: place cursorSym on one reel; others get non-TNT, non-cursorSym symbols
 		winReel = r.intn(3)
 		for i := range reels {
 			if i == winReel {
 				reels[i] = cursorSym
 			} else {
-				// Pick any symbol except cursorSym
-				s := r.intn(NumSyms - 1)
+				// Pick from {1..6} excluding cursorSym (never TNT on win)
+				s := 1 + r.intn(NumSyms-2)
 				if s >= cursorSym {
 					s++
 				}

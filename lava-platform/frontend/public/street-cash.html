@@ -328,14 +328,14 @@ html,body{width:100%;height:100%;overflow:hidden;background:#05050a;font-family:
       <div id="legend">
         <div class="legend-row">
           <div class="li feat sym-bg-6" data-sym="6"><img src="/assets/street-cash/sym-6.png"><div class="li-mult">×500</div></div>
-          <div class="li sym-bg-5" data-sym="5"><img src="/assets/street-cash/sym-5.png"><div class="li-mult">×75</div></div>
-          <div class="li sym-bg-4" data-sym="4"><img src="/assets/street-cash/sym-4.png"><div class="li-mult">×20</div></div>
-          <div class="li sym-bg-3" data-sym="3"><img src="/assets/street-cash/sym-3.png"><div class="li-mult">×8</div></div>
+          <div class="li sym-bg-5" data-sym="5"><img src="/assets/street-cash/sym-4.png"><div class="li-mult">×75</div></div>
+          <div class="li sym-bg-4" data-sym="4"><img src="/assets/street-cash/sym-3.png"><div class="li-mult">×20</div></div>
+          <div class="li sym-bg-3" data-sym="3"><img src="/assets/street-cash/sym-2.png"><div class="li-mult">×8</div></div>
         </div>
         <div class="legend-row">
-          <div class="li sym-bg-2" data-sym="2"><img src="/assets/street-cash/sym-2.png"><div class="li-mult">×3</div></div>
-          <div class="li sym-bg-1" data-sym="1"><img src="/assets/street-cash/sym-1.png"><div class="li-mult">×1.5</div></div>
-          <div class="li sym-bg-0" data-sym="0"><img src="/assets/street-cash/sym-0.png"><div class="li-mult">LOSS</div></div>
+          <div class="li sym-bg-2" data-sym="2"><img src="/assets/street-cash/sym-1.png"><div class="li-mult">×3</div></div>
+          <div class="li sym-bg-1" data-sym="1"><img src="/assets/street-cash/sym-0.png"><div class="li-mult">×2</div></div>
+          <div class="li sym-bg-0" data-sym="0"><img src="/assets/street-cash/tnt.svg"><div class="li-mult">LOSS</div></div>
         </div>
       </div>
     </div>
@@ -365,12 +365,12 @@ html,body{width:100%;height:100%;overflow:hidden;background:#05050a;font-family:
     <h3>HOW TO WIN</h3>
     <p style="text-align:center;font-size:9px;color:rgba(255,215,0,.5);letter-spacing:1px;margin-bottom:10px">CURSOR STOPS ON A SYMBOL · MATCH ON ANY REEL = WIN</p>
     <div class="pt-row"><img src="/assets/street-cash/sym-6.png"><span class="pt-name">Platinum Card</span><span class="pt-mult">×500</span></div>
-    <div class="pt-row"><img src="/assets/street-cash/sym-5.png"><span class="pt-name">Key Fob</span><span class="pt-mult">×75</span></div>
-    <div class="pt-row"><img src="/assets/street-cash/sym-4.png"><span class="pt-name">Watch</span><span class="pt-mult">×20</span></div>
-    <div class="pt-row"><img src="/assets/street-cash/sym-3.png"><span class="pt-name">Gold Chain</span><span class="pt-mult">×8</span></div>
-    <div class="pt-row"><img src="/assets/street-cash/sym-2.png"><span class="pt-name">Sneaker</span><span class="pt-mult">×3</span></div>
-    <div class="pt-row"><img src="/assets/street-cash/sym-1.png"><span class="pt-name">Sunglasses</span><span class="pt-mult">×1.5</span></div>
-    <div class="pt-row pt-loss"><img src="/assets/street-cash/sym-0.png"><span class="pt-name">Dice — LOSS</span><span class="pt-mult">×0</span></div>
+    <div class="pt-row"><img src="/assets/street-cash/sym-4.png"><span class="pt-name">Watch</span><span class="pt-mult">×75</span></div>
+    <div class="pt-row"><img src="/assets/street-cash/sym-3.png"><span class="pt-name">Gold Chain</span><span class="pt-mult">×20</span></div>
+    <div class="pt-row"><img src="/assets/street-cash/sym-2.png"><span class="pt-name">Sneaker</span><span class="pt-mult">×8</span></div>
+    <div class="pt-row"><img src="/assets/street-cash/sym-1.png"><span class="pt-name">Sunglasses</span><span class="pt-mult">×3</span></div>
+    <div class="pt-row"><img src="/assets/street-cash/sym-0.png"><span class="pt-name">Dice</span><span class="pt-mult">×2</span></div>
+    <div class="pt-row pt-loss"><img src="/assets/street-cash/tnt.svg" style="width:34px;height:34px"><span class="pt-name">TNT — BLOCKER</span><span class="pt-mult">LOSS</span></div>
     <p style="text-align:center;font-size:9px;color:rgba(255,215,0,.3);margin-top:10px;letter-spacing:1px">RTP 94%</p>
     <button id="pt-close" onclick="closePT()">CLOSE</button>
   </div>
@@ -390,27 +390,28 @@ html,body{width:100%;height:100%;overflow:hidden;background:#05050a;font-family:
 
 <script>
 // ── Symbols ───────────────────────────────────────────────────────────────────
+// sym-0 = TNT (LOSS), sym-1 = Dice ×2, sym-2..6 = win symbols
 const SYMS = [
-  { mult:0,   src:'/assets/street-cash/sym-0.png', bg:'sym-bg-0', name:'Dice',    isLoss:true  },
-  { mult:1.5, src:'/assets/street-cash/sym-1.png', bg:'sym-bg-1', name:'Shades',  isLoss:false },
-  { mult:3,   src:'/assets/street-cash/sym-2.png', bg:'sym-bg-2', name:'Sneaker', isLoss:false },
-  { mult:8,   src:'/assets/street-cash/sym-3.png', bg:'sym-bg-3', name:'Chain',   isLoss:false },
-  { mult:20,  src:'/assets/street-cash/sym-4.png', bg:'sym-bg-4', name:'Watch',   isLoss:false },
-  { mult:75,  src:'/assets/street-cash/sym-5.png', bg:'sym-bg-5', name:'Key Fob', isLoss:false },
+  { mult:0,   src:'/assets/street-cash/tnt.svg',   bg:'sym-bg-0', name:'TNT',     isLoss:true  },
+  { mult:2,   src:'/assets/street-cash/sym-0.png', bg:'sym-bg-1', name:'Dice',    isLoss:false },
+  { mult:3,   src:'/assets/street-cash/sym-1.png', bg:'sym-bg-2', name:'Shades',  isLoss:false },
+  { mult:8,   src:'/assets/street-cash/sym-2.png', bg:'sym-bg-3', name:'Sneaker', isLoss:false },
+  { mult:20,  src:'/assets/street-cash/sym-3.png', bg:'sym-bg-4', name:'Chain',   isLoss:false },
+  { mult:75,  src:'/assets/street-cash/sym-4.png', bg:'sym-bg-5', name:'Watch',   isLoss:false },
   { mult:500, src:'/assets/street-cash/sym-6.png', bg:'sym-bg-6', name:'Card',    isLoss:false },
 ]
 
 // Demo weights matching backend (out of 100000)
-const DEMO_W = [63280, 31900, 3000, 1200, 500, 100, 20]
+const DEMO_W = [73200, 21500, 3000, 1500, 700, 80, 20]
 
 // ── Outer frame layout (26 cells, indexed by fc-id) ───────────────────────────
-// All 7 symbols present; sym-5 at fc13 (top-right), sym-6 at fc0 (top-left).
+// sym-0=TNT(loss), sym-1=Dice(×2), sym-6=Card(×500) at fc0 top-left corner
 // fc0-7=top, fc8-12=left-col, fc13-17=right-col, fc18-25=bottom
 const FRAME_LAYOUT = [
-  6,1,0,2,1,0,1,2,   // top   fc0–fc7
-  3,0,1,0,4,          // left  fc8–fc12
-  5,1,0,3,1,          // right fc13–fc17
-  0,2,1,4,0,3,1,0    // bot   fc18–fc25
+  6,1,0,2,1,0,1,3,   // top   fc0–fc7
+  4,0,1,0,2,          // left  fc8–fc12
+  5,2,0,4,1,          // right fc13–fc17
+  0,1,3,0,5,0,1,0    // bot   fc18–fc25
 ]
 
 // Clockwise traversal order of the 26 cells
@@ -697,13 +698,18 @@ function demoResult() {
   let reels   = [randSym(), randSym(), randSym()]
   let winReel = -1
 
-  if (cursorSym !== 0) {
+  if (cursorSym === 0) {
+    // Loss: show TNT on at least one reel
+    const tntReel = Math.floor(Math.random() * 3)
+    reels[tntReel] = 0
+  } else {
+    // Win: winReel shows cursorSym; other reels from {1..6} excluding cursorSym (never TNT)
     winReel = Math.floor(Math.random() * 3)
     reels[winReel] = cursorSym
     for (let i = 0; i < 3; i++) {
       if (i !== winReel) {
         let s
-        do { s = randSym() } while (s === cursorSym)
+        do { s = 1 + Math.floor(Math.random() * (SYMS.length - 1)) } while (s === cursorSym)
         reels[i] = s
       }
     }
