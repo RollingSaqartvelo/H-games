@@ -11,7 +11,7 @@ import (
 // ── Symbols ───────────────────────────────────────────────────────────────────
 
 const (
-	SymDice    = 0 // loss symbol
+	SymDice    = 0 // loss symbol (replaces bomb)
 	SymShades  = 1
 	SymSneaker = 2
 	SymChain   = 3
@@ -22,14 +22,13 @@ const (
 )
 
 // ── Payout multipliers (× bet) ────────────────────────────────────────────────
-// Calibrated for 94% RTP.
-// Dice = ×0 (loss). Shades–Card scale up.
-// RTP = 0.319×1.5 + 0.030×3 + 0.012×8 + 0.005×20 + 0.001×75 + 0.0002×500 ≈ 0.940
+// Dice = ×0 (loss). RTP ≈ 94%.
 var RouletteMultipliers = [NumSyms]float64{0, 1.5, 3, 8, 20, 75, 500}
 
-// ── Reel weights (out of 100000) ─────────────────────────────────────────────
+// ── Cursor weights (out of 100000) ───────────────────────────────────────────
+// Cursor stops on these symbols; if it matches a reel symbol → win.
 var rouletteWeights = [NumSyms]int{
-	63280, // sym-0 Dice  (63.28% loss)
+	63280, // sym-0 Dice  — loss (63.28%)
 	31900, // sym-1 Shades
 	3000,  // sym-2 Sneaker
 	1200,  // sym-3 Chain
@@ -92,7 +91,9 @@ func HashSeed(seed string) string {
 type SpinResult struct {
 	ServerSeedHash string  `json:"server_seed_hash"`
 	Nonce          int64   `json:"nonce"`
-	WinSym         int     `json:"win_sym"` // 0-6; Dice = loss (×0)
+	CursorSym      int     `json:"cursor_sym"` // symbol cursor lands on; 0=Dice=loss
+	Reels          [3]int  `json:"reels"`       // center symbol on each of the 3 reels
+	WinReel        int     `json:"win_reel"`    // which reel matched cursor (-1 = loss)
 	Payout         float64 `json:"payout"`
 	Bet            float64 `json:"bet"`
 }
@@ -102,27 +103,55 @@ type SpinResult struct {
 func Spin(serverSeed string, nonce int64, bet float64) *SpinResult {
 	r := newRNG(serverSeed, nonce)
 
+	// Pick cursor symbol
 	total := 0
 	for _, w := range rouletteWeights {
 		total += w
 	}
 	roll := r.intn(total)
-	winSym := 0
+	cursorSym := 0
 	cum := 0
 	for i, w := range rouletteWeights {
 		cum += w
 		if roll < cum {
-			winSym = i
+			cursorSym = i
 			break
 		}
 	}
 
-	payout := RouletteMultipliers[winSym] * bet
+	payout := RouletteMultipliers[cursorSym] * bet
+
+	var reels [3]int
+	winReel := -1
+
+	if cursorSym == SymDice {
+		// Loss: random symbols on all reels (cursor landed on dice)
+		for i := range reels {
+			reels[i] = r.intn(NumSyms)
+		}
+	} else {
+		// Win: place cursorSym on one random reel, others get different symbols
+		winReel = r.intn(3)
+		for i := range reels {
+			if i == winReel {
+				reels[i] = cursorSym
+			} else {
+				// Pick any symbol except cursorSym
+				s := r.intn(NumSyms - 1)
+				if s >= cursorSym {
+					s++
+				}
+				reels[i] = s
+			}
+		}
+	}
 
 	return &SpinResult{
 		ServerSeedHash: HashSeed(serverSeed),
 		Nonce:          nonce,
-		WinSym:         winSym,
+		CursorSym:      cursorSym,
+		Reels:          reels,
+		WinReel:        winReel,
 		Payout:         payout,
 		Bet:            bet,
 	}

@@ -78,7 +78,7 @@ func (h *Handler) Spin(c *gin.Context) {
 	result := Spin(seed, nonce, req.Bet)
 
 	finalBalance := debitResp.Balance
-	if result.Payout > 0 {
+	if result.WinReel >= 0 && result.Payout > 0 {
 		winDec := decimal.NewFromFloat(result.Payout)
 		winTxID := fmt.Sprintf("sc-win-%s-%d", sess.UserID, time.Now().UnixNano())
 		creditResp, err := h.wallet.Credit(c.Request.Context(), &domain.CreditRequest{
@@ -97,7 +97,9 @@ func (h *Handler) Spin(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"server_seed_hash": result.ServerSeedHash,
 		"nonce":            result.Nonce,
-		"win_sym":          result.WinSym,
+		"cursor_sym":       result.CursorSym,
+		"reels":            result.Reels,
+		"win_reel":         result.WinReel,
 		"payout":           result.Payout,
 		"bet":              result.Bet,
 		"balance":          balF,

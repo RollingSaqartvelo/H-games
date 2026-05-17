@@ -28,16 +28,43 @@ html,body{width:100%;height:100%;overflow:hidden;background:#05050a;font-family:
 #board{display:flex;flex-direction:column;gap:var(--gap,2px);padding:var(--gap,2px)}
 #mid-row{display:flex;gap:var(--gap,2px);align-items:stretch}
 
-/* ── Outer decoration cells ── */
+/* ── Outer frame cells ── */
 .fc{
   flex-shrink:0;display:flex;align-items:center;justify-content:center;
   border-radius:5px;border:1.5px solid rgba(255,215,0,.18);
   position:relative;overflow:hidden;
   background:linear-gradient(145deg,#0d0d18,#07070f);
-  opacity:.7;transition:opacity .2s;
+  opacity:.7;
+  transition:opacity .15s,box-shadow .08s,border-color .08s,transform .08s;
+  z-index:1;
 }
 .fc img{width:76%;height:76%;object-fit:contain;display:block}
 .fc::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.07) 0%,transparent 55%);pointer-events:none}
+
+/* Cursor highlight on outer frame */
+.fc.cursor-lit{
+  opacity:1 !important;
+  border-color:rgba(255,215,0,.95) !important;
+  box-shadow:0 0 14px rgba(255,215,0,.9),0 0 28px rgba(255,215,0,.45),inset 0 0 10px rgba(255,215,0,.3) !important;
+  transform:scale(1.1) !important;
+  z-index:6 !important;
+}
+
+/* Cursor final stop — stays lit */
+.fc.cursor-stop{
+  opacity:1 !important;
+  border-color:rgba(255,215,0,1) !important;
+  box-shadow:0 0 18px rgba(255,215,0,1),0 0 36px rgba(255,215,0,.55),inset 0 0 12px rgba(255,215,0,.4) !important;
+  transform:scale(1.12) !important;
+  z-index:6 !important;
+  animation:cursor-pulse .5s ease-in-out infinite alternate;
+}
+@keyframes cursor-pulse{
+  from{box-shadow:0 0 14px rgba(255,215,0,.8),0 0 28px rgba(255,215,0,.4)}
+  to{box-shadow:0 0 22px rgba(255,215,0,1),0 0 44px rgba(255,215,0,.65),0 0 60px rgba(255,215,0,.25)}
+}
+
+/* Symbol bg colors */
 .sym-bg-0{background:linear-gradient(145deg,#1e2030,#10111a)}
 .sym-bg-1{background:linear-gradient(145deg,#142040,#080e20)}
 .sym-bg-2{background:linear-gradient(145deg,#082818,#030f08)}
@@ -74,8 +101,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:#05050a;font-family:
     0 0 18px rgba(255,215,0,.12);
   overflow:hidden;
 }
-
-/* Left/right shadow inside drum */
 #slot-drum::before,#slot-drum::after{
   content:'';position:absolute;top:0;bottom:0;width:18px;z-index:8;pointer-events:none;
 }
@@ -90,51 +115,60 @@ html,body{width:100%;height:100%;overflow:hidden;background:#05050a;font-family:
 }
 .slot-reel:last-child{border-right:none}
 
-/* ── Reel cells (top / center payline / bottom) ── */
+/* ── Reel cells ── */
 .rc{
   display:flex;align-items:center;justify-content:center;
   position:relative;flex-shrink:0;overflow:hidden;
 }
 .rc img{object-fit:contain;display:block;transition:transform .1s}
+.rc.rc-top,.rc.rc-bot{background:rgba(0,0,0,.06)}
+.rc.rc-ctr{background:rgba(255,255,255,.55);position:relative;z-index:2}
 
-/* top and bottom rows: slightly dimmed */
-.rc.rc-top,.rc.rc-bot{
-  background:rgba(0,0,0,.06);
-}
-
-/* CENTER ROW — the payline ── */
-.rc.rc-ctr{
-  background:rgba(255,255,255,.55);
-  position:relative;z-index:2;
-}
-
-/* Payline horizontal lines (top & bottom edge of center row) */
+/* Payline lines */
 #payline-top,#payline-bot{
   position:absolute;left:0;right:0;height:2px;z-index:9;pointer-events:none;
   background:rgba(220,30,30,.55);
   box-shadow:0 0 4px rgba(220,30,30,.4);
 }
 
-/* Win: center cells glow */
-.rc.rc-ctr.win{
-  background:rgba(255,215,0,.25);
-  animation:pay-glow .4s ease-in-out infinite alternate;
-}
+/* Reel land bounce */
+.slot-reel.spinning .rc{filter:blur(3px) brightness(1.1);transition:none}
+.rc.land{animation:land-bounce .22s cubic-bezier(.2,1.4,.5,1)}
+@keyframes land-bounce{0%{transform:scaleY(.75)}55%{transform:scaleY(1.07)}100%{transform:scaleY(1)}}
+
+/* Win glow on center row */
+.rc.rc-ctr.win{animation:pay-glow .4s ease-in-out infinite alternate}
 @keyframes pay-glow{
   from{background:rgba(255,215,0,.18);box-shadow:inset 0 0 8px rgba(255,215,0,.3)}
   to{background:rgba(255,215,0,.38);box-shadow:inset 0 0 18px rgba(255,215,0,.6)}
 }
-.rc.rc-ctr.win img{animation:sym-pop .5s cubic-bezier(.2,1.4,.5,1)}
-@keyframes sym-pop{0%{transform:scale(.6)}60%{transform:scale(1.12)}100%{transform:scale(1)}}
 
-/* Spinning blur */
-.slot-reel.spinning .rc{filter:blur(3px) brightness(1.1);transition:none}
+/* ── Multiplier card (win display) ── */
+.mult-card{
+  width:100%;height:100%;
+  display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(145deg,#d81b60,#880e4f);
+  animation:card-pop .3s cubic-bezier(.2,1.4,.5,1);
+}
+.mult-card-txt{
+  font-family:'Orbitron',sans-serif;font-weight:900;color:#fff;
+  text-shadow:0 0 10px rgba(255,180,220,.9),0 2px 4px rgba(0,0,0,.5);
+}
+@keyframes card-pop{from{transform:scale(.4) rotate(-8deg);opacity:0}to{transform:scale(1) rotate(0);opacity:1}}
 
-/* Reel land bounce */
-.rc.land{animation:land-bounce .22s cubic-bezier(.2,1.4,.5,1)}
-@keyframes land-bounce{0%{transform:scaleY(.75)}55%{transform:scaleY(1.07)}100%{transform:scaleY(1)}}
+/* ── Big win drum overlay ── */
+.drum-big-win{
+  position:absolute;inset:0;z-index:20;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(8,6,0,.88);
+  animation:card-pop .35s cubic-bezier(.2,1.4,.5,1);
+}
+.drum-big-win-txt{
+  font-family:'Orbitron',sans-serif;font-weight:900;color:#ffd700;
+  text-shadow:0 0 20px rgba(255,215,0,.9),0 0 40px rgba(255,215,0,.5);
+}
 
-/* ── Win stripe overlay on drum ── */
+/* Win stripe sweep */
 #win-stripe{
   display:none;
   position:absolute;left:0;right:0;z-index:7;pointer-events:none;
@@ -143,7 +177,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#05050a;font-family:
 }
 @keyframes stripe-sweep{0%{opacity:.3}50%{opacity:1}100%{opacity:.3}}
 
-/* ── Center panel bottom: win/idle text ── */
+/* ── Center bottom ── */
 #sc-bottom{
   width:100%;display:flex;align-items:center;justify-content:center;
   padding:3px 4px 2px;min-height:22px;flex-shrink:0;
@@ -243,8 +277,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:#05050a;font-family:
 
         <!-- ══ CENTER PANEL ══ -->
         <div id="center-panel">
-
-          <!-- Lights -->
           <div id="reel-lights">
             <div class="reel-light" id="l0"></div>
             <div class="reel-light" id="l1"></div>
@@ -253,36 +285,28 @@ html,body{width:100%;height:100%;overflow:hidden;background:#05050a;font-family:
             <div class="reel-light" id="l4"></div>
           </div>
 
-          <!-- ▼▼▼ CLASSIC 3-REEL DRUM ▼▼▼ -->
           <div id="slot-drum">
-            <!-- Payline red lines (positioned by JS) -->
             <div id="payline-top"></div>
             <div id="payline-bot"></div>
-            <!-- Win stripe sweep -->
             <div id="win-stripe"></div>
 
-            <!-- REEL 0 -->
             <div class="slot-reel" id="reel-0">
               <div class="rc rc-top" id="r0t"></div>
               <div class="rc rc-ctr" id="r0c"></div>
               <div class="rc rc-bot" id="r0b"></div>
             </div>
-            <!-- REEL 1 -->
             <div class="slot-reel" id="reel-1">
               <div class="rc rc-top" id="r1t"></div>
               <div class="rc rc-ctr" id="r1c"></div>
               <div class="rc rc-bot" id="r1b"></div>
             </div>
-            <!-- REEL 2 -->
             <div class="slot-reel" id="reel-2">
               <div class="rc rc-top" id="r2t"></div>
               <div class="rc rc-ctr" id="r2c"></div>
               <div class="rc rc-bot" id="r2b"></div>
             </div>
           </div>
-          <!-- ▲▲▲ END DRUM ▲▲▲ -->
 
-          <!-- Small win amount line -->
           <div id="sc-bottom">
             <div id="sc-idle-txt">PRESS PLAY</div>
             <div id="sc-win-txt"></div>
@@ -338,15 +362,16 @@ html,body{width:100%;height:100%;overflow:hidden;background:#05050a;font-family:
 <!-- Paytable modal -->
 <div id="pt-modal" onclick="if(event.target===this)closePT()">
   <div id="pt-sheet">
-    <h3>WINNING SYMBOLS</h3>
+    <h3>HOW TO WIN</h3>
+    <p style="text-align:center;font-size:9px;color:rgba(255,215,0,.5);letter-spacing:1px;margin-bottom:10px">CURSOR STOPS ON A SYMBOL · MATCH ON ANY REEL = WIN</p>
     <div class="pt-row"><img src="/assets/street-cash/sym-6.png"><span class="pt-name">Platinum Card</span><span class="pt-mult">×500</span></div>
     <div class="pt-row"><img src="/assets/street-cash/sym-5.png"><span class="pt-name">Key Fob</span><span class="pt-mult">×75</span></div>
     <div class="pt-row"><img src="/assets/street-cash/sym-4.png"><span class="pt-name">Watch</span><span class="pt-mult">×20</span></div>
     <div class="pt-row"><img src="/assets/street-cash/sym-3.png"><span class="pt-name">Gold Chain</span><span class="pt-mult">×8</span></div>
     <div class="pt-row"><img src="/assets/street-cash/sym-2.png"><span class="pt-name">Sneaker</span><span class="pt-mult">×3</span></div>
     <div class="pt-row"><img src="/assets/street-cash/sym-1.png"><span class="pt-name">Sunglasses</span><span class="pt-mult">×1.5</span></div>
-    <div class="pt-row pt-loss"><img src="/assets/street-cash/sym-0.png"><span class="pt-name">Dice</span><span class="pt-mult">LOSS</span></div>
-    <p style="text-align:center;font-size:9px;color:rgba(255,215,0,.3);margin-top:10px;letter-spacing:1px">RTP 94% · CENTER ROW is the payline</p>
+    <div class="pt-row pt-loss"><img src="/assets/street-cash/sym-0.png"><span class="pt-name">Dice — LOSS</span><span class="pt-mult">×0</span></div>
+    <p style="text-align:center;font-size:9px;color:rgba(255,215,0,.3);margin-top:10px;letter-spacing:1px">RTP 94%</p>
     <button id="pt-close" onclick="closePT()">CLOSE</button>
   </div>
 </div>
@@ -366,26 +391,42 @@ html,body{width:100%;height:100%;overflow:hidden;background:#05050a;font-family:
 <script>
 // ── Symbols ───────────────────────────────────────────────────────────────────
 const SYMS = [
-  { mult:0,   src:'/assets/street-cash/sym-0.png', bg:'sym-bg-0', name:'Dice',     isLoss:true  },
-  { mult:1.5, src:'/assets/street-cash/sym-1.png', bg:'sym-bg-1', name:'Shades',   isLoss:false },
-  { mult:3,   src:'/assets/street-cash/sym-2.png', bg:'sym-bg-2', name:'Sneaker',  isLoss:false },
-  { mult:8,   src:'/assets/street-cash/sym-3.png', bg:'sym-bg-3', name:'Chain',    isLoss:false },
-  { mult:20,  src:'/assets/street-cash/sym-4.png', bg:'sym-bg-4', name:'Watch',    isLoss:false },
-  { mult:75,  src:'/assets/street-cash/sym-5.png', bg:'sym-bg-5', name:'Key Fob',  isLoss:false },
-  { mult:500, src:'/assets/street-cash/sym-6.png', bg:'sym-bg-6', name:'Card',     isLoss:false },
+  { mult:0,   src:'/assets/street-cash/sym-0.png', bg:'sym-bg-0', name:'Dice',    isLoss:true  },
+  { mult:1.5, src:'/assets/street-cash/sym-1.png', bg:'sym-bg-1', name:'Shades',  isLoss:false },
+  { mult:3,   src:'/assets/street-cash/sym-2.png', bg:'sym-bg-2', name:'Sneaker', isLoss:false },
+  { mult:8,   src:'/assets/street-cash/sym-3.png', bg:'sym-bg-3', name:'Chain',   isLoss:false },
+  { mult:20,  src:'/assets/street-cash/sym-4.png', bg:'sym-bg-4', name:'Watch',   isLoss:false },
+  { mult:75,  src:'/assets/street-cash/sym-5.png', bg:'sym-bg-5', name:'Key Fob', isLoss:false },
+  { mult:500, src:'/assets/street-cash/sym-6.png', bg:'sym-bg-6', name:'Card',    isLoss:false },
 ]
 
 // Demo weights matching backend (out of 100000)
 const DEMO_W = [63280, 31900, 3000, 1200, 500, 100, 20]
 
-// Outer frame decoration: fixed symbol layout for 26 cells (clockwise)
-// 0=Dice,1=Shades,2=Sneaker,3=Chain,4=Watch,5=KeyFob,6=Card
+// ── Outer frame layout (26 cells, indexed by fc-id) ───────────────────────────
+// All 7 symbols present; sym-5 at fc13 (top-right), sym-6 at fc0 (top-left).
+// fc0-7=top, fc8-12=left-col, fc13-17=right-col, fc18-25=bottom
 const FRAME_LAYOUT = [
-  1,0,2,1,1,3,0,1,   // top row fc0–fc7
-  2,0,1,3,0,         // left col fc8–fc12
-  1,4,0,2,0,         // right col fc13–fc17
-  0,1,3,0,2,0,1,0    // bottom row fc18–fc25
+  6,1,0,2,1,0,1,2,   // top   fc0–fc7
+  3,0,1,0,4,          // left  fc8–fc12
+  5,1,0,3,1,          // right fc13–fc17
+  0,2,1,4,0,3,1,0    // bot   fc18–fc25
 ]
+
+// Clockwise traversal order of the 26 cells
+const CW_ORDER = [
+  0,1,2,3,4,5,6,7,          // top L→R
+  13,14,15,16,17,            // right T→B
+  25,24,23,22,21,20,19,18,  // bottom R→L
+  12,11,10,9,8               // left B→T
+]
+
+// For each symbol, which CW positions contain it
+const SYM_CW = (() => {
+  const map = Array.from({length:7}, () => [])
+  CW_ORDER.forEach((fcId, cwPos) => map[FRAME_LAYOUT[fcId]].push(cwPos))
+  return map
+})()
 
 // ── State ─────────────────────────────────────────────────────────────────────
 let bet        = 1.00
@@ -397,14 +438,15 @@ let token      = null
 let demoMode   = true
 let CELL       = 44
 let GAP        = 2
-let REEL_H     = 60   // reel cell height
-let IMG_SZ     = 46   // symbol image size inside drum
+let REEL_H     = 60
+let IMG_SZ     = 46
+let cursorCell = null  // fc-element currently showing cursor-stop
 
 // ── Build DOM ─────────────────────────────────────────────────────────────────
 function setup() {
   const W = Math.min(window.innerWidth, 440)
-  CELL    = Math.floor((W - 14) / 8)
-  GAP     = 2
+  CELL = Math.floor((W - 14) / 8)
+  GAP  = 2
   document.documentElement.style.setProperty('--gap', GAP + 'px')
 
   const topRow = document.getElementById('row-top')
@@ -413,10 +455,9 @@ function setup() {
   const colR   = document.getElementById('col-right')
   const frameSz = Math.round(CELL * .72) + 'px'
 
-  // Make outer decoration cells
   function makeFC(id, symIdx) {
-    const d = document.createElement('div')
     const sym = SYMS[symIdx]
+    const d = document.createElement('div')
     d.className = `fc ${sym.bg}`
     d.id = 'fc' + id
     d.style.cssText = `width:${CELL}px;height:${CELL}px`
@@ -427,38 +468,29 @@ function setup() {
     return d
   }
 
-  for (let i = 0;  i < 8;  i++) topRow.appendChild(makeFC(i,   FRAME_LAYOUT[i]))
-  for (let i = 8;  i <= 12; i++) colL.appendChild(makeFC(i,    FRAME_LAYOUT[i]))
-  for (let i = 13; i <= 17; i++) colR.appendChild(makeFC(i,    FRAME_LAYOUT[i]))
-  for (let i = 18; i <= 25; i++) botRow.appendChild(makeFC(i,  FRAME_LAYOUT[i]))
+  for (let i = 0;  i < 8;  i++) topRow.appendChild(makeFC(i,  FRAME_LAYOUT[i]))
+  for (let i = 8;  i <= 12; i++) colL.appendChild(makeFC(i,   FRAME_LAYOUT[i]))
+  for (let i = 13; i <= 17; i++) colR.appendChild(makeFC(i,   FRAME_LAYOUT[i]))
+  for (let i = 18; i <= 25; i++) botRow.appendChild(makeFC(i, FRAME_LAYOUT[i]))
 
-  // Size center panel
   const centerH = CELL * 5 + GAP * 4
   document.getElementById('center-panel').style.minHeight = centerH + 'px'
 
-  // Size reel cells inside drum
-  // Drum height = centerH - lights - bottom text - paddings ≈ centerH - 60
   const drumH = centerH - 60
   REEL_H = Math.floor(drumH / 3)
   IMG_SZ = Math.round(REEL_H * 0.78)
   document.getElementById('slot-drum').style.height = drumH + 'px'
+  document.querySelectorAll('.rc').forEach(el => el.style.height = REEL_H + 'px')
 
-  document.querySelectorAll('.rc').forEach(el => {
-    el.style.height = REEL_H + 'px'
-  })
-
-  // Position payline lines at center row boundaries
   const ptTop = document.getElementById('payline-top')
   const ptBot = document.getElementById('payline-bot')
   ptTop.style.top = REEL_H + 'px'
   ptBot.style.top = (REEL_H * 2) + 'px'
 
-  // Position win-stripe over center row
   const stripe = document.getElementById('win-stripe')
   stripe.style.top    = REEL_H + 'px'
   stripe.style.height = REEL_H + 'px'
 
-  // Init reel cells with placeholder symbols
   for (let ri = 0; ri < 3; ri++) {
     setRC(`r${ri}t`, randSym())
     setRC(`r${ri}c`, randSym())
@@ -468,29 +500,22 @@ function setup() {
 
 // ── Reel cell helpers ──────────────────────────────────────────────────────────
 function setRC(id, symIdx) {
-  const el  = document.getElementById(id)
+  const el = document.getElementById(id)
   if (!el) return
   const sym = SYMS[symIdx]
+  el.style.background = ''
   el.innerHTML = `<img src="${sym.src}" style="width:${IMG_SZ}px;height:${IMG_SZ}px;object-fit:contain" alt="">`
 }
 
-function randSym() {
-  return Math.floor(Math.random() * SYMS.length)
-}
+function randSym() { return Math.floor(Math.random() * SYMS.length) }
 
-function randNonMatch(exclude) {
-  let s
-  do { s = randSym() } while (s === exclude)
-  return s
-}
-
-// ── Spin animation — one reel ─────────────────────────────────────────────────
-function spinReel(ri, finalTop, finalCtr, finalBot, startDelay, spinMs) {
+// ── Spin one reel ─────────────────────────────────────────────────────────────
+function spinReel(ri, finalCtr, startDelay, spinMs) {
   return new Promise(resolve => {
     const reel = document.getElementById('reel-' + ri)
     setTimeout(() => {
       reel.classList.add('spinning')
-      const tick = 60
+      const tick = 55
       let elapsed = 0
       const iv = setInterval(() => {
         setRC(`r${ri}t`, randSym())
@@ -500,11 +525,9 @@ function spinReel(ri, finalTop, finalCtr, finalBot, startDelay, spinMs) {
         if (elapsed >= spinMs) {
           clearInterval(iv)
           reel.classList.remove('spinning')
-          // Snap to result
-          setRC(`r${ri}t`, finalTop)
+          setRC(`r${ri}t`, randSym())
           setRC(`r${ri}c`, finalCtr)
-          setRC(`r${ri}b`, finalBot)
-          // Bounce each cell
+          setRC(`r${ri}b`, randSym())
           ;['t','c','b'].forEach(row => {
             const el = document.getElementById(`r${ri}${row}`)
             if (el) { el.classList.add('land'); setTimeout(() => el.classList.remove('land'), 300) }
@@ -516,7 +539,61 @@ function spinReel(ri, finalTop, finalCtr, finalBot, startDelay, spinMs) {
   })
 }
 
-// ── Reel lights ───────────────────────────────────────────────────────────────
+// ── Cursor animation on outer frame ──────────────────────────────────────────
+// Runs 1 full clockwise lap then decelerates and stops at a cell with cursorSym.
+function runCursor(cursorSym) {
+  return new Promise(resolve => {
+    // Pick target CW position (random among cells with this symbol)
+    const positions = SYM_CW[cursorSym]
+    const targetCW  = positions[Math.floor(Math.random() * positions.length)]
+
+    // 1 full lap + steps to reach target
+    const totalSteps = 26 + targetCW + 1
+
+    let step = 0
+    let prevEl = null
+
+    function getDelay(stepsLeft) {
+      if (stepsLeft > 22) return 45
+      if (stepsLeft > 15) return 68
+      if (stepsLeft > 9)  return 110
+      if (stepsLeft > 5)  return 175
+      if (stepsLeft > 2)  return 290
+      return 430
+    }
+
+    function tick() {
+      // Remove lit from previous
+      if (prevEl) {
+        prevEl.classList.remove('cursor-lit')
+      }
+
+      const cwPos = step % 26
+      const fcId  = CW_ORDER[cwPos]
+      const el    = document.getElementById('fc' + fcId)
+
+      const stepsLeft = totalSteps - step - 1
+
+      if (step === totalSteps - 1) {
+        // Final stop
+        el.classList.add('cursor-stop')
+        cursorCell = el
+        resolve()
+        return
+      }
+
+      el.classList.add('cursor-lit')
+      prevEl = el
+      step++
+
+      setTimeout(tick, getDelay(stepsLeft))
+    }
+
+    tick()
+  })
+}
+
+// ── Lights ────────────────────────────────────────────────────────────────────
 let litTimer = null, litIdx = 0
 function startLights() {
   const ls = [0,1,2,3,4].map(i => document.getElementById('l'+i))
@@ -542,28 +619,63 @@ function highlightLegend(sym) {
   const el = document.querySelector(`.li[data-sym="${sym}"]`)
   if (el) el.classList.add('active')
 }
+
 function setMsg(t) { document.getElementById('msg-bar').textContent = t }
 
-// ── Clear win visuals ──────────────────────────────────────────────────────────
+// ── Clear win state ───────────────────────────────────────────────────────────
 function clearWin() {
-  ;['r0c','r1c','r2c'].forEach(id => {
-    const el = document.getElementById(id)
-    if (el) el.classList.remove('win')
+  // Remove cursor highlights
+  CW_ORDER.forEach(fcId => {
+    const el = document.getElementById('fc' + fcId)
+    if (el) el.classList.remove('cursor-lit', 'cursor-stop')
   })
+  cursorCell = null
+
+  // Remove drum big-win overlays
+  document.querySelectorAll('.drum-big-win').forEach(el => el.remove())
+
+  // Clear reel center cells
+  for (let ri = 0; ri < 3; ri++) {
+    const el = document.getElementById(`r${ri}c`)
+    if (el) {
+      el.classList.remove('win')
+      setRC(`r${ri}c`, randSym())
+    }
+  }
+
   document.getElementById('win-stripe').style.display = 'none'
   document.getElementById('sc-win-txt').style.display  = 'none'
   document.getElementById('sc-idle-txt').style.display = 'block'
+  document.querySelectorAll('.li').forEach(el => el.classList.remove('active'))
 }
 
-// ── Apply win glow to center row ──────────────────────────────────────────────
-function applyWin(payout) {
-  ;['r0c','r1c','r2c'].forEach(id => {
-    const el = document.getElementById(id)
-    if (el) el.classList.add('win')
-  })
-  const stripe = document.getElementById('win-stripe')
-  stripe.style.display = 'block'
+// ── Win display ───────────────────────────────────────────────────────────────
+function showWinCard(winReel, cursorSym) {
+  const mult = SYMS[cursorSym].mult
 
+  if (mult >= 20) {
+    // Big win: full drum overlay with giant multiplier
+    const drum = document.getElementById('slot-drum')
+    const fs = Math.round(REEL_H * 0.95)
+    const div = document.createElement('div')
+    div.className = 'drum-big-win'
+    div.innerHTML = `<div class="drum-big-win-txt" style="font-size:${fs}px">×${mult}</div>`
+    drum.appendChild(div)
+  } else {
+    // Small win: multiplier card on matching reel cell
+    const el = document.getElementById(`r${winReel}c`)
+    if (!el) return
+    const fs = Math.round(IMG_SZ * 0.35)
+    el.style.background = ''
+    el.innerHTML = `<div class="mult-card"><div class="mult-card-txt" style="font-size:${fs}px">×${mult}</div></div>`
+    el.classList.add('win')
+  }
+
+  // Win stripe on drum background
+  document.getElementById('win-stripe').style.display = 'block'
+}
+
+function applyWinText(payout) {
   const winTxt = document.getElementById('sc-win-txt')
   winTxt.textContent = '+$' + payout.toFixed(2)
   winTxt.style.fontSize = payout >= 100 ? '13px' : payout >= 10 ? '15px' : '17px'
@@ -579,75 +691,97 @@ function demoPick() {
   return 0
 }
 
+function demoResult() {
+  const cursorSym = demoPick()
+  const payout    = parseFloat((SYMS[cursorSym].mult * bet).toFixed(2))
+  let reels   = [randSym(), randSym(), randSym()]
+  let winReel = -1
+
+  if (cursorSym !== 0) {
+    winReel = Math.floor(Math.random() * 3)
+    reels[winReel] = cursorSym
+    for (let i = 0; i < 3; i++) {
+      if (i !== winReel) {
+        let s
+        do { s = randSym() } while (s === cursorSym)
+        reels[i] = s
+      }
+    }
+  }
+
+  balance = parseFloat((balance - bet).toFixed(2))
+  if (payout > 0) balance = parseFloat((balance + payout).toFixed(2))
+
+  return { cursorSym, reels, winReel, payout }
+}
+
 // ── Play ──────────────────────────────────────────────────────────────────────
 async function onPlay() {
   if (spinning) return
-  if (balance < bet) { setMsg('❌ Insufficient balance'); return }
+  if (balance < bet) { setMsg('Insufficient balance'); return }
 
   spinning = true
   const btn = document.getElementById('play-btn')
   btn.disabled = true
-  document.querySelectorAll('.li').forEach(el => el.classList.remove('active'))
   clearWin()
-  setMsg('Good luck! 🤞')
+  setMsg('Spinning...')
   startLights()
 
-  // ── Backend ──────────────────────────────────────────────────────────────────
-  let winSym = null, payout = 0
+  // ── Fetch result ──────────────────────────────────────────────────────────
+  let cursorSym = null, reels = null, winReel = -1, payout = 0
+
   if (!demoMode && token) {
     try {
       const resp = await fetch('/tma/v1/street-cash/spin', {
-        method:'POST',
-        headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+        method: 'POST',
+        headers: {'Content-Type':'application/json','Authorization':'Bearer '+token},
         body: JSON.stringify({bet})
       })
       if (resp.ok) {
         const d = await resp.json()
         if (d.balance != null) { balance = d.balance; updateBal() }
-        winSym = d.win_sym
-        payout = d.payout
+        cursorSym = d.cursor_sym
+        reels     = d.reels
+        winReel   = d.win_reel
+        payout    = d.payout
       } else if (resp.status === 402) {
-        setMsg('❌ Insufficient balance')
+        setMsg('Insufficient balance')
         spinning = false; btn.disabled = false; stopLights(); return
       }
     } catch {}
   }
 
-  // ── Demo fallback ────────────────────────────────────────────────────────────
-  if (winSym === null) {
-    balance = parseFloat((balance - bet).toFixed(2))
+  // Demo fallback
+  if (cursorSym === null) {
+    const r = demoResult()
+    cursorSym = r.cursorSym
+    reels     = r.reels
+    winReel   = r.winReel
+    payout    = r.payout
     updateBal()
-    winSym = demoPick()
-    payout = parseFloat((SYMS[winSym].mult * bet).toFixed(2))
-    if (payout > 0) { balance = parseFloat((balance + payout).toFixed(2)); updateBal() }
   }
 
-  // Build what each reel shows:
-  // Center row (payline): win → all 3 show winSym; loss → 3 different non-matching
-  let ctr0, ctr1, ctr2
-  if (!SYMS[winSym].isLoss) {
-    ctr0 = ctr1 = ctr2 = winSym
-  } else {
-    ctr0 = randNonMatch(-1)
-    do { ctr1 = randSym() } while (ctr1 === ctr0)
-    do { ctr2 = randSym() } while (ctr2 === ctr0 || ctr2 === ctr1)
-  }
-
-  // Animate 3 reels sequentially (staggered starts, each spins independently)
+  // ── Phase 1: Spin reels ───────────────────────────────────────────────────
   await Promise.all([
-    spinReel(0, randSym(), ctr0, randSym(), 0,   480),
-    spinReel(1, randSym(), ctr1, randSym(), 120, 580),
-    spinReel(2, randSym(), ctr2, randSym(), 240, 700),
+    spinReel(0, reels[0], 0,   480),
+    spinReel(1, reels[1], 120, 580),
+    spinReel(2, reels[2], 240, 700),
   ])
 
   stopLights()
+  setMsg('Watch the cursor...')
 
-  highlightLegend(winSym)
+  // ── Phase 2: Cursor animation on outer frame ──────────────────────────────
+  await runCursor(cursorSym)
 
-  if (!SYMS[winSym].isLoss && payout > 0) {
-    applyWin(payout)
-    setMsg(`${SYMS[winSym].name.toUpperCase()}! ×${SYMS[winSym].mult} → +$${payout.toFixed(2)}`)
-    if (payout >= bet * 8) setTimeout(() => showOverlay(winSym, payout), 350)
+  // ── Phase 3: Show result ──────────────────────────────────────────────────
+  highlightLegend(cursorSym)
+
+  if (winReel >= 0 && payout > 0) {
+    showWinCard(winReel, cursorSym)
+    applyWinText(payout)
+    setMsg(`${SYMS[cursorSym].name.toUpperCase()}! ×${SYMS[cursorSym].mult} → +$${payout.toFixed(2)}`)
+    if (payout >= bet * 8) setTimeout(() => showOverlay(cursorSym, payout), 400)
   } else {
     setMsg('Better luck next time!')
   }
@@ -655,7 +789,7 @@ async function onPlay() {
   spinning = false
   btn.disabled = false
 
-  if (autoMode) autoTimer = setTimeout(onPlay, SYMS[winSym].isLoss ? 1400 : 2600)
+  if (autoMode) autoTimer = setTimeout(onPlay, payout > 0 ? 2800 : 1600)
 }
 
 // ── Win overlay ───────────────────────────────────────────────────────────────
@@ -664,7 +798,7 @@ function showOverlay(sym, payout) {
   document.getElementById('ov-mult').textContent   = '×' + SYMS[sym].mult
   document.getElementById('ov-amount').textContent = '$' + payout.toFixed(2)
   document.getElementById('win-overlay').classList.add('show')
-  const vid = document.getElementById('win-video')
+  const vid   = document.getElementById('win-video')
   const inner = document.getElementById('win-inner')
   vid.src = `/video/street-cash/win-${sym}.mp4`
   vid.load()
@@ -680,7 +814,7 @@ function closeOverlay() {
   document.getElementById('win-overlay').classList.remove('show')
 }
 
-// ── Paytable ─────────────────────────────────────────────────────────────────
+// ── Paytable ──────────────────────────────────────────────────────────────────
 function openPaytable() { document.getElementById('pt-modal').classList.add('open') }
 function closePT()       { document.getElementById('pt-modal').classList.remove('open') }
 
