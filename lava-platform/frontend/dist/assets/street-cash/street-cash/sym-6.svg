@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="card" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#1a1a1a"/><stop offset="50%" stop-color="#0a0a0a"/><stop offset="100%" stop-color="#111"/></linearGradient>
+    <linearGradient id="chip" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#e8c84a"/><stop offset="50%" stop-color="#ffd700"/><stop offset="100%" stop-color="#c8a020"/></linearGradient>
+    <linearGradient id="band" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="rgba(255,215,0,0.08)"/><stop offset="100%" stop-color="rgba(255,215,0,0.02)"/></linearGradient>
+    <filter id="glow"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <filter id="gs"><feGaussianBlur stdDeviation="1"/></filter>
+  </defs>
+  <!-- Card body -->
+  <rect x="8" y="22" width="84" height="56" rx="6" fill="url(#card)"/>
+  <!-- Card shimmer band -->
+  <rect x="8" y="22" width="84" height="56" rx="6" fill="url(#band)"/>
+  <!-- Magnetic stripe -->
+  <rect x="8" y="34" width="84" height="12" fill="#111" opacity=".9"/>
+  <rect x="8" y="34" width="84" height="4" fill="rgba(80,80,80,0.4)"/>
+  <!-- Chip -->
+  <rect x="16" y="50" width="22" height="18" rx="3" fill="url(#chip)"/>
+  <rect x="18" y="52" width="18" height="14" rx="2" fill="#c8a020" opacity=".4"/>
+  <!-- Chip lines -->
+  <line x1="22" y1="52" x2="22" y2="66" stroke="#a08010" stroke-width="1"/>
+  <line x1="27" y1="52" x2="27" y2="66" stroke="#a08010" stroke-width="1"/>
+  <line x1="32" y1="52" x2="32" y2="66" stroke="#a08010" stroke-width="1"/>
+  <line x1="16" y1="56" x2="38" y2="56" stroke="#a08010" stroke-width="1"/>
+  <line x1="16" y1="62" x2="38" y2="62" stroke="#a08010" stroke-width="1"/>
+  <!-- H-GAMES text -->
+  <text x="50" y="58" text-anchor="middle" font-family="Arial Black,sans-serif" font-weight="900" font-size="8" letter-spacing="2" fill="#ffd700" filter="url(#glow)">H-GAMES</text>
+  <!-- Card number dots -->
+  <circle cx="46" cy="68" r="1.5" fill="#ffd700" opacity=".6"/>
+  <circle cx="51" cy="68" r="1.5" fill="#ffd700" opacity=".6"/>
+  <circle cx="56" cy="68" r="1.5" fill="#ffd700" opacity=".6"/>
+  <circle cx="61" cy="68" r="1.5" fill="#ffd700" opacity=".6"/>
+  <circle cx="68" cy="68" r="1.5" fill="#ffd700" opacity=".6"/>
+  <circle cx="73" cy="68" r="1.5" fill="#ffd700" opacity=".6"/>
+  <circle cx="78" cy="68" r="1.5" fill="#ffd700" opacity=".6"/>
+  <circle cx="83" cy="68" r="1.5" fill="#ffd700" opacity=".6"/>
+  <!-- Hologram circle -->
+  <circle cx="82" cy="55" r="7" fill="none" stroke="#ffd700" stroke-width="0.8" opacity=".4"/>
+  <circle cx="82" cy="55" r="5" fill="rgba(255,215,0,0.05)"/>
+  <text x="82" y="58" text-anchor="middle" font-family="Arial,sans-serif" font-size="6" font-weight="bold" fill="#ffd700" opacity=".7">H</text>
+  <!-- Card border highlight -->
+  <rect x="8" y="22" width="84" height="56" rx="6" fill="none" stroke="#ffd700" stroke-width="1.5" opacity=".5"/>
+  <rect x="8" y="22" width="84" height="56" rx="6" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/>
+  <!-- Top shine -->
+  <rect x="10" y="23" width="80" height="4" rx="3" fill="rgba(255,255,255,0.06)"/>
+</svg>

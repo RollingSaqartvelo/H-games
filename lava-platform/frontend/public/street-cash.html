@@ -167,16 +167,27 @@ html,body{width:100%;height:100%;overflow:hidden;background:#05050a;font-family:
 /* ── Win overlay ── */
 #win-overlay{
   display:none;position:fixed;inset:0;z-index:200;
-  background:rgba(0,0,0,.75);backdrop-filter:blur(3px);
+  background:#000;
   flex-direction:column;align-items:center;justify-content:center;
 }
-#win-overlay.show{display:flex;animation:ov-in .25s ease}
+#win-overlay.show{display:flex;animation:ov-in .2s ease}
 @keyframes ov-in{from{opacity:0}to{opacity:1}}
+
+/* video fullscreen */
+#win-video{
+  position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+  display:none;
+}
+#win-video.playing{display:block}
+
+/* fallback card (shown when video unavailable) */
 #win-inner{
+  position:relative;z-index:2;
   background:linear-gradient(160deg,#1c1400,#0e0e00,#1c1400);
   border:2px solid #ffd700;border-radius:22px;padding:28px 40px;text-align:center;
   box-shadow:0 0 80px rgba(255,215,0,.4),inset 0 0 40px rgba(255,215,0,.04);
 }
+#win-inner.behind{background:linear-gradient(160deg,rgba(28,20,0,.7),rgba(14,14,0,.7));border-color:rgba(255,215,0,.5)}
 #ov-sym img{width:80px;height:80px;object-fit:contain;animation:sym-bounce .6s ease-in-out infinite alternate;margin-bottom:8px}
 @keyframes sym-bounce{from{transform:scale(1) rotate(-4deg)}to{transform:scale(1.1) rotate(4deg)}}
 #ov-title{font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:3px;color:rgba(255,215,0,.6);margin-bottom:4px}
@@ -184,7 +195,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#05050a;font-family:
 #ov-close{
   margin-top:18px;padding:10px 32px;background:linear-gradient(90deg,#ffd700,#ff6b35,#ffd700);background-size:200%;
   border:none;border-radius:20px;font-family:'Orbitron',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;color:#000;
-  cursor:pointer;animation:grad-flow 2s linear infinite;
+  cursor:pointer;animation:grad-flow 2s linear infinite;position:relative;z-index:3;
 }
 @keyframes grad-flow{0%{background-position:0%}100%{background-position:200%}}
 #ov-close:active{transform:scale(.96)}
@@ -227,15 +238,15 @@ html,body{width:100%;height:100%;overflow:hidden;background:#05050a;font-family:
 
     <div id="legend">
       <div class="legend-row">
-        <div class="legend-item sym-bg-6" data-sym="6"><img src="/assets/street-cash/sym-6.svg"><div class="legend-mult">×100</div></div>
-        <div class="legend-item sym-bg-5" data-sym="5"><img src="/assets/street-cash/sym-5.svg"><div class="legend-mult">×70</div></div>
-        <div class="legend-item sym-bg-4" data-sym="4"><img src="/assets/street-cash/sym-4.svg"><div class="legend-mult">×50</div></div>
-        <div class="legend-item sym-bg-3" data-sym="3"><img src="/assets/street-cash/sym-3.svg"><div class="legend-mult">×20</div></div>
+        <div class="legend-item sym-bg-6" data-sym="6"><img src="/assets/street-cash/sym-6.png"><div class="legend-mult">×100</div></div>
+        <div class="legend-item sym-bg-5" data-sym="5"><img src="/assets/street-cash/sym-5.png"><div class="legend-mult">×70</div></div>
+        <div class="legend-item sym-bg-4" data-sym="4"><img src="/assets/street-cash/sym-4.png"><div class="legend-mult">×50</div></div>
+        <div class="legend-item sym-bg-3" data-sym="3"><img src="/assets/street-cash/sym-3.png"><div class="legend-mult">×20</div></div>
       </div>
       <div class="legend-row">
-        <div class="legend-item sym-bg-2" data-sym="2"><img src="/assets/street-cash/sym-2.svg"><div class="legend-mult">×10</div></div>
-        <div class="legend-item sym-bg-1" data-sym="1"><img src="/assets/street-cash/sym-1.svg"><div class="legend-mult">×5</div></div>
-        <div class="legend-item sym-bg-0" data-sym="0"><img src="/assets/street-cash/sym-0.svg"><div class="legend-mult">×2</div></div>
+        <div class="legend-item sym-bg-2" data-sym="2"><img src="/assets/street-cash/sym-2.png"><div class="legend-mult">×10</div></div>
+        <div class="legend-item sym-bg-1" data-sym="1"><img src="/assets/street-cash/sym-1.png"><div class="legend-mult">×5</div></div>
+        <div class="legend-item sym-bg-0" data-sym="0"><img src="/assets/street-cash/sym-0.png"><div class="legend-mult">×2</div></div>
       </div>
     </div>
 
@@ -260,6 +271,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#05050a;font-family:
 
 <!-- Win overlay -->
 <div id="win-overlay">
+  <video id="win-video" playsinline muted></video>
   <div id="win-inner">
     <div id="ov-sym"><img id="ov-sym-img" src="" alt=""></div>
     <div id="ov-title">CONGRATULATIONS</div>
@@ -271,13 +283,13 @@ html,body{width:100%;height:100%;overflow:hidden;background:#05050a;font-family:
 <script>
 // ── Symbols ───────────────────────────────────────────────────────────────────
 const SYMS = [
-  { mult:2,   src:'/assets/street-cash/sym-0.svg', bg:'sym-bg-0', glow:'#a0b0c0' },
-  { mult:5,   src:'/assets/street-cash/sym-1.svg', bg:'sym-bg-1', glow:'#4080e0' },
-  { mult:10,  src:'/assets/street-cash/sym-2.svg', bg:'sym-bg-2', glow:'#20c060' },
-  { mult:20,  src:'/assets/street-cash/sym-3.svg', bg:'sym-bg-3', glow:'#ffd700' },
-  { mult:50,  src:'/assets/street-cash/sym-4.svg', bg:'sym-bg-4', glow:'#ff8020' },
-  { mult:70,  src:'/assets/street-cash/sym-5.svg', bg:'sym-bg-5', glow:'#c060ff' },
-  { mult:100, src:'/assets/street-cash/sym-6.svg', bg:'sym-bg-6', glow:'#ffd700' },
+  { mult:2,   src:'/assets/street-cash/sym-0.png', bg:'sym-bg-0', glow:'#a0b0c0' },
+  { mult:5,   src:'/assets/street-cash/sym-1.png', bg:'sym-bg-1', glow:'#4080e0' },
+  { mult:10,  src:'/assets/street-cash/sym-2.png', bg:'sym-bg-2', glow:'#20c060' },
+  { mult:20,  src:'/assets/street-cash/sym-3.png', bg:'sym-bg-3', glow:'#ffd700' },
+  { mult:50,  src:'/assets/street-cash/sym-4.png', bg:'sym-bg-4', glow:'#ff8020' },
+  { mult:70,  src:'/assets/street-cash/sym-5.png', bg:'sym-bg-5', glow:'#c060ff' },
+  { mult:100, src:'/assets/street-cash/sym-6.png', bg:'sym-bg-6', glow:'#ffd700' },
 ]
 
 // Frame pool: 26 cells, no x100 (ultra rare only via reel)
@@ -533,9 +545,31 @@ async function onPlay() {
 function showOverlay(symIdx, payout) {
   document.getElementById('ov-sym-img').src = SYMS[symIdx].src
   document.getElementById('ov-amount').textContent = '$' + payout.toFixed(2)
-  document.getElementById('win-overlay').classList.add('show')
+  const overlay = document.getElementById('win-overlay')
+  overlay.classList.add('show')
+
+  // Try to play win video for this symbol
+  const vid = document.getElementById('win-video')
+  const inner = document.getElementById('win-inner')
+  const videoSrc = `/video/street-cash/win-${symIdx}.mp4`
+  vid.src = videoSrc
+  vid.load()
+  vid.play().then(() => {
+    vid.classList.add('playing')
+    inner.classList.add('behind')
+    vid.onended = () => { /* keep overlay open, user presses COLLECT */ }
+  }).catch(() => {
+    // video not available yet — show static card only
+    vid.classList.remove('playing')
+    inner.classList.remove('behind')
+  })
 }
 function closeOverlay() {
+  const vid = document.getElementById('win-video')
+  vid.pause()
+  vid.src = ''
+  vid.classList.remove('playing')
+  document.getElementById('win-inner').classList.remove('behind')
   document.getElementById('win-overlay').classList.remove('show')
 }
 

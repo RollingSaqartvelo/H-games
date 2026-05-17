@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="case" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#e8c84a"/><stop offset="50%" stop-color="#ffd700"/><stop offset="100%" stop-color="#8b6000"/></linearGradient>
+    <linearGradient id="dial" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#1a1a2e"/><stop offset="100%" stop-color="#080814"/></linearGradient>
+    <radialGradient id="face" cx="40%" cy="35%"><stop offset="0%" stop-color="#2a2a4a"/><stop offset="100%" stop-color="#080810"/></radialGradient>
+    <filter id="g"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  </defs>
+  <!-- Watch case outer -->
+  <circle cx="50" cy="50" r="38" fill="url(#case)"/>
+  <!-- Lugs -->
+  <rect x="44" y="8" width="12" height="8" rx="3" fill="#c8a830"/>
+  <rect x="44" y="84" width="12" height="8" rx="3" fill="#c8a830"/>
+  <rect x="8" y="44" width="8" height="12" rx="3" fill="#c8a830"/>
+  <rect x="84" y="44" width="8" height="12" rx="3" fill="#c8a830"/>
+  <!-- Crown -->
+  <rect x="87" y="46" width="8" height="8" rx="2" fill="#d4a832"/>
+  <!-- Watch face -->
+  <circle cx="50" cy="50" r="30" fill="url(#face)"/>
+  <!-- Hour markers -->
+  <rect x="48.5" y="22" width="3" height="7" rx="1" fill="#ffd700"/>
+  <rect x="48.5" y="71" width="3" height="7" rx="1" fill="#ffd700"/>
+  <rect x="22" y="48.5" width="7" height="3" rx="1" fill="#ffd700"/>
+  <rect x="71" y="48.5" width="7" height="3" rx="1" fill="#ffd700"/>
+  <!-- Minute markers (small) -->
+  <rect x="49" y="23" width="2" height="4" rx="1" fill="#888" opacity=".5" transform="rotate(30,50,50)"/>
+  <rect x="49" y="23" width="2" height="4" rx="1" fill="#888" opacity=".5" transform="rotate(60,50,50)"/>
+  <rect x="49" y="23" width="2" height="4" rx="1" fill="#888" opacity=".5" transform="rotate(120,50,50)"/>
+  <rect x="49" y="23" width="2" height="4" rx="1" fill="#888" opacity=".5" transform="rotate(150,50,50)"/>
+  <rect x="49" y="23" width="2" height="4" rx="1" fill="#888" opacity=".5" transform="rotate(210,50,50)"/>
+  <rect x="49" y="23" width="2" height="4" rx="1" fill="#888" opacity=".5" transform="rotate(240,50,50)"/>
+  <rect x="49" y="23" width="2" height="4" rx="1" fill="#888" opacity=".5" transform="rotate(300,50,50)"/>
+  <rect x="49" y="23" width="2" height="4" rx="1" fill="#888" opacity=".5" transform="rotate(330,50,50)"/>
+  <!-- Hour hand (10 o'clock) -->
+  <line x1="50" y1="50" x2="35" y2="32" stroke="#ffd700" stroke-width="3" stroke-linecap="round"/>
+  <!-- Minute hand (2 o'clock) -->
+  <line x1="50" y1="50" x2="64" y2="30" stroke="#ffd700" stroke-width="2" stroke-linecap="round"/>
+  <!-- Seconds hand -->
+  <line x1="50" y1="50" x2="50" y2="68" stroke="#ff3030" stroke-width="1.5" stroke-linecap="round"/>
+  <!-- Center dot -->
+  <circle cx="50" cy="50" r="3.5" fill="#ffd700" filter="url(#g)"/>
+  <!-- Crystal reflection -->
+  <ellipse cx="38" cy="38" rx="12" ry="8" fill="rgba(255,255,255,0.06)" transform="rotate(-20,38,38)"/>
+  <!-- Case highlight -->
+  <circle cx="50" cy="50" r="38" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+  <circle cx="50" cy="50" r="30" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+</svg>
