@@ -108,19 +108,63 @@ html,body{width:100%;height:100%;overflow:hidden;background:#05050a;font-family:
 @keyframes win-pop{from{transform:scale(.3) rotate(-10deg);opacity:0}to{transform:scale(1) rotate(0);opacity:1}}
 #win-label{font-size:9px;letter-spacing:3px;color:rgba(255,215,0,.6);margin-top:3px}
 
-/* ── Legend ── */
-#legend{padding:6px 6px 2px;display:flex;flex-direction:column;gap:3px}
-.legend-row{display:flex;gap:3px;justify-content:center}
-.legend-item{
-  flex:1;max-width:58px;min-width:0;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;
-  border-radius:6px;padding:4px 2px;border:1.5px solid rgba(255,215,0,.12);
-  position:relative;overflow:hidden;transition:border-color .2s,transform .1s;
+/* ── Paytable panel ── */
+#legend{
+  margin:0 8px 6px;
+  background:linear-gradient(160deg,#181210,#0c0a06,#181210);
+  border:2px solid rgba(255,215,0,.35);
+  border-radius:14px;
+  padding:8px 8px 6px;
+  box-shadow:0 0 24px rgba(255,215,0,.07),inset 0 1px 0 rgba(255,215,0,.08);
+  display:flex;flex-direction:column;gap:5px;
 }
-.legend-item img{width:36px;height:36px;object-fit:contain}
-.legend-item.active{border-color:rgba(255,215,0,.8);transform:scale(1.05);box-shadow:0 0 10px rgba(255,215,0,.35)}
-.legend-mult{font-size:9px;font-weight:bold;color:rgba(255,215,0,.65);letter-spacing:.5px}
-.legend-item.active .legend-mult{color:#ffd700}
+.legend-row{display:flex;gap:5px;align-items:stretch}
+/* featured item (×100) */
+.legend-item--featured{
+  flex:1.15;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  border-radius:10px;padding:6px 4px;
+  background:linear-gradient(145deg,#201800,#0e0c00);
+  border:2px solid rgba(255,215,0,.55);
+  position:relative;overflow:hidden;
+  box-shadow:0 0 14px rgba(255,215,0,.18),inset 0 1px 0 rgba(255,215,0,.12);
+  transition:border-color .2s,transform .1s;
+}
+.legend-item--featured::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(255,215,0,.08),transparent);
+}
+.legend-item--featured img{width:52px;height:52px;object-fit:contain;position:relative}
+/* regular items */
+.legend-item{
+  flex:1;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+  border-radius:10px;padding:5px 3px;
+  background:linear-gradient(145deg,#14110a,#0a0807);
+  border:1.5px solid rgba(255,215,0,.2);
+  position:relative;overflow:hidden;
+  transition:border-color .2s,transform .12s;
+}
+.legend-item img{width:40px;height:40px;object-fit:contain}
+/* active highlight on win */
+.legend-item.active,.legend-item--featured.active{
+  border-color:rgba(255,215,0,.9);
+  transform:scale(1.05);
+  box-shadow:0 0 16px rgba(255,215,0,.45),inset 0 0 12px rgba(255,215,0,.06);
+}
+/* multiplier badge */
+.legend-mult{
+  font-family:'Orbitron',sans-serif;
+  font-size:10px;font-weight:900;
+  letter-spacing:.5px;
+  color:#ffd700;
+  text-shadow:0 0 8px rgba(255,215,0,.6);
+  line-height:1;
+}
+.legend-item--featured .legend-mult{font-size:13px;text-shadow:0 0 12px rgba(255,215,0,.8)}
+.legend-item.active .legend-mult,.legend-item--featured.active .legend-mult{
+  color:#fff;text-shadow:0 0 14px #ffd700;
+}
 
 /* ── Bet section ── */
 #bet-section{padding:5px 8px 3px;display:flex;flex-direction:column;gap:5px}
@@ -237,13 +281,15 @@ html,body{width:100%;height:100%;overflow:hidden;background:#05050a;font-family:
     </div>
 
     <div id="legend">
+      <!-- Row 1: ×70  ×50  ×20 -->
       <div class="legend-row">
-        <div class="legend-item sym-bg-6" data-sym="6"><img src="/assets/street-cash/sym-6.png"><div class="legend-mult">×100</div></div>
         <div class="legend-item sym-bg-5" data-sym="5"><img src="/assets/street-cash/sym-5.png"><div class="legend-mult">×70</div></div>
         <div class="legend-item sym-bg-4" data-sym="4"><img src="/assets/street-cash/sym-4.png"><div class="legend-mult">×50</div></div>
         <div class="legend-item sym-bg-3" data-sym="3"><img src="/assets/street-cash/sym-3.png"><div class="legend-mult">×20</div></div>
       </div>
+      <!-- Row 2: ×100 (featured)  ×10  ×5  ×2 -->
       <div class="legend-row">
+        <div class="legend-item--featured sym-bg-6" data-sym="6"><img src="/assets/street-cash/sym-6.png"><div class="legend-mult">×100</div></div>
         <div class="legend-item sym-bg-2" data-sym="2"><img src="/assets/street-cash/sym-2.png"><div class="legend-mult">×10</div></div>
         <div class="legend-item sym-bg-1" data-sym="1"><img src="/assets/street-cash/sym-1.png"><div class="legend-mult">×5</div></div>
         <div class="legend-item sym-bg-0" data-sym="0"><img src="/assets/street-cash/sym-0.png"><div class="legend-mult">×2</div></div>
@@ -478,8 +524,8 @@ function glowMatches(s) {
 }
 
 function highlightLegend(s) {
-  document.querySelectorAll('.legend-item').forEach(el => el.classList.remove('active'))
-  const el = document.querySelector(`.legend-item[data-sym="${s}"]`)
+  document.querySelectorAll('.legend-item,.legend-item--featured').forEach(el => el.classList.remove('active'))
+  const el = document.querySelector(`[data-sym="${s}"]`)
   if (el) el.classList.add('active')
 }
 
@@ -493,7 +539,7 @@ async function onPlay() {
   spinning = true
   const btn = document.getElementById('play-btn')
   btn.disabled = true
-  document.querySelectorAll('.legend-item').forEach(el => el.classList.remove('active'))
+  document.querySelectorAll('.legend-item,.legend-item--featured').forEach(el => el.classList.remove('active'))
   clearGlow()
 
   balance -= bet
