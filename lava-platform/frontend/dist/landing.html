@@ -297,6 +297,11 @@
       background:linear-gradient(90deg,#8B6914,#D4A017,#F5C842,#D4A017,#8B6914);
       background-size:300% 100%;
     }
+    .m-game-btn--street { color:#ffd700 }
+    .m-game-btn--street::before {
+      background:linear-gradient(90deg,#c0c0c0,#ffd700,#ff6b35,#ffd700,#c0c0c0);
+      background-size:300% 100%;
+    }
 
     .m-coming {
       width:100%; max-width:320px; font-size:7px; letter-spacing:.4em;
@@ -521,6 +526,11 @@
         background-size:300% 300%;
       }
       .d-card--slots::after { background:linear-gradient(90deg,transparent,#D4A017,transparent) }
+      .d-card--street::before {
+        background:linear-gradient(135deg,#c0c0c0,#ffd700,#ff6b35,#ffd700,#c0c0c0);
+        background-size:300% 300%;
+      }
+      .d-card--street::after { background:linear-gradient(90deg,transparent,#ffd700,transparent) }
       .d-card:hover { transform:translateY(-5px) }
 
       /* Card icon (geometric diamond frame) */
@@ -536,6 +546,7 @@
       .d-card--granny .d-card-icon { color:var(--c4) }
       .d-card--bubble .d-card-icon { color:#f472b6 }
       .d-card--slots .d-card-icon  { color:#D4A017 }
+      .d-card--street .d-card-icon { color:#ffd700 }
       .d-card-icon svg { width:22px; height:22px }
 
       .d-card-name { font-family:'Orbitron',sans-serif; font-size:11px; font-weight:700; letter-spacing:.2em; text-align:center }
@@ -543,6 +554,7 @@
       .d-card--granny .d-card-name { color:var(--c4) }
       .d-card--bubble .d-card-name { color:#f472b6 }
       .d-card--slots  .d-card-name { color:#F5C842 }
+      .d-card--street .d-card-name { color:#ffd700 }
       .d-card-desc { font-size:9px; letter-spacing:.2em; text-transform:uppercase; color:var(--muted); text-align:center }
       .d-card-rtp { font-size:8px; letter-spacing:.3em; padding:2px 8px; border:1px solid var(--border); color:var(--muted) }
 
@@ -577,6 +589,9 @@
       .d-card--slots  .d-card-play { color:#F5C842 }
       .d-card--slots  .d-card-play::after { background:rgba(0,0,0,.88) }
       .d-card--slots  .d-card-play::before { background:linear-gradient(90deg,#8B6914,#D4A017,#F5C842,#D4A017,#8B6914); background-size:300% 100% }
+      .d-card--street .d-card-play { color:#ffd700 }
+      .d-card--street .d-card-play::after { background:rgba(0,0,0,.88) }
+      .d-card--street .d-card-play::before { background:linear-gradient(90deg,#c0c0c0,#ffd700,#ff6b35,#ffd700,#c0c0c0); background-size:300% 100% }
       .d-card-play:hover { opacity:.8; transform:translateY(-1px) }
       .d-card-play:disabled { opacity:.25; cursor:default }
 
@@ -623,6 +638,7 @@
     .rules-card--outlaw::before { background:linear-gradient(135deg,var(--c1),var(--c2),var(--c1)) }
     .rules-card--granny::before { background:linear-gradient(135deg,var(--c3),var(--c4),var(--c5)) }
     .rules-card--bubble::before { background:linear-gradient(135deg,#a855f7,#e879f9,#f472b6) }
+    .rules-card--street::before { background:linear-gradient(135deg,#c0c0c0,#ffd700,#ff6b35) }
     .rules-card--slots::before  { background:linear-gradient(135deg,#8B6914,#D4A017,#F5C842) }
     .rules-card:active { transform:scale(.97) }
     .rc-game { font-size:7px; letter-spacing:.4em; text-transform:uppercase; color:var(--muted) }
@@ -630,6 +646,7 @@
     .rules-card--outlaw .rc-title { color:var(--c1) }
     .rules-card--granny .rc-title { color:var(--c4) }
     .rules-card--bubble .rc-title { color:#f472b6 }
+    .rules-card--street .rc-title { color:#ffd700 }
     .rules-card--slots  .rc-title { color:#F5C842 }
     .rc-meta { display:flex; gap:6px; flex-wrap:wrap }
     .rc-pill {
@@ -644,6 +661,7 @@
     .rules-card--outlaw .rc-btn { color:var(--c1) }
     .rules-card--granny .rc-btn { color:var(--c4) }
     .rules-card--bubble .rc-btn { color:#f472b6 }
+    .rules-card--street .rc-btn { color:#ffd700 }
     .rules-card--slots  .rc-btn { color:#F5C842 }
     .rc-btn:hover { opacity:1 }
 
@@ -715,6 +733,7 @@
     .rm-gtab--outlaw.active { color:var(--c1) }
     .rm-gtab--granny.active { color:var(--c4) }
     .rm-gtab--bubble.active { color:#f472b6 }
+    .rm-gtab--street.active { color:#ffd700 }
     .rm-gtab--slots.active  { color:#F5C842 }
 
     /* Content area */
@@ -928,7 +947,8 @@
   <button id="grannyBtn" class="m-game-btn m-game-btn--granny"><span>GRANNY RUN</span></button>
   <button id="bubbleBtn" class="m-game-btn m-game-btn--bubble"><span>BUBBLE GUM</span></button>
   <button id="slotsBtn" class="m-game-btn m-game-btn--slots" onclick="goSlots()"><span>OUTLAW GOLD</span></button>
-  <div class="m-coming">· Four games, one platform ·</div>
+  <button id="streetBtn" class="m-game-btn m-game-btn--street" onclick="goStreetCash()"><span>STREET CASH</span></button>
+  <div class="m-coming">· Five games, one platform ·</div>
 
   <!-- Rules hub: horizontal scroll cards -->
   <div class="rules-hub">
@@ -964,6 +984,15 @@
       <div class="rules-card rules-card--slots" onclick="openRules('slots')">
         <div class="rc-game">Cluster Slots</div>
         <div class="rc-title">OUTLAW GOLD</div>
+        <div class="rc-meta">
+          <span class="rc-pill">RTP 96%</span>
+          <span class="rc-pill">HIGH VOL</span>
+        </div>
+        <button class="rc-btn">HOW TO PLAY →</button>
+      </div>
+      <div class="rules-card rules-card--street" onclick="openRules('street')">
+        <div class="rc-game">Arcade Reel</div>
+        <div class="rc-title">STREET CASH</div>
         <div class="rc-meta">
           <span class="rc-pill">RTP 96%</span>
           <span class="rc-pill">HIGH VOL</span>
@@ -1139,8 +1168,23 @@
           <button class="d-card-play" onclick="event.stopPropagation();goSlots()"><span>PLAY</span></button>
         </div>
 
+        <div class="d-card d-card--street" onclick="goStreetCash()">
+          <div class="d-card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="7" width="20" height="12" rx="2"/>
+              <path d="M16 7V5a2 2 0 0 0-4 0v2"/>
+              <circle cx="12" cy="13" r="2" fill="currentColor" opacity=".6"/>
+              <path d="M6 11h2M16 11h2"/>
+            </svg>
+          </div>
+          <div class="d-card-name">STREET CASH</div>
+          <div class="d-card-desc">Luxury street jackpot</div>
+          <div class="d-card-rtp">RTP 96%</div>
+          <button class="d-card-play" onclick="event.stopPropagation();goStreetCash()"><span>PLAY</span></button>
+        </div>
+
       </div>
-      <div class="d-cards-sub">· Four games, one platform ·</div>
+      <div class="d-cards-sub">· Five games, one platform ·</div>
     </div>
 
   </div>
@@ -1196,6 +1240,7 @@ function goOutlaw(){ window.location.href = window.location.origin + '/play' }
 function goGranny(){ window.location.href = window.location.origin + '/granny.html?v=29' }
 function goBubble(){ window.location.href = window.location.origin + '/bubble.html' }
 function goSlots() { window.location.href = window.location.origin + '/outlaw-gold.html' }
+function goStreetCash() { window.location.href = window.location.origin + '/street-cash.html' }
 
 // ── User profile display ──────────────────────────────────────────────────────
 const user = tg?.initDataUnsafe?.user || {}
@@ -1487,6 +1532,31 @@ const GAME_RULES = {
       { label:'Mega Pop',   mult:'15.0× – 20.0×+',desc:'Rare maximum inflation' },
     ]
   },
+  street: {
+    id: 'street', cls: 'street', title: 'STREET CASH', sub: 'Luxury street jackpot',
+    color: '#ffd700', rtp: '96%', vol: 'HIGH', maxwin: '100×+', minbet: '$0.10',
+    rounds: 'Instant',
+    rules: [
+      'Outer frame fills with premium symbols before each spin',
+      'Center reel spins and lands on one symbol',
+      'Machine counts matching symbols in the outer frame',
+      'Payout = symbol multiplier × number of outer frame matches',
+      'Example: x50 Watch lands + 3 Watches in frame = x150 win',
+      '3 BONUS symbols trigger DRIP MODE — 10 auto-spins',
+      'In DRIP MODE multipliers stack and persist each winning spin',
+      'WILD (H-GAMES medallion) substitutes for any symbol',
+      'All results are provably fair and verifiable on-chain'
+    ],
+    payouts: [
+      { label:'Entry (x2)',  mult:'x2 × matches',   desc:'Street Dice / Neon Token' },
+      { label:'Low (x5)',    mult:'x5 × matches',   desc:'Designer Shades' },
+      { label:'Mid (x10)',   mult:'x10 × matches',  desc:'Premium Sneakers' },
+      { label:'Strong (x20)',mult:'x20 × matches',  desc:'Gold Chain' },
+      { label:'High (x50)',  mult:'x50 × matches',  desc:'Luxury Watch' },
+      { label:'Elite (x70)', mult:'x70 × matches',  desc:'Sports Car Key' },
+      { label:'Top (x100)',  mult:'x100 × matches', desc:'H-GAMES Black Card' },
+    ]
+  },
   slots: {
     id: 'slots', cls: 'slots', title: 'OUTLAW GOLD', sub: 'Cluster pays slot',
     color: '#F5C842', rtp: '96%', vol: 'HIGH', maxwin: '500×+', minbet: '$0.10',
@@ -1702,6 +1772,7 @@ document.addEventListener('keydown', e => {
       <button class="rm-gtab rm-gtab--granny"         data-game="granny" onclick="_rulesGame='granny';_renderRules()">GRANNY</button>
       <button class="rm-gtab rm-gtab--bubble"         data-game="bubble" onclick="_rulesGame='bubble';_renderRules()">BUBBLE</button>
       <button class="rm-gtab rm-gtab--slots"          data-game="slots"  onclick="_rulesGame='slots';_renderRules()">SLOTS</button>
+      <button class="rm-gtab rm-gtab--street"        data-game="street" onclick="_rulesGame='street';_renderRules()">STREET</button>
     </div>
 
     <div class="rm-body">
