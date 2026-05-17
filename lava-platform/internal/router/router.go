@@ -28,6 +28,7 @@ import (
 	sessionSvc "github.com/lava-platform/internal/session/service"
 	"github.com/lava-platform/internal/telegram"
 	slotsHandler "github.com/lava-platform/internal/slots"
+	streetcashHandler "github.com/lava-platform/internal/streetcash"
 	walletHandler "github.com/lava-platform/internal/wallet/handler"
 	walletRepo "github.com/lava-platform/internal/wallet/repository"
 	walletSvc "github.com/lava-platform/internal/wallet/service"
@@ -128,6 +129,7 @@ func New(cfg *config.Config, infra *infrastructure.Infra, deps *Deps) *gin.Engin
 	bubbleHandler := roundHandler.New(deps.Bubble.Engine, rRepo, "bubble_gum")
 
 	slotsH := slotsHandler.NewHandler(provider)
+	scH := streetcashHandler.NewHandler(provider)
 
 	// ── Admin API (HTTP Basic Auth + X-SYSTEM-KEY) ───────────────────────────
 	adm := adminHandler.New(infra.DB, cfg.Operator.SystemAPIKey)
@@ -258,6 +260,12 @@ func New(cfg *config.Config, infra *infrastructure.Infra, deps *Deps) *gin.Engin
 		tmaSlots.Use(middleware.SessionValidate(sessSvc))
 		tmaSlots.POST("/spin",   slotsH.Spin)
 		tmaSlots.GET("/config",  slotsH.Config)
+
+		// Street Cash TMA routes
+		tmaSC := tma.Group("/v1/street-cash")
+		tmaSC.Use(middleware.SessionValidate(sessSvc))
+		tmaSC.POST("/spin",   scH.Spin)
+		tmaSC.GET("/config",  scH.Config)
 
 		go func() {
 			if err := botHandler.RegisterWebhook(context.Background(), cfg.Telegram.AppURL); err != nil {
