@@ -729,6 +729,8 @@ async function onPlay() {
   spinning = true
   const btn = document.getElementById('play-btn')
   btn.disabled = true
+  document.getElementById('bet-section').style.opacity = '0.35'
+  document.getElementById('bet-section').style.pointerEvents = 'none'
   clearWin()
   setMsg('Spinning...')
   startLights()
@@ -794,6 +796,8 @@ async function onPlay() {
 
   spinning = false
   btn.disabled = false
+  document.getElementById('bet-section').style.opacity = ''
+  document.getElementById('bet-section').style.pointerEvents = ''
 
   if (autoMode) autoTimer = setTimeout(onPlay, payout > 0 ? 2800 : 1600)
 }
@@ -835,6 +839,7 @@ function toggleAuto() {
 // ── Bet ───────────────────────────────────────────────────────────────────────
 const BET_MIN = 0.10, BET_MAX = 100
 function adjBet(a) {
+  if (spinning) return
   if (a==='min')  bet = BET_MIN
   if (a==='max')  bet = Math.min(BET_MAX, parseFloat(balance.toFixed(2)))
   if (a==='x2')   bet = Math.min(BET_MAX, parseFloat((bet*2).toFixed(2)))
