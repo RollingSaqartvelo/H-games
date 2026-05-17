@@ -49,7 +49,7 @@ export function RunningVideo() {
   return (
     <video
       ref={videoRef}
-      src="/video/comp1.mp4"
+      src="/video/run_bg.mp4"
       style={{
         position: 'absolute',
         inset: 0,
