@@ -33,12 +33,23 @@
   .players-table td:nth-child(4) { color: #f0c040; }
   .players-table td:nth-child(5) { color: #22a060; }
   #status { color: #8b6340; font-size: 11px; padding: 8px 20px; }
+  .actions { display: flex; gap: 10px; padding: 0 20px 12px; }
+  .btn { padding: 7px 18px; border: none; border-radius: 4px; font-family: inherit; font-size: 12px; cursor: pointer; letter-spacing: 1px; font-weight: bold; }
+  .btn-deploy { background: #1a4020; color: #4ade80; border: 1px solid #22a060; }
+  .btn-deploy:hover { background: #22a060; color: #0d0a06; }
+  .btn-credit { background: #3a2a00; color: #f0c040; border: 1px solid #d97706; }
+  .btn-credit:hover { background: #d97706; color: #0d0a06; }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
 </style>
 </head>
 <body>
 <div class="header">
   <h1>&#x1F920; OUTLAW ESCAPE &mdash; ADMIN</h1>
   <div class="refresh" id="countdown">обновление через 10 сек</div>
+</div>
+<div class="actions">
+  <button class="btn btn-deploy" onclick="doDeploy()">&#x1F680; DEPLOY</button>
+  <button class="btn btn-credit" onclick="doCredit()">&#x1F4B0; ЗАЧИСЛИТЬ $5000</button>
 </div>
 <div id="status">Загрузка...</div>
 <div id="root"></div>
@@ -147,6 +158,38 @@ function render(d) {
       '<table><thead><tr><th>ID</th><th>Статус</th><th>Crash point</th><th>Длительность</th><th>Создан</th></tr></thead>' +
       '<tbody>' + roundRows + '</tbody></table></div>' +
     '</div>';
+}
+
+function doDeploy() {
+  var btn = document.querySelector('.btn-deploy');
+  btn.disabled = true; btn.textContent = 'Деплой...';
+  document.getElementById('status').textContent = 'Запускаю деплой...';
+  fetch('/admin/v1/deploy', { method: 'POST', headers: { 'X-SYSTEM-KEY': KEY } })
+    .then(function(res) { return res.json(); })
+    .then(function(d) {
+      document.getElementById('status').textContent = d.message || d.error || JSON.stringify(d);
+      btn.disabled = false; btn.textContent = '🚀 DEPLOY';
+    })
+    .catch(function(e) {
+      document.getElementById('status').textContent = 'Ошибка: ' + e.message;
+      btn.disabled = false; btn.textContent = '🚀 DEPLOY';
+    });
+}
+
+function doCredit() {
+  if (!confirm('Зачислить $5000 на все кошельки?')) return;
+  var btn = document.querySelector('.btn-credit');
+  btn.disabled = true; btn.textContent = 'Зачисляю...';
+  fetch('/admin/v1/credit-all', { method: 'POST', headers: { 'X-SYSTEM-KEY': KEY, 'Content-Type': 'application/json' }, body: JSON.stringify({amount: 5000}) })
+    .then(function(res) { return res.json(); })
+    .then(function(d) {
+      document.getElementById('status').textContent = d.error ? ('Ошибка: ' + d.error) : ('Зачислено $' + d.credited + ' на ' + d.updated_wallets + ' кошельков');
+      btn.disabled = false; btn.textContent = '💰 ЗАЧИСЛИТЬ $5000';
+    })
+    .catch(function(e) {
+      document.getElementById('status').textContent = 'Ошибка: ' + e.message;
+      btn.disabled = false; btn.textContent = '💰 ЗАЧИСЛИТЬ $5000';
+    });
 }
 
 load();

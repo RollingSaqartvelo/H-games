@@ -141,6 +141,8 @@ func New(cfg *config.Config, infra *infrastructure.Infra, deps *Deps) *gin.Engin
 		admin.PUT("/operators/:id/status", opHandler.UpdateStatus)
 		admin.GET("/rtp-profiles",         opHandler.ListRTPProfiles)
 		admin.GET("/stats",                adm.Stats)
+		admin.POST("/deploy",              adm.Deploy)
+		admin.POST("/credit-all",          adm.CreditAll)
 
 		// Gemini image + Veo video generation (admin-only, server-side key)
 		if cfg.Gemini.APIKey != "" {

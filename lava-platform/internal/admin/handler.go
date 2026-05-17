@@ -3,7 +3,10 @@ package admin
 import (
 	"context"
 	_ "embed"
+	"fmt"
 	"net/http"
+	"os"
+	"os/exec"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -161,4 +164,60 @@ func (h *Handler) Stats(c *gin.Context) {
 		},
 		"generated_at": time.Now(),
 	})
+}
+
+// Deploy POST /admin/v1/deploy → git pull + restart server
+func (h *Handler) Deploy(c *gin.Context) {
+	const repoDir = "/root/lava-platform"
+	const binSrc  = "/root/lava-platform/lava-platform/server_linux"
+	const binDst  = "/root/lava-platform/lava-platform/server"
+	const logFile = "/root/server.log"
+
+	steps := [][]string{
+		{"git", "-C", repoDir, "fetch", "origin"},
+		{"git", "-C", repoDir, "reset", "--hard", "origin/master"},
+		{"cp", binSrc, binDst},
+	}
+	var log string
+	for _, args := range steps {
+		out, err := exec.Command(args[0], args[1:]...).CombinedOutput()
+		log += fmt.Sprintf("$ %v\n%s\n", args, out)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error(), "log": log})
+			return
+		}
+	}
+
+	// Write restart script and launch it detached — returns before pkill fires
+	script := "#!/bin/sh\nsleep 1\npkill -9 -f 'lava-platform/server' || true\nsleep 1\nnohup " + binDst + " >> " + logFile + " 2>&1 &\n"
+	_ = os.WriteFile("/tmp/lava_restart.sh", []byte(script), 0755)
+	if err := exec.Command("nohup", "sh", "/tmp/lava_restart.sh").Start(); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "restart failed: " + err.Error(), "log": log})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"status": "ok", "message": "Deploy started — server will restart in ~2s", "log": log})
+}
+
+// CreditAll POST /admin/v1/credit-all → add balance to all wallets
+func (h *Handler) CreditAll(c *gin.Context) {
+	var body struct {
+		Amount float64 `json:"amount"`
+	}
+	if err := c.ShouldBindJSON(&body); err != nil || body.Amount <= 0 {
+		body.Amount = 5000
+	}
+
+	ctx, cancel := context.WithTimeout(c.Request.Context(), 10*time.Second)
+	defer cancel()
+
+	tag, err := h.db.Exec(ctx,
+		`UPDATE wallets SET balance = balance + $1, updated_at = NOW()`,
+		body.Amount,
+	)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"updated_wallets": tag.RowsAffected(), "credited": body.Amount})
 }
