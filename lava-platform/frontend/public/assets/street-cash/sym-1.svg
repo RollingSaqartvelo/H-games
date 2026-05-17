@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="lens" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#1a3a6a" stop-opacity="0.95"/><stop offset="100%" stop-color="#0a0a1a" stop-opacity="0.98"/></linearGradient>
+    <linearGradient id="frame" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#e8b86d"/><stop offset="50%" stop-color="#ffd700"/><stop offset="100%" stop-color="#b8860b"/></linearGradient>
+    <filter id="g"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <filter id="ls"><feGaussianBlur stdDeviation="1"/></filter>
+  </defs>
+  <!-- Left lens -->
+  <ellipse cx="33" cy="52" rx="22" ry="16" fill="url(#frame)"/>
+  <ellipse cx="33" cy="52" rx="19" ry="13" fill="url(#lens)"/>
+  <!-- Right lens -->
+  <ellipse cx="67" cy="52" rx="22" ry="16" fill="url(#frame)"/>
+  <ellipse cx="67" cy="52" rx="19" ry="13" fill="url(#lens)"/>
+  <!-- Bridge -->
+  <path d="M 52 52 Q 50 46 48 52" stroke="url(#frame)" stroke-width="2.5" fill="none"/>
+  <!-- Left arm -->
+  <line x1="11" y1="50" x2="22" y2="50" stroke="url(#frame)" stroke-width="3" stroke-linecap="round"/>
+  <!-- Right arm -->
+  <line x1="78" y1="50" x2="89" y2="50" stroke="url(#frame)" stroke-width="3" stroke-linecap="round"/>
+  <!-- Lens reflection -->
+  <ellipse cx="27" cy="46" rx="7" ry="4" fill="rgba(255,255,255,0.12)" transform="rotate(-20,27,46)"/>
+  <ellipse cx="61" cy="46" rx="7" ry="4" fill="rgba(255,255,255,0.12)" transform="rotate(-20,61,46)"/>
+  <!-- Frame highlight -->
+  <ellipse cx="33" cy="52" rx="22" ry="16" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="0.8"/>
+  <ellipse cx="67" cy="52" rx="22" ry="16" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="0.8"/>
+</svg>

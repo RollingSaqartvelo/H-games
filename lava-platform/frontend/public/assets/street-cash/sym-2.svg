@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="sole" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#ffd700"/><stop offset="100%" stop-color="#8b6914"/></linearGradient>
+    <linearGradient id="upper" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#f0f0f8"/><stop offset="100%" stop-color="#b0b8d0"/></linearGradient>
+    <linearGradient id="swoosh" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#00ff88"/><stop offset="100%" stop-color="#00cc66"/></linearGradient>
+    <filter id="g"><feGaussianBlur stdDeviation="1.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  </defs>
+  <!-- Sole -->
+  <rect x="10" y="72" width="80" height="14" rx="6" fill="url(#sole)"/>
+  <rect x="10" y="72" width="80" height="7" rx="3" fill="rgba(255,255,255,0.15)"/>
+  <!-- Midsole detail -->
+  <rect x="12" y="65" width="76" height="10" rx="3" fill="#e8e8f0"/>
+  <!-- Upper body -->
+  <path d="M 18 66 Q 20 30 38 22 Q 60 15 82 28 Q 88 35 88 65 Z" fill="url(#upper)"/>
+  <!-- Tongue -->
+  <path d="M 38 22 Q 48 18 52 28 L 50 65 L 38 65 Z" fill="#d8d8e8"/>
+  <!-- Swoosh -->
+  <path d="M 30 52 Q 55 38 78 48" stroke="url(#swoosh)" stroke-width="4" fill="none" stroke-linecap="round" filter="url(#g)"/>
+  <!-- Laces -->
+  <line x1="40" y1="35" x2="58" y2="32" stroke="#a0a8b8" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="40" y1="42" x2="58" y2="40" stroke="#a0a8b8" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="40" y1="49" x2="57" y2="48" stroke="#a0a8b8" stroke-width="1.5" stroke-linecap="round"/>
+  <!-- Heel tab -->
+  <rect x="74" y="28" width="8" height="20" rx="3" fill="#ffd700" opacity=".7"/>
+  <!-- Highlight -->
+  <path d="M 24 60 Q 26 40 40 30 Q 55 22 70 28" stroke="rgba(255,255,255,0.4)" stroke-width="2" fill="none" stroke-linecap="round"/>
+</svg>
