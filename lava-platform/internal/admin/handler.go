@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -17,17 +18,18 @@ import (
 var dashboardHTML string
 
 type Handler struct {
-	db *pgxpool.Pool
+	db         *pgxpool.Pool
+	systemKey  string
 }
 
-func New(db *pgxpool.Pool) *Handler {
-	return &Handler{db: db}
+func New(db *pgxpool.Pool, systemKey string) *Handler {
+	return &Handler{db: db, systemKey: systemKey}
 }
 
-// Dashboard GET /admin → HTML page
+// Dashboard GET /admin → HTML page with injected API key
 func (h *Handler) Dashboard(c *gin.Context) {
-	c.Header("Content-Type", "text/html; charset=utf-8")
-	c.String(http.StatusOK, dashboardHTML)
+	html := strings.ReplaceAll(dashboardHTML, "{{SYSTEM_KEY}}", h.systemKey)
+	c.Data(http.StatusOK, "text/html; charset=utf-8", []byte(html))
 }
 
 // Stats GET /admin/v1/stats → JSON data for the dashboard

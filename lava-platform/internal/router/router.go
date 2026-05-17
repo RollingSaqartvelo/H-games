@@ -129,11 +129,13 @@ func New(cfg *config.Config, infra *infrastructure.Infra, deps *Deps) *gin.Engin
 
 	slotsH := slotsHandler.NewHandler(provider)
 
-	// ── Admin API (X-SYSTEM-KEY) ──────────────────────────────────────────────
-	adm := adminHandler.New(infra.DB)
-	r.GET("/admin", adm.Dashboard)
+	// ── Admin API (HTTP Basic Auth + X-SYSTEM-KEY) ───────────────────────────
+	adm := adminHandler.New(infra.DB, cfg.Operator.SystemAPIKey)
+	adminBasic := middleware.AdminBasicAuth(cfg.Operator.SystemAPIKey)
+	r.GET("/admin", adminBasic, adm.Dashboard)
 
 	admin := r.Group("/admin/v1")
+	admin.Use(adminBasic)
 	admin.Use(middleware.SystemAuth(cfg.Operator.SystemAPIKey))
 	{
 		admin.POST("/operators",           opHandler.CreateOperator)

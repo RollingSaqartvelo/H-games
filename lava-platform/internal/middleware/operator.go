@@ -78,6 +78,12 @@ func OperatorFromCtx(c *gin.Context) *domain.Operator {
 	return op
 }
 
+// AdminBasicAuth protects the admin dashboard with HTTP Basic Auth.
+// username: "admin", password: systemKey.
+func AdminBasicAuth(systemKey string) gin.HandlerFunc {
+	return gin.BasicAuth(gin.Accounts{"admin": systemKey})
+}
+
 // SystemAuth protects admin endpoints with a static system API key.
 func SystemAuth(systemKey string) gin.HandlerFunc {
 	return func(c *gin.Context) {
