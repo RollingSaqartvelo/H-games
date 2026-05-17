@@ -60,17 +60,20 @@
 
 /* ─── Reset ──────────────────────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html, body { height: 100%; overflow: hidden; }
+html { height: 100%; }
 body {
+  min-height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
   background: var(--bg);
   color: var(--text);
   font-family: 'Courier New', Courier, monospace;
   font-size: 13px;
   -webkit-font-smoothing: antialiased;
-  overscroll-behavior: none;
+  overscroll-behavior-x: none;
   user-select: none;
   -webkit-user-select: none;
-  touch-action: manipulation;
+  touch-action: pan-y;
 }
 button { font-family: inherit; cursor: pointer; border: none; outline: none; background: none; }
 input  { font-family: inherit; outline: none; color: inherit; }
@@ -80,9 +83,8 @@ ul, li { list-style: none; }
 .app {
   display: flex;
   flex-direction: column;
-  height: 100dvh;
-  height: 100vh;
-  overflow: hidden;
+  min-height: 100dvh;
+  min-height: 100vh;
   background: var(--bg);
   position: relative;
 }
@@ -128,23 +130,18 @@ ul, li { list-style: none; }
 .game-overlay--bottom     { bottom: 0; left: 0; right: 0; pointer-events: none; z-index: 6; }
 
 .app__footer {
-  flex: 1 1 0;
-  min-height: 0;
-  overflow-y: auto;
-  overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
+  flex: 1 1 auto;
+  overflow: visible;
   background: linear-gradient(180deg, #0a0602 0%, #060401 60%, #080502 100%);
   border-top: 1px solid rgba(217,119,6,.2);
   padding: 8px 10px;
-  padding-bottom: max(env(safe-area-inset-bottom, 8px), 8px);
+  padding-bottom: max(env(safe-area-inset-bottom, 16px), 16px);
   position: relative;
   z-index: 1;
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
-.app__footer::-webkit-scrollbar { display: none; }
 
 /* ─── Splash screen ──────────────────────────────────────────────────────────── */
 .splash {
