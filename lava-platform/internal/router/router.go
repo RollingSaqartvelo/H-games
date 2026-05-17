@@ -355,6 +355,17 @@ func serveFrontend(r *gin.Engine) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "not found"})
 			return
 		}
+		// Serve any .html file from dist directly (street-cash.html, etc.)
+		if strings.HasSuffix(path, ".html") {
+			filePath := distDir + path
+			if _, err := os.Stat(filePath); err == nil {
+				c.Header("Cache-Control", "no-cache, no-store, must-revalidate")
+				c.Header("Pragma", "no-cache")
+				c.Header("Expires", "0")
+				c.File(filePath)
+				return
+			}
+		}
 		c.Header("Cache-Control", "no-cache, no-store, must-revalidate")
 		c.Header("Pragma", "no-cache")
 		c.Header("Expires", "0")
