@@ -1,0 +1,21 @@
+name: Deploy to server
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: 89.223.121.214
+          username: root
+          key: ${{ secrets.SSH_DEPLOY_KEY }}
+          script: |
+            cd /root/lava-platform
+            git fetch origin
+            git reset --hard origin/master
+            echo "Deployed at $(date)"
