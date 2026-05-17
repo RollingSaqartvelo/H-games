@@ -21,5 +21,5 @@ jobs:
             pkill -9 -f "lava-platform/server" || true
             sleep 1
             cp lava-platform/server_linux lava-platform/server
-            cd /root/lava-platform && SYSTEM_API_KEY=hgames-admin-2026 nohup lava-platform/server >> /root/server.log 2>&1 &
+            cd /root/lava-platform/lava-platform && SYSTEM_API_KEY=hgames-admin-2026 nohup ./server >> /root/server.log 2>&1 &
             echo "Deployed at $(date)"
