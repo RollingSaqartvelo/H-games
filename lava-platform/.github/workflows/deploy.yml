@@ -18,6 +18,12 @@ jobs:
             cd /root/lava-platform
             git fetch origin
             git reset --hard origin/master
+            # Create .env with secrets if not present
+            ENV_FILE=/root/lava-platform/lava-platform/.env
+            if [ ! -f "$ENV_FILE" ]; then
+              cp /root/lava-platform/lava-platform/.env.example "$ENV_FILE" 2>/dev/null || touch "$ENV_FILE"
+            fi
+            grep -q "SYSTEM_API_KEY=" "$ENV_FILE" || echo "SYSTEM_API_KEY=hgames-admin-2026" >> "$ENV_FILE"
             pkill -9 -f "lava-platform/server" || true
             sleep 1
             cp lava-platform/server_linux lava-platform/server
