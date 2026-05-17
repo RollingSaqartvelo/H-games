@@ -15,7 +15,7 @@ import (
 
 const (
 	apiKey  = "AIzaSyAsIIFzZeIm5nUgyFJ68wLnwEapCxfxN-Q"
-	veoURL  = "https://generativelanguage.googleapis.com/v1beta/models/veo-3.0-generate-001:predictLongRunning"
+	veoURL  = "https://generativelanguage.googleapis.com/v1beta/models/veo-2.0-generate-001:predictLongRunning"
 	veoBase = "https://generativelanguage.googleapis.com/v1beta"
 	outDir  = "frontend/public/video/street-cash"
 )
@@ -104,12 +104,25 @@ func generateVideo(name, scene string) error {
 	prompt := styleBase() + scene
 	body, _ := json.Marshal(veoReq{
 		Instances:  []veoInst{{Prompt: prompt}},
-		Parameters: veoParams{AspectRatio: "9:16", DurationSeconds: 5},
+		Parameters: veoParams{AspectRatio: "9:16", DurationSeconds: 6},
 	})
-	resp, err := http.Post(fmt.Sprintf("%s?key=%s", veoURL, apiKey), "application/json", strings.NewReader(string(body)))
-	if err != nil { return err }
-	defer resp.Body.Close()
-	raw, _ := io.ReadAll(resp.Body)
+
+	var resp *http.Response
+	var raw []byte
+	for attempt := 0; attempt < 15; attempt++ {
+		var err error
+		resp, err = http.Post(fmt.Sprintf("%s?key=%s", veoURL, apiKey), "application/json", strings.NewReader(string(body)))
+		if err != nil { return err }
+		raw, _ = io.ReadAll(resp.Body)
+		resp.Body.Close()
+		if resp.StatusCode == 429 {
+			wait := time.Duration(90+attempt*60) * time.Second
+			fmt.Printf("  quota 429, waiting %v before retry %d...\n", wait, attempt+1)
+			time.Sleep(wait)
+			continue
+		}
+		break
+	}
 	if resp.StatusCode != 200 {
 		sz := len(raw); if sz > 500 { sz = 500 }
 		return fmt.Errorf("veo start %d: %s", resp.StatusCode, string(raw[:sz]))
@@ -172,11 +185,16 @@ func generateVideo(name, scene string) error {
 func main() {
 	os.MkdirAll(outDir, 0755)
 	for _, v := range winVideos {
+		outPath := fmt.Sprintf("%s/%s.mp4", outDir, v.name)
+		if _, err := os.Stat(outPath); err == nil {
+			fmt.Printf("Skipping %s (already exists)\n", v.name)
+			continue
+		}
 		fmt.Printf("\nGenerating %s...\n", v.name)
 		if err := generateVideo(v.name, v.scene); err != nil {
 			fmt.Printf("  ERROR: %v\n", err)
 		}
-		time.Sleep(5 * time.Second)
+		time.Sleep(90 * time.Second) // rate limit: ~1 req/min
 	}
 	fmt.Println("\nAll videos done!")
 }

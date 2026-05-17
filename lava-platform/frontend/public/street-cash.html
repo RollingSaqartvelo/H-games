@@ -167,16 +167,16 @@ html,body{width:100%;height:100%;overflow:hidden;background:#05050a;font-family:
 /* ── Win overlay ── */
 #win-overlay{
   display:none;position:fixed;inset:0;z-index:200;
-  background:#000;
+  background:rgba(0,0,0,.88);
   flex-direction:column;align-items:center;justify-content:center;
 }
 #win-overlay.show{display:flex;animation:ov-in .2s ease}
 @keyframes ov-in{from{opacity:0}to{opacity:1}}
 
-/* video fullscreen */
+/* video fullscreen — mix-blend-mode:screen makes black pixels transparent */
 #win-video{
   position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
-  display:none;
+  display:none;mix-blend-mode:screen;
 }
 #win-video.playing{display:block}
 
