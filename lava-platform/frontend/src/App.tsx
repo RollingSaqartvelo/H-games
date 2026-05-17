@@ -5,6 +5,7 @@ import { Multiplier }        from './components/Multiplier'
 import { RoundCountdown }    from './components/RoundCountdown'
 import { SocialTicker }      from './components/SocialTicker'
 import { DualBetPanel }      from './components/DualBetPanel'
+import { BetsViewer }        from './components/BetsViewer'
 import { BettingVideo }      from './components/BettingVideo'
 import { WastedOverlay }    from './components/WastedOverlay'
 import { GifCharacters }   from './components/GifCharacters'
@@ -116,6 +117,7 @@ export function App() {
           <div className="player-badge">🤠 {firstName}</div>
         )}
         <DualBetPanel token={token} playerId={playerId} />
+        <BetsViewer playerId={playerId ?? ''} />
       </footer>
     </div>
   )
