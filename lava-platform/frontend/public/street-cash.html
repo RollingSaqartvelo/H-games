@@ -9,7 +9,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&display=swap');
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{width:100%;height:100%;overflow:hidden;background:#05050a;font-family:'Courier New',monospace;user-select:none;-webkit-user-select:none;touch-action:manipulation}
-
 #app{display:flex;flex-direction:column;align-items:center;height:100%;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;padding-top:env(safe-area-inset-top,0);padding-bottom:env(safe-area-inset-bottom,8px)}
 #app::-webkit-scrollbar{display:none}
 
@@ -25,25 +24,20 @@ html,body{width:100%;height:100%;overflow:hidden;background:#05050a;font-family:
 /* ── Message bar ── */
 #msg-bar{text-align:center;padding:7px 12px;font-size:13px;font-weight:bold;letter-spacing:.5px;color:#fff;background:rgba(0,0,0,.5);border-bottom:1px solid rgba(255,215,0,.15);min-height:30px;display:flex;align-items:center;justify-content:center}
 
-/* ── Board (outer square + center) ── */
+/* ── Board ── */
 #board{display:flex;flex-direction:column;gap:var(--gap,2px);padding:var(--gap,2px)}
 #mid-row{display:flex;gap:var(--gap,2px);align-items:stretch}
 
-/* ── Outer perimeter cells ── */
+/* ── Outer decoration cells ── */
 .fc{
-  flex-shrink:0;
-  display:flex;align-items:center;justify-content:center;
-  border-radius:6px;
-  border:1.5px solid rgba(255,215,0,.15);
+  flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  border-radius:5px;border:1.5px solid rgba(255,215,0,.18);
   position:relative;overflow:hidden;
-  background:linear-gradient(145deg,#0d0d18,#070710);
-  transition:border-color .06s,box-shadow .06s,transform .06s,opacity .06s;
-  opacity:.65;
+  background:linear-gradient(145deg,#0d0d18,#07070f);
+  opacity:.7;transition:opacity .2s;
 }
-.fc img{width:78%;height:78%;object-fit:contain;display:block}
-.fc::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.08) 0%,transparent 60%);pointer-events:none}
-
-/* Symbol backgrounds */
+.fc img{width:76%;height:76%;object-fit:contain;display:block}
+.fc::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.07) 0%,transparent 55%);pointer-events:none}
 .sym-bg-0{background:linear-gradient(145deg,#1e2030,#10111a)}
 .sym-bg-1{background:linear-gradient(145deg,#142040,#080e20)}
 .sym-bg-2{background:linear-gradient(145deg,#082818,#030f08)}
@@ -52,97 +46,124 @@ html,body{width:100%;height:100%;overflow:hidden;background:#05050a;font-family:
 .sym-bg-5{background:linear-gradient(145deg,#1c0630,#0c0218)}
 .sym-bg-6{background:linear-gradient(145deg,#181200,#0a0800)}
 
-/* Cursor highlight — one cell at a time */
-.fc.cursor{
-  opacity:1;
-  border-color:rgba(255,215,0,.85);
-  box-shadow:0 0 14px rgba(255,215,0,.65),0 0 28px rgba(255,215,0,.2),inset 0 0 8px rgba(255,215,0,.08);
-  transform:scale(1.1);
-  z-index:10;
-  animation:cursor-tick .07s ease-out;
-}
-@keyframes cursor-tick{0%{transform:scale(1.18) brightness(1.4)}100%{transform:scale(1.1)}}
-
-/* Trail (previous 2-3 cells, fading) */
-.fc.trail-1{opacity:.85;border-color:rgba(255,215,0,.45);box-shadow:0 0 8px rgba(255,215,0,.3);transform:scale(1.05)}
-.fc.trail-2{opacity:.7;border-color:rgba(255,215,0,.25);transform:scale(1.02)}
-
-/* Winner — sustained glow */
-.fc.winner{
-  opacity:1;
-  border-color:#ffd700;
-  box-shadow:0 0 20px rgba(255,215,0,.9),0 0 40px rgba(255,215,0,.4),inset 0 0 12px rgba(255,215,0,.1);
-  transform:scale(1.14);
-  z-index:12;
-  animation:winner-pulse .5s ease-in-out infinite alternate;
-}
-@keyframes winner-pulse{
-  from{box-shadow:0 0 16px rgba(255,215,0,.7),0 0 32px rgba(255,215,0,.25)}
-  to{box-shadow:0 0 28px rgba(255,215,0,1),0 0 56px rgba(255,215,0,.5)}
-}
-.fc.winner img{animation:winner-bounce .5s ease-in-out infinite alternate}
-@keyframes winner-bounce{from{transform:scale(.95)}to{transform:scale(1.05)}}
-
-/* ── Center showcase panel ── */
+/* ── Center panel wrapper ── */
 #center-panel{
   flex:1;min-width:0;
-  background:linear-gradient(180deg,#0c0c1e 0%,#06060e 100%);
-  border:2px solid rgba(255,215,0,.3);border-radius:10px;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:4px;padding:6px 5px;position:relative;overflow:hidden;
+  gap:0;padding:3px;position:relative;
+  background:linear-gradient(180deg,#0c0c1e,#06060e);
+  border:2px solid rgba(255,215,0,.35);border-radius:10px;overflow:hidden;
 }
-#center-panel::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(255,215,0,.55),transparent)}
+#center-panel::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(255,215,0,.6),transparent)}
 
-/* Idle state */
-#sc-idle{display:flex;flex-direction:column;align-items:center;gap:4px}
-#sc-idle-icon{font-size:28px;animation:float 2s ease-in-out infinite alternate}
-@keyframes float{from{transform:translateY(-3px)}to{transform:translateY(3px)}}
-#sc-idle-txt{font-family:'Orbitron',sans-serif;font-size:8px;letter-spacing:2px;color:rgba(255,215,0,.45)}
+/* ── Decorative lights row ── */
+#reel-lights{display:flex;gap:6px;padding:4px 0 2px;flex-shrink:0}
+.reel-light{width:6px;height:6px;border-radius:50%;background:#1a1a30;transition:all .08s}
+.reel-light.on{background:#ffd700;box-shadow:0 0 6px #ffd700,0 0 12px rgba(255,215,0,.5)}
 
-/* Spinning state */
-#sc-spin{display:none;flex-direction:column;align-items:center;gap:5px}
-#spin-dots{display:flex;gap:5px}
-.spin-dot{width:6px;height:6px;border-radius:50%;background:#ffd700;animation:dot-pulse 1s ease-in-out infinite}
-.spin-dot:nth-child(2){animation-delay:.15s}
-.spin-dot:nth-child(3){animation-delay:.30s}
-@keyframes dot-pulse{0%,100%{opacity:.2;transform:scale(.7)}50%{opacity:1;transform:scale(1.2)}}
-#spin-label{font-family:'Orbitron',sans-serif;font-size:7px;letter-spacing:2px;color:rgba(255,215,0,.5)}
+/* ── Classic slot drum ── */
+#slot-drum{
+  width:100%;flex-shrink:0;position:relative;
+  display:flex;
+  background:linear-gradient(180deg,#f0ece0 0%,#e8e2cc 50%,#f0ece0 100%);
+  border-radius:6px;
+  border:3px solid rgba(180,140,30,.55);
+  box-shadow:
+    inset 0 2px 8px rgba(0,0,0,.25),
+    inset 0 -2px 6px rgba(0,0,0,.15),
+    0 0 18px rgba(255,215,0,.12);
+  overflow:hidden;
+}
 
-/* Result state */
-#sc-result{display:none;flex-direction:column;align-items:center;gap:3px}
-#sc-sym-wrap{position:relative}
-#sc-sym-img{object-fit:contain;animation:sym-reveal .4s cubic-bezier(.2,1.4,.5,1)}
-@keyframes sym-reveal{from{transform:scale(.2) rotate(-15deg);opacity:0}to{transform:scale(1) rotate(0);opacity:1}}
-#sc-mult{font-family:'Orbitron',sans-serif;font-weight:900;color:#ffd700;letter-spacing:1px;text-shadow:0 0 16px rgba(255,215,0,.8);animation:mult-pop .35s cubic-bezier(.2,1.4,.5,1)}
-@keyframes mult-pop{from{transform:scale(.3);opacity:0}to{transform:scale(1);opacity:1}}
-#sc-win-amt{font-family:'Orbitron',sans-serif;font-size:11px;font-weight:700;color:#00ff88;letter-spacing:1px;text-shadow:0 0 8px rgba(0,255,136,.6)}
-#sc-loss-txt{font-size:9px;color:rgba(255,80,80,.7);letter-spacing:2px;font-family:'Orbitron',sans-serif}
+/* Left/right shadow inside drum */
+#slot-drum::before,#slot-drum::after{
+  content:'';position:absolute;top:0;bottom:0;width:18px;z-index:8;pointer-events:none;
+}
+#slot-drum::before{left:0;background:linear-gradient(90deg,rgba(0,0,0,.18),transparent)}
+#slot-drum::after{right:0;background:linear-gradient(-90deg,rgba(0,0,0,.18),transparent)}
+
+/* ── Individual reel column ── */
+.slot-reel{
+  flex:1;display:flex;flex-direction:column;
+  border-right:2px solid rgba(150,110,20,.35);
+  position:relative;overflow:hidden;
+}
+.slot-reel:last-child{border-right:none}
+
+/* ── Reel cells (top / center payline / bottom) ── */
+.rc{
+  display:flex;align-items:center;justify-content:center;
+  position:relative;flex-shrink:0;overflow:hidden;
+}
+.rc img{object-fit:contain;display:block;transition:transform .1s}
+
+/* top and bottom rows: slightly dimmed */
+.rc.rc-top,.rc.rc-bot{
+  background:rgba(0,0,0,.06);
+}
+
+/* CENTER ROW — the payline ── */
+.rc.rc-ctr{
+  background:rgba(255,255,255,.55);
+  position:relative;z-index:2;
+}
+
+/* Payline horizontal lines (top & bottom edge of center row) */
+#payline-top,#payline-bot{
+  position:absolute;left:0;right:0;height:2px;z-index:9;pointer-events:none;
+  background:rgba(220,30,30,.55);
+  box-shadow:0 0 4px rgba(220,30,30,.4);
+}
+
+/* Win: center cells glow */
+.rc.rc-ctr.win{
+  background:rgba(255,215,0,.25);
+  animation:pay-glow .4s ease-in-out infinite alternate;
+}
+@keyframes pay-glow{
+  from{background:rgba(255,215,0,.18);box-shadow:inset 0 0 8px rgba(255,215,0,.3)}
+  to{background:rgba(255,215,0,.38);box-shadow:inset 0 0 18px rgba(255,215,0,.6)}
+}
+.rc.rc-ctr.win img{animation:sym-pop .5s cubic-bezier(.2,1.4,.5,1)}
+@keyframes sym-pop{0%{transform:scale(.6)}60%{transform:scale(1.12)}100%{transform:scale(1)}}
+
+/* Spinning blur */
+.slot-reel.spinning .rc{filter:blur(3px) brightness(1.1);transition:none}
+
+/* Reel land bounce */
+.rc.land{animation:land-bounce .22s cubic-bezier(.2,1.4,.5,1)}
+@keyframes land-bounce{0%{transform:scaleY(.75)}55%{transform:scaleY(1.07)}100%{transform:scaleY(1)}}
+
+/* ── Win stripe overlay on drum ── */
+#win-stripe{
+  display:none;
+  position:absolute;left:0;right:0;z-index:7;pointer-events:none;
+  background:linear-gradient(90deg,transparent,rgba(255,215,0,.15),transparent);
+  animation:stripe-sweep 1s ease-in-out infinite;
+}
+@keyframes stripe-sweep{0%{opacity:.3}50%{opacity:1}100%{opacity:.3}}
+
+/* ── Center panel bottom: win/idle text ── */
+#sc-bottom{
+  width:100%;display:flex;align-items:center;justify-content:center;
+  padding:3px 4px 2px;min-height:22px;flex-shrink:0;
+}
+#sc-win-txt{
+  display:none;font-family:'Orbitron',sans-serif;font-weight:900;
+  color:#ffd700;letter-spacing:1px;text-shadow:0 0 12px rgba(255,215,0,.8);
+  animation:win-pop .35s cubic-bezier(.2,1.4,.5,1);
+}
+@keyframes win-pop{from{transform:scale(.3);opacity:0}to{transform:scale(1);opacity:1}}
+#sc-idle-txt{font-size:8px;letter-spacing:2px;color:rgba(255,215,0,.35);font-family:'Orbitron',sans-serif}
 
 /* ── Mini paytable ── */
 #legend-wrap{position:relative;margin:0 8px 4px}
 #pt-btn{position:absolute;top:-2px;right:-2px;width:22px;height:22px;border-radius:50%;background:linear-gradient(145deg,#2a2000,#1a1400);border:1.5px solid rgba(255,215,0,.5);color:rgba(255,215,0,.8);font-size:11px;font-weight:900;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:10;box-shadow:0 0 8px rgba(255,215,0,.2);font-family:'Orbitron',sans-serif}
 #pt-btn:active{transform:scale(.9)}
-#legend{
-  background:linear-gradient(160deg,#181210,#0c0a06,#181210);
-  border:2px solid rgba(255,215,0,.35);border-radius:14px;
-  padding:7px 7px 5px;
-  box-shadow:0 0 24px rgba(255,215,0,.07);
-  display:flex;flex-direction:column;gap:4px;
-}
+#legend{background:linear-gradient(160deg,#181210,#0c0a06,#181210);border:2px solid rgba(255,215,0,.35);border-radius:14px;padding:7px 7px 5px;display:flex;flex-direction:column;gap:4px}
 .legend-row{display:flex;gap:4px;align-items:stretch}
-.li{
-  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
-  border-radius:9px;padding:4px 2px;
-  background:linear-gradient(145deg,#14110a,#0a0807);
-  border:1.5px solid rgba(255,215,0,.2);
-  transition:border-color .15s,transform .1s;
-}
-.li.feat{
-  flex:1.2;
-  background:linear-gradient(145deg,#201800,#0e0c00);
-  border:2px solid rgba(255,215,0,.55);
-  box-shadow:0 0 12px rgba(255,215,0,.15);
-}
+.li{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border-radius:9px;padding:4px 2px;background:linear-gradient(145deg,#14110a,#0a0807);border:1.5px solid rgba(255,215,0,.2);transition:border-color .15s,transform .1s}
+.li.feat{flex:1.2;background:linear-gradient(145deg,#201800,#0e0c00);border:2px solid rgba(255,215,0,.55);box-shadow:0 0 12px rgba(255,215,0,.15)}
 .li img{width:36px;height:36px;object-fit:contain}
 .li.feat img{width:46px;height:46px}
 .li-mult{font-family:'Orbitron',sans-serif;font-size:9px;font-weight:900;color:#ffd700;line-height:1;text-shadow:0 0 6px rgba(255,215,0,.5)}
@@ -153,13 +174,14 @@ html,body{width:100%;height:100%;overflow:hidden;background:#05050a;font-family:
 /* ── Paytable modal ── */
 #pt-modal{display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.78);backdrop-filter:blur(4px);align-items:flex-end;justify-content:center}
 #pt-modal.open{display:flex;animation:ov-in .2s ease}
-#pt-sheet{width:100%;max-width:440px;background:linear-gradient(180deg,#1a1200,#0e0a00,#181000);border:1.5px solid rgba(255,215,0,.4);border-bottom:none;border-radius:20px 20px 0 0;padding:16px 14px max(env(safe-area-inset-bottom,16px),16px);max-height:85vh;overflow-y:auto}
+@keyframes ov-in{from{opacity:0}to{opacity:1}}
+#pt-sheet{width:100%;max-width:440px;background:linear-gradient(180deg,#1a1200,#0e0a00,#181000);border:1.5px solid rgba(255,215,0,.4);border-bottom:none;border-radius:20px 20px 0 0;padding:16px 14px max(env(safe-area-inset-bottom,16px),16px);max-height:82vh;overflow-y:auto}
 #pt-sheet h3{font-family:'Orbitron',sans-serif;font-size:11px;font-weight:900;letter-spacing:3px;color:#ffd700;text-align:center;margin-bottom:12px}
 .pt-row{display:flex;align-items:center;gap:10px;padding:8px;border-radius:10px;margin-bottom:4px;background:rgba(255,215,0,.03);border:1px solid rgba(255,215,0,.1)}
 .pt-row img{width:34px;height:34px;object-fit:contain;flex-shrink:0}
 .pt-name{flex:1;font-size:11px;color:rgba(255,255,255,.7);letter-spacing:.5px}
 .pt-mult{font-family:'Orbitron',sans-serif;font-size:14px;font-weight:900;color:#ffd700;text-shadow:0 0 8px rgba(255,215,0,.5)}
-.pt-row.pt-loss .pt-mult{color:rgba(255,80,80,.8)}
+.pt-loss .pt-mult{color:rgba(255,80,80,.8)}
 #pt-close{width:100%;margin-top:12px;padding:10px;background:linear-gradient(90deg,#ffd700,#ff8c00,#ffd700);background-size:200%;border:none;border-radius:12px;font-family:'Orbitron',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;color:#000;cursor:pointer;animation:grad-flow 2s linear infinite}
 @keyframes grad-flow{0%{background-position:0%}100%{background-position:200%}}
 
@@ -176,15 +198,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#05050a;font-family:
 .action-side{width:52px;height:52px;border-radius:50%;background:linear-gradient(145deg,#181828,#0e0e1c);border:1.5px solid rgba(255,215,0,.3);display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;transition:all .15s}
 .action-side:active{transform:scale(.92);border-color:rgba(255,215,0,.7)}
 .action-side.auto-on{border-color:#ffd700;box-shadow:0 0 14px rgba(255,215,0,.4)}
-
-#play-btn{
-  width:72px;height:72px;border-radius:50%;
-  background:radial-gradient(circle at 35% 35%,#ffe566,#ffd700 40%,#c89000 100%);
-  border:3px solid rgba(255,255,255,.25);
-  box-shadow:0 4px 24px rgba(255,215,0,.55),0 0 50px rgba(255,215,0,.15),inset 0 2px 0 rgba(255,255,255,.35);
-  display:flex;align-items:center;justify-content:center;
-  font-size:28px;cursor:pointer;transition:all .12s;color:#1a0800;
-}
+#play-btn{width:72px;height:72px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#ffe566,#ffd700 40%,#c89000 100%);border:3px solid rgba(255,255,255,.25);box-shadow:0 4px 24px rgba(255,215,0,.55),0 0 50px rgba(255,215,0,.15),inset 0 2px 0 rgba(255,255,255,.35);display:flex;align-items:center;justify-content:center;font-size:28px;cursor:pointer;transition:all .12s;color:#1a0800}
 #play-btn:active:not(:disabled){transform:scale(.92)}
 #play-btn:disabled{opacity:.35;cursor:not-allowed;animation:none!important}
 @keyframes play-pulse{0%,100%{box-shadow:0 4px 24px rgba(255,215,0,.45),0 0 30px rgba(255,215,0,.1)}50%{box-shadow:0 4px 32px rgba(255,215,0,.9),0 0 60px rgba(255,215,0,.35)}}
@@ -195,7 +209,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:#05050a;font-family:
 /* ── Win overlay ── */
 #win-overlay{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.88);flex-direction:column;align-items:center;justify-content:center}
 #win-overlay.show{display:flex;animation:ov-in .25s ease}
-@keyframes ov-in{from{opacity:0}to{opacity:1}}
 #win-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none;mix-blend-mode:screen}
 #win-video.playing{display:block}
 #win-inner{position:relative;z-index:2;background:linear-gradient(160deg,#1c1400,#0e0e00,#1c1400);border:2px solid #ffd700;border-radius:22px;padding:28px 40px;text-align:center;box-shadow:0 0 80px rgba(255,215,0,.4)}
@@ -203,9 +216,8 @@ html,body{width:100%;height:100%;overflow:hidden;background:#05050a;font-family:
 #ov-sym img{width:80px;height:80px;object-fit:contain;animation:sym-bounce .6s ease-in-out infinite alternate;margin-bottom:8px}
 @keyframes sym-bounce{from{transform:scale(1) rotate(-4deg)}to{transform:scale(1.1) rotate(4deg)}}
 #ov-title{font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:3px;color:rgba(255,215,0,.6);margin-bottom:4px}
-#ov-mult{font-family:'Orbitron',sans-serif;font-size:16px;font-weight:900;color:rgba(255,215,0,.7);margin-bottom:2px}
+#ov-mult{font-family:'Orbitron',sans-serif;font-size:16px;font-weight:900;color:rgba(255,215,0,.75);margin-bottom:4px}
 #ov-amount{font-family:'Orbitron',sans-serif;font-size:34px;font-weight:900;color:#ffd700;letter-spacing:2px;animation:win-pop .4s ease}
-@keyframes win-pop{from{transform:scale(.3);opacity:0}to{transform:scale(1);opacity:1}}
 #ov-close{margin-top:18px;padding:10px 32px;background:linear-gradient(90deg,#ffd700,#ff6b35,#ffd700);background-size:200%;border:none;border-radius:20px;font-family:'Orbitron',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;color:#000;cursor:pointer;animation:grad-flow 2s linear infinite;position:relative;z-index:3}
 #ov-close:active{transform:scale(.96)}
 </style>
@@ -219,7 +231,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#05050a;font-family:
   </div>
 
   <div id="machine">
-    <div id="msg-bar">All symbols visible — spin to win!</div>
+    <div id="msg-bar">Choose your stake and press PLAY</div>
     <div id="board">
 
       <!-- TOP ROW: fc0–fc7 -->
@@ -229,30 +241,54 @@ html,body{width:100%;height:100%;overflow:hidden;background:#05050a;font-family:
         <!-- LEFT COL: fc8–fc12 -->
         <div id="col-left" style="display:flex;flex-direction:column;gap:var(--gap,2px)"></div>
 
-        <!-- CENTER SHOWCASE -->
+        <!-- ══ CENTER PANEL ══ -->
         <div id="center-panel">
-          <!-- Idle -->
-          <div id="sc-idle">
-            <div id="sc-idle-icon">🎰</div>
-            <div id="sc-idle-txt">PRESS PLAY</div>
+
+          <!-- Lights -->
+          <div id="reel-lights">
+            <div class="reel-light" id="l0"></div>
+            <div class="reel-light" id="l1"></div>
+            <div class="reel-light" id="l2"></div>
+            <div class="reel-light" id="l3"></div>
+            <div class="reel-light" id="l4"></div>
           </div>
-          <!-- Spinning indicator -->
-          <div id="sc-spin">
-            <div id="spin-dots">
-              <div class="spin-dot"></div>
-              <div class="spin-dot"></div>
-              <div class="spin-dot"></div>
+
+          <!-- ▼▼▼ CLASSIC 3-REEL DRUM ▼▼▼ -->
+          <div id="slot-drum">
+            <!-- Payline red lines (positioned by JS) -->
+            <div id="payline-top"></div>
+            <div id="payline-bot"></div>
+            <!-- Win stripe sweep -->
+            <div id="win-stripe"></div>
+
+            <!-- REEL 0 -->
+            <div class="slot-reel" id="reel-0">
+              <div class="rc rc-top" id="r0t"></div>
+              <div class="rc rc-ctr" id="r0c"></div>
+              <div class="rc rc-bot" id="r0b"></div>
             </div>
-            <div id="spin-label">SPINNING</div>
+            <!-- REEL 1 -->
+            <div class="slot-reel" id="reel-1">
+              <div class="rc rc-top" id="r1t"></div>
+              <div class="rc rc-ctr" id="r1c"></div>
+              <div class="rc rc-bot" id="r1b"></div>
+            </div>
+            <!-- REEL 2 -->
+            <div class="slot-reel" id="reel-2">
+              <div class="rc rc-top" id="r2t"></div>
+              <div class="rc rc-ctr" id="r2c"></div>
+              <div class="rc rc-bot" id="r2b"></div>
+            </div>
           </div>
-          <!-- Result showcase -->
-          <div id="sc-result">
-            <div id="sc-sym-wrap"><img id="sc-sym-img" src="" alt="" id="sc-sym-img"></div>
-            <div id="sc-mult"></div>
-            <div id="sc-win-amt"></div>
-            <div id="sc-loss-txt"></div>
+          <!-- ▲▲▲ END DRUM ▲▲▲ -->
+
+          <!-- Small win amount line -->
+          <div id="sc-bottom">
+            <div id="sc-idle-txt">PRESS PLAY</div>
+            <div id="sc-win-txt"></div>
           </div>
         </div>
+        <!-- ══ END CENTER PANEL ══ -->
 
         <!-- RIGHT COL: fc13–fc17 -->
         <div id="col-right" style="display:flex;flex-direction:column;gap:var(--gap,2px)"></div>
@@ -291,7 +327,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#05050a;font-family:
     </div>
 
     <div id="action-section">
-      <div class="action-side" id="info-btn" onclick="openPaytable()">ℹ️</div>
+      <div class="action-side" onclick="openPaytable()">ℹ️</div>
       <button id="play-btn" onclick="onPlay()">▶</button>
       <div class="action-side" id="auto-btn" onclick="toggleAuto()">↻</div>
     </div>
@@ -310,7 +346,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#05050a;font-family:
     <div class="pt-row"><img src="/assets/street-cash/sym-2.png"><span class="pt-name">Sneaker</span><span class="pt-mult">×3</span></div>
     <div class="pt-row"><img src="/assets/street-cash/sym-1.png"><span class="pt-name">Sunglasses</span><span class="pt-mult">×1.5</span></div>
     <div class="pt-row pt-loss"><img src="/assets/street-cash/sym-0.png"><span class="pt-name">Dice</span><span class="pt-mult">LOSS</span></div>
-    <p style="text-align:center;font-size:9px;color:rgba(255,215,0,.3);margin-top:10px;letter-spacing:1px">RTP 94% · Highlight runner stops on ONE cell</p>
+    <p style="text-align:center;font-size:9px;color:rgba(255,215,0,.3);margin-top:10px;letter-spacing:1px">RTP 94% · CENTER ROW is the payline</p>
     <button id="pt-close" onclick="closePT()">CLOSE</button>
   </div>
 </div>
@@ -330,125 +366,174 @@ html,body{width:100%;height:100%;overflow:hidden;background:#05050a;font-family:
 <script>
 // ── Symbols ───────────────────────────────────────────────────────────────────
 const SYMS = [
-  { mult:0,   src:'/assets/street-cash/sym-0.png', bg:'sym-bg-0', glow:'#a0a0b0', name:'Dice',     isLoss:true  },
-  { mult:1.5, src:'/assets/street-cash/sym-1.png', bg:'sym-bg-1', glow:'#4080e0', name:'Sunglasses',isLoss:false },
-  { mult:3,   src:'/assets/street-cash/sym-2.png', bg:'sym-bg-2', glow:'#20c060', name:'Sneaker',  isLoss:false },
-  { mult:8,   src:'/assets/street-cash/sym-3.png', bg:'sym-bg-3', glow:'#ffd700', name:'Chain',    isLoss:false },
-  { mult:20,  src:'/assets/street-cash/sym-4.png', bg:'sym-bg-4', glow:'#ff8020', name:'Watch',    isLoss:false },
-  { mult:75,  src:'/assets/street-cash/sym-5.png', bg:'sym-bg-5', glow:'#c060ff', name:'Key Fob',  isLoss:false },
-  { mult:500, src:'/assets/street-cash/sym-6.png', bg:'sym-bg-6', glow:'#ffd700', name:'Card',     isLoss:false },
+  { mult:0,   src:'/assets/street-cash/sym-0.png', bg:'sym-bg-0', name:'Dice',     isLoss:true  },
+  { mult:1.5, src:'/assets/street-cash/sym-1.png', bg:'sym-bg-1', name:'Shades',   isLoss:false },
+  { mult:3,   src:'/assets/street-cash/sym-2.png', bg:'sym-bg-2', name:'Sneaker',  isLoss:false },
+  { mult:8,   src:'/assets/street-cash/sym-3.png', bg:'sym-bg-3', name:'Chain',    isLoss:false },
+  { mult:20,  src:'/assets/street-cash/sym-4.png', bg:'sym-bg-4', name:'Watch',    isLoss:false },
+  { mult:75,  src:'/assets/street-cash/sym-5.png', bg:'sym-bg-5', name:'Key Fob',  isLoss:false },
+  { mult:500, src:'/assets/street-cash/sym-6.png', bg:'sym-bg-6', name:'Card',     isLoss:false },
 ]
 
-// ── Fixed clockwise cell layout (26 cells) ────────────────────────────────────
-// Positions 0-25 in clockwise order (top-left → right → bottom-right → left → back)
-// Each value = sym index (0=Dice, 1=Shades, 2=Sneaker, 3=Chain, 4=Watch, 5=KeyFob, 6=Card)
-const CELL_SYMS = [
-  1, 0, 2, 1, 1, 3, 0, 1,   // pos 0-7:  top row  (L→R)
-  2, 0, 1, 3, 0,             // pos 8-12: right col (T→B)
-  1, 4, 0, 2, 0, 1, 3, 0,   // pos 13-20: bottom row (R→L)
-  2, 0, 5, 1, 6              // pos 21-25: left col (B→T)
-]
+// Demo weights matching backend (out of 100000)
+const DEMO_W = [63280, 31900, 3000, 1200, 500, 100, 20]
 
-// Clockwise traversal order: maps CW position → DOM cell ID
-// Top L→R: fc0..fc7; Right T→B: fc13..fc17; Bot R→L: fc25..fc18; Left B→T: fc12..fc8
-const CW_ORDER = [
-  0,1,2,3,4,5,6,7,          // top row (fc0–fc7)
-  13,14,15,16,17,            // right col (fc13–fc17)
-  25,24,23,22,21,20,19,18,  // bottom row reversed (fc25→fc18)
-  12,11,10,9,8               // left col reversed (fc12→fc8)
+// Outer frame decoration: fixed symbol layout for 26 cells (clockwise)
+// 0=Dice,1=Shades,2=Sneaker,3=Chain,4=Watch,5=KeyFob,6=Card
+const FRAME_LAYOUT = [
+  1,0,2,1,1,3,0,1,   // top row fc0–fc7
+  2,0,1,3,0,         // left col fc8–fc12
+  1,4,0,2,0,         // right col fc13–fc17
+  0,1,3,0,2,0,1,0    // bottom row fc18–fc25
 ]
-
-// Demo weights mirror backend (out of 100000)
-const DEMO_WEIGHTS = [63280,31900,3000,1200,500,100,20]
 
 // ── State ─────────────────────────────────────────────────────────────────────
-let bet      = 1.00
-let balance  = 1000.00
-let spinning = false
-let autoMode = false
-let autoTimer = null
-let token    = null
-let demoMode = true
-let CELL     = 44
-let GAP      = 2
-let lastCWPos = 0  // last landing clockwise position
+let bet        = 1.00
+let balance    = 1000.00
+let spinning   = false
+let autoMode   = false
+let autoTimer  = null
+let token      = null
+let demoMode   = true
+let CELL       = 44
+let GAP        = 2
+let REEL_H     = 60   // reel cell height
+let IMG_SZ     = 46   // symbol image size inside drum
 
 // ── Build DOM ─────────────────────────────────────────────────────────────────
 function setup() {
   const W = Math.min(window.innerWidth, 440)
-  CELL     = Math.floor((W - 14) / 8)
-  GAP      = 2
+  CELL    = Math.floor((W - 14) / 8)
+  GAP     = 2
   document.documentElement.style.setProperty('--gap', GAP + 'px')
 
   const topRow = document.getElementById('row-top')
   const botRow = document.getElementById('row-bot')
   const colL   = document.getElementById('col-left')
   const colR   = document.getElementById('col-right')
+  const frameSz = Math.round(CELL * .72) + 'px'
 
-  const centerH = CELL * 5 + GAP * 4
-  document.getElementById('center-panel').style.minHeight = centerH + 'px'
-  const imgSz = Math.round(CELL * 0.65) + 'px'
-
-  function makeCell(domId) {
+  // Make outer decoration cells
+  function makeFC(id, symIdx) {
     const d = document.createElement('div')
-    d.className = 'fc'
-    d.id = 'fc' + domId
+    const sym = SYMS[symIdx]
+    d.className = `fc ${sym.bg}`
+    d.id = 'fc' + id
     d.style.cssText = `width:${CELL}px;height:${CELL}px`
     const img = document.createElement('img')
-    img.style.cssText = `width:${imgSz};height:${imgSz};object-fit:contain`
+    img.src = sym.src
+    img.style.cssText = `width:${frameSz};height:${frameSz}`
     d.appendChild(img)
     return d
   }
 
-  for (let i = 0;  i < 8;  i++) topRow.appendChild(makeCell(i))
-  for (let i = 8;  i <= 12; i++) colL.appendChild(makeCell(i))
-  for (let i = 13; i <= 17; i++) colR.appendChild(makeCell(i))
-  for (let i = 18; i <= 25; i++) botRow.appendChild(makeCell(i))
+  for (let i = 0;  i < 8;  i++) topRow.appendChild(makeFC(i,   FRAME_LAYOUT[i]))
+  for (let i = 8;  i <= 12; i++) colL.appendChild(makeFC(i,    FRAME_LAYOUT[i]))
+  for (let i = 13; i <= 17; i++) colR.appendChild(makeFC(i,    FRAME_LAYOUT[i]))
+  for (let i = 18; i <= 25; i++) botRow.appendChild(makeFC(i,  FRAME_LAYOUT[i]))
 
-  // Set symbol images & backgrounds for each DOM cell
-  for (let cwPos = 0; cwPos < 26; cwPos++) {
-    const domId = CW_ORDER[cwPos]
-    const sym   = SYMS[CELL_SYMS[cwPos]]
-    const el    = document.getElementById('fc' + domId)
-    el.className = `fc ${sym.bg}`
-    el.querySelector('img').src = sym.src
+  // Size center panel
+  const centerH = CELL * 5 + GAP * 4
+  document.getElementById('center-panel').style.minHeight = centerH + 'px'
+
+  // Size reel cells inside drum
+  // Drum height = centerH - lights - bottom text - paddings ≈ centerH - 60
+  const drumH = centerH - 60
+  REEL_H = Math.floor(drumH / 3)
+  IMG_SZ = Math.round(REEL_H * 0.78)
+  document.getElementById('slot-drum').style.height = drumH + 'px'
+
+  document.querySelectorAll('.rc').forEach(el => {
+    el.style.height = REEL_H + 'px'
+  })
+
+  // Position payline lines at center row boundaries
+  const ptTop = document.getElementById('payline-top')
+  const ptBot = document.getElementById('payline-bot')
+  ptTop.style.top = REEL_H + 'px'
+  ptBot.style.top = (REEL_H * 2) + 'px'
+
+  // Position win-stripe over center row
+  const stripe = document.getElementById('win-stripe')
+  stripe.style.top    = REEL_H + 'px'
+  stripe.style.height = REEL_H + 'px'
+
+  // Init reel cells with placeholder symbols
+  for (let ri = 0; ri < 3; ri++) {
+    setRC(`r${ri}t`, randSym())
+    setRC(`r${ri}c`, randSym())
+    setRC(`r${ri}b`, randSym())
   }
-
-  // Size center showcase image
-  const scImg = document.getElementById('sc-sym-img')
-  const scSz  = Math.round(centerH * 0.38)
-  scImg.style.cssText = `width:${scSz}px;height:${scSz}px`
-  document.getElementById('sc-mult').style.fontSize = Math.round(scSz * 0.28) + 'px'
 }
 
-// ── Center panel state ────────────────────────────────────────────────────────
-function showState(s) {
-  document.getElementById('sc-idle').style.display   = s==='idle'   ? 'flex' : 'none'
-  document.getElementById('sc-spin').style.display   = s==='spin'   ? 'flex' : 'none'
-  document.getElementById('sc-result').style.display = s==='result' ? 'flex' : 'none'
+// ── Reel cell helpers ──────────────────────────────────────────────────────────
+function setRC(id, symIdx) {
+  const el  = document.getElementById(id)
+  if (!el) return
+  const sym = SYMS[symIdx]
+  el.innerHTML = `<img src="${sym.src}" style="width:${IMG_SZ}px;height:${IMG_SZ}px;object-fit:contain" alt="">`
 }
 
-function showResult(sym, payout) {
-  const s = SYMS[sym]
-  document.getElementById('sc-sym-img').src = s.src
-  const multEl = document.getElementById('sc-mult')
-  const winEl  = document.getElementById('sc-win-amt')
-  const lossEl = document.getElementById('sc-loss-txt')
+function randSym() {
+  return Math.floor(Math.random() * SYMS.length)
+}
 
-  if (s.isLoss) {
-    multEl.textContent = '×0'
-    multEl.style.color = 'rgba(255,80,80,.7)'
-    winEl.style.display  = 'none'
-    lossEl.style.display = 'block'
-    lossEl.textContent   = 'NO WIN'
-  } else {
-    multEl.textContent = '×' + s.mult
-    multEl.style.color = '#ffd700'
-    winEl.style.display  = 'block'
-    lossEl.style.display = 'none'
-    winEl.textContent = '+$' + payout.toFixed(2)
-  }
-  showState('result')
+function randNonMatch(exclude) {
+  let s
+  do { s = randSym() } while (s === exclude)
+  return s
+}
+
+// ── Spin animation — one reel ─────────────────────────────────────────────────
+function spinReel(ri, finalTop, finalCtr, finalBot, startDelay, spinMs) {
+  return new Promise(resolve => {
+    const reel = document.getElementById('reel-' + ri)
+    setTimeout(() => {
+      reel.classList.add('spinning')
+      const tick = 60
+      let elapsed = 0
+      const iv = setInterval(() => {
+        setRC(`r${ri}t`, randSym())
+        setRC(`r${ri}c`, randSym())
+        setRC(`r${ri}b`, randSym())
+        elapsed += tick
+        if (elapsed >= spinMs) {
+          clearInterval(iv)
+          reel.classList.remove('spinning')
+          // Snap to result
+          setRC(`r${ri}t`, finalTop)
+          setRC(`r${ri}c`, finalCtr)
+          setRC(`r${ri}b`, finalBot)
+          // Bounce each cell
+          ;['t','c','b'].forEach(row => {
+            const el = document.getElementById(`r${ri}${row}`)
+            if (el) { el.classList.add('land'); setTimeout(() => el.classList.remove('land'), 300) }
+          })
+          resolve()
+        }
+      }, tick)
+    }, startDelay)
+  })
+}
+
+// ── Reel lights ───────────────────────────────────────────────────────────────
+let litTimer = null, litIdx = 0
+function startLights() {
+  const ls = [0,1,2,3,4].map(i => document.getElementById('l'+i))
+  ls.forEach(l => l.classList.remove('on'))
+  litIdx = 0
+  litTimer = setInterval(() => {
+    ls.forEach(l => l.classList.remove('on'))
+    ls[litIdx % 5].classList.add('on')
+    litIdx++
+  }, 100)
+}
+function stopLights() {
+  clearInterval(litTimer)
+  ;[0,1,2,3,4].forEach(i => {
+    const l = document.getElementById('l'+i)
+    if (l) { l.classList.add('on'); setTimeout(() => l.classList.remove('on'), 400) }
+  })
 }
 
 // ── Legend highlight ──────────────────────────────────────────────────────────
@@ -457,99 +542,40 @@ function highlightLegend(sym) {
   const el = document.querySelector(`.li[data-sym="${sym}"]`)
   if (el) el.classList.add('active')
 }
-
 function setMsg(t) { document.getElementById('msg-bar').textContent = t }
 
-// ── Cell highlight helpers ────────────────────────────────────────────────────
-function getCellEl(cwPos) {
-  return document.getElementById('fc' + CW_ORDER[cwPos])
-}
-
-function clearAllHighlights() {
-  for (let i = 0; i < 26; i++) {
-    const el = getCellEl(i)
-    el.classList.remove('cursor','trail-1','trail-2','winner')
-  }
-}
-
-// ── Clockwise roulette animation ──────────────────────────────────────────────
-// Finds all CW positions where the symbol matches winSym, picks landing target.
-// Runs 2 full laps + offset to reach target, with eased speed.
-function runRoulette(winSym) {
-  return new Promise(resolve => {
-    // Find candidate CW positions for the winning symbol
-    const candidates = []
-    for (let i = 0; i < 26; i++) {
-      if (CELL_SYMS[i] === winSym) candidates.push(i)
-    }
-    // Pick a candidate that's at least 6 steps ahead to avoid too-short animation
-    let targetCW = candidates[Math.floor(Math.random() * candidates.length)]
-
-    // Compute total steps: 2 full laps + offset to target
-    const minLaps = 2
-    const offset  = ((targetCW - lastCWPos) % 26 + 26) % 26
-    const totalSteps = minLaps * 26 + (offset === 0 ? 26 : offset)
-
-    // Generate timing for each step (ease-out: fast at start, slow at end)
-    const times = []
-    let elapsed = 0
-    for (let i = 0; i < totalSteps; i++) {
-      const t = i / totalSteps                // 0 → 1
-      // Ease-out cubic: slow at end
-      const speed = 45 + Math.pow(t, 1.8) * 380  // 45ms → 425ms
-      elapsed += speed
-      times.push(elapsed)
-    }
-
-    let step = 0
-    let prevCW = lastCWPos
-
-    function doStep() {
-      if (step >= totalSteps) {
-        // Landing!
-        clearAllHighlights()
-        getCellEl(targetCW).classList.add('winner')
-        lastCWPos = targetCW
-        resolve()
-        return
-      }
-
-      // Remove previous highlights
-      getCellEl(prevCW).classList.remove('cursor')
-      if (step > 0) getCellEl(prevCW).classList.add('trail-1')
-
-      // Remove older trail
-      const t2pos = ((prevCW - 1) + 26) % 26
-      getCellEl(t2pos).classList.remove('trail-1')
-      if (step > 1) getCellEl(t2pos).classList.add('trail-2')
-      const t3pos = ((prevCW - 2) + 26) % 26
-      getCellEl(t3pos).classList.remove('trail-2')
-
-      const curCW = (lastCWPos + step + 1) % 26
-      getCellEl(curCW).classList.add('cursor')
-      getCellEl(curCW).classList.remove('trail-1','trail-2','winner')
-
-      prevCW = curCW
-      step++
-
-      const delay = step < times.length ? times[step] - times[step-1] : 400
-      setTimeout(doStep, delay)
-    }
-
-    // Start with a tiny delay
-    showState('spin')
-    setTimeout(doStep, 80)
+// ── Clear win visuals ──────────────────────────────────────────────────────────
+function clearWin() {
+  ;['r0c','r1c','r2c'].forEach(id => {
+    const el = document.getElementById(id)
+    if (el) el.classList.remove('win')
   })
+  document.getElementById('win-stripe').style.display = 'none'
+  document.getElementById('sc-win-txt').style.display  = 'none'
+  document.getElementById('sc-idle-txt').style.display = 'block'
 }
 
-// ── Demo weighted pick ────────────────────────────────────────────────────────
+// ── Apply win glow to center row ──────────────────────────────────────────────
+function applyWin(payout) {
+  ;['r0c','r1c','r2c'].forEach(id => {
+    const el = document.getElementById(id)
+    if (el) el.classList.add('win')
+  })
+  const stripe = document.getElementById('win-stripe')
+  stripe.style.display = 'block'
+
+  const winTxt = document.getElementById('sc-win-txt')
+  winTxt.textContent = '+$' + payout.toFixed(2)
+  winTxt.style.fontSize = payout >= 100 ? '13px' : payout >= 10 ? '15px' : '17px'
+  winTxt.style.display = 'block'
+  document.getElementById('sc-idle-txt').style.display = 'none'
+}
+
+// ── Demo pick ─────────────────────────────────────────────────────────────────
 function demoPick() {
-  const total = DEMO_WEIGHTS.reduce((a, b) => a + b, 0)
+  const total = DEMO_W.reduce((a,b) => a+b, 0)
   let r = Math.floor(Math.random() * total)
-  for (let i = 0; i < DEMO_WEIGHTS.length; i++) {
-    r -= DEMO_WEIGHTS[i]
-    if (r < 0) return i
-  }
+  for (let i = 0; i < DEMO_W.length; i++) { r -= DEMO_W[i]; if (r < 0) return i }
   return 0
 }
 
@@ -562,11 +588,11 @@ async function onPlay() {
   const btn = document.getElementById('play-btn')
   btn.disabled = true
   document.querySelectorAll('.li').forEach(el => el.classList.remove('active'))
-  clearAllHighlights()
-  showState('idle')
-  setMsg('Round and round it goes... 🎰')
+  clearWin()
+  setMsg('Good luck! 🤞')
+  startLights()
 
-  // ── Backend (real money) ─────────────────────────────────────────────────────
+  // ── Backend ──────────────────────────────────────────────────────────────────
   let winSym = null, payout = 0
   if (!demoMode && token) {
     try {
@@ -582,7 +608,7 @@ async function onPlay() {
         payout = d.payout
       } else if (resp.status === 402) {
         setMsg('❌ Insufficient balance')
-        spinning = false; btn.disabled = false; return
+        spinning = false; btn.disabled = false; stopLights(); return
       }
     } catch {}
   }
@@ -596,31 +622,45 @@ async function onPlay() {
     if (payout > 0) { balance = parseFloat((balance + payout).toFixed(2)); updateBal() }
   }
 
-  // Animate roulette
-  await runRoulette(winSym)
+  // Build what each reel shows:
+  // Center row (payline): win → all 3 show winSym; loss → 3 different non-matching
+  let ctr0, ctr1, ctr2
+  if (!SYMS[winSym].isLoss) {
+    ctr0 = ctr1 = ctr2 = winSym
+  } else {
+    ctr0 = randNonMatch(-1)
+    do { ctr1 = randSym() } while (ctr1 === ctr0)
+    do { ctr2 = randSym() } while (ctr2 === ctr0 || ctr2 === ctr1)
+  }
 
-  // Show center result
-  showResult(winSym, payout)
+  // Animate 3 reels sequentially (staggered starts, each spins independently)
+  await Promise.all([
+    spinReel(0, randSym(), ctr0, randSym(), 0,   480),
+    spinReel(1, randSym(), ctr1, randSym(), 120, 580),
+    spinReel(2, randSym(), ctr2, randSym(), 240, 700),
+  ])
+
+  stopLights()
+
   highlightLegend(winSym)
 
-  if (SYMS[winSym].isLoss) {
-    setMsg('Better luck next time!')
-  } else {
+  if (!SYMS[winSym].isLoss && payout > 0) {
+    applyWin(payout)
     setMsg(`${SYMS[winSym].name.toUpperCase()}! ×${SYMS[winSym].mult} → +$${payout.toFixed(2)}`)
-    if (payout >= bet * 8) {
-      setTimeout(() => showOverlay(winSym, payout), 350)
-    }
+    if (payout >= bet * 8) setTimeout(() => showOverlay(winSym, payout), 350)
+  } else {
+    setMsg('Better luck next time!')
   }
 
   spinning = false
   btn.disabled = false
 
-  if (autoMode) autoTimer = setTimeout(onPlay, SYMS[winSym].isLoss ? 1400 : 2800)
+  if (autoMode) autoTimer = setTimeout(onPlay, SYMS[winSym].isLoss ? 1400 : 2600)
 }
 
-// ── Overlay ───────────────────────────────────────────────────────────────────
+// ── Win overlay ───────────────────────────────────────────────────────────────
 function showOverlay(sym, payout) {
-  document.getElementById('ov-sym-img').src = SYMS[sym].src
+  document.getElementById('ov-sym-img').src    = SYMS[sym].src
   document.getElementById('ov-mult').textContent   = '×' + SYMS[sym].mult
   document.getElementById('ov-amount').textContent = '$' + payout.toFixed(2)
   document.getElementById('win-overlay').classList.add('show')
@@ -628,8 +668,9 @@ function showOverlay(sym, payout) {
   const inner = document.getElementById('win-inner')
   vid.src = `/video/street-cash/win-${sym}.mp4`
   vid.load()
-  vid.play().then(() => { vid.classList.add('playing'); inner.classList.add('behind') })
-     .catch(() => { vid.classList.remove('playing'); inner.classList.remove('behind') })
+  vid.play()
+    .then(() => { vid.classList.add('playing'); inner.classList.add('behind') })
+    .catch(() => { vid.classList.remove('playing'); inner.classList.remove('behind') })
 }
 function closeOverlay() {
   const vid = document.getElementById('win-video')
@@ -639,7 +680,7 @@ function closeOverlay() {
   document.getElementById('win-overlay').classList.remove('show')
 }
 
-// ── Paytable ──────────────────────────────────────────────────────────────────
+// ── Paytable ─────────────────────────────────────────────────────────────────
 function openPaytable() { document.getElementById('pt-modal').classList.add('open') }
 function closePT()       { document.getElementById('pt-modal').classList.remove('open') }
 
@@ -671,9 +712,7 @@ function updateBal() {
 async function boot() {
   const tg = window.Telegram?.WebApp
   if (tg) { tg.ready(); tg.expand() }
-
   token = localStorage.getItem('crash_token')
-
   try {
     const initData = tg?.initData || ''
     if (initData || token) {
@@ -688,16 +727,13 @@ async function boot() {
       }
     }
   } catch {}
-
   if (demoMode) {
     const s = parseFloat(localStorage.getItem('sc_bal'))
     balance = isNaN(s) ? 1000 : s
     document.getElementById('demo-badge').textContent = '· DEMO · $1,000 PRACTICE BALANCE ·'
   }
-
   setup()
   updateBal()
-  showState('idle')
 }
 
 boot()
