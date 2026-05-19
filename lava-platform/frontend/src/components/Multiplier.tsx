@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { useGame } from '../store/game'
 import { useRealtimeMult, multTier } from '../hooks/useRealtimeMult'
 
@@ -13,6 +14,13 @@ export function Multiplier() {
   const liveMult = useRealtimeMult()
 
   const isCrashed  = roundState === 'CRASHED'
+
+  const [showCrashedBadge, setShowCrashedBadge] = useState(false)
+  useEffect(() => {
+    if (!isCrashed) { setShowCrashedBadge(false); return }
+    const t = setTimeout(() => setShowCrashedBadge(true), 600)
+    return () => clearTimeout(t)
+  }, [isCrashed])
   const isRunning  = roundState === 'RUNNING'
   const isStarting = roundState === 'STARTING'
   const isWaiting  = !roundState || roundState === 'CREATED'
@@ -45,7 +53,14 @@ export function Multiplier() {
             {value.toFixed(2)}
             <span className="mult__x mult__x-label">×</span>
           </div>
-          {/* WASTED badge replaced by WastedOverlay cinematic PNG */}
+          {showCrashedBadge && (
+            <img
+              key={isCrashed ? 'wasted' : ''}
+              className="mult__crashed-badge"
+              src="/assets/ui/Wasted/newwasted.png"
+              alt="WASTED"
+            />
+          )}
         </>
       )}
     </div>

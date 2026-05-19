@@ -17,23 +17,23 @@ const (
 	SymSneaker = 3 // ×8
 	SymChain   = 4 // ×20
 	SymWatch   = 5 // ×75
-	SymCard    = 6 // ×500
+	SymCard    = 6 // ×100
 	NumSyms    = 7
 )
 
 // ── Payout multipliers (× bet) ────────────────────────────────────────────────
-// RTP ≈ 94%: 0.215×2 + 0.030×3 + 0.015×8 + 0.007×20 + 0.0008×75 + 0.0002×500 = 0.940
-var RouletteMultipliers = [NumSyms]float64{0, 2, 3, 8, 20, 75, 500}
+// RTP ≈ 94%: 0.215×2 + 0.030×3 + 0.015×8 + 0.007×20 + 0.0008×75 + 0.001×100 = 0.940
+var RouletteMultipliers = [NumSyms]float64{0, 2, 3, 8, 20, 75, 100}
 
 // ── Cursor weights (out of 100000) ───────────────────────────────────────────
 var rouletteWeights = [NumSyms]int{
-	73200, // sym-0 TNT   — loss  (73.2%)
+	73120, // sym-0 TNT   — loss  (73.12%)
 	21500, // sym-1 Dice  — ×2
 	3000,  // sym-2 Shades— ×3
 	1500,  // sym-3 Sneaker×8
 	700,   // sym-4 Chain ×20
 	80,    // sym-5 Watch ×75
-	20,    // sym-6 Card  ×500
+	100,   // sym-6 Card  ×100
 } // total = 100000
 
 // ── RNG (HMAC-SHA256) ─────────────────────────────────────────────────────────

@@ -4,6 +4,7 @@ export type MsgType =
   | 'state'
   | 'tick'
   | 'crashed'
+  | 'pre_crash'
   | 'bet_placed'
   | 'cashout'
   | 'error'

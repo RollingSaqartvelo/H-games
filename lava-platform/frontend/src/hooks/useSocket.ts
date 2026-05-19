@@ -22,7 +22,7 @@ const WS_URL =
  * current player (all cashout events are broadcast to everyone).
  */
 export function useSocket(playerId: string): void {
-  const { setWsStatus, applyState, applyTick, applyCrashed, applyCashoutMsg, applyBetPlaced } =
+  const { setWsStatus, applyState, applyTick, applyCrashed, applyPreCrash, applyCashoutMsg, applyBetPlaced } =
     useGame.getState()
 
   // Keep the latest playerId in a ref so the message handler is always current
@@ -44,6 +44,9 @@ export function useSocket(playerId: string): void {
             break
           case 'crashed':
             applyCrashed(msg.data as CrashedData)
+            break
+          case 'pre_crash':
+            applyPreCrash()
             break
           case 'bet_placed':
             applyBetPlaced(msg.data as BetPlacedData)

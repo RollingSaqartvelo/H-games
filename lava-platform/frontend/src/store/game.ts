@@ -76,6 +76,9 @@ interface GameState {
   // ── Last cashout event — used by DualBetPanel to detect auto-cashout ─────────
   lastCashoutEvent: CashoutData | null
 
+  // ── Pre-crash flag — true 50ms before crash, reset on new round ─────────────
+  preCrash: boolean
+
   // ── Last bet_placed broadcast — consumed by BetsViewer ───────────────────────
   lastBetPlaced: BetPlacedData | null
 
@@ -94,6 +97,7 @@ interface GameActions {
   applyTick(d: TickData): void
   applyCrashed(d: CrashedData): void
   applyCashoutMsg(d: CashoutData, myPlayerId: string): void
+  applyPreCrash(): void
   applyBetPlaced(d: BetPlacedData): void
   setBetActive(bet: ActiveBet): void
   setBetAmount(v: string): void
@@ -128,6 +132,7 @@ export const useGame = create<GameState & GameActions>()(
     history: [],
     recentCashouts: [],
     lastCashoutEvent: null,
+    preCrash: false,
     lastBetPlaced: null,
     betAmount: '1.00',
     autoCashout: '',
@@ -155,6 +160,7 @@ export const useGame = create<GameState & GameActions>()(
           cashedOutCount:    newRound ? 0     : prev.cashedOutCount,
           anyBetLost:        newRound ? false : prev.anyBetLost,
           lastCashoutEvent:  newRound ? null  : prev.lastCashoutEvent,
+          preCrash:          newRound ? false : prev.preCrash,
           lastBetPlaced:     newRound ? null  : prev.lastBetPlaced,
           crashPoint: null,
           serverSeed: null,
@@ -206,6 +212,7 @@ export const useGame = create<GameState & GameActions>()(
         payout: null,
       }),
 
+    applyPreCrash: () => set({ preCrash: true }),
     setBetAmount: (betAmount) => set({ betAmount }),
     setAutoCashout: (autoCashout) => set({ autoCashout }),
     setBalance: (balance) => set({ balance }),

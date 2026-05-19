@@ -1,15 +1,17 @@
 import { useEffect, useRef } from 'react'
 import { useGame } from '../store/game'
 
-// How many seconds before the natural end to loop back — bigger = safer, wastes less if video is seamless
-const LOOP_GUARD_S = 0.15
+const LOOP_GUARD_S  = 0.15
+const CRASH_PAUSE_MS = 1700 // pause 100ms before crash GIF freezes (GIF = 1800ms)
 
 export function RunningVideo() {
   const roundState = useGame((s) => s.roundState)
   const videoRef   = useRef<HTMLVideoElement>(null)
   const rafRef     = useRef<number>(0)
+  const pauseTimer = useRef<number | undefined>(undefined)
 
-  const visible = roundState === 'RUNNING'
+  const visible = roundState === 'RUNNING' || roundState === 'CRASHED'
+  const crashed = roundState === 'CRASHED'
 
   // rAF loop: poll currentTime every frame for tightest possible loop
   useEffect(() => {
@@ -37,6 +39,17 @@ export function RunningVideo() {
       vid.pause()
     }
   }, [visible])
+
+  // Pause video 1700ms after crash so it freezes 100ms before crash GIF ends
+  useEffect(() => {
+    const vid = videoRef.current
+    if (!vid) return
+    window.clearTimeout(pauseTimer.current)
+    if (crashed) {
+      pauseTimer.current = window.setTimeout(() => vid.pause(), CRASH_PAUSE_MS)
+    }
+    return () => window.clearTimeout(pauseTimer.current)
+  }, [crashed])
 
   const handleEnded = () => {
     const vid = videoRef.current

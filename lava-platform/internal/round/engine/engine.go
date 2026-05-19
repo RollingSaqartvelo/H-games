@@ -205,6 +205,23 @@ func (e *Engine) runMultiplierLoop(ctx context.Context, r *domain.Round, started
 	ticker := time.NewTicker(e.cfg.TickInterval)
 	defer ticker.Stop()
 
+	// Fire pre_crash 50ms before the expected crash so the client can swap to crash GIF.
+	crashElapsedMs := int64(math.Log(r.CrashPoint) / e.cfg.GrowthRate * 1000)
+	preCrashDelay := time.Until(startedAt.Add(time.Duration(crashElapsedMs-50) * time.Millisecond))
+	if preCrashDelay > 0 {
+		go func() {
+			t := time.NewTimer(preCrashDelay)
+			defer t.Stop()
+			select {
+			case <-t.C:
+				realtime.LogPublishErr(e.pub.Publish(ctx, realtime.MsgTypePreCrash, map[string]string{
+					"round_id": r.ID,
+				}), realtime.MsgTypePreCrash)
+			case <-ctx.Done():
+			}
+		}()
+	}
+
 	for {
 		select {
 		case <-ctx.Done():

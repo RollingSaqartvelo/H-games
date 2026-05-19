@@ -21,6 +21,7 @@ const (
 	MsgTypeState      MsgType = "state"       // full round state (sent on connect + transitions)
 	MsgTypeTick       MsgType = "tick"        // multiplier update (every 100ms)
 	MsgTypeCrashed    MsgType = "crashed"     // round ended — reveals server_seed
+	MsgTypePreCrash   MsgType = "pre_crash"   // fired 50ms before crash — triggers crash GIF
 	MsgTypeBetPlaced  MsgType = "bet_placed"  // someone placed a bet
 	MsgTypeCashout    MsgType = "cashout"     // someone cashed out
 	MsgTypeError      MsgType = "error"
