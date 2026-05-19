@@ -883,7 +883,6 @@ async function boot() {
     balance = isNaN(s) ? 1000 : s
     document.getElementById('demo-badge').textContent = '· DEMO · $1,000 PRACTICE BALANCE ·'
   }
-  await preprocessAssets()
   setup()
   updateBal()
 }

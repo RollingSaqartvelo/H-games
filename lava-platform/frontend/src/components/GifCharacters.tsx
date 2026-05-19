@@ -30,8 +30,8 @@ export function GifCharacters() {
   const preCrash   = useGame((s) => s.preCrash)
   const [firing, setFiring]   = useState(false)
   const [shotKey, setShotKey] = useState(0)
-  // 'run' | 'crash-gif' | 'freeze'
   const [heroState, setHeroState] = useState<'run' | 'crash-gif' | 'hidden'>('run')
+  const [flashKey, setFlashKey]   = useState(0)
   const intervalRef = useRef<number | undefined>(undefined)
   const hideRef     = useRef<number | undefined>(undefined)
   const heroTimer   = useRef<number | undefined>(undefined)
@@ -67,8 +67,10 @@ export function GifCharacters() {
       setHeroState('run')
     } else if (running && preCrash) {
       setHeroState('crash-gif')
+      setFlashKey((k) => k + 1)
     } else if (crashed) {
       setHeroState('crash-gif')
+      setFlashKey((k) => k + 1)
       heroTimer.current = window.setTimeout(() => setHeroState('hidden'), CRASH_GIF_MS)
     } else {
       setHeroState('run')
@@ -111,6 +113,18 @@ export function GifCharacters() {
           src={heroState === 'run' ? HERO_SRC : CRASH_SRC}
           alt=""
           style={{ ...charStyle, left: isMobile ? '25%' : '55%' }}
+        />
+      )}
+      {flashKey > 0 && (
+        <div
+          key={flashKey}
+          style={{
+            position: 'absolute',
+            inset: 0,
+            background: '#fff',
+            animation: 'crash-flash 350ms ease-out forwards',
+            zIndex: 100,
+          }}
         />
       )}
     </div>
