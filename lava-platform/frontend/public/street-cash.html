@@ -31,7 +31,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#05050a;font-family:
 /* ── Outer frame cells ── */
 .fc{
   flex-shrink:0;display:flex;align-items:center;justify-content:center;
-  border-radius:5px;border:1.5px solid rgba(255,215,0,.18);
+  border-radius:5px;border:1.5px solid #ff6b35;
   position:relative;overflow:hidden;
   background:linear-gradient(145deg,#0d0d18,#07070f);
   opacity:.7;
@@ -64,24 +64,29 @@ html,body{width:100%;height:100%;overflow:hidden;background:#05050a;font-family:
   to{box-shadow:0 0 22px rgba(255,215,0,1),0 0 44px rgba(255,215,0,.65),0 0 60px rgba(255,215,0,.25)}
 }
 
-/* Symbol bg colors */
-.sym-bg-0{background:linear-gradient(145deg,#1e2030,#10111a)}
-.sym-bg-1{background:linear-gradient(145deg,#142040,#080e20)}
-.sym-bg-2{background:linear-gradient(145deg,#082818,#030f08)}
-.sym-bg-3{background:linear-gradient(145deg,#281a00,#100a00)}
-.sym-bg-4{background:linear-gradient(145deg,#281000,#100600)}
-.sym-bg-5{background:linear-gradient(145deg,#1c0630,#0c0218)}
-.sym-bg-6{background:linear-gradient(145deg,#181200,#0a0800)}
+/* Symbol bg colors — unified dark */
+.sym-bg-0,.sym-bg-1,.sym-bg-2,.sym-bg-3,.sym-bg-4,.sym-bg-5,.sym-bg-6{
+  background:linear-gradient(145deg,#0d0d18,#07070f)
+}
+
+/* Chess pattern */
+.fc-black{background:#000}
+.fc-white{background:#fff}
 
 /* ── Center panel wrapper ── */
 #center-panel{
   flex:1;min-width:0;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   gap:0;padding:3px;position:relative;
-  background:linear-gradient(180deg,#0c0c1e,#06060e);
-  border:2px solid rgba(255,215,0,.35);border-radius:10px;overflow:hidden;
+  background:linear-gradient(160deg,#ff6b35,#ffd700,#ff6b35);
+  border:2px solid #ff6b35;border-radius:10px;overflow:hidden;
+  animation:panel-glow 1.5s ease-in-out infinite alternate;
 }
-#center-panel::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(255,215,0,.6),transparent)}
+@keyframes panel-glow{
+  from{border-color:#ff6b35;box-shadow:0 0 8px rgba(255,107,53,.5),0 0 16px rgba(255,215,0,.2)}
+  to{border-color:#ffd700;box-shadow:0 0 18px rgba(255,215,0,.8),0 0 36px rgba(255,107,53,.4)}
+}
+#center-panel::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(255,107,53,.8),transparent)}
 
 /* ── Decorative lights row ── */
 #reel-lights{display:flex;gap:6px;padding:4px 0 2px;flex-shrink:0}
@@ -92,13 +97,13 @@ html,body{width:100%;height:100%;overflow:hidden;background:#05050a;font-family:
 #slot-drum{
   width:100%;flex-shrink:0;position:relative;
   display:flex;
-  background:linear-gradient(180deg,#f0ece0 0%,#e8e2cc 50%,#f0ece0 100%);
+  background:#0d0d0d;
   border-radius:6px;
-  border:3px solid rgba(180,140,30,.55);
+  border:2px solid #333;
   box-shadow:
-    inset 0 2px 8px rgba(0,0,0,.25),
-    inset 0 -2px 6px rgba(0,0,0,.15),
-    0 0 18px rgba(255,215,0,.12);
+    inset 0 2px 12px rgba(0,0,0,.6),
+    0 0 18px rgba(0,229,255,.15),
+    0 0 36px rgba(119,0,255,.1);
   overflow:hidden;
 }
 #slot-drum::before,#slot-drum::after{
@@ -110,7 +115,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#05050a;font-family:
 /* ── Individual reel column ── */
 .slot-reel{
   flex:1;display:flex;flex-direction:column;
-  border-right:2px solid rgba(150,110,20,.35);
+  border-right:1px solid rgba(0,229,255,.15);
   position:relative;overflow:hidden;
 }
 .slot-reel:last-child{border-right:none}
@@ -121,15 +126,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#05050a;font-family:
   position:relative;flex-shrink:0;overflow:hidden;
 }
 .rc img{object-fit:contain;display:block;transition:transform .1s}
-.rc.rc-top,.rc.rc-bot{background:rgba(0,0,0,.06)}
-.rc.rc-ctr{background:rgba(255,255,255,.55);position:relative;z-index:2}
-
-/* Payline lines */
-#payline-top,#payline-bot{
-  position:absolute;left:0;right:0;height:2px;z-index:9;pointer-events:none;
-  background:rgba(220,30,30,.55);
-  box-shadow:0 0 4px rgba(220,30,30,.4);
-}
+.rc.rc-ctr{background:#fff;position:relative;z-index:2;border:2px solid rgba(0,0,0,.2)}
 
 /* Reel land bounce */
 .slot-reel.spinning .rc{filter:blur(3px) brightness(1.1);transition:none}
@@ -188,7 +185,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#05050a;font-family:
   animation:win-pop .35s cubic-bezier(.2,1.4,.5,1);
 }
 @keyframes win-pop{from{transform:scale(.3);opacity:0}to{transform:scale(1);opacity:1}}
-#sc-idle-txt{font-size:8px;letter-spacing:2px;color:rgba(255,215,0,.35);font-family:'Orbitron',sans-serif}
+#sc-idle-txt{font-size:8px;letter-spacing:2px;font-family:'Orbitron',sans-serif;background:linear-gradient(90deg,#c0c0c0,#ffd700,#ff6b35,#ffd700);background-size:200%;animation:grad-flow 2s linear infinite;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 
 /* ── Mini paytable ── */
 #legend-wrap{position:relative;margin:0 8px 4px}
@@ -286,24 +283,16 @@ html,body{width:100%;height:100%;overflow:hidden;background:#05050a;font-family:
           </div>
 
           <div id="slot-drum">
-            <div id="payline-top"></div>
-            <div id="payline-bot"></div>
             <div id="win-stripe"></div>
 
             <div class="slot-reel" id="reel-0">
-              <div class="rc rc-top" id="r0t"></div>
               <div class="rc rc-ctr" id="r0c"></div>
-              <div class="rc rc-bot" id="r0b"></div>
             </div>
             <div class="slot-reel" id="reel-1">
-              <div class="rc rc-top" id="r1t"></div>
               <div class="rc rc-ctr" id="r1c"></div>
-              <div class="rc rc-bot" id="r1b"></div>
             </div>
             <div class="slot-reel" id="reel-2">
-              <div class="rc rc-top" id="r2t"></div>
               <div class="rc rc-ctr" id="r2c"></div>
-              <div class="rc rc-bot" id="r2b"></div>
             </div>
           </div>
 
@@ -327,7 +316,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#05050a;font-family:
       <button id="pt-btn" onclick="openPaytable()">?</button>
       <div id="legend">
         <div class="legend-row">
-          <div class="li feat sym-bg-6" data-sym="6"><img src="/assets/street-cash/sym-6.png"><div class="li-mult">×500</div></div>
+          <div class="li feat sym-bg-6" data-sym="6"><img src="/assets/street-cash/sym-6.png"><div class="li-mult">×100</div></div>
           <div class="li sym-bg-5" data-sym="5"><img src="/assets/street-cash/sym-4.png"><div class="li-mult">×75</div></div>
           <div class="li sym-bg-4" data-sym="4"><img src="/assets/street-cash/sym-3.png"><div class="li-mult">×20</div></div>
           <div class="li sym-bg-3" data-sym="3"><img src="/assets/street-cash/sym-2.png"><div class="li-mult">×8</div></div>
@@ -335,7 +324,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#05050a;font-family:
         <div class="legend-row">
           <div class="li sym-bg-2" data-sym="2"><img src="/assets/street-cash/sym-1.png"><div class="li-mult">×3</div></div>
           <div class="li sym-bg-1" data-sym="1"><img src="/assets/street-cash/sym-0.png"><div class="li-mult">×2</div></div>
-          <div class="li sym-bg-0" data-sym="0"><img src="/assets/street-cash/tnt.svg"><div class="li-mult">LOSS</div></div>
+          <div class="li sym-bg-0" data-sym="0"><img src="/assets/street-cash/tnt.png"><div class="li-mult">LOSS</div></div>
         </div>
       </div>
     </div>
@@ -364,13 +353,13 @@ html,body{width:100%;height:100%;overflow:hidden;background:#05050a;font-family:
   <div id="pt-sheet">
     <h3>HOW TO WIN</h3>
     <p style="text-align:center;font-size:9px;color:rgba(255,215,0,.5);letter-spacing:1px;margin-bottom:10px">CURSOR STOPS ON A SYMBOL · MATCH ON ANY REEL = WIN</p>
-    <div class="pt-row"><img src="/assets/street-cash/sym-6.png"><span class="pt-name">Platinum Card</span><span class="pt-mult">×500</span></div>
+    <div class="pt-row"><img src="/assets/street-cash/sym-6.png"><span class="pt-name">Platinum Card</span><span class="pt-mult">×100</span></div>
     <div class="pt-row"><img src="/assets/street-cash/sym-4.png"><span class="pt-name">Watch</span><span class="pt-mult">×75</span></div>
     <div class="pt-row"><img src="/assets/street-cash/sym-3.png"><span class="pt-name">Gold Chain</span><span class="pt-mult">×20</span></div>
     <div class="pt-row"><img src="/assets/street-cash/sym-2.png"><span class="pt-name">Sneaker</span><span class="pt-mult">×8</span></div>
     <div class="pt-row"><img src="/assets/street-cash/sym-1.png"><span class="pt-name">Sunglasses</span><span class="pt-mult">×3</span></div>
     <div class="pt-row"><img src="/assets/street-cash/sym-0.png"><span class="pt-name">Dice</span><span class="pt-mult">×2</span></div>
-    <div class="pt-row pt-loss"><img src="/assets/street-cash/tnt.svg" style="width:34px;height:34px"><span class="pt-name">TNT — BLOCKER</span><span class="pt-mult">LOSS</span></div>
+    <div class="pt-row pt-loss"><img src="/assets/street-cash/tnt.png" style="width:34px;height:34px"><span class="pt-name">TNT — BLOCKER</span><span class="pt-mult">LOSS</span></div>
     <p style="text-align:center;font-size:9px;color:rgba(255,215,0,.3);margin-top:10px;letter-spacing:1px">RTP 94%</p>
     <button id="pt-close" onclick="closePT()">CLOSE</button>
   </div>
@@ -392,13 +381,13 @@ html,body{width:100%;height:100%;overflow:hidden;background:#05050a;font-family:
 // ── Symbols ───────────────────────────────────────────────────────────────────
 // sym-0 = TNT (LOSS), sym-1 = Dice ×2, sym-2..6 = win symbols
 const SYMS = [
-  { mult:0,   src:'/assets/street-cash/tnt.svg',   bg:'sym-bg-0', name:'TNT',     isLoss:true  },
+  { mult:0,   src:'/assets/street-cash/tnt.png',   bg:'sym-bg-0', name:'TNT',     isLoss:true  },
   { mult:2,   src:'/assets/street-cash/sym-0.png', bg:'sym-bg-1', name:'Dice',    isLoss:false },
   { mult:3,   src:'/assets/street-cash/sym-1.png', bg:'sym-bg-2', name:'Shades',  isLoss:false },
   { mult:8,   src:'/assets/street-cash/sym-2.png', bg:'sym-bg-3', name:'Sneaker', isLoss:false },
   { mult:20,  src:'/assets/street-cash/sym-3.png', bg:'sym-bg-4', name:'Chain',   isLoss:false },
   { mult:75,  src:'/assets/street-cash/sym-4.png', bg:'sym-bg-5', name:'Watch',   isLoss:false },
-  { mult:500, src:'/assets/street-cash/sym-6.png', bg:'sym-bg-6', name:'Card',    isLoss:false },
+  { mult:100, src:'/assets/street-cash/sym-6.png', bg:'sym-bg-6', name:'Card',    isLoss:false },
 ]
 
 // Demo weights matching backend (out of 100000)
@@ -456,10 +445,19 @@ function setup() {
   const colR   = document.getElementById('col-right')
   const frameSz = Math.round(CELL * .72) + 'px'
 
+  // Checkerboard by 2D position (x+y)%2
+  // top y=0: fc0-7 x=0-7 | left y=1-5: fc8-12 x=0 | right y=1-5: fc13-17 x=7 | bot y=6: fc18-25 x=0-7
+  const FC_CHESS = [
+    0,1,0,1,0,1,0,1,  // fc0-7  top row
+    1,0,1,0,1,         // fc8-12 left col
+    0,1,0,1,0,         // fc13-17 right col
+    0,1,0,1,0,1,0,1   // fc18-25 bottom row
+  ]
   function makeFC(id, symIdx) {
     const sym = SYMS[symIdx]
     const d = document.createElement('div')
-    d.className = `fc ${sym.bg}`
+    const chess = FC_CHESS[id] === 0 ? 'fc-black' : 'fc-white'
+    d.className = `fc ${chess}`
     d.id = 'fc' + id
     d.style.cssText = `width:${CELL}px;height:${CELL}px`
     const img = document.createElement('img')
@@ -477,25 +475,17 @@ function setup() {
   const centerH = CELL * 5 + GAP * 4
   document.getElementById('center-panel').style.minHeight = centerH + 'px'
 
-  const drumH = centerH - 60
-  REEL_H = Math.floor(drumH / 3)
+  REEL_H = Math.min(Math.floor(CELL * 2.2), 120)
   IMG_SZ = Math.round(REEL_H * 0.78)
-  document.getElementById('slot-drum').style.height = drumH + 'px'
+  document.getElementById('slot-drum').style.height = REEL_H + 'px'
   document.querySelectorAll('.rc').forEach(el => el.style.height = REEL_H + 'px')
 
-  const ptTop = document.getElementById('payline-top')
-  const ptBot = document.getElementById('payline-bot')
-  ptTop.style.top = REEL_H + 'px'
-  ptBot.style.top = (REEL_H * 2) + 'px'
-
   const stripe = document.getElementById('win-stripe')
-  stripe.style.top    = REEL_H + 'px'
+  stripe.style.top    = '0'
   stripe.style.height = REEL_H + 'px'
 
   for (let ri = 0; ri < 3; ri++) {
-    setRC(`r${ri}t`, randSym())
     setRC(`r${ri}c`, randSym())
-    setRC(`r${ri}b`, randSym())
   }
 }
 
@@ -511,32 +501,24 @@ function setRC(id, symIdx) {
 function randSym() { return Math.floor(Math.random() * SYMS.length) }
 
 // ── Spin one reel ─────────────────────────────────────────────────────────────
-function spinReel(ri, finalCtr, startDelay, spinMs) {
+function spinReel(ri, finalCtr, stopDelay) {
   return new Promise(resolve => {
     const reel = document.getElementById('reel-' + ri)
-    setTimeout(() => {
-      reel.classList.add('spinning')
-      const tick = 55
-      let elapsed = 0
-      const iv = setInterval(() => {
-        setRC(`r${ri}t`, randSym())
-        setRC(`r${ri}c`, randSym())
-        setRC(`r${ri}b`, randSym())
-        elapsed += tick
-        if (elapsed >= spinMs) {
-          clearInterval(iv)
-          reel.classList.remove('spinning')
-          setRC(`r${ri}t`, randSym())
-          setRC(`r${ri}c`, finalCtr)
-          setRC(`r${ri}b`, randSym())
-          ;['t','c','b'].forEach(row => {
-            const el = document.getElementById(`r${ri}${row}`)
-            if (el) { el.classList.add('land'); setTimeout(() => el.classList.remove('land'), 300) }
-          })
-          resolve()
-        }
-      }, tick)
-    }, startDelay)
+    reel.classList.add('spinning')
+    const tick = 55
+    let elapsed = 0
+    const iv = setInterval(() => {
+      setRC(`r${ri}c`, randSym())
+      elapsed += tick
+      if (elapsed >= stopDelay) {
+        clearInterval(iv)
+        reel.classList.remove('spinning')
+        setRC(`r${ri}c`, finalCtr)
+        const el = document.getElementById(`r${ri}c`)
+        if (el) { el.classList.add('land'); setTimeout(() => el.classList.remove('land'), 300) }
+        resolve()
+      }
+    }, tick)
   })
 }
 
@@ -635,13 +617,9 @@ function clearWin() {
   // Remove drum big-win overlays
   document.querySelectorAll('.drum-big-win').forEach(el => el.remove())
 
-  // Clear reel center cells
   for (let ri = 0; ri < 3; ri++) {
     const el = document.getElementById(`r${ri}c`)
-    if (el) {
-      el.classList.remove('win')
-      setRC(`r${ri}c`, randSym())
-    }
+    if (el) { el.classList.remove('win'); setRC(`r${ri}c`, randSym()) }
   }
 
   document.getElementById('win-stripe').style.display = 'none'
@@ -769,18 +747,15 @@ async function onPlay() {
     updateBal()
   }
 
-  // ── Phase 1: Spin reels ───────────────────────────────────────────────────
+  // ── Reels + cursor start simultaneously ──────────────────────────────────
   await Promise.all([
-    spinReel(0, reels[0], 0,   480),
-    spinReel(1, reels[1], 120, 580),
-    spinReel(2, reels[2], 240, 700),
+    spinReel(0, reels[0], 600),
+    spinReel(1, reels[1], 700),
+    spinReel(2, reels[2], 800),
+    runCursor(cursorSym),
   ])
 
   stopLights()
-  setMsg('Watch the cursor...')
-
-  // ── Phase 2: Cursor animation on outer frame ──────────────────────────────
-  await runCursor(cursorSym)
 
   // ── Phase 3: Show result ──────────────────────────────────────────────────
   highlightLegend(cursorSym)
@@ -851,6 +826,42 @@ function adjBet(a) {
 function updateBal() {
   document.getElementById('balance-display').textContent = '$' + balance.toFixed(2)
   if (demoMode) localStorage.setItem('sc_bal', balance.toFixed(2))
+}
+
+// ── Black-background removal via canvas ───────────────────────────────────────
+async function removeBg(src) {
+  if (!src || src.endsWith('.svg') || src.startsWith('data:')) return src
+  return new Promise(resolve => {
+    const img = new Image()
+    img.onload = () => {
+      const SZ = 300
+      const canvas = document.createElement('canvas')
+      canvas.width = SZ; canvas.height = SZ
+      const ctx = canvas.getContext('2d')
+      ctx.drawImage(img, 0, 0, SZ, SZ)
+      const id = ctx.getImageData(0, 0, SZ, SZ)
+      const d = id.data
+      for (let i = 0; i < d.length; i += 4) {
+        if (d[i] < 45 && d[i+1] < 45 && d[i+2] < 45) d[i+3] = 0
+      }
+      ctx.putImageData(id, 0, 0)
+      resolve(canvas.toDataURL('image/png'))
+    }
+    img.onerror = () => resolve(src)
+    img.src = src
+  })
+}
+
+async function preprocessAssets() {
+  SYMS.forEach(sym => { sym._orig = sym.src })
+  await Promise.all(SYMS.map(async sym => {
+    sym.src = await removeBg(sym._orig)
+  }))
+  document.querySelectorAll('#legend img, #pt-sheet img').forEach(img => {
+    const attr = img.getAttribute('src')
+    const sym = SYMS.find(s => s._orig === attr)
+    if (sym) img.src = sym.src
+  })
 }
 
 // ── Boot ──────────────────────────────────────────────────────────────────────
