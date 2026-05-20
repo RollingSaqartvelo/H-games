@@ -41,7 +41,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:url('/assets
   transition:opacity .15s,box-shadow .08s,transform .08s;
   z-index:15;
 }
-.fc img{width:88%;height:88%;object-fit:contain;display:block}
+.fc img{width:70%;height:70%;object-fit:contain;display:block}
 .fc::after{display:none}
 
 /* Cursor highlight on outer frame */
@@ -456,19 +456,20 @@ function setup() {
   scBot.style.width = drumW + 'px'
 
   // ── 38 frame cells: absolute on board ──
-  // Use a cell size that fits both top (10 cells in iW) and side (9 cells in iH)
-  CELL = Math.floor(Math.min((iW - 9*2) / 10, (iH - 8*2) / 9))
-  const icSz = Math.round(CELL * 0.88)
+  // CELL: must fit 10 across full frame width (fW) and 11 tall (9 side + 2 corner) with centered band positioning
+  // side available = (iB+fB-fT-iT)/2 - CELL → 10*CELL = (iB+fB-fT-iT)/2 → CELL = (iB+fB-fT-iT)/20
+  const fW = fR - fL
+  CELL = Math.floor(Math.min(fW / 10, (iB + fB - fT - iT) / 20))
 
-  const borderH = iT - fT  // top/bottom border band height
-  const borderW = iL - fL  // left/right border band width
-  const cellY_top = Math.round(fT + (borderH - CELL) / 2)
-  const cellY_bot = Math.round(iB + (fB - iB - CELL) / 2)
-  const cellX_lft = Math.round(fL + (borderW - CELL) / 2)
-  const cellX_rgt = Math.round(iR + (fR - iR - CELL) / 2)
+  // Center each cell within its border band
+  const cellY_top = Math.round((fT + iT - CELL) / 2)
+  const cellY_bot = Math.round((iB + fB - CELL) / 2)
+  const cellX_lft = Math.round((fL + iL - CELL) / 2)
+  const cellX_rgt = Math.round((iR + fR - CELL) / 2)
 
-  const topGap  = (iW - 10 * CELL) / 9
-  const sideGap = (iH - 9  * CELL) / 8
+  const topGap  = (fW - 10 * CELL) / 9
+  const sideTop = cellY_top + CELL       // y of first side cell (just below top corner)
+  const sideGap = Math.max(0, (cellY_bot - sideTop - 9 * CELL) / 8)
 
   function makeAbsFC(id, symIdx, x, y) {
     const d = document.createElement('div')
@@ -480,25 +481,23 @@ function setup() {
     d.style.height = CELL + 'px'
     const img = document.createElement('img')
     img.src = SYMS[symIdx].src
-    img.style.width = icSz + 'px'
-    img.style.height = icSz + 'px'
     d.appendChild(img)
     board.appendChild(d)
     return d
   }
 
-  // Top row (fc0-9): L→R
+  // Top row (fc0-9): L→R, starting at fL (outer frame edge — fills corners)
   for (let i = 0; i < 10; i++)
-    makeAbsFC(i, FRAME_LAYOUT[i], iL + i*(CELL+topGap), cellY_top)
-  // Right col (fc10-18): T→B
+    makeAbsFC(i, FRAME_LAYOUT[i], fL + i*(CELL+topGap), cellY_top)
+  // Right col (fc10-18): T→B, fc10 just below fc9, fc18 just above fc19
   for (let i = 0; i < 9; i++)
-    makeAbsFC(10+i, FRAME_LAYOUT[10+i], cellX_rgt, iT + i*(CELL+sideGap))
-  // Bottom row (fc19-28): R→L
+    makeAbsFC(10+i, FRAME_LAYOUT[10+i], cellX_rgt, sideTop + i*(CELL+sideGap))
+  // Bottom row (fc19-28): R→L, starting at fR (outer frame right edge — fills corners)
   for (let i = 0; i < 10; i++)
-    makeAbsFC(19+i, FRAME_LAYOUT[19+i], iR - CELL - i*(CELL+topGap), cellY_bot)
-  // Left col (fc29-37): B→T
+    makeAbsFC(19+i, FRAME_LAYOUT[19+i], fR - CELL - i*(CELL+topGap), cellY_bot)
+  // Left col (fc29-37): T→B — fc29=top, fc37=bottom (matches CW_ORDER: 37,36,…,29 from bottom)
   for (let i = 0; i < 9; i++)
-    makeAbsFC(29+i, FRAME_LAYOUT[29+i], cellX_lft, iB - CELL - i*(CELL+sideGap))
+    makeAbsFC(29+i, FRAME_LAYOUT[29+i], cellX_lft, sideTop + i*(CELL+sideGap))
 
   for (let ri = 0; ri < 3; ri++) setRC(`r${ri}c`, randSym())
 }
@@ -674,12 +673,13 @@ function runCursor(cursorSym) {
 // ── Lights ────────────────────────────────────────────────────────────────────
 let litTimer = null, litIdx = 0
 function startLights() {
-  const ls = [0,1,2,3,4].map(i => document.getElementById('l'+i))
+  const ls = [0,1,2,3,4].map(i => document.getElementById('l'+i)).filter(Boolean)
+  if (!ls.length) return
   ls.forEach(l => l.classList.remove('on'))
   litIdx = 0
   litTimer = setInterval(() => {
     ls.forEach(l => l.classList.remove('on'))
-    ls[litIdx % 5].classList.add('on')
+    ls[litIdx % ls.length].classList.add('on')
     litIdx++
   }, 100)
 }
