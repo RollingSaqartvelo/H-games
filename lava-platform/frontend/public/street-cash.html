@@ -496,19 +496,21 @@ function setup() {
   for (let i = 20; i < 30; i++) botRow.appendChild(makeFC(i, FRAME_LAYOUT[i]))
   for (let i = 30; i < 40; i++) colL.appendChild(makeFC(i,  FRAME_LAYOUT[i]))
 
-  // Slot drum: absolutely positioned inside board, centred on the vault window
-  // Vault drum window in newpanel.png: x=480–1520 (24%–76%), y=1380–2050 (38.5%–57.2%)
-  const drumLeft  = Math.round(W * 480 / 2000)
-  const drumRight = Math.round(W * 1520 / 2000)
-  const drumTop   = Math.round(imageH * 1380 / 3585)
-  const drumBot   = Math.round(imageH * 2050 / 3585)
-  const drumW     = drumRight - drumLeft
-  const drumH     = drumBot   - drumTop
+  // ── Slot drum: absolutely positioned relative to #board ──────────────────
+  // Measured from newpanel.png cylinder window (screenshot-calibrated):
+  //   x: 416–1547 of 2000px → 21%–77%
+  //   y: 1190–2150 of 3585px → 33%–60%
+  const drumLeft = Math.round(W * 416 / 2000)
+  const drumTop  = Math.round(imageH * 1190 / 3585)
+  const drumW    = Math.round(W * (1547 - 416) / 2000)
+  const drumHpx  = Math.round(imageH * (2150 - 1190) / 3585)
 
-  REEL_H = Math.max(Math.floor(drumH * 0.80), 28)
+  REEL_H = Math.max(Math.floor(drumHpx * 0.68), 28)
   IMG_SZ = Math.round(REEL_H * 0.82)
 
   const drum = document.getElementById('slot-drum')
+  // CRITICAL: move drum to board so position:absolute is relative to board, not center-panel
+  board.appendChild(drum)
   drum.style.position = 'absolute'
   drum.style.left     = drumLeft + 'px'
   drum.style.top      = drumTop  + 'px'
@@ -517,17 +519,14 @@ function setup() {
   drum.style.zIndex   = '10'
   document.querySelectorAll('.rc').forEach(el => el.style.height = REEL_H + 'px')
 
-  // Center panel: still holds lights + win text, shrink it so it doesn't interfere
+  // Center panel: now just a spacer — hide lights, keep sc-bottom
   const cp = document.getElementById('center-panel')
-  cp.style.gap = '2px'
   cp.style.padding = '0'
+  document.getElementById('reel-lights').style.display = 'none'
 
   const stripe = document.getElementById('win-stripe')
   stripe.style.top    = '0'
   stripe.style.height = REEL_H + 'px'
-
-  // Lights — remove from center-panel (drum is now absolute), hide them
-  document.getElementById('reel-lights').style.display = 'none'
 
   for (let ri = 0; ri < 3; ri++) {
     setRC(`r${ri}c`, randSym())
