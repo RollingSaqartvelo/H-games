@@ -398,11 +398,12 @@ const DEMO_W = [73200, 21500, 3000, 1500, 700, 80, 20]
 
 // ── Outer frame layout (40 cells, indexed by fc-id) ───────────────────────────
 // fc0-9=top, fc10-19=right-col(interior), fc20-29=bottom, fc30-39=left-col(interior)
+// Distribution: TNT×12(30%), Dice×9(22.5%), Shades×7(17.5%), Sneaker×5(12.5%), Chain×4(10%), Watch×2(5%), Card×1(2.5%)
 const FRAME_LAYOUT = [
-  0,1,2,3,0,1,2,0,1,3,   // top   fc0–fc9
-  0,4,1,0,5,2,0,1,4,3,   // right fc10–fc19
-  0,1,6,2,0,3,5,0,5,2,   // bot   fc20–fc29
-  1,0,3,4,0,6,1,0,2,4    // left  fc30–fc39
+  0,1,2,0,3,4,2,1,0,5,   // top   fc0–fc9
+  0,1,2,3,0,4,1,2,0,6,   // right fc10–fc19
+  0,1,3,0,2,1,4,0,2,1,   // bot   fc20–fc29
+  0,1,0,3,2,5,1,4,3,0    // left  fc30–fc39
 ]
 
 // Clockwise traversal order of the 40 cells
@@ -470,7 +471,7 @@ function setup() {
   const botRow = document.getElementById('row-bot')
   const colL   = document.getElementById('col-left')
   const colR   = document.getElementById('col-right')
-  const frameSz = Math.round(CELL * .82) + 'px'
+  const frameSz = Math.round(CELL * .95) + 'px'
 
   const FC_CHESS = [
     0,1,0,1,0,1,0,1,0,1,  // fc0-9  top
@@ -1014,7 +1015,6 @@ async function boot() {
     document.getElementById('demo-badge').textContent = '· DEMO · $1,000 PRACTICE BALANCE ·'
   }
   setup()
-  applyArcTransforms()
   updateBal()
 }
 
