@@ -482,26 +482,25 @@ function setup() {
   for (let i = 20; i < 30; i++) botRow.appendChild(makeFC(i, FRAME_LAYOUT[i]))
   for (let i = 30; i < 40; i++) colL.appendChild(makeFC(i,  FRAME_LAYOUT[i]))
 
-  // ── Slot drum: absolutely positioned relative to #board ──────────────────
-  // Measured from newpanel.png cylinder window (screenshot-calibrated):
-  //   x: 416–1547 of 2000px → 21%–77%
-  //   y: 1190–2150 of 3585px → 33%–60%
-  const drumLeft = Math.round(W * 416 / 2000)
-  const drumTop  = Math.round(imageH * 1190 / 3585)
-  const drumW    = Math.round(W * (1547 - 416) / 2000)
-  const drumHpx  = Math.round(imageH * (2150 - 1190) / 3585)
+  // ── Slot drum: derived from the same grid as the frame cells ──────────────
+  // Frame grid: 10 cols × 12 rows. Drum = inner 8 cols × 10 rows (no corners).
+  // This guarantees perfect alignment with the frame squares in newpanel.png.
+  const drumLeft = padSide + CELL + GAP
+  const drumTop  = padTop  + CELL + GAP
+  const drumW    = 8 * CELL + 7 * GAP
+  const drumHpx  = 10 * CELL + 9 * GAP
 
-  REEL_H = Math.max(Math.floor(drumHpx * 0.68), 28)
-  IMG_SZ = Math.round(REEL_H * 0.82)
+  // Each reel cell fills the full drum height (1 symbol per cylinder window)
+  REEL_H = drumHpx
+  IMG_SZ = Math.round(Math.floor(drumW / 3) * 0.85)
 
   const drum = document.getElementById('slot-drum')
-  // CRITICAL: move drum to board so position:absolute is relative to board, not center-panel
   board.appendChild(drum)
   drum.style.position = 'absolute'
   drum.style.left     = drumLeft + 'px'
   drum.style.top      = drumTop  + 'px'
   drum.style.width    = drumW    + 'px'
-  drum.style.height   = REEL_H  + 'px'
+  drum.style.height   = drumHpx + 'px'
   drum.style.zIndex   = '10'
   document.querySelectorAll('.rc').forEach(el => el.style.height = REEL_H + 'px')
 
