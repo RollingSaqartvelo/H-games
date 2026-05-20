@@ -8,40 +8,44 @@
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&display=swap');
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{width:100%;height:100%;overflow:hidden;background:#f3eeff;font-family:'Courier New',monospace;user-select:none;-webkit-user-select:none;touch-action:manipulation}
-body::before{content:'';position:fixed;inset:0;z-index:0;background:url('/assets/street-cash/BG.jpeg') center/cover no-repeat;opacity:.18;pointer-events:none}
-#app{position:relative;z-index:1}
-#app{display:flex;flex-direction:column;align-items:center;height:100%;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;padding-top:env(safe-area-inset-top,0);padding-bottom:env(safe-area-inset-bottom,8px)}
+html,body{width:100%;height:100%;overflow:hidden;background:#0a0516;font-family:'Courier New',monospace;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+body::before{content:'';position:fixed;inset:0;z-index:0;background:url('/assets/street-cash/BG.jpeg') center/cover no-repeat;opacity:.22;pointer-events:none}
+#app{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;height:100%;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;padding-top:env(safe-area-inset-top,0);padding-bottom:env(safe-area-inset-bottom,8px)}
+#app::-webkit-scrollbar{display:none}
 #app::-webkit-scrollbar{display:none}
 
 /* ── Top bar ── */
-#topbar{width:100%;max-width:440px;display:flex;align-items:center;justify-content:space-between;padding:8px 12px 4px;flex-shrink:0;background:#f0e6ff;border-bottom:1px solid #c49eff}
+#topbar{width:100%;max-width:440px;display:flex;align-items:center;justify-content:space-between;padding:8px 12px 4px;flex-shrink:0;background:rgba(15,8,35,.8);border-bottom:1px solid rgba(180,120,50,.3)}
 #back-btn{background:none;border:1px solid #c49eff;color:#6d28d9;font-size:20px;width:36px;height:36px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center}
 #game-title{font-family:'Orbitron',sans-serif;font-size:14px;font-weight:900;letter-spacing:3px;background:linear-gradient(90deg,#e9d5ff,#a855f7,#7c3aed,#a855f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 #balance-display{font-size:14px;font-weight:bold;color:#7c3aed;letter-spacing:1px}
 
 /* ── Machine shell ── */
-#machine{width:100%;max-width:440px;flex-shrink:0;background:linear-gradient(180deg,#f3eeff 0%,#ede0ff 100%);border-left:2px solid #c49eff;border-right:2px solid #c49eff;padding-bottom:6px}
+#machine{width:100%;max-width:440px;flex-shrink:0;background:rgba(10,5,22,0.72);border-left:1px solid rgba(180,120,50,.3);border-right:1px solid rgba(180,120,50,.3);padding-bottom:6px}
 
 /* ── Message bar ── */
 #msg-bar{text-align:center;padding:7px 12px;font-size:13px;font-weight:bold;letter-spacing:.5px;color:#fff;background:#7c3aed;border-bottom:1px solid #6d28d9;min-height:30px;display:flex;align-items:center;justify-content:center}
 
 /* ── Board ── */
-#board{display:flex;flex-direction:column;gap:var(--gap,2px);padding:var(--gap,2px)}
-#mid-row{display:flex;gap:var(--gap,2px);align-items:stretch}
+#board{
+  display:flex;flex-direction:column;gap:3px;padding:3px;
+  background:url('/assets/street-cash/street%20panel.png') center/100% 100% no-repeat;
+  border-radius:12px;
+}
+#mid-row{display:flex;gap:3px;align-items:stretch}
 
 /* ── Outer frame cells ── */
 .fc{
   flex-shrink:0;display:flex;align-items:center;justify-content:center;
-  border-radius:14px;border:2px solid #a855f7;
+  border-radius:8px;border:1px solid rgba(200,140,40,.35);
   position:relative;overflow:hidden;
-  background:#ffffff;
-  opacity:.85;
+  background:rgba(8,4,20,.6);
+  opacity:.92;
   transition:opacity .15s,box-shadow .08s,border-color .08s,transform .08s;
   z-index:1;
 }
-.fc img{width:76%;height:76%;object-fit:contain;display:block}
-.fc::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.28) 0%,transparent 55%);pointer-events:none}
+.fc img{width:80%;height:80%;object-fit:contain;display:block}
+.fc::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,200,80,.08) 0%,transparent 50%);pointer-events:none}
 
 /* Cursor highlight on outer frame */
 .fc.cursor-lit{
@@ -66,9 +70,9 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:url('/assets
   to{box-shadow:0 0 22px rgba(255,215,0,1),0 0 44px rgba(255,215,0,.65),0 0 60px rgba(255,215,0,.25)}
 }
 
-/* Both chess-pattern classes → same white background */
-.fc-black{background:#ffffff}
-.fc-white{background:#ffffff}
+/* Both chess-pattern classes → same dark background */
+.fc-black{background:rgba(8,4,20,.6)}
+.fc-white{background:rgba(15,8,35,.5)}
 
 /* ── Center panel wrapper ── */
 #center-panel{
