@@ -212,14 +212,38 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:url('/assets
 .bet-btn:active{background:rgba(168,85,247,.15);transform:scale(.96)}
 
 /* ── Action buttons ── */
-#action-section{padding:6px 10px 4px;margin:0 8px;background:linear-gradient(145deg,#ede0ff,#ddd6fe);border-radius:20px;display:flex;align-items:center;justify-content:center;gap:14px}
-.action-side{width:52px;height:52px;border-radius:50%;background:#ffffff;border:1.5px solid #c084fc;display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;transition:all .15s}
-.action-side:active{transform:scale(.92);border-color:#a855f7}
-.action-side.auto-on{border-color:#7c3aed;box-shadow:0 0 14px rgba(168,85,247,.35)}
-#play-btn{width:72px;height:72px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#d8b4fe,#a855f7 40%,#7c3aed 100%);border:3px solid rgba(255,255,255,.25);box-shadow:0 4px 24px rgba(168,85,247,.6),0 0 50px rgba(168,85,247,.2),inset 0 2px 0 rgba(255,255,255,.35);display:flex;align-items:center;justify-content:center;font-size:28px;cursor:pointer;transition:all .12s;color:#fff}
-#play-btn:active:not(:disabled){transform:scale(.92)}
-#play-btn:disabled{opacity:.35;cursor:not-allowed;animation:none!important}
-@keyframes play-pulse{0%,100%{box-shadow:0 4px 24px rgba(168,85,247,.5),0 0 30px rgba(168,85,247,.15)}50%{box-shadow:0 4px 32px rgba(168,85,247,.9),0 0 60px rgba(168,85,247,.4)}}
+#action-section{
+  position:relative;display:block;
+  width:calc(100% - 16px);max-width:424px;
+  margin:0 8px;padding:0;
+  background:url('/assets/street-cash/play.png') center/100% 100% no-repeat;
+  border-radius:16px;
+  aspect-ratio:2000/916;
+  overflow:hidden;
+}
+/* Info button — inside left circle of play.png (~25% from left, centered) */
+.action-side{
+  position:absolute;left:25%;top:50%;
+  transform:translate(-50%,-50%);
+  width:52px;height:52px;border-radius:50%;
+  background:transparent;border:none;
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;cursor:pointer;transition:transform .15s;
+}
+.action-side:active{transform:translate(-50%,-50%) scale(.92)}
+.action-side.auto-on{box-shadow:0 0 14px rgba(168,85,247,.5)}
+/* Play button — inside right circle of play.png (~76% from left, centered) */
+#play-btn{
+  position:absolute;left:76%;top:50%;
+  transform:translate(-50%,-50%);
+  width:80px;height:80px;border-radius:50%;
+  background:transparent;border:none;box-shadow:none;
+  display:flex;align-items:center;justify-content:center;
+  font-size:32px;cursor:pointer;transition:transform .12s;color:#fff;
+}
+#play-btn:active:not(:disabled){transform:translate(-50%,-50%) scale(.92)}
+#play-btn:disabled{opacity:.4;cursor:not-allowed}
+@keyframes play-pulse{0%,100%{text-shadow:0 0 12px rgba(255,255,255,.6)}50%{text-shadow:0 0 24px rgba(255,255,255,1)}}
 #play-btn:not(:disabled){animation:play-pulse 2s ease-in-out infinite}
 
 #demo-badge{text-align:center;font-size:8px;letter-spacing:2px;color:rgba(124,58,237,.4);padding:2px 0 3px}
