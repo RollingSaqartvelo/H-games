@@ -28,7 +28,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:url('/assets
 
 /* ── Board ── */
 #board{display:flex;flex-direction:column;gap:var(--gap,2px);padding:var(--gap,2px)}
-#mid-row{display:flex;gap:var(--gap,2px);align-items:center;justify-content:center}
+#mid-row{display:flex;gap:var(--gap,2px);align-items:stretch}
 
 /* ── Outer frame cells ── */
 .fc{
@@ -72,11 +72,11 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:url('/assets
 
 /* ── Center panel wrapper ── */
 #center-panel{
-  flex:0 0 auto;
+  flex:1;min-width:0;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:0;padding:2px;position:relative;
-  background:linear-gradient(160deg,#9333ea,#a855f7,#7c3aed);
-  border:2px solid #7c3aed;border-radius:50%;overflow:hidden;
+  gap:4px;padding:8px 6px;position:relative;
+  background:linear-gradient(160deg,#1a0a35,#2d1060,#1a0a35);
+  border:2px solid #7c3aed;border-radius:20px;overflow:hidden;
   animation:panel-glow 1.5s ease-in-out infinite alternate;
 }
 @keyframes panel-glow{
@@ -479,21 +479,10 @@ function setup() {
 
   // Shrink drum by padding the orange panel horizontally → square cells
   const naturalCenterW = Math.floor(W - 14 - 2 * CELL - 4 * GAP)
-  const hPad = Math.floor(naturalCenterW * 0.08)
   const cp = document.getElementById('center-panel')
-  cp.style.paddingLeft  = hPad + 'px'
-  cp.style.paddingRight = hPad + 'px'
-  const drumInnerW = naturalCenterW - 2 * hPad
-  // Square cells: reel height = reel width (3 reels in drumInnerW minus reel borders)
-  REEL_H = Math.max(Math.floor((drumInnerW - 6) / 3), 28)
-  // Circle fills available space
-  const circleDiameter = Math.min(drumInnerW + 72, naturalCenterW - 2)
-  cp.style.width         = circleDiameter + 'px'
-  cp.style.height        = circleDiameter + 'px'
-  cp.style.minHeight     = 'unset'
-  cp.style.paddingTop    = '8px'
-  cp.style.paddingBottom = '8px'
-  IMG_SZ = Math.round(REEL_H * 0.78)
+  // Drum fills full center width; cells are square
+  REEL_H = Math.max(Math.floor((naturalCenterW - 6 - 12) / 3), 28)  // 12px = panel h-padding*2
+  IMG_SZ = Math.round(REEL_H * 0.80)
   document.getElementById('slot-drum').style.height = REEL_H + 'px'
   document.querySelectorAll('.rc').forEach(el => el.style.height = REEL_H + 'px')
 
