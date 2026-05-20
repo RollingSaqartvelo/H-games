@@ -28,11 +28,10 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:url('/assets
 
 /* ── Board ── */
 #board{
-  display:flex;flex-direction:column;gap:3px;padding:3px;
-  background:url('/assets/street-cash/newpanel.png') center/100% 100% no-repeat;
-  border-radius:12px;
+  display:flex;flex-direction:column;
+  background:url('/assets/street-cash/newpanel.png') left top/100% auto no-repeat;
 }
-#mid-row{display:flex;gap:3px;align-items:stretch}
+#mid-row{display:flex;gap:var(--gap,2px);align-items:stretch}
 
 /* ── Outer frame cells ── */
 .fc{
@@ -270,11 +269,11 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:url('/assets
     <div id="msg-bar">Choose your stake and press PLAY</div>
     <div id="board">
 
-      <!-- TOP ROW: fc0–fc7 -->
+      <!-- TOP ROW: fc0–fc5 -->
       <div id="row-top" style="display:flex;gap:var(--gap,2px)"></div>
 
       <div id="mid-row">
-        <!-- LEFT COL: fc8–fc12 -->
+        <!-- LEFT COL: fc6–fc9 -->
         <div id="col-left" style="display:flex;flex-direction:column;gap:var(--gap,2px)"></div>
 
         <!-- ══ CENTER PANEL ══ -->
@@ -308,11 +307,11 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:url('/assets
         </div>
         <!-- ══ END CENTER PANEL ══ -->
 
-        <!-- RIGHT COL: fc13–fc17 -->
+        <!-- RIGHT COL: fc10–fc13 -->
         <div id="col-right" style="display:flex;flex-direction:column;gap:var(--gap,2px)"></div>
       </div>
 
-      <!-- BOTTOM ROW: fc18–fc25 -->
+      <!-- BOTTOM ROW: fc14–fc19 -->
       <div id="row-bot" style="display:flex;gap:var(--gap,2px)"></div>
     </div>
 
@@ -397,21 +396,21 @@ const SYMS = [
 // Demo weights matching backend (out of 100000)
 const DEMO_W = [73200, 21500, 3000, 1500, 700, 80, 20]
 
-// ── Outer frame layout (30 cells, indexed by fc-id) ───────────────────────────
-// fc0-7=top, fc8-14=left-col, fc15-21=right-col, fc22-29=bottom
+// ── Outer frame layout (20 cells, indexed by fc-id) ───────────────────────────
+// fc0-5=top, fc6-9=left-col, fc10-13=right-col, fc14-19=bottom
 const FRAME_LAYOUT = [
-  6,1,0,2,1,0,1,3,      // top   fc0–fc7
-  4,0,1,0,2,1,0,        // left  fc8–fc14
-  5,2,0,4,1,3,0,        // right fc15–fc21
-  0,1,3,0,5,0,1,0       // bot   fc22–fc29
+  6,1,0,2,1,3,     // top   fc0–fc5
+  4,0,2,1,         // left  fc6–fc9
+  5,0,4,3,         // right fc10–fc13
+  0,1,5,0,2,1      // bot   fc14–fc19
 ]
 
-// Clockwise traversal order of the 30 cells
+// Clockwise traversal order of the 20 cells
 const CW_ORDER = [
-  0,1,2,3,4,5,6,7,              // top L→R
-  15,16,17,18,19,20,21,         // right T→B
-  29,28,27,26,25,24,23,22,      // bottom R→L
-  14,13,12,11,10,9,8            // left B→T
+  0,1,2,3,4,5,        // top L→R
+  10,11,12,13,        // right T→B
+  19,18,17,16,15,14,  // bottom R→L
+  9,8,7,6             // left B→T
 ]
 
 // For each symbol, which CW positions contain it
@@ -438,24 +437,45 @@ let cursorCell = null  // fc-element currently showing cursor-stop
 
 // ── Build DOM ─────────────────────────────────────────────────────────────────
 function setup() {
-  const W = Math.min(window.innerWidth, 440)
-  CELL = Math.floor((W - 14) / 8)
-  GAP  = 2
+  const W       = Math.min(window.innerWidth, 440)
+  // newpanel.png is 2000×3585 — derive display geometry from those proportions
+  const imageH  = Math.round(W * 3585 / 2000)
+  const padSide = Math.round(W * 260 / 2000)          // grid left edge at x=260/2000
+  const padTop  = Math.round(imageH * 1076 / 3585)    // grid top    at y=1076/3585
+  const padBot  = imageH - Math.round(imageH * 2796 / 3585)  // grid bottom at y=2796/3585
+
+  GAP = 2
   document.documentElement.style.setProperty('--gap', GAP + 'px')
 
-  const topRow = document.getElementById('row-top')
-  const botRow = document.getElementById('row-bot')
-  const colL   = document.getElementById('col-left')
-  const colR   = document.getElementById('col-right')
-  const frameSz = Math.round(CELL * .72) + 'px'
+  // 6 rows (top + 4 side + bottom) must fill the grid height
+  const gridH = imageH - padTop - padBot
+  CELL = Math.floor((gridH - 5 * GAP) / 6)
+
+  // Apply board sizing so panel image aligns with cells
+  const board = document.getElementById('board')
+  board.style.minHeight     = imageH + 'px'
+  board.style.paddingTop    = padTop  + 'px'
+  board.style.paddingBottom = padBot  + 'px'
+  board.style.paddingLeft   = padSide + 'px'
+  board.style.paddingRight  = padSide + 'px'
+  board.style.gap           = GAP + 'px'
+
+  const topRow  = document.getElementById('row-top')
+  const botRow  = document.getElementById('row-bot')
+  const colL    = document.getElementById('col-left')
+  const colR    = document.getElementById('col-right')
+  const frameSz = Math.round(CELL * .80) + 'px'
 
   // Checkerboard by 2D position (x+y)%2
-  // top y=0: fc0-7 x=0-7 | left y=1-7: fc8-14 x=0 | right y=1-7: fc15-21 x=7 | bot y=8: fc22-29 x=0-7
+  // top y=0: x=0-5 → parity=x%2
+  // left x=0, y=1-4 → parity=y%2
+  // right x=5, y=1-4 → parity=(5+y)%2
+  // bot y=5, x=0-5 → parity=(x+5)%2
   const FC_CHESS = [
-    0,1,0,1,0,1,0,1,   // fc0-7  top row
-    1,0,1,0,1,0,1,     // fc8-14 left col
-    0,1,0,1,0,1,0,     // fc15-21 right col
-    0,1,0,1,0,1,0,1    // fc22-29 bottom row
+    0,1,0,1,0,1,   // fc0-5  top
+    1,0,1,0,       // fc6-9  left
+    0,1,0,1,       // fc10-13 right
+    1,0,1,0,1,0    // fc14-19 bottom
   ]
   function makeFC(id, symIdx) {
     const sym = SYMS[symIdx]
@@ -471,16 +491,14 @@ function setup() {
     return d
   }
 
-  for (let i = 0;  i < 8;  i++) topRow.appendChild(makeFC(i,  FRAME_LAYOUT[i]))
-  for (let i = 8;  i <= 14; i++) colL.appendChild(makeFC(i,  FRAME_LAYOUT[i]))
-  for (let i = 15; i <= 21; i++) colR.appendChild(makeFC(i,  FRAME_LAYOUT[i]))
-  for (let i = 22; i <= 29; i++) botRow.appendChild(makeFC(i, FRAME_LAYOUT[i]))
+  for (let i = 0;  i < 6;  i++) topRow.appendChild(makeFC(i,  FRAME_LAYOUT[i]))
+  for (let i = 6;  i <= 9; i++) colL.appendChild(makeFC(i,  FRAME_LAYOUT[i]))
+  for (let i = 10; i <= 13; i++) colR.appendChild(makeFC(i,  FRAME_LAYOUT[i]))
+  for (let i = 14; i <= 19; i++) botRow.appendChild(makeFC(i, FRAME_LAYOUT[i]))
 
-  // Shrink drum by padding the orange panel horizontally → square cells
-  const naturalCenterW = Math.floor(W - 14 - 2 * CELL - 4 * GAP)
-  const cp = document.getElementById('center-panel')
-  // Drum fills full center width; cells are square
-  REEL_H = Math.max(Math.floor((naturalCenterW - 6 - 12) / 3), 28)  // 12px = panel h-padding*2
+  // Center drum: remaining width after side cols + gaps
+  const centerW = W - 2 * padSide - 2 * CELL - 2 * GAP
+  REEL_H = Math.max(Math.floor((centerW - 12) / 3), 28)
   IMG_SZ = Math.round(REEL_H * 0.80)
   document.getElementById('slot-drum').style.height = REEL_H + 'px'
   document.querySelectorAll('.rc').forEach(el => el.style.height = REEL_H + 'px')
@@ -617,7 +635,7 @@ function runCursor(cursorSym) {
     const targetCW  = positions[Math.floor(Math.random() * positions.length)]
 
     // 1 full lap + steps to reach target
-    const totalSteps = 30 + targetCW + 1
+    const totalSteps = 20 + targetCW + 1
 
     let step = 0
     let prevEl = null
@@ -637,7 +655,7 @@ function runCursor(cursorSym) {
         prevEl.classList.remove('cursor-lit')
       }
 
-      const cwPos = step % 26
+      const cwPos = step % 20
       const fcId  = CW_ORDER[cwPos]
       const el    = document.getElementById('fc' + fcId)
 
