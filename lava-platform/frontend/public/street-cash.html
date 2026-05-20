@@ -88,26 +88,35 @@ html,body{width:100%;height:100%;overflow:hidden;background:#f3eeff;font-family:
 .reel-light{width:5px;height:5px;border-radius:50%;background:#c084fc;transition:all .08s}
 .reel-light.on{background:#a855f7;box-shadow:0 0 6px #a855f7,0 0 12px rgba(168,85,247,.5)}
 
-/* ── Classic slot drum ── */
+/* ── Premium slot drum ── */
 #slot-drum{
   width:100%;flex-shrink:0;position:relative;
   display:flex;
-  background:#faf5ff;
-  border-radius:16px;
-  border:2px solid #c084fc;
-  box-shadow:inset 0 2px 8px rgba(168,85,247,.08);
+  background:#0e0820;
+  border-radius:14px;
+  border:2px solid rgba(255,215,0,.75);
+  box-shadow:
+    0 0 0 1px rgba(255,215,0,.12),
+    0 0 22px rgba(255,215,0,.18),
+    inset 0 0 24px rgba(0,0,0,.55),
+    0 4px 14px rgba(0,0,0,.45);
   overflow:hidden;
 }
-#slot-drum::before,#slot-drum::after{
-  content:'';position:absolute;top:0;bottom:0;width:18px;z-index:8;pointer-events:none;
+#slot-drum::before{
+  content:'';position:absolute;inset:0;z-index:15;pointer-events:none;
+  background:linear-gradient(135deg,rgba(255,255,255,.18) 0%,rgba(255,255,255,.05) 35%,transparent 65%);
+  border-radius:12px;
 }
-#slot-drum::before{left:0;background:linear-gradient(90deg,rgba(168,85,247,.1),transparent)}
-#slot-drum::after{right:0;background:linear-gradient(-90deg,rgba(168,85,247,.1),transparent)}
+#slot-drum::after{
+  content:'';position:absolute;inset:0;z-index:15;pointer-events:none;
+  background:linear-gradient(to bottom,transparent 40%,rgba(0,0,0,.18) 100%);
+  border-radius:12px;
+}
 
 /* ── Individual reel column ── */
 .slot-reel{
   flex:1;display:flex;flex-direction:column;
-  border-right:1px solid rgba(168,85,247,.15);
+  border-right:1px solid rgba(255,215,0,.18);
   position:relative;overflow:hidden;
 }
 .slot-reel:last-child{border-right:none}
@@ -118,18 +127,21 @@ html,body{width:100%;height:100%;overflow:hidden;background:#f3eeff;font-family:
   position:relative;flex-shrink:0;overflow:hidden;
 }
 .rc img{object-fit:contain;display:block;transition:transform .1s}
-.rc.rc-ctr{background:#ffffff;position:relative;z-index:2;border:1px solid rgba(168,85,247,.25)}
+.rc.rc-ctr{
+  background:#1a0f2e;position:relative;z-index:2;
+  border-top:1px solid rgba(255,215,0,.2);
+  border-bottom:1px solid rgba(255,215,0,.2);
+}
 
 /* Reel land bounce */
-.slot-reel.spinning .rc{filter:blur(3px) brightness(1.05);transition:none}
 .rc.land{animation:land-bounce .22s cubic-bezier(.2,1.4,.5,1)}
 @keyframes land-bounce{0%{transform:scaleY(.75)}55%{transform:scaleY(1.07)}100%{transform:scaleY(1)}}
 
 /* Win glow on center row */
-.rc.rc-ctr.win{animation:pay-glow .4s ease-in-out infinite alternate}
+.rc.rc-ctr.win{animation:pay-glow .45s ease-in-out infinite alternate;z-index:6}
 @keyframes pay-glow{
-  from{background:rgba(168,85,247,.1);box-shadow:inset 0 0 8px rgba(168,85,247,.2)}
-  to{background:rgba(168,85,247,.22);box-shadow:inset 0 0 18px rgba(168,85,247,.4)}
+  from{background:rgba(255,215,0,.06);box-shadow:inset 0 0 8px rgba(255,215,0,.3),0 0 10px rgba(255,215,0,.15)}
+  to{background:rgba(255,215,0,.16);box-shadow:inset 0 0 20px rgba(255,215,0,.55),0 0 20px rgba(255,215,0,.3)}
 }
 
 /* ── Multiplier card (win display) ── */
@@ -412,6 +424,7 @@ const SYM_CW = (() => {
 // ── State ─────────────────────────────────────────────────────────────────────
 let bet        = 1.00
 let balance    = 1000.00
+let reelSym    = [0, 0, 0]
 let spinning   = false
 let autoMode   = false
 let autoTimer  = null
@@ -465,20 +478,20 @@ function setup() {
 
   // Shrink drum by padding the orange panel horizontally → square cells
   const naturalCenterW = Math.floor(W - 14 - 2 * CELL - 4 * GAP)
-  const hPad = Math.floor(naturalCenterW * 0.25)
+  const hPad = Math.floor(naturalCenterW * 0.20)
   const cp = document.getElementById('center-panel')
   cp.style.paddingLeft  = hPad + 'px'
   cp.style.paddingRight = hPad + 'px'
   const drumInnerW = naturalCenterW - 2 * hPad
   // Square cells: reel height = reel width (3 reels in drumInnerW minus reel borders)
   REEL_H = Math.max(Math.floor((drumInnerW - 6) / 3), 28)
-  // Circle: diameter tightly wraps drum + minimal vertical padding
-  const circleDiameter = drumInnerW + 32
+  // Circle: bigger — wraps drum + generous purple halo
+  const circleDiameter = drumInnerW + 72
   cp.style.width         = circleDiameter + 'px'
   cp.style.height        = circleDiameter + 'px'
   cp.style.minHeight     = 'unset'
-  cp.style.paddingTop    = '6px'
-  cp.style.paddingBottom = '6px'
+  cp.style.paddingTop    = '8px'
+  cp.style.paddingBottom = '8px'
   IMG_SZ = Math.round(REEL_H * 0.78)
   document.getElementById('slot-drum').style.height = REEL_H + 'px'
   document.querySelectorAll('.rc').forEach(el => el.style.height = REEL_H + 'px')
@@ -532,29 +545,77 @@ function setRC(id, symIdx) {
   const sym = SYMS[symIdx]
   el.style.background = ''
   el.innerHTML = `<img src="${sym.src}" style="width:${IMG_SZ}px;height:${IMG_SZ}px;object-fit:contain" alt="">`
+  const m = id.match(/^r(\d)c$/)
+  if (m) reelSym[+m[1]] = symIdx
 }
 
 function randSym() { return Math.floor(Math.random() * SYMS.length) }
 
-// ── Spin one reel ─────────────────────────────────────────────────────────────
+// ── Spin one reel — mechanical strip animation ────────────────────────────────
 function spinReel(ri, finalCtr, stopDelay) {
   return new Promise(resolve => {
-    const reel = document.getElementById('reel-' + ri)
-    reel.classList.add('spinning')
-    const tick = 55
-    let elapsed = 0
-    const iv = setInterval(() => {
-      setRC(`r${ri}c`, randSym())
-      elapsed += tick
-      if (elapsed >= stopDelay) {
-        clearInterval(iv)
-        reel.classList.remove('spinning')
-        setRC(`r${ri}c`, finalCtr)
-        const el = document.getElementById(`r${ri}c`)
-        if (el) { el.classList.add('land'); setTimeout(() => el.classList.remove('land'), 300) }
-        resolve()
-      }
-    }, tick)
+    const cell = document.getElementById(`r${ri}c`)
+    if (!cell) { resolve(); return }
+
+    const NSYMS = 28  // symbols in strip (enough for convincing spin)
+    const syms  = []
+    syms.push(reelSym[ri])  // strip[0] = current (start)
+    for (let i = 1; i < NSYMS - 1; i++) syms.push(randSym())
+    syms.push(finalCtr)     // strip[NSYMS-1] = final (end)
+
+    // Build scrolling strip inside the cell
+    const strip = document.createElement('div')
+    strip.style.cssText = 'position:absolute;top:0;left:0;width:100%;display:flex;flex-direction:column;will-change:transform'
+    syms.forEach(s => {
+      const d = document.createElement('div')
+      d.style.cssText = `width:100%;height:${REEL_H}px;flex-shrink:0;display:flex;align-items:center;justify-content:center`
+      d.innerHTML = `<img src="${SYMS[s].src}" style="width:${IMG_SZ}px;height:${IMG_SZ}px;object-fit:contain" alt="">`
+      strip.appendChild(d)
+    })
+
+    cell.style.overflow = 'hidden'
+    cell.innerHTML = ''
+    cell.appendChild(strip)
+
+    const totalDist = (NSYMS - 1) * REEL_H
+    const startTime = performance.now()
+
+    function eased(t) {
+      if (t < 0.18) { const u = t / 0.18; return u * u * 0.10 }         // ease-in → 0–10%
+      if (t < 0.80) { return 0.10 + (t - 0.18) / 0.62 * 0.80 }         // linear  → 10–90%
+      const u = (t - 0.80) / 0.20; return 0.90 + (1 - (1-u)*(1-u)*(1-u)) * 0.10  // ease-out → 90–100%
+    }
+
+    function tick(now) {
+      const t   = Math.min((now - startTime) / stopDelay, 1)
+      const pos = eased(t) * totalDist
+      strip.style.transform = `translateY(${-pos}px)`
+
+      // Motion blur proportional to speed in fast phase
+      const speed = t < 0.18 ? t/0.18 : t < 0.80 ? 1 : (1-t)/0.20
+      strip.style.filter = speed > 0.25 ? `blur(${(speed * 5).toFixed(1)}px) brightness(1.08)` : ''
+
+      if (t < 1) { requestAnimationFrame(tick); return }
+
+      // Land: tiny overshoot then spring back
+      strip.style.filter = ''
+      strip.style.transform = `translateY(${-(totalDist + REEL_H * 0.09)}px)`
+      requestAnimationFrame(() => {
+        strip.style.transition = 'transform 190ms cubic-bezier(0.2,1.4,0.5,1)'
+        strip.style.transform  = `translateY(${-totalDist}px)`
+        setTimeout(() => {
+          strip.style.transition = ''
+          // Replace strip with final image
+          cell.innerHTML = `<img src="${SYMS[finalCtr].src}" style="width:${IMG_SZ}px;height:${IMG_SZ}px;object-fit:contain" alt="">`
+          reelSym[ri] = finalCtr
+          cell.classList.add('land')
+          setTimeout(() => cell.classList.remove('land'), 300)
+          resolve()
+        }, 190)
+      })
+    }
+
+    requestAnimationFrame(tick)
   })
 }
 
