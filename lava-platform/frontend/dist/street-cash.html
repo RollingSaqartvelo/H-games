@@ -463,10 +463,10 @@ function setup() {
   for (let i = 13; i <= 17; i++) colR.appendChild(makeFC(i,   FRAME_LAYOUT[i]))
   for (let i = 18; i <= 25; i++) botRow.appendChild(makeFC(i, FRAME_LAYOUT[i]))
 
-  const centerH = CELL * 3.6 + GAP * 3
+  const centerH = CELL * 2.4 + GAP * 3
   document.getElementById('center-panel').style.minHeight = centerH + 'px'
 
-  REEL_H = Math.min(Math.floor(CELL * 1.4), 76)
+  REEL_H = Math.min(Math.floor(CELL * 0.93), 51)
   IMG_SZ = Math.round(REEL_H * 0.78)
   document.getElementById('slot-drum').style.height = REEL_H + 'px'
   document.querySelectorAll('.rc').forEach(el => el.style.height = REEL_H + 'px')
