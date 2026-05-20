@@ -398,22 +398,21 @@ const SYMS = [
 // Demo weights matching backend (out of 100000)
 const DEMO_W = [73200, 21500, 3000, 1500, 700, 80, 20]
 
-// ── Outer frame layout (26 cells, indexed by fc-id) ───────────────────────────
-// sym-0=TNT(loss), sym-1=Dice(×2), sym-6=Card(×500) at fc0 top-left corner
-// fc0-7=top, fc8-12=left-col, fc13-17=right-col, fc18-25=bottom
+// ── Outer frame layout (30 cells, indexed by fc-id) ───────────────────────────
+// fc0-7=top, fc8-14=left-col, fc15-21=right-col, fc22-29=bottom
 const FRAME_LAYOUT = [
-  6,1,0,2,1,0,1,3,   // top   fc0–fc7
-  4,0,1,0,2,          // left  fc8–fc12
-  5,2,0,4,1,          // right fc13–fc17
-  0,1,3,0,5,0,1,0    // bot   fc18–fc25
+  6,1,0,2,1,0,1,3,      // top   fc0–fc7
+  4,0,1,0,2,1,0,        // left  fc8–fc14
+  5,2,0,4,1,3,0,        // right fc15–fc21
+  0,1,3,0,5,0,1,0       // bot   fc22–fc29
 ]
 
-// Clockwise traversal order of the 26 cells
+// Clockwise traversal order of the 30 cells
 const CW_ORDER = [
-  0,1,2,3,4,5,6,7,          // top L→R
-  13,14,15,16,17,            // right T→B
-  25,24,23,22,21,20,19,18,  // bottom R→L
-  12,11,10,9,8               // left B→T
+  0,1,2,3,4,5,6,7,              // top L→R
+  15,16,17,18,19,20,21,         // right T→B
+  29,28,27,26,25,24,23,22,      // bottom R→L
+  14,13,12,11,10,9,8            // left B→T
 ]
 
 // For each symbol, which CW positions contain it
@@ -452,12 +451,12 @@ function setup() {
   const frameSz = Math.round(CELL * .72) + 'px'
 
   // Checkerboard by 2D position (x+y)%2
-  // top y=0: fc0-7 x=0-7 | left y=1-5: fc8-12 x=0 | right y=1-5: fc13-17 x=7 | bot y=6: fc18-25 x=0-7
+  // top y=0: fc0-7 x=0-7 | left y=1-7: fc8-14 x=0 | right y=1-7: fc15-21 x=7 | bot y=8: fc22-29 x=0-7
   const FC_CHESS = [
-    0,1,0,1,0,1,0,1,  // fc0-7  top row
-    1,0,1,0,1,         // fc8-12 left col
-    0,1,0,1,0,         // fc13-17 right col
-    0,1,0,1,0,1,0,1   // fc18-25 bottom row
+    0,1,0,1,0,1,0,1,   // fc0-7  top row
+    1,0,1,0,1,0,1,     // fc8-14 left col
+    0,1,0,1,0,1,0,     // fc15-21 right col
+    0,1,0,1,0,1,0,1    // fc22-29 bottom row
   ]
   function makeFC(id, symIdx) {
     const sym = SYMS[symIdx]
@@ -474,9 +473,9 @@ function setup() {
   }
 
   for (let i = 0;  i < 8;  i++) topRow.appendChild(makeFC(i,  FRAME_LAYOUT[i]))
-  for (let i = 8;  i <= 12; i++) colL.appendChild(makeFC(i,   FRAME_LAYOUT[i]))
-  for (let i = 13; i <= 17; i++) colR.appendChild(makeFC(i,   FRAME_LAYOUT[i]))
-  for (let i = 18; i <= 25; i++) botRow.appendChild(makeFC(i, FRAME_LAYOUT[i]))
+  for (let i = 8;  i <= 14; i++) colL.appendChild(makeFC(i,  FRAME_LAYOUT[i]))
+  for (let i = 15; i <= 21; i++) colR.appendChild(makeFC(i,  FRAME_LAYOUT[i]))
+  for (let i = 22; i <= 29; i++) botRow.appendChild(makeFC(i, FRAME_LAYOUT[i]))
 
   // Shrink drum by padding the orange panel horizontally → square cells
   const naturalCenterW = Math.floor(W - 14 - 2 * CELL - 4 * GAP)
@@ -630,7 +629,7 @@ function runCursor(cursorSym) {
     const targetCW  = positions[Math.floor(Math.random() * positions.length)]
 
     // 1 full lap + steps to reach target
-    const totalSteps = 26 + targetCW + 1
+    const totalSteps = 30 + targetCW + 1
 
     let step = 0
     let prevEl = null
