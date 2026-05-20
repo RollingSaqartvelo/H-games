@@ -269,11 +269,11 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:url('/assets
     <div id="msg-bar">Choose your stake and press PLAY</div>
     <div id="board">
 
-      <!-- TOP ROW: fc0–fc5 -->
+      <!-- TOP ROW: fc0–fc9 -->
       <div id="row-top" style="display:flex;gap:var(--gap,2px)"></div>
 
       <div id="mid-row">
-        <!-- LEFT COL: fc6–fc9 -->
+        <!-- LEFT COL: fc30–fc39 -->
         <div id="col-left" style="display:flex;flex-direction:column;gap:var(--gap,2px)"></div>
 
         <!-- ══ CENTER PANEL ══ -->
@@ -307,11 +307,11 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:url('/assets
         </div>
         <!-- ══ END CENTER PANEL ══ -->
 
-        <!-- RIGHT COL: fc10–fc13 -->
+        <!-- RIGHT COL: fc10–fc19 -->
         <div id="col-right" style="display:flex;flex-direction:column;gap:var(--gap,2px)"></div>
       </div>
 
-      <!-- BOTTOM ROW: fc14–fc19 -->
+      <!-- BOTTOM ROW: fc20–fc29 -->
       <div id="row-bot" style="display:flex;gap:var(--gap,2px)"></div>
     </div>
 
@@ -396,21 +396,21 @@ const SYMS = [
 // Demo weights matching backend (out of 100000)
 const DEMO_W = [73200, 21500, 3000, 1500, 700, 80, 20]
 
-// ── Outer frame layout (20 cells, indexed by fc-id) ───────────────────────────
-// fc0-5=top, fc6-9=left-col, fc10-13=right-col, fc14-19=bottom
+// ── Outer frame layout (40 cells, indexed by fc-id) ───────────────────────────
+// fc0-9=top, fc10-19=right-col(interior), fc20-29=bottom, fc30-39=left-col(interior)
 const FRAME_LAYOUT = [
-  6,1,0,2,1,3,     // top   fc0–fc5
-  4,0,2,1,         // left  fc6–fc9
-  5,0,4,3,         // right fc10–fc13
-  0,1,5,0,2,1      // bot   fc14–fc19
+  0,1,2,3,0,1,2,0,1,3,   // top   fc0–fc9
+  0,4,1,0,5,2,0,1,4,3,   // right fc10–fc19
+  0,1,6,2,0,3,5,0,5,2,   // bot   fc20–fc29
+  1,0,3,4,0,6,1,0,2,4    // left  fc30–fc39
 ]
 
-// Clockwise traversal order of the 20 cells
+// Clockwise traversal order of the 40 cells
 const CW_ORDER = [
-  0,1,2,3,4,5,        // top L→R
-  10,11,12,13,        // right T→B
-  19,18,17,16,15,14,  // bottom R→L
-  9,8,7,6             // left B→T
+  0,1,2,3,4,5,6,7,8,9,           // top L→R
+  10,11,12,13,14,15,16,17,18,19, // right T→B
+  20,21,22,23,24,25,26,27,28,29, // bottom R→L
+  39,38,37,36,35,34,33,32,31,30  // left B→T
 ]
 
 // For each symbol, which CW positions contain it
@@ -437,22 +437,28 @@ let cursorCell = null  // fc-element currently showing cursor-stop
 
 // ── Build DOM ─────────────────────────────────────────────────────────────────
 function setup() {
-  const W       = Math.min(window.innerWidth, 440)
-  // newpanel.png is 2000×3585 — derive display geometry from those proportions
+  const W      = Math.min(window.innerWidth, 440)
+  // newpanel.png is 2000×3585 — derive cell grid from panel proportions
+  // Outer border squares: x=260–1740, y=1076–2796
   const imageH  = Math.round(W * 3585 / 2000)
-  const padSide = Math.round(W * 260 / 2000)          // grid left edge at x=260/2000
-  const padTop  = Math.round(imageH * 1076 / 3585)    // grid top    at y=1076/3585
-  const padBot  = imageH - Math.round(imageH * 2796 / 3585)  // grid bottom at y=2796/3585
+  const padSide = Math.round(W * 260 / 2000)
+  const padTop  = Math.round(imageH * 1076 / 3585)
 
-  GAP = 2
+  // 40 cells: 10 across top/bottom, 10 on each side (interior)
+  // → 10 cols × 12 rows total; derive CELL from the 10-column width
+  GAP  = 2
   document.documentElement.style.setProperty('--gap', GAP + 'px')
 
-  // 6 rows (top + 4 side + bottom) must fill the grid height
-  const gridH = imageH - padTop - padBot
-  CELL = Math.floor((gridH - 5 * GAP) / 6)
+  const gridW = W - 2 * padSide                          // width of cell area
+  CELL = Math.floor((gridW - 9 * GAP) / 10)             // 10 cells across
 
-  // Apply board sizing so panel image aligns with cells
+  // Recalculate padBot so 12 rows fit exactly in the image
+  const frameH = 12 * CELL + 11 * GAP
+  const padBot = Math.max(imageH - padTop - frameH, 0)
+
+  // Set board geometry
   const board = document.getElementById('board')
+  board.style.position      = 'relative'
   board.style.minHeight     = imageH + 'px'
   board.style.paddingTop    = padTop  + 'px'
   board.style.paddingBottom = padBot  + 'px'
@@ -460,28 +466,22 @@ function setup() {
   board.style.paddingRight  = padSide + 'px'
   board.style.gap           = GAP + 'px'
 
-  const topRow  = document.getElementById('row-top')
-  const botRow  = document.getElementById('row-bot')
-  const colL    = document.getElementById('col-left')
-  const colR    = document.getElementById('col-right')
-  const frameSz = Math.round(CELL * .80) + 'px'
+  const topRow = document.getElementById('row-top')
+  const botRow = document.getElementById('row-bot')
+  const colL   = document.getElementById('col-left')
+  const colR   = document.getElementById('col-right')
+  const frameSz = Math.round(CELL * .82) + 'px'
 
-  // Checkerboard by 2D position (x+y)%2
-  // top y=0: x=0-5 → parity=x%2
-  // left x=0, y=1-4 → parity=y%2
-  // right x=5, y=1-4 → parity=(5+y)%2
-  // bot y=5, x=0-5 → parity=(x+5)%2
   const FC_CHESS = [
-    0,1,0,1,0,1,   // fc0-5  top
-    1,0,1,0,       // fc6-9  left
-    0,1,0,1,       // fc10-13 right
-    1,0,1,0,1,0    // fc14-19 bottom
+    0,1,0,1,0,1,0,1,0,1,  // fc0-9  top
+    0,1,0,1,0,1,0,1,0,1,  // fc10-19 right
+    0,1,0,1,0,1,0,1,0,1,  // fc20-29 bottom
+    1,0,1,0,1,0,1,0,1,0   // fc30-39 left
   ]
   function makeFC(id, symIdx) {
     const sym = SYMS[symIdx]
-    const d = document.createElement('div')
-    const chess = FC_CHESS[id] === 0 ? 'fc-black' : 'fc-white'
-    d.className = `fc ${chess}`
+    const d   = document.createElement('div')
+    d.className = 'fc ' + (FC_CHESS[id] === 0 ? 'fc-black' : 'fc-white')
     d.id = 'fc' + id
     d.style.cssText = `width:${CELL}px;height:${CELL}px`
     const img = document.createElement('img')
@@ -491,21 +491,43 @@ function setup() {
     return d
   }
 
-  for (let i = 0;  i < 6;  i++) topRow.appendChild(makeFC(i,  FRAME_LAYOUT[i]))
-  for (let i = 6;  i <= 9; i++) colL.appendChild(makeFC(i,  FRAME_LAYOUT[i]))
-  for (let i = 10; i <= 13; i++) colR.appendChild(makeFC(i,  FRAME_LAYOUT[i]))
-  for (let i = 14; i <= 19; i++) botRow.appendChild(makeFC(i, FRAME_LAYOUT[i]))
+  for (let i = 0;  i < 10; i++) topRow.appendChild(makeFC(i,  FRAME_LAYOUT[i]))
+  for (let i = 10; i < 20; i++) colR.appendChild(makeFC(i,  FRAME_LAYOUT[i]))
+  for (let i = 20; i < 30; i++) botRow.appendChild(makeFC(i, FRAME_LAYOUT[i]))
+  for (let i = 30; i < 40; i++) colL.appendChild(makeFC(i,  FRAME_LAYOUT[i]))
 
-  // Center drum: remaining width after side cols + gaps
-  const centerW = W - 2 * padSide - 2 * CELL - 2 * GAP
-  REEL_H = Math.max(Math.floor((centerW - 12) / 3), 28)
-  IMG_SZ = Math.round(REEL_H * 0.80)
-  document.getElementById('slot-drum').style.height = REEL_H + 'px'
+  // Slot drum: absolutely positioned inside board, centred on the vault window
+  // Vault drum window in newpanel.png: x=480–1520 (24%–76%), y=1380–2050 (38.5%–57.2%)
+  const drumLeft  = Math.round(W * 480 / 2000)
+  const drumRight = Math.round(W * 1520 / 2000)
+  const drumTop   = Math.round(imageH * 1380 / 3585)
+  const drumBot   = Math.round(imageH * 2050 / 3585)
+  const drumW     = drumRight - drumLeft
+  const drumH     = drumBot   - drumTop
+
+  REEL_H = Math.max(Math.floor(drumH * 0.80), 28)
+  IMG_SZ = Math.round(REEL_H * 0.82)
+
+  const drum = document.getElementById('slot-drum')
+  drum.style.position = 'absolute'
+  drum.style.left     = drumLeft + 'px'
+  drum.style.top      = drumTop  + 'px'
+  drum.style.width    = drumW    + 'px'
+  drum.style.height   = REEL_H  + 'px'
+  drum.style.zIndex   = '10'
   document.querySelectorAll('.rc').forEach(el => el.style.height = REEL_H + 'px')
+
+  // Center panel: still holds lights + win text, shrink it so it doesn't interfere
+  const cp = document.getElementById('center-panel')
+  cp.style.gap = '2px'
+  cp.style.padding = '0'
 
   const stripe = document.getElementById('win-stripe')
   stripe.style.top    = '0'
   stripe.style.height = REEL_H + 'px'
+
+  // Lights — remove from center-panel (drum is now absolute), hide them
+  document.getElementById('reel-lights').style.display = 'none'
 
   for (let ri = 0; ri < 3; ri++) {
     setRC(`r${ri}c`, randSym())
@@ -635,7 +657,7 @@ function runCursor(cursorSym) {
     const targetCW  = positions[Math.floor(Math.random() * positions.length)]
 
     // 1 full lap + steps to reach target
-    const totalSteps = 20 + targetCW + 1
+    const totalSteps = 40 + targetCW + 1
 
     let step = 0
     let prevEl = null
@@ -655,7 +677,7 @@ function runCursor(cursorSym) {
         prevEl.classList.remove('cursor-lit')
       }
 
-      const cwPos = step % 20
+      const cwPos = step % 40
       const fcId  = CW_ORDER[cwPos]
       const el    = document.getElementById('fc' + fcId)
 
