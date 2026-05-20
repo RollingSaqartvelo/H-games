@@ -478,15 +478,15 @@ function setup() {
 
   // Shrink drum by padding the orange panel horizontally → square cells
   const naturalCenterW = Math.floor(W - 14 - 2 * CELL - 4 * GAP)
-  const hPad = Math.floor(naturalCenterW * 0.20)
+  const hPad = Math.floor(naturalCenterW * 0.08)
   const cp = document.getElementById('center-panel')
   cp.style.paddingLeft  = hPad + 'px'
   cp.style.paddingRight = hPad + 'px'
   const drumInnerW = naturalCenterW - 2 * hPad
   // Square cells: reel height = reel width (3 reels in drumInnerW minus reel borders)
   REEL_H = Math.max(Math.floor((drumInnerW - 6) / 3), 28)
-  // Circle: bigger — wraps drum + generous purple halo
-  const circleDiameter = drumInnerW + 72
+  // Circle fills available space
+  const circleDiameter = Math.min(drumInnerW + 72, naturalCenterW - 2)
   cp.style.width         = circleDiameter + 'px'
   cp.style.height        = circleDiameter + 'px'
   cp.style.minHeight     = 'unset'
