@@ -61,7 +61,7 @@ export function GifCharacters() {
         if (t < 0.003)            op = 0
         else if (t < 2.0)         op = 0.3
         else if (t < 3.0)         op = 0.65
-        else if (t >= 6.0 && t < 6.25) op = 0
+        else if (t >= 6.24 && t < 6.25) op = 0
         setBgOpacity(op)
       }
       raf = requestAnimationFrame(tick)
