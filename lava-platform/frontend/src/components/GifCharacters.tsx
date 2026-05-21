@@ -48,6 +48,24 @@ export function GifCharacters() {
   const crashed = roundState === 'CRASHED'
   const visible = running || crashed
 
+  // Sync opacity with bg video timestamps: fade to 30% at 0–3s and 6.25s+
+  const [bgOpacity, setBgOpacity] = useState(1)
+  useEffect(() => {
+    if (!visible) return
+    let raf: number
+    const tick = () => {
+      const vid = document.getElementById('running-bg-video') as HTMLVideoElement | null
+      if (vid && vid.duration) {
+        const t = vid.currentTime
+        const inFade = t < 3.0 || t >= 6.25
+        setBgOpacity(inFade ? 0.3 : 1)
+      }
+      raf = requestAnimationFrame(tick)
+    }
+    raf = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(raf)
+  }, [visible])
+
   // Sheriff shooting — only while running
   useEffect(() => {
     window.clearInterval(intervalRef.current)
@@ -120,6 +138,8 @@ export function GifCharacters() {
         pointerEvents: 'none',
         zIndex: 50,
         overflow: 'hidden',
+        opacity: bgOpacity,
+        transition: 'opacity 0.4s ease',
       }}
     >
       <img
