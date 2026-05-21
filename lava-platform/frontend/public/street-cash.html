@@ -474,25 +474,24 @@ function setup() {
   scBot.style.top   = (drumT + drumH + 4) + 'px'
   scBot.style.width = drumW + 'px'
 
-  // ── 38 frame cells — geometry matches pannel.png bands exactly ──
-  // Top/bottom bands: full height = iT-fT, cells span fW/10 wide each
-  // Left/right bands: full width = iL-fL, cells span iH/9 tall each
+  // ── 38 frame cells — 4 corners + 8 top + 9 right + 8 bottom + 9 left ──
   const fW  = fR - fL
-  const tcW = fW / 10       // top/bottom cell width  ≈ 34px
-  const tcH = iT - fT       // top/bottom cell height ≈ 43px (full band)
-  const scW = iL - fL       // side cell width        ≈ 43px (full band)
-  const scH = iH / 9        // side cell height       ≈ 27px
-  CELL = Math.floor(Math.min(tcW, scH))  // smallest dim (backward compat)
+  const scW = iL - fL        // side band width  ≈ 43px
+  const tcH = iT - fT        // top band height  ≈ 43px
+  const cW  = scW, cH = tcH  // corner square
+  const tcW = (fW - 2*scW) / 8  // interior cell width (8 cells fit between corners)
+  const scH = iH / 9             // side cell height
+  CELL = Math.floor(Math.min(tcW, scH))
 
   // Per-symbol icon dims [width%, height%] relative to each cell's own W×H
   const ICON_DIMS = [
-    [0.52, 0.64],  // 0 TNT    — tall bundle
-    [0.58, 0.54],  // 1 Dice   — square-ish
-    [0.70, 0.40],  // 2 Shades — very wide flat
-    [0.66, 0.48],  // 3 Sneaker— wide shoe
-    [0.58, 0.52],  // 4 Chain  — round loop
-    [0.56, 0.56],  // 5 Watch  — circular face
-    [0.66, 0.44],  // 6 Card   — wide rectangle
+    [0.52, 0.64],  // 0 TNT
+    [0.58, 0.54],  // 1 Dice
+    [0.70, 0.40],  // 2 Shades
+    [0.66, 0.48],  // 3 Sneaker
+    [0.58, 0.52],  // 4 Chain
+    [0.56, 0.56],  // 5 Watch
+    [0.66, 0.44],  // 6 Card
   ]
 
   function makeAbsFC(id, symIdx, x, y, w, h) {
@@ -515,16 +514,25 @@ function setup() {
     return d
   }
 
-  // Top row (fc0-9): L→R from fL, y=fT, cell=tcW×tcH
-  for (let i = 0; i < 10; i++)
-    makeAbsFC(i, FRAME_LAYOUT[i], fL + i*tcW, fT, tcW, tcH)
-  // Right col (fc10-18): T→B from iT, x=iR, cell=scW×scH
+  // 4 corners
+  makeAbsFC(0,  FRAME_LAYOUT[0],  fL, fT, cW, cH)  // top-left
+  makeAbsFC(9,  FRAME_LAYOUT[9],  iR, fT, cW, cH)  // top-right
+  makeAbsFC(19, FRAME_LAYOUT[19], iR, iB, cW, cH)  // bottom-right
+  makeAbsFC(28, FRAME_LAYOUT[28], fL, iB, cW, cH)  // bottom-left
+
+  // Top interior fc1-8: 8 cells L→R between corners
+  for (let i = 0; i < 8; i++)
+    makeAbsFC(1+i, FRAME_LAYOUT[1+i], fL+cW + i*tcW, fT, tcW, tcH)
+
+  // Right col fc10-18: 9 cells T→B
   for (let i = 0; i < 9; i++)
     makeAbsFC(10+i, FRAME_LAYOUT[10+i], iR, iT + i*scH, scW, scH)
-  // Bottom row (fc19-28): R→L from fR, y=iB, cell=tcW×tcH
-  for (let i = 0; i < 10; i++)
-    makeAbsFC(19+i, FRAME_LAYOUT[19+i], fR - (i+1)*tcW, iB, tcW, tcH)
-  // Left col (fc29-37): T→B from iT, x=fL — fc29=top, fc37=bottom
+
+  // Bottom interior fc20-27: 8 cells R→L between corners
+  for (let i = 0; i < 8; i++)
+    makeAbsFC(20+i, FRAME_LAYOUT[20+i], iR - (i+1)*tcW, iB, tcW, tcH)
+
+  // Left col fc29-37: 9 cells T→B
   for (let i = 0; i < 9; i++)
     makeAbsFC(29+i, FRAME_LAYOUT[29+i], fL, iT + i*scH, scW, scH)
 
