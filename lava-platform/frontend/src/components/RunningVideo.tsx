@@ -62,7 +62,7 @@ export function RunningVideo() {
   return (
     <video
       ref={videoRef}
-      src="/video/Comp%201.mp4"
+      src="/video/Comp%201_1_2.mp4"
       style={{
         position: 'absolute',
         inset: 0,
