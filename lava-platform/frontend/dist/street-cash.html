@@ -678,7 +678,7 @@ function runCursor(cursorSym) {
         prevEl.classList.remove('cursor-lit')
       }
 
-      const cwPos = step % 38
+      const cwPos = step % CW_ORDER.length
       const fcId  = CW_ORDER[cwPos]
       const el    = document.getElementById('fc' + fcId)
 
