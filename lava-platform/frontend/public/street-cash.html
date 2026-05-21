@@ -499,10 +499,13 @@ function setup() {
     const img = document.createElement('img')
     img.src = SYMS[symIdx].src
     const [wf, hf] = ICON_DIMS[symIdx] || [0.60, 0.60]
-    img.style.display   = 'block'
-    img.style.flexShrink = '0'
-    img.style.width     = Math.round(w * wf) + 'px'
-    img.style.height    = Math.round(h * hf) + 'px'
+    const iw = Math.round(w * wf)
+    const ih = Math.round(h * hf)
+    img.style.position  = 'absolute'
+    img.style.left      = Math.round((w - iw) / 2) + 'px'
+    img.style.top       = Math.round((h - ih) / 2) + 'px'
+    img.style.width     = iw + 'px'
+    img.style.height    = ih + 'px'
     img.style.objectFit = 'contain'
     d.appendChild(img)
     board.appendChild(d)
