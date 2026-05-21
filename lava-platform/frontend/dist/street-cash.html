@@ -172,7 +172,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:url('/assets
   animation:win-pop .35s cubic-bezier(.2,1.4,.5,1);
 }
 @keyframes win-pop{from{transform:scale(.3);opacity:0}to{transform:scale(1);opacity:1}}
-#sc-idle-txt{font-size:8px;letter-spacing:2px;font-family:'Orbitron',sans-serif;background:linear-gradient(90deg,#e9d5ff,#a855f7,#7c3aed,#a855f7);background-size:200%;animation:grad-flow 2s linear infinite;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+#sc-idle-txt{display:none}
 
 /* ── Mini paytable ── */
 #legend-wrap{position:relative;margin:0 8px 4px}
@@ -745,7 +745,7 @@ function clearWin() {
 
   document.getElementById('win-stripe').style.display = 'none'
   document.getElementById('sc-win-txt').style.display  = 'none'
-  document.getElementById('sc-idle-txt').style.display = 'block'
+  // sc-idle-txt hidden permanently
   document.querySelectorAll('.li').forEach(el => el.classList.remove('active'))
 }
 
