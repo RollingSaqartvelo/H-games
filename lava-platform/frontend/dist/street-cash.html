@@ -9,7 +9,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&display=swap');
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:'Courier New',monospace;user-select:none;-webkit-user-select:none;touch-action:manipulation}
-body::before{content:'';position:fixed;inset:0;z-index:0;background:url('/assets/street-cash/bg2.jpeg') center/cover no-repeat;opacity:.35;pointer-events:none}
+body::before{content:'';position:fixed;inset:0;z-index:0;background:url('/assets/street-cash/bg2.jpeg') center/cover no-repeat;opacity:.65;pointer-events:none}
 #app{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;height:100%;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;padding-top:env(safe-area-inset-top,0);padding-bottom:env(safe-area-inset-bottom,8px)}
 #app::-webkit-scrollbar{display:none}
 #app::-webkit-scrollbar{display:none}
@@ -17,14 +17,14 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:url('/assets
 /* ── Top bar ── */
 #topbar{width:100%;max-width:440px;display:flex;align-items:center;justify-content:space-between;padding:8px 12px 4px;flex-shrink:0;background:rgba(0,0,0,.55);border-bottom:1px solid rgba(255,255,255,.08)}
 #back-btn{background:none;border:1px solid #c49eff;color:#6d28d9;font-size:20px;width:36px;height:36px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center}
-#game-title{font-family:'Orbitron',sans-serif;font-size:14px;font-weight:900;letter-spacing:3px;background:linear-gradient(90deg,#e9d5ff,#a855f7,#7c3aed,#a855f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+#game-title{font-family:'Orbitron',sans-serif;font-size:14px;font-weight:900;letter-spacing:3px;background:linear-gradient(180deg,#fff0a0 0%,#d4a017 30%,#ffd700 55%,#b8860b 75%,#f5d060 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 #balance-display{font-size:14px;font-weight:bold;color:#7c3aed;letter-spacing:1px}
 
 /* ── Machine shell ── */
 #machine{width:100%;max-width:440px;flex-shrink:0;background:transparent;border:none;padding-bottom:6px}
 
 /* ── Message bar ── */
-#msg-bar{text-align:center;padding:7px 12px;font-size:13px;font-weight:bold;letter-spacing:.5px;color:#fff;background:#7c3aed;border-bottom:1px solid #6d28d9;min-height:30px;display:flex;align-items:center;justify-content:center}
+#msg-bar{text-align:center;padding:5px 12px;font-size:12px;font-weight:bold;letter-spacing:.5px;background:linear-gradient(180deg,#fff0a0 0%,#d4a017 30%,#ffd700 55%,#b8860b 75%,#f5d060 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;background-color:#1a0a2e;border-bottom:1px solid rgba(212,160,23,.3);min-height:26px;display:flex;align-items:center;justify-content:center}
 
 /* ── Board ── */
 #board{
@@ -175,7 +175,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:url('/assets
 #sc-idle-txt{display:none}
 
 /* ── Mini paytable ── */
-#legend-wrap{position:relative;margin:0 8px 2px}
+#legend-wrap{position:relative;margin:0 8px 1px}
 #pt-btn{position:absolute;top:-2px;right:-2px;width:18px;height:18px;border-radius:50%;background:linear-gradient(145deg,#f5f0ff,#ede0ff);border:1.5px solid rgba(192,132,252,.5);color:#7c3aed;font-size:9px;font-weight:900;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:10;box-shadow:0 0 8px rgba(168,85,247,.15);font-family:'Orbitron',sans-serif}
 #pt-btn:active{transform:scale(.9)}
 #legend{background:rgba(0,0,0,.45);border:1px solid rgba(255,215,0,.2);border-radius:12px;padding:4px 4px 3px;display:flex;flex-direction:column;gap:3px}
@@ -204,11 +204,11 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:url('/assets
 @keyframes grad-flow{0%{background-position:0%}100%{background-position:200%}}
 
 /* ── Bet section ── */
-#bet-section{padding:8px;margin:0 8px 4px;background:rgba(0,0,0,.4);border-radius:16px;border:1px solid rgba(255,215,0,.15);display:flex;flex-direction:column;gap:4px}
-#bet-display{background:#ffffff;border:1.5px solid #c084fc;border-radius:8px;text-align:center;padding:6px 10px;font-size:16px;font-weight:bold;color:#4a1d96;letter-spacing:1px}
-#bet-display em{color:rgba(74,29,150,.5);font-style:normal;font-size:11px;margin-right:6px}
-#bet-btns{display:flex;gap:4px}
-.bet-btn{flex:1;padding:7px 0;background:linear-gradient(145deg,#faf5ff,#f3e8ff);border:1px solid #c084fc;border-radius:12px;color:#6d28d9;font-family:'Courier New',monospace;font-size:12px;font-weight:bold;letter-spacing:1px;cursor:pointer;transition:all .1s}
+#bet-section{padding:4px 6px;margin:0 8px 2px;background:rgba(0,0,0,.4);border-radius:12px;border:1px solid rgba(255,215,0,.15);display:flex;flex-direction:column;gap:3px}
+#bet-display{background:#ffffff;border:1.5px solid #c084fc;border-radius:8px;text-align:center;padding:3px 8px;font-size:15px;font-weight:bold;color:#4a1d96;letter-spacing:1px}
+#bet-display em{color:rgba(74,29,150,.5);font-style:normal;font-size:10px;margin-right:5px}
+#bet-btns{display:flex;gap:3px}
+.bet-btn{flex:1;padding:4px 0;background:linear-gradient(145deg,#faf5ff,#f3e8ff);border:1px solid #c084fc;border-radius:10px;color:#6d28d9;font-family:'Courier New',monospace;font-size:11px;font-weight:bold;letter-spacing:1px;cursor:pointer;transition:all .1s}
 .bet-btn:active{background:rgba(168,85,247,.15);transform:scale(.96)}
 
 /* ── Action buttons ── */
@@ -475,47 +475,40 @@ function setup() {
   scBot.style.top   = (drumT + drumH + 4) + 'px'
   scBot.style.width = drumW + 'px'
 
-  // ── 38 frame cells: absolute on board ──
-  // CELL: must fit 10 across full frame width (fW) and 11 tall (9 side + 2 corner) with centered band positioning
-  // side available = (iB+fB-fT-iT)/2 - CELL → 10*CELL = (iB+fB-fT-iT)/2 → CELL = (iB+fB-fT-iT)/20
-  const fW = fR - fL
-  CELL = Math.floor(Math.min(fW / 10, (iB + fB - fT - iT) / 20))
+  // ── 38 frame cells — geometry matches pannel.png bands exactly ──
+  // Top/bottom bands: full height = iT-fT, cells span fW/10 wide each
+  // Left/right bands: full width = iL-fL, cells span iH/9 tall each
+  const fW  = fR - fL
+  const tcW = fW / 10       // top/bottom cell width  ≈ 34px
+  const tcH = iT - fT       // top/bottom cell height ≈ 43px (full band)
+  const scW = iL - fL       // side cell width        ≈ 43px (full band)
+  const scH = iH / 9        // side cell height       ≈ 27px
+  CELL = Math.floor(Math.min(tcW, scH))  // smallest dim (backward compat)
 
-  // Center each cell within its border band
-  const cellY_top = Math.round((fT + iT - CELL) / 2)
-  const cellY_bot = Math.round((iB + fB - CELL) / 2)
-  const cellX_lft = Math.round((fL + iL - CELL) / 2)
-  const cellX_rgt = Math.round((iR + fR - CELL) / 2)
-
-  const topGap  = (fW - 10 * CELL) / 9
-  const sideTop = cellY_top + CELL       // y of first side cell (just below top corner)
-  const sideGap = Math.max(0, (cellY_bot - sideTop - 9 * CELL) / 8)
-
-  // Per-symbol icon dims [width%, height%] of CELL — each tuned individually
-  // 0=TNT(tall) 1=Dice(sq) 2=Shades(wide) 3=Sneaker(wide) 4=Chain(circ) 5=Watch(circ) 6=Card(wide)
+  // Per-symbol icon dims [width%, height%] relative to each cell's own W×H
   const ICON_DIMS = [
-    [0.52, 0.64],  // 0 TNT — tall bundle
-    [0.58, 0.54],  // 1 Dice — square-ish
+    [0.52, 0.64],  // 0 TNT    — tall bundle
+    [0.58, 0.54],  // 1 Dice   — square-ish
     [0.70, 0.40],  // 2 Shades — very wide flat
-    [0.66, 0.48],  // 3 Sneaker — wide shoe
-    [0.58, 0.52],  // 4 Chain — round loop
-    [0.56, 0.56],  // 5 Watch — circular face
-    [0.66, 0.44],  // 6 Card — wide rectangle
+    [0.66, 0.48],  // 3 Sneaker— wide shoe
+    [0.58, 0.52],  // 4 Chain  — round loop
+    [0.56, 0.56],  // 5 Watch  — circular face
+    [0.66, 0.44],  // 6 Card   — wide rectangle
   ]
 
-  function makeAbsFC(id, symIdx, x, y) {
+  function makeAbsFC(id, symIdx, x, y, w, h) {
     const d = document.createElement('div')
     d.id = 'fc' + id
     d.className = 'fc'
     d.style.left   = Math.round(x) + 'px'
     d.style.top    = Math.round(y) + 'px'
-    d.style.width  = CELL + 'px'
-    d.style.height = CELL + 'px'
+    d.style.width  = Math.round(w) + 'px'
+    d.style.height = Math.round(h) + 'px'
     const img = document.createElement('img')
     img.src = SYMS[symIdx].src
-    const [wf, hf] = ICON_DIMS[symIdx] || [0.55, 0.55]
-    img.style.width  = Math.round(CELL * wf) + 'px'
-    img.style.height = Math.round(CELL * hf) + 'px'
+    const [wf, hf] = ICON_DIMS[symIdx] || [0.60, 0.60]
+    img.style.width  = Math.round(w * wf) + 'px'
+    img.style.height = Math.round(h * hf) + 'px'
     img.style.objectFit = 'contain'
     img.style.display   = 'block'
     d.appendChild(img)
@@ -523,18 +516,18 @@ function setup() {
     return d
   }
 
-  // Top row (fc0-9): L→R, starting at fL (outer frame edge — fills corners)
+  // Top row (fc0-9): L→R from fL, y=fT, cell=tcW×tcH
   for (let i = 0; i < 10; i++)
-    makeAbsFC(i, FRAME_LAYOUT[i], fL + i*(CELL+topGap), cellY_top)
-  // Right col (fc10-18): T→B, fc10 just below fc9, fc18 just above fc19
+    makeAbsFC(i, FRAME_LAYOUT[i], fL + i*tcW, fT, tcW, tcH)
+  // Right col (fc10-18): T→B from iT, x=iR, cell=scW×scH
   for (let i = 0; i < 9; i++)
-    makeAbsFC(10+i, FRAME_LAYOUT[10+i], cellX_rgt, sideTop + i*(CELL+sideGap))
-  // Bottom row (fc19-28): R→L, starting at fR (outer frame right edge — fills corners)
+    makeAbsFC(10+i, FRAME_LAYOUT[10+i], iR, iT + i*scH, scW, scH)
+  // Bottom row (fc19-28): R→L from fR, y=iB, cell=tcW×tcH
   for (let i = 0; i < 10; i++)
-    makeAbsFC(19+i, FRAME_LAYOUT[19+i], fR - CELL - i*(CELL+topGap), cellY_bot)
-  // Left col (fc29-37): T→B — fc29=top, fc37=bottom (matches CW_ORDER: 37,36,…,29 from bottom)
+    makeAbsFC(19+i, FRAME_LAYOUT[19+i], fR - (i+1)*tcW, iB, tcW, tcH)
+  // Left col (fc29-37): T→B from iT, x=fL — fc29=top, fc37=bottom
   for (let i = 0; i < 9; i++)
-    makeAbsFC(29+i, FRAME_LAYOUT[29+i], cellX_lft, sideTop + i*(CELL+sideGap))
+    makeAbsFC(29+i, FRAME_LAYOUT[29+i], fL, iT + i*scH, scW, scH)
 
   for (let ri = 0; ri < 3; ri++) setRC(`r${ri}c`, randSym())
 }
