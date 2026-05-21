@@ -41,7 +41,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:url('/assets
   transition:opacity .15s,box-shadow .08s,transform .08s;
   z-index:15;
 }
-.fc img{width:70%;height:70%;object-fit:contain;display:block}
+.fc img{object-fit:contain;display:block}
 .fc::after{display:none}
 
 /* Cursor highlight on outer frame */
@@ -491,6 +491,18 @@ function setup() {
   const sideTop = cellY_top + CELL       // y of first side cell (just below top corner)
   const sideGap = Math.max(0, (cellY_bot - sideTop - 9 * CELL) / 8)
 
+  // Per-symbol icon dims [width%, height%] of CELL — each tuned individually
+  // 0=TNT(tall) 1=Dice(sq) 2=Shades(wide) 3=Sneaker(wide) 4=Chain(circ) 5=Watch(circ) 6=Card(wide)
+  const ICON_DIMS = [
+    [0.52, 0.64],  // 0 TNT — tall bundle
+    [0.58, 0.54],  // 1 Dice — square-ish
+    [0.70, 0.40],  // 2 Shades — very wide flat
+    [0.66, 0.48],  // 3 Sneaker — wide shoe
+    [0.58, 0.52],  // 4 Chain — round loop
+    [0.56, 0.56],  // 5 Watch — circular face
+    [0.66, 0.44],  // 6 Card — wide rectangle
+  ]
+
   function makeAbsFC(id, symIdx, x, y) {
     const d = document.createElement('div')
     d.id = 'fc' + id
@@ -501,6 +513,11 @@ function setup() {
     d.style.height = CELL + 'px'
     const img = document.createElement('img')
     img.src = SYMS[symIdx].src
+    const [wf, hf] = ICON_DIMS[symIdx] || [0.55, 0.55]
+    img.style.width  = Math.round(CELL * wf) + 'px'
+    img.style.height = Math.round(CELL * hf) + 'px'
+    img.style.objectFit = 'contain'
+    img.style.display   = 'block'
     d.appendChild(img)
     board.appendChild(d)
     return d
