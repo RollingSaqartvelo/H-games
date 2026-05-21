@@ -47,7 +47,7 @@ type Config struct {
 func DefaultConfig() Config {
 	return Config{
 		BettingDuration: 10 * time.Second,
-		CrashCooldown:   5 * time.Second,
+		CrashCooldown:   4 * time.Second,
 		GrowthRate:      0.06,
 		TickInterval:    100 * time.Millisecond,
 		DefaultRTP:      94,
