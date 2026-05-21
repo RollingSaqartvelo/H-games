@@ -529,13 +529,8 @@ function setup() {
     makeAbsFC(19+i, FRAME_LAYOUT[19+i], iR - (i+1)*tcW, iB, tcW, tcH)
 
   // Left col fc28-35: 8 cells T→B
-  for (let i = 0; i < 8; i++) {
-    const el = makeAbsFC(28+i, FRAME_LAYOUT[28+i], fL, iT + i*scH, scW, scH)
-    el.style.alignItems     = 'flex-start'
-    el.style.justifyContent = 'flex-start'
-    const img = el.querySelector('img')
-    if (img) { img.style.marginTop = '3px'; img.style.marginLeft = '3px' }
-  }
+  for (let i = 0; i < 8; i++)
+    makeAbsFC(28+i, FRAME_LAYOUT[28+i], fL, iT + i*scH, scW, scH)
 
   for (let ri = 0; ri < 3; ri++) setRC(`r${ri}c`, randSym())
 }
