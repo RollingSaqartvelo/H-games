@@ -439,12 +439,10 @@ function setup() {
   vok.style.height = iH + 'px'
 
   // ── Layer 3: baraban.jpeg over white area in vokryg ──
-  // White painted area in vokryg.jpeg (888×826): x=226-698, y=116-504
-  // As fractions: x=25.5%-78.6%, y=14.0%-61.0%
-  const drumL = Math.round(iL + iW * 0.255)
-  const drumT = Math.round(iT + iH * 0.140)
-  const drumW = Math.round(iW * (0.786 - 0.255))
-  const drumH = Math.round(iH * (0.610 - 0.140))
+  const drumL = Math.round(iL + iW * 0.180)
+  const drumT = Math.round(iT + iH * 0.220)
+  const drumW = Math.round(iW * 0.531)
+  const drumH = Math.round(iH * 0.470)
 
   REEL_H = drumH
   IMG_SZ = Math.round(Math.floor(drumW / 3) * 0.80)
