@@ -956,7 +956,7 @@ function adjBet(a) {
 // ── Balance ───────────────────────────────────────────────────────────────────
 function updateBal() {
   document.getElementById('balance-display').textContent = '$' + balance.toFixed(2)
-  if (demoMode) localStorage.setItem('sc_bal', balance.toFixed(2))
+  if (demoMode) localStorage.setItem('crash_bal', balance.toFixed(2))
 }
 
 // ── Black-background removal via canvas ───────────────────────────────────────
@@ -1015,7 +1015,7 @@ async function boot() {
     }
   } catch {}
   if (demoMode) {
-    const s = parseFloat(localStorage.getItem('sc_bal'))
+    const s = parseFloat(localStorage.getItem('crash_bal'))
     balance = isNaN(s) ? 1000 : s
     document.getElementById('demo-badge').textContent = '· DEMO · $1,000 PRACTICE BALANCE ·'
   }
