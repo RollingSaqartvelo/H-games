@@ -47,24 +47,24 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:url('/assets
 /* Cursor highlight on outer frame */
 .fc.cursor-lit{
   opacity:1 !important;
-  border-color:rgba(255,215,0,.95) !important;
-  box-shadow:0 0 14px rgba(255,215,0,.9),0 0 28px rgba(255,215,0,.45),inset 0 0 10px rgba(255,215,0,.3) !important;
-  transform:scale(1.1) !important;
+  outline:2px solid rgba(255,215,0,.95) !important;
+  box-shadow:0 0 6px rgba(255,215,0,.8),inset 0 0 4px rgba(255,215,0,.25) !important;
+  transform:none !important;
   z-index:6 !important;
 }
 
 /* Cursor final stop — stays lit */
 .fc.cursor-stop{
   opacity:1 !important;
-  border-color:rgba(255,215,0,1) !important;
-  box-shadow:0 0 18px rgba(255,215,0,1),0 0 36px rgba(255,215,0,.55),inset 0 0 12px rgba(255,215,0,.4) !important;
-  transform:scale(1.12) !important;
+  outline:2px solid rgba(255,215,0,1) !important;
+  box-shadow:0 0 8px rgba(255,215,0,1),inset 0 0 6px rgba(255,215,0,.35) !important;
+  transform:none !important;
   z-index:6 !important;
   animation:cursor-pulse .5s ease-in-out infinite alternate;
 }
 @keyframes cursor-pulse{
-  from{box-shadow:0 0 14px rgba(255,215,0,.8),0 0 28px rgba(255,215,0,.4)}
-  to{box-shadow:0 0 22px rgba(255,215,0,1),0 0 44px rgba(255,215,0,.65),0 0 60px rgba(255,215,0,.25)}
+  from{box-shadow:0 0 6px rgba(255,215,0,.8),inset 0 0 4px rgba(255,215,0,.2)}
+  to{box-shadow:0 0 12px rgba(255,215,0,1),0 0 18px rgba(255,215,0,.4),inset 0 0 6px rgba(255,215,0,.35)}
 }
 
 .fc-black{background:transparent}
