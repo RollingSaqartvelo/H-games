@@ -58,7 +58,7 @@ export function GifCharacters() {
       if (vid && vid.duration) {
         const t = vid.currentTime
         let op = 1
-        if (t < 1.0)              op = 0
+        if (t < 0.003)            op = 0
         else if (t < 2.0)         op = 0.3
         else if (t < 3.0)         op = 0.65
         else if (t >= 6.0 && t < 6.25) op = 0
