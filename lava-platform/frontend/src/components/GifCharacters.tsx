@@ -59,7 +59,7 @@ export function GifCharacters() {
         const t = vid.currentTime
         let op = 1
         if (t < 0.005)                     op = 0
-        else if (t < 2.0)                  op = 0.3
+        else if (t < 0.03)                 op = 0.3
         else if (t >= 6.2455 && t < 6.25) op = 0
         setBgOpacity(op)
       }
@@ -142,7 +142,7 @@ export function GifCharacters() {
         zIndex: 50,
         overflow: 'hidden',
         opacity: bgOpacity,
-        transition: 'opacity 0.4s ease',
+        transition: 'opacity 0.03s linear',
       }}
     >
       <img
