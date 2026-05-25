@@ -202,8 +202,8 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
 .scatter-anim{animation:scatter-flash .3s ease 5;}
 
 /* ── Character canvas ── */
-.char-canvas{position:fixed;bottom:0;right:0;z-index:2;
-  width:28vw;max-width:160px;pointer-events:none;}
+.char-canvas{position:absolute;bottom:0;left:0;z-index:5;
+  width:120px;height:180px;background:transparent;pointer-events:none;}
 </style>
 </head>
 <body>
@@ -211,7 +211,6 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
 <div class="bg-layer"></div>
 <canvas class="bg-stars" id="starsCanvas"></canvas>
 <video id="pirateVideo" playsinline muted style="display:none"></video>
-<canvas id="pirateCanvas" class="char-canvas"></canvas>
 
 <div class="holdwin-overlay" id="hwOverlay">
   <div class="hw-title">HOLD &amp; WIN</div>
@@ -323,6 +322,7 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
     </div>
   </div>
 
+  <canvas id="pirateCanvas" class="char-canvas"></canvas>
 </div>
 
 <script>
@@ -1174,9 +1174,9 @@ function initChar() {
   charVideo = document.getElementById('pirateVideo');
   charCanvas = document.getElementById('pirateCanvas');
   if (!charVideo || !charCanvas) return;
-  charCtx = charCanvas.getContext('2d', {willReadFrequently: true});
-  charCanvas.width = 300;
-  charCanvas.height = 400;
+  charCtx = charCanvas.getContext('2d', {alpha: true, willReadFrequently: true});
+  charCanvas.width = 240;
+  charCanvas.height = 360;
   playCharVideo(CHAR_INTRO, () => playCharVideo(CHAR_IDLE, null, true));
   requestAnimationFrame(renderCharFrame);
 }
