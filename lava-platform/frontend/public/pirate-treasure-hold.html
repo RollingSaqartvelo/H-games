@@ -407,14 +407,47 @@ const SYMBOL_IMGS = [
   'assets/h-slots/pirate/symbols/sym-a.png',
 ];
 
-// Preload all symbol images, log errors with the exact URL
-const _preloaded = SYMBOL_IMGS.map(src => {
+// ── Asset diagnostics + preload ───────────────────────────────
+const ALL_ASSETS = [
+  'assets/h-slots/pirate/symbols/sym-chest.png',
+  'assets/h-slots/pirate/symbols/sym-coins.png',
+  'assets/h-slots/pirate/symbols/sym-rum.png',
+  'assets/h-slots/pirate/symbols/sym-anchor.png',
+  'assets/h-slots/pirate/symbols/sym-wild.png',
+  'assets/h-slots/pirate/symbols/sym-scatter.png',
+  'assets/h-slots/pirate/symbols/sym-doubloon.png',
+  'assets/h-slots/pirate/symbols/sym-boost.png',
+  'assets/h-slots/pirate/symbols/sym-mystery.png',
+  'assets/h-slots/pirate/symbols/sym-j.png',
+  'assets/h-slots/pirate/symbols/sym-q.png',
+  'assets/h-slots/pirate/symbols/sym-k.png',
+  'assets/h-slots/pirate/symbols/sym-a.png',
+  'assets/h-slots/pirate/ui/btn-spin-idle.png',
+  'assets/h-slots/pirate/ui/btn-spin-active.png',
+  'assets/h-slots/pirate/ui/btn-autoplay.png',
+  'assets/h-slots/pirate/ui/btn-buy-bonus.png',
+  'assets/h-slots/pirate/ui/btn-paytable.png',
+  'assets/h-slots/pirate/ui/btn-mute.png',
+  'assets/h-slots/pirate/ui/jackpot-panel.png',
+  'assets/h-slots/pirate/ui/hold-win-frame.png',
+  'assets/h-slots/pirate/bg/background.PNG',
+];
+let _assetFails = 0;
+const _assetImgs = {};
+ALL_ASSETS.forEach(src => {
   const img = new Image();
-  img.onerror = () => console.warn('[PIRATE] Failed to load symbol: ' + new URL(src, location.href).href);
-  img.onload  = () => console.log('[PIRATE] Loaded: ' + src);
+  img.onload  = () => console.log('%cOK: ' + src, 'color:green');
+  img.onerror = () => { _assetFails++; console.error('FAIL: ' + new URL(src, location.href).href); };
   img.src = src;
-  return img;
+  _assetImgs[src] = img;
 });
+setTimeout(() => {
+  if (_assetFails === 0) console.log('%c[PIRATE] All ' + ALL_ASSETS.length + ' assets OK', 'color:green;font-weight:bold');
+  else console.error('[PIRATE] ' + _assetFails + ' asset(s) FAILED — see FAIL lines above');
+}, 6000);
+
+// _preloaded[symId] = actual Image object so setCell() can check .complete
+const _preloaded = SYMBOL_IMGS.map(src => _assetImgs[src]);
 
 let betIdx = 2; // default $1.00
 let balance = DEMO_START;
