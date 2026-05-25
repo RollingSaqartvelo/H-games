@@ -228,6 +228,11 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
 @keyframes scatter-flash{0%,100%{opacity:1}50%{opacity:.3}}
 .scatter-anim{animation:scatter-flash .3s ease 5;}
 
+/* ── Mute button ── */
+.mute-btn{background:none;border:none;font-size:16px;cursor:pointer;
+  padding:2px 6px;opacity:1;transition:opacity .2s;line-height:1;}
+.mute-btn.muted{opacity:0.35;}
+
 /* ── Character canvas (absolute, overlaps reels on the left) ── */
 .char-canvas{
   position:absolute;left:-20px;bottom:0;
@@ -238,6 +243,10 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
 </style>
 </head>
 <body>
+
+<audio id="bgMusic" loop preload="auto">
+  <source src="audio/pirat.mp3" type="audio/mpeg">
+</audio>
 
 <div class="bg-layer"></div>
 <canvas class="bg-stars" id="starsCanvas"></canvas>
@@ -308,6 +317,7 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
 
   <div class="header">
     <div class="header-logo">⚓ Pirate Treasure</div>
+    <button id="muteBtn" class="mute-btn" aria-label="mute">🔊</button>
     <div class="header-bal">
       <div class="bal-lbl">Balance</div>
       <div class="bal-val" id="balVal">$0.00</div>
@@ -487,22 +497,48 @@ function playTone(freq, dur, vol=0.3, type='sine') {
   gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
   osc.start(); osc.stop(ctx.currentTime + dur);
 }
-function soundSpin() { playTone(120, 0.1, 0.15, 'sawtooth'); }
-function soundClick() { playTone(440, 0.08, 0.1); }
+// ── MP3 sound effects ──────────────────────────────────────
+function playSound(src, vol=0.7) {
+  const a = new Audio(src);
+  a.volume = vol;
+  a.play().catch(() => {});
+}
+
+function soundSpin()  { playSound('audio/strike.mp3', 0.6); }
+function soundClick() { playTone(440, 0.08, 0.08); } // reel-stop beep — keep as web audio
 function soundWin(amount, bet) {
-  const ctx = getAudioCtx(); if (!ctx) return;
   const mult = amount / bet;
   if (mult >= 10) {
-    [523,659,784,1046].forEach((f,i) => { setTimeout(() => playTone(f,0.3,0.25), i*120); });
-  } else if (mult >= 3) {
-    [440,550,660].forEach((f,i) => { setTimeout(() => playTone(f,0.25,0.2), i*100); });
+    playSound('audio/BIG WIN.mp3', 0.8);
   } else {
-    playTone(550, 0.2, 0.15);
+    playSound('audio/TO_WIN.mp3', 0.7);
   }
 }
-function soundHoldWin() {
-  [200,300,400,600,800].forEach((f,i) => { setTimeout(() => playTone(f,0.4,0.3,'triangle'), i*150); });
+function soundHoldWin() { playSound('audio/Start bonus.mp3', 0.8); }
+
+// ── Background music ────────────────────────────────────────
+const bgMusic = document.getElementById('bgMusic');
+bgMusic.volume = 0.4;
+
+function startMusic() {
+  bgMusic.play().catch(() => {});
 }
+document.addEventListener('touchstart', startMusic, {once:true});
+document.addEventListener('click',      startMusic, {once:true});
+
+const muteBtn = document.getElementById('muteBtn');
+muteBtn.onclick = (e) => {
+  e.stopPropagation(); // don't re-trigger startMusic
+  if (bgMusic.paused) {
+    bgMusic.play().catch(() => {});
+    muteBtn.textContent = '🔊';
+    muteBtn.classList.remove('muted');
+  } else {
+    bgMusic.pause();
+    muteBtn.textContent = '🔇';
+    muteBtn.classList.add('muted');
+  }
+};
 
 // ═══════════════════════════════════════════════════════════
 //  REEL BUILD
