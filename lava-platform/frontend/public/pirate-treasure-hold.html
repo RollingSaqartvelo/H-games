@@ -563,12 +563,18 @@ function symClass(symId) {
 }
 
 function setCell(col, idx, symId, doubloonVal) {
-  const cell = cellRows[col][idx];
+  const cell = cellRows[col]?.[idx];
+  if (!cell) { console.error(`[PIRATE] setCell: no cell at col=${col} idx=${idx}`); return; }
+  // Guard: undefined/null symId → fallback to chest (0)
+  if (symId === undefined || symId === null) {
+    console.warn(`[PIRATE] setCell: symId undefined at col=${col} idx=${idx}, using 0`);
+    symId = 0;
+  }
   cell.className = 'sym-cell';
   cell.innerHTML = '';
   cell.dataset.sym = symId;
 
-  const src = SYMBOL_IMGS[symId] || SYMBOL_IMGS[0];
+  const src = SYMBOL_IMGS[symId] ?? SYMBOL_IMGS[0];
   const img = document.createElement('img');
   img.alt = SYMBOL_NAMES[symId] || '';
   img.style.cssText = 'width:100%;height:100%;object-fit:contain;display:block;background:transparent;';
@@ -935,6 +941,19 @@ async function doSpin(options={}) {
   lastResult = result;
   const grid = result.grid;
 
+  // Diagnostic: verify grid structure from server/demo
+  console.log('[PIRATE] Grid from server:', JSON.stringify(grid));
+  for (let row = 0; row < NUM_ROWS; row++) {
+    for (let col = 0; col < NUM_COLS; col++) {
+      const symId = grid[row]?.[col];
+      if (symId === undefined || symId === null) {
+        console.error(`[PIRATE] MISSING cell[${row}][${col}] = ${symId}`);
+      } else {
+        console.log(`[PIRATE] cell[${row}][${col}] = symId ${symId} (${SYMBOL_NAMES[symId]||'?'})`);
+      }
+    }
+  }
+
   // Animate reels stopping
   const stopDelays = [0, 200, 400, 600, 800];
   const reelPromises = [];
@@ -1154,9 +1173,11 @@ function flashScatters(grid) {
   for (let col=0; col<NUM_COLS; col++) {
     for (let row=0; row<NUM_ROWS; row++) {
       if (grid[row][col]===5) {
-        const cell = cellRows[col][27+row];
-        cell.classList.add('scatter-anim');
-        cell.addEventListener('animationend', ()=>cell.classList.remove('scatter-anim'), {once:true});
+        const cell = cellRows[col][SPIN_END+row];
+        if (cell) {
+          cell.classList.add('scatter-anim');
+          cell.addEventListener('animationend', ()=>cell.classList.remove('scatter-anim'), {once:true});
+        }
       }
     }
   }
