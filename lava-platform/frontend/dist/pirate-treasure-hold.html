@@ -37,17 +37,27 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
 .bal-lbl{font-size:8px;letter-spacing:.3em;color:var(--muted);text-transform:uppercase;}
 .bal-val{font-size:16px;font-weight:700;color:var(--gold);font-family:monospace;}
 
-/* ── Jackpot Panel ── */
-.jackpot-panel{width:100%;display:flex;gap:4px;margin-bottom:6px;flex-shrink:0;
-  background:url('assets/h-slots/pirate/ui/jackpot-panel.png') center/100% 100% no-repeat;}
-.jp-item{flex:1;text-align:center;padding:4px 2px;position:relative;
-  background:transparent;border:none;}
-.jp-item.active{border-color:var(--gold);animation:jp-pulse 1.5s ease-in-out infinite;}
-@keyframes jp-pulse{0%,100%{box-shadow:0 0 4px rgba(240,192,64,.3)}50%{box-shadow:0 0 12px rgba(240,192,64,.8)}}
-.jp-name{font-size:7px;letter-spacing:.2em;color:var(--muted);text-transform:uppercase;}
-.jp-val{font-size:10px;font-weight:700;color:var(--gold);font-family:monospace;}
-.jp-item.grand .jp-name{color:#ff6b35;}
-.jp-item.grand .jp-val{color:#ff6b35;font-size:11px;}
+/* ── 3-column game layout ── */
+.game-layout{display:flex;flex-direction:row;align-items:stretch;
+  flex:1;width:100%;min-height:0;}
+.col-character{width:15%;display:flex;flex-direction:column;
+  align-items:center;justify-content:flex-end;overflow:hidden;}
+.col-reels{flex:1;display:flex;flex-direction:column;
+  align-items:center;min-width:0;}
+.col-jackpot{width:18%;display:flex;flex-direction:column;
+  align-items:stretch;position:relative;}
+
+/* ── Jackpot panel (right column vertical scroll) ── */
+.jp-panel-wrap{position:relative;flex:1;display:flex;flex-direction:column;}
+.jp-panel-img{width:100%;height:100%;object-fit:fill;display:block;pointer-events:none;}
+.jp-values{position:absolute;inset:0;display:flex;flex-direction:column;}
+.jp-slot{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.jp-slot .jp-name{font-size:5px;color:var(--muted);letter-spacing:.1em;
+  text-transform:uppercase;line-height:1;}
+.jp-slot .jp-val{font-size:6px;font-weight:700;color:var(--gold);
+  font-family:monospace;text-align:center;line-height:1.2;}
+.jp-slot.grand .jp-name{color:#ff6b35;}
+.jp-slot.grand .jp-val{color:#ff6b35;}
 
 /* ── Reel grid ── */
 .reels-outer{width:100%;position:relative;flex-shrink:0;}
@@ -104,8 +114,8 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
 .action-row{display:flex;align-items:center;gap:6px;justify-content:center;width:100%;}
 .side-col{display:flex;flex-direction:column;gap:6px;align-items:center;flex:0 0 auto;}
 
-/* Spin button — ×3 */
-.spin-btn{width:min(216px,55vw);height:min(216px,55vw);border:none;background:transparent;
+/* Spin button */
+.spin-btn{width:min(120px,31vw);height:min(120px,31vw);border:none;background:transparent;
   cursor:pointer;padding:0;box-shadow:none;flex-shrink:0;
   transition:transform .15s;display:flex;align-items:center;justify-content:center;}
 .spin-btn:active{transform:scale(.95);}
@@ -113,17 +123,16 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
 .spin-btn img{width:100%;height:100%;object-fit:contain;display:block;}
 
 .auto-btn{border:none;background:transparent;padding:0;cursor:pointer;box-shadow:none;
-  transition:opacity .15s;
-  width:min(76px,19vw);height:min(76px,19vw);}
+  transition:opacity .15s;width:min(48px,12vw);height:min(48px,12vw);}
 .auto-btn img{width:100%;height:100%;object-fit:contain;display:block;}
 .auto-btn.active img{opacity:0.6;filter:hue-rotate(120deg);}
 
 .bonus-btn{border:none;background:transparent;padding:0;cursor:pointer;box-shadow:none;
-  width:min(76px,19vw);height:min(76px,19vw);}
+  width:min(48px,12vw);height:min(48px,12vw);}
 .bonus-btn img{width:100%;height:100%;object-fit:contain;display:block;}
 
 .info-btn{border:none;background:transparent;padding:0;cursor:pointer;
-  width:min(60px,15vw);height:min(60px,15vw);}
+  width:min(36px,9vw);height:min(36px,9vw);}
 .info-btn img{width:100%;height:100%;object-fit:contain;display:block;}
 
 /* ── Hold & Win overlay ── */
@@ -208,9 +217,9 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
 @keyframes scatter-flash{0%,100%{opacity:1}50%{opacity:.3}}
 .scatter-anim{animation:scatter-flash .3s ease 5;}
 
-/* ── Character canvas ── */
-.char-canvas{position:absolute;bottom:0;left:0;z-index:5;
-  width:120px;height:180px;background:transparent;pointer-events:none;}
+/* ── Character canvas (inside col-character) ── */
+.char-canvas{width:100%;height:auto;display:block;
+  background:transparent;pointer-events:none;}
 </style>
 </head>
 <body>
@@ -290,48 +299,80 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
     </div>
   </div>
 
-  <div class="jackpot-panel" id="jpPanel">
-    <div class="jp-item grand" id="jp-grand"><div class="jp-name">GRAND</div><div class="jp-val" id="jp-grand-val">$10,000</div></div>
-    <div class="jp-item" id="jp-mega"><div class="jp-name">MEGA</div><div class="jp-val" id="jp-mega-val">$2,000</div></div>
-    <div class="jp-item" id="jp-major"><div class="jp-name">MAJOR</div><div class="jp-val" id="jp-major-val">$150</div></div>
-    <div class="jp-item" id="jp-minor"><div class="jp-name">MINOR</div><div class="jp-val" id="jp-minor-val">$50</div></div>
-    <div class="jp-item" id="jp-mini"><div class="jp-name">MINI</div><div class="jp-val" id="jp-mini-val">$20</div></div>
-  </div>
+  <div class="game-layout">
 
-  <div class="reels-outer">
-    <div class="reels-frame" id="reelsFrame">
-      <!-- 5 reels generated by JS -->
+    <!-- Left column: character -->
+    <div class="col-character">
+      <canvas id="pirateCanvas" class="char-canvas"></canvas>
     </div>
-  </div>
 
-  <div class="win-display">
-    <div class="win-text" id="winText">WIN $0.00</div>
-    <div class="free-badge" id="freeBadge">FREE SPINS</div>
-    <div class="free-counter" id="freeCounter"></div>
-  </div>
+    <!-- Center column: reels + controls -->
+    <div class="col-reels">
+      <div class="reels-outer">
+        <div class="reels-frame" id="reelsFrame">
+          <!-- 5 reels generated by JS -->
+        </div>
+      </div>
 
-  <div class="controls">
-    <div class="bet-row">
-      <span class="bet-lbl">Bet</span>
-      <div class="bet-stepper">
-        <button class="bet-btn" id="betDown">−</button>
-        <div class="bet-val" id="betDisplay">$1.00</div>
-        <button class="bet-btn" id="betUp">+</button>
+      <div class="win-display">
+        <div class="win-text" id="winText">WIN $0.00</div>
+        <div class="free-badge" id="freeBadge">FREE SPINS</div>
+        <div class="free-counter" id="freeCounter"></div>
+      </div>
+
+      <div class="controls">
+        <div class="bet-row">
+          <span class="bet-lbl">Bet</span>
+          <div class="bet-stepper">
+            <button class="bet-btn" id="betDown">−</button>
+            <div class="bet-val" id="betDisplay">$1.00</div>
+            <button class="bet-btn" id="betUp">+</button>
+          </div>
+        </div>
+        <div class="action-row">
+          <div class="side-col">
+            <button class="bonus-btn" id="bonusBtn" onclick="doBonusBuy()"><img src="assets/h-slots/pirate/ui/btn-buy-bonus.png" alt="BUY BONUS"></button>
+            <button class="info-btn" onclick="openInfo()"><img src="assets/h-slots/pirate/ui/btn-paytable.png" alt="INFO"></button>
+          </div>
+          <button class="spin-btn" id="spinBtn" onclick="doSpin()">
+            <img id="spinBtnImg" src="assets/h-slots/pirate/ui/btn-spin-idle.png" alt="SPIN">
+          </button>
+          <button class="auto-btn" id="autoBtn" onclick="toggleAuto()"><img src="assets/h-slots/pirate/ui/btn-autoplay.png" alt="AUTO"></button>
+        </div>
       </div>
     </div>
-    <div class="action-row">
-      <div class="side-col">
-        <button class="bonus-btn" id="bonusBtn" onclick="doBonusBuy()"><img src="assets/h-slots/pirate/ui/btn-buy-bonus.png" alt="BUY BONUS"></button>
-        <button class="info-btn" onclick="openInfo()"><img src="assets/h-slots/pirate/ui/btn-paytable.png" alt="INFO"></button>
-      </div>
-      <button class="spin-btn" id="spinBtn" onclick="doSpin()">
-        <img id="spinBtnImg" src="assets/h-slots/pirate/ui/btn-spin-idle.png" alt="SPIN">
-      </button>
-      <button class="auto-btn" id="autoBtn" onclick="toggleAuto()"><img src="assets/h-slots/pirate/ui/btn-autoplay.png" alt="AUTO"></button>
-    </div>
-  </div>
 
-  <canvas id="pirateCanvas" class="char-canvas"></canvas>
+    <!-- Right column: vertical jackpot scroll -->
+    <div class="col-jackpot">
+      <div class="jp-panel-wrap" id="jpPanel">
+        <img class="jp-panel-img" src="assets/h-slots/pirate/ui/jackpot-panel.png" alt="">
+        <div class="jp-values">
+          <div class="jp-slot grand">
+            <div class="jp-name">GRAND</div>
+            <div class="jp-val" id="jp-grand-val">$10,000</div>
+          </div>
+          <div class="jp-slot">
+            <div class="jp-name">MEGA</div>
+            <div class="jp-val" id="jp-mega-val">$2,000</div>
+          </div>
+          <div class="jp-slot">
+            <div class="jp-name">MAJOR</div>
+            <div class="jp-val" id="jp-major-val">$150</div>
+          </div>
+          <div class="jp-slot">
+            <div class="jp-name">MINOR</div>
+            <div class="jp-val" id="jp-minor-val">$50</div>
+          </div>
+          <div class="jp-slot">
+            <div class="jp-name">MINI</div>
+            <div class="jp-val" id="jp-mini-val">$20</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- .game-layout -->
+
 </div>
 
 <script>
@@ -340,7 +381,7 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
 // ═══════════════════════════════════════════════════════════
 const DEMO_START = 1000;
 const BET_STEPS = [0.25, 0.50, 1, 2, 5, 10, 25, 30];
-const CELL_H = 64; // px per symbol cell
+const CELL_H = 48; // px per symbol cell (fits col-reels ~65% width)
 const NUM_ROWS = 3;
 const NUM_COLS = 5;
 const SYMBOL_NAMES = ['chest','coins','rum','anchor','wild','scatter','doubloon','boost','mystery','j','q','k','a'];
