@@ -231,7 +231,7 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
 
 /* ── Character canvas (inside col-character) ── */
 .char-canvas{width:100%;height:auto;display:block;
-  background:transparent;pointer-events:none;}
+  background:transparent !important;mix-blend-mode:normal;pointer-events:none;}
 </style>
 </head>
 <body>
@@ -1245,14 +1245,11 @@ let charVideo = null, charCanvas = null, charCtx = null;
 function chromaKey(data) {
   for (let i = 0; i < data.length; i += 4) {
     const r = data[i], g = data[i+1], b = data[i+2];
-    const diff = g - Math.max(r, b);
-    if (diff > 30) {
+    const brightness = Math.max(r, g, b);
+    if (brightness < 25) {
       data[i+3] = 0;
-    } else if (diff > 10) {
-      data[i+3] = Math.round(255 * (1 - (diff - 10) / 20));
-      data[i+1] = Math.round((r + b) / 2);
-    } else if (g > 80 && g > r * 1.2 && g > b * 1.2) {
-      data[i+1] = Math.round((r + b) / 2);
+    } else if (brightness < 60) {
+      data[i+3] = Math.round(255 * (brightness - 25) / 35);
     }
   }
 }
