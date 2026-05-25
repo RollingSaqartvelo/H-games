@@ -302,6 +302,9 @@
       background:linear-gradient(90deg,#c0c0c0,#ffd700,#ff6b35,#ffd700,#c0c0c0);
       background-size:300% 100%;
     }
+    .m-game-btn--pirate { background: linear-gradient(135deg, #0a1628 0%, #1a3a6b 60%, #8b1a1a 100%); border: 2px solid #f0c040; color: #f0c040; font-weight: bold; clip-path: none; }
+    .m-game-btn--pirate::before { background: linear-gradient(90deg,#0a1628,#1a3a6b,#8b1a1a,#1a3a6b,#0a1628); background-size:300% 100%; }
+    .m-game-btn--pirate::after { background: transparent; }
 
     .m-coming {
       width:100%; max-width:320px; font-size:7px; letter-spacing:.4em;
@@ -531,6 +534,11 @@
         background-size:300% 300%;
       }
       .d-card--street::after { background:linear-gradient(90deg,transparent,#ffd700,transparent) }
+      .d-card--pirate::before {
+        background:linear-gradient(135deg,#0a1628,#1a3a6b,#f0c040,#1a3a6b,#0a1628);
+        background-size:300% 300%;
+      }
+      .d-card--pirate::after { background:linear-gradient(90deg,transparent,#f0c040,transparent) }
       .d-card:hover { transform:translateY(-5px) }
 
       /* Card icon (geometric diamond frame) */
@@ -547,6 +555,7 @@
       .d-card--bubble .d-card-icon { color:#f472b6 }
       .d-card--slots .d-card-icon  { color:#D4A017 }
       .d-card--street .d-card-icon { color:#ffd700 }
+      .d-card--pirate .d-card-icon { color:#f0c040 }
       .d-card-icon svg { width:22px; height:22px }
 
       .d-card-name { font-family:'Orbitron',sans-serif; font-size:11px; font-weight:700; letter-spacing:.2em; text-align:center }
@@ -555,6 +564,7 @@
       .d-card--bubble .d-card-name { color:#f472b6 }
       .d-card--slots  .d-card-name { color:#F5C842 }
       .d-card--street .d-card-name { color:#ffd700 }
+      .d-card--pirate .d-card-name { color:#f0c040 }
       .d-card-desc { font-size:9px; letter-spacing:.2em; text-transform:uppercase; color:var(--muted); text-align:center }
       .d-card-rtp { font-size:8px; letter-spacing:.3em; padding:2px 8px; border:1px solid var(--border); color:var(--muted) }
 
@@ -592,6 +602,9 @@
       .d-card--street .d-card-play { color:#ffd700 }
       .d-card--street .d-card-play::after { background:rgba(0,0,0,.88) }
       .d-card--street .d-card-play::before { background:linear-gradient(90deg,#c0c0c0,#ffd700,#ff6b35,#ffd700,#c0c0c0); background-size:300% 100% }
+      .d-card--pirate .d-card-play { color:#f0c040 }
+      .d-card--pirate .d-card-play::after { background:rgba(0,0,0,.88) }
+      .d-card--pirate .d-card-play::before { background:linear-gradient(90deg,#0a1628,#1a3a6b,#f0c040,#1a3a6b,#0a1628); background-size:300% 100% }
       .d-card-play:hover { opacity:.8; transform:translateY(-1px) }
       .d-card-play:disabled { opacity:.25; cursor:default }
 
@@ -948,7 +961,8 @@
   <button id="grannyBtn" class="m-game-btn m-game-btn--granny"><span>GRANNY RUN</span></button>
   <button id="bubbleBtn" class="m-game-btn m-game-btn--bubble"><span>BUBBLE GUM</span></button>
   <button id="slotsBtn" class="m-game-btn m-game-btn--slots" onclick="goSlots()"><span>OUTLAW GOLD</span></button>
-  <div class="m-coming">· Five games, one platform ·</div>
+  <button class="m-game-btn m-game-btn--pirate" onclick="goPirate()"><span>PIRATE TREASURE</span></button>
+  <div class="m-coming">· Six games, one platform ·</div>
 
   <!-- Rules hub: horizontal scroll cards -->
   <div class="rules-hub">
@@ -1183,8 +1197,20 @@
           <button class="d-card-play" onclick="event.stopPropagation();goStreetCash()"><span>PLAY</span></button>
         </div>
 
+        <div class="d-card d-card--pirate" onclick="goPirate()">
+          <div class="d-card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2l2 7h7l-5.5 4 2 7L12 16l-5.5 4 2-7L3 9h7z"/>
+            </svg>
+          </div>
+          <div class="d-card-name">PIRATE TREASURE</div>
+          <div class="d-card-desc">Hold &amp; Win jackpots</div>
+          <div class="d-card-rtp">RTP 96%</div>
+          <button class="d-card-play" onclick="event.stopPropagation();goPirate()"><span>PLAY</span></button>
+        </div>
+
       </div>
-      <div class="d-cards-sub">· Five games, one platform ·</div>
+      <div class="d-cards-sub">· Six games, one platform ·</div>
     </div>
 
   </div>
@@ -1241,6 +1267,7 @@ function goGranny(){ window.location.href = window.location.origin + '/granny.ht
 function goBubble(){ window.location.href = window.location.origin + '/bubble.html' }
 function goSlots() { window.location.href = window.location.origin + '/outlaw-gold.html' }
 function goStreetCash() { window.location.href = window.location.origin + '/street-cash.html' }
+function goPirate() { window.location.href = window.location.origin + '/pirate-treasure-hold.html' }
 
 // ── User profile display ──────────────────────────────────────────────────────
 const user = tg?.initDataUnsafe?.user || {}

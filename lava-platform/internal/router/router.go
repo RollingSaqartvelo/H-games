@@ -27,6 +27,7 @@ import (
 	sessionRepo "github.com/lava-platform/internal/session/repository"
 	sessionSvc "github.com/lava-platform/internal/session/service"
 	"github.com/lava-platform/internal/telegram"
+	pirateHandler "github.com/lava-platform/internal/pirate"
 	slotsHandler "github.com/lava-platform/internal/slots"
 	streetcashHandler "github.com/lava-platform/internal/streetcash"
 	walletHandler "github.com/lava-platform/internal/wallet/handler"
@@ -130,6 +131,11 @@ func New(cfg *config.Config, infra *infrastructure.Infra, deps *Deps) *gin.Engin
 
 	slotsH := slotsHandler.NewHandler(provider)
 	scH := streetcashHandler.NewHandler(provider)
+	pirateH := pirateHandler.NewHandler(provider, &pirateHandler.Config{
+		Weights:         pirateHandler.DefaultWeights,
+		FreeSpinWeights: pirateHandler.FreeSpinWeights,
+		BonusBuyCost:    65.0,
+	})
 
 	// ── Admin API (HTTP Basic Auth + X-SYSTEM-KEY) ───────────────────────────
 	adm := adminHandler.New(infra.DB, cfg.Operator.SystemAPIKey)
@@ -267,6 +273,12 @@ func New(cfg *config.Config, infra *infrastructure.Infra, deps *Deps) *gin.Engin
 		tmaSC.POST("/spin",   scH.Spin)
 		tmaSC.GET("/config",  scH.Config)
 
+		// Pirate Treasure Hold TMA routes
+		tmaPirate := tma.Group("/v1/pirate")
+		tmaPirate.Use(middleware.SessionValidate(sessSvc))
+		tmaPirate.POST("/spin",   pirateH.Spin)
+		tmaPirate.GET("/config",  pirateH.Config)
+
 		go func() {
 			if err := botHandler.RegisterWebhook(context.Background(), cfg.Telegram.AppURL); err != nil {
 				_ = err
@@ -338,6 +350,12 @@ func serveFrontend(r *gin.Engine) {
 		c.Header("Pragma", "no-cache")
 		c.Header("Expires", "0")
 		c.File(distDir + "/bubble.html")
+	})
+
+	// pirate-treasure-hold.html — Pirate Treasure Hold slot game
+	r.GET("/pirate-treasure-hold.html", func(c *gin.Context) {
+		c.Header("Cache-Control", "no-cache, no-store, must-revalidate")
+		c.File(distDir + "/pirate-treasure-hold.html")
 	})
 
 	// outlaw-gold.html — H-SLOTS slot game
