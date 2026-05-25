@@ -331,22 +331,22 @@ func countDoubloon(grid [NumRows][NumCols]int) int {
 // ── Hold & Win ────────────────────────────────────────────────────────────────
 
 func newDoubloonCell(r *rng, bet float64) *DoubloonCell {
-	// Weighted choice: 85% cash, 6% MINI, 4% MINOR, 3% MAJOR, 1.5% MEGA, 0.5% GRAND
+	// Weighted choice: 88% cash, 6% MINI, 3.5% MINOR, 2% MAJOR, 0.4% MEGA, 0.1% GRAND
 	roll := r.intn(1000)
 	switch {
-	case roll < 850: // cash
+	case roll < 880: // cash
 		idx := r.intn(len(doubloonCashMults))
 		return &DoubloonCell{
 			Value: doubloonCashMults[idx] * bet,
 			Type:  "cash",
 		}
-	case roll < 910: // MINI
+	case roll < 940: // MINI
 		return &DoubloonCell{Value: 20 * bet, Type: "MINI"}
-	case roll < 950: // MINOR
+	case roll < 975: // MINOR
 		return &DoubloonCell{Value: 50 * bet, Type: "MINOR"}
-	case roll < 980: // MAJOR
+	case roll < 995: // MAJOR
 		return &DoubloonCell{Value: 150 * bet, Type: "MAJOR"}
-	case roll < 995: // MEGA
+	case roll < 999: // MEGA
 		return &DoubloonCell{Value: 2000 * bet, Type: "MEGA"}
 	default: // GRAND
 		return &DoubloonCell{Value: 10000 * bet, Type: "GRAND"}
@@ -432,9 +432,9 @@ func runHoldWinRespin(state *HoldWinState, r *rng) *HoldWinState {
 				continue // already locked
 			}
 
-			// 25% chance to land doubloon-type symbol on each empty cell
+			// 6% chance to land doubloon-type symbol on each empty cell
 			roll := r.intn(100)
-			if roll >= 25 {
+			if roll >= 6 {
 				continue
 			}
 
@@ -508,7 +508,7 @@ func runHoldWinRespin(state *HoldWinState, r *rng) *HoldWinState {
 		state.Complete = true
 		if filledCells == NumRows*NumCols {
 			state.Jackpot = "GRAND"
-			state.TotalValue += 10000 * bet // GRAND jackpot bonus for full board
+			// значение уже накоплено в ячейках, двойное добавление убрано
 		}
 	}
 
