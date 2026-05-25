@@ -75,7 +75,7 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
 /* ── Single reel ── */
 .reel{flex:1;overflow:hidden;position:relative;border-radius:2px;}
 .reel-strip{display:flex;flex-direction:column;will-change:transform;}
-.reel-strip.spinning{filter:blur(3px);}
+.reel-strip.spinning{filter:none;}
 .sym-cell{display:flex;align-items:center;justify-content:center;
   position:relative;background:transparent!important;border:none!important;box-shadow:none!important;}
 .sym-cell img{width:100%;height:100%;object-fit:contain;display:block;background:transparent;}
@@ -496,7 +496,13 @@ function soundHoldWin() {
 
 // ═══════════════════════════════════════════════════════════
 //  REEL BUILD
-// ═══════════════════════════════════════════════════════════
+// ── Spin strip layout ──────────────────────────────────────
+// Strip: 70 cells. Spin from showing cell SPIN_START_IDX to SPIN_END_IDX.
+// Travel = 67-14 = 53 cells (≈4× more than original 13). Reset before each spin.
+const SPIN_TOTAL  = 70;
+const SPIN_START  = 14; // cells shown before spin
+const SPIN_END    = 67; // cells shown after spin (67,68,69 = final result)
+
 let reelEls = [];
 let stripEls = [];
 let cellRows = []; // cellRows[col][row] = element
@@ -513,13 +519,10 @@ function buildReels() {
     reel.className = 'reel';
     reel.style.height = (cellH * NUM_ROWS) + 'px';
 
-    // Strip with extra symbols above/below for animation
     const strip = document.createElement('div');
     strip.className = 'reel-strip';
-    // 30 symbols total; middle NUM_ROWS are "visible"
-    const totalCells = 30;
     const cells = [];
-    for (let i = 0; i < totalCells; i++) {
+    for (let i = 0; i < SPIN_TOTAL; i++) {
       const cell = document.createElement('div');
       cell.className = 'sym-cell';
       cell.style.height = cellH + 'px';
@@ -535,13 +538,11 @@ function buildReels() {
     cellRows.push(cells);
   }
 
-  // Init all cells to random symbols
   for (let col = 0; col < NUM_COLS; col++) {
-    for (let i = 0; i < 30; i++) {
+    for (let i = 0; i < SPIN_TOTAL; i++) {
       setCell(col, i, Math.floor(Math.random() * 9));
     }
-    // Position strip to show rows 14,15,16 as the visible 3
-    setStripY(col, -14 * cellH);
+    setStripY(col, -SPIN_START * cellH);
   }
 }
 
@@ -606,22 +607,25 @@ async function animateReel(col, finalSymbols, stopDelay) {
       const cellH = CELL_H;
       const strip = stripEls[col];
 
-      // Fill strip with random symbols (top portion for spinning)
-      for (let i = 0; i < 27; i++) {
+      // Reset to start position instantly (fixes distance=0 bug on spin 2+)
+      strip.style.transition = 'none';
+      setStripY(col, -SPIN_START * cellH);
+
+      // Fill travel portion with random symbols, set finals at end
+      for (let i = 0; i < SPIN_END; i++) {
         setCell(col, i, Math.floor(Math.random() * 9));
       }
-      // Set final 3 visible symbols at positions 27,28,29
       for (let r = 0; r < NUM_ROWS; r++) {
-        setCell(col, 27 + r, finalSymbols[r]);
+        setCell(col, SPIN_END + r, finalSymbols[r]);
       }
 
       strip.classList.add('spinning');
-      const startY = getStripY(col);
-      const targetY = -27 * cellH; // show cells 27,28,29
+      const startY = -SPIN_START * cellH;
+      const targetY = -SPIN_END  * cellH; // 53 cells of travel (≈4×)
       const distance = targetY - startY;
 
-      // Fast spin phase
-      const spinDur = 600;
+      // 40% faster: 600ms → 360ms
+      const spinDur = 360;
       const startTime = performance.now();
 
       await new Promise(r2 => {
@@ -922,11 +926,10 @@ async function doSpin(options={}) {
   await Promise.all(reelPromises);
   skipRequested = false;
 
-  // Update visible cells to final state
+  // Update visible cells to final state (SPIN_END = 67,68,69)
   for (let col=0; col<NUM_COLS; col++) {
     for (let row=0; row<NUM_ROWS; row++) {
-      // cells 27+row in the strip
-      setCell(col, 27+row, grid[row][col]);
+      setCell(col, SPIN_END+row, grid[row][col]);
     }
   }
 
