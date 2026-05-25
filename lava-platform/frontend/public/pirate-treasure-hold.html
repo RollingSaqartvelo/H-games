@@ -87,7 +87,8 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
 .free-counter{font-size:10px;color:var(--muted);letter-spacing:.2em;margin-left:8px;display:none;}
 
 /* ── Controls ── */
-.controls{width:100%;display:flex;flex-direction:column;gap:6px;flex-shrink:0;margin-top:6px;}
+.controls{width:100%;display:flex;flex-direction:column;gap:6px;flex-shrink:0;margin-top:6px;
+  position:relative;z-index:6;}
 
 .bet-row{display:flex;align-items:center;gap:6px;justify-content:center;}
 .bet-lbl{font-size:9px;color:var(--muted);letter-spacing:.2em;text-transform:uppercase;}
@@ -99,25 +100,31 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
 .bet-val{font-size:15px;font-weight:700;color:var(--gold);font-family:monospace;
   min-width:50px;text-align:center;}
 
-.action-row{display:flex;align-items:center;gap:8px;justify-content:center;}
+/* action-row: side-col | spin | auto */
+.action-row{display:flex;align-items:center;gap:6px;justify-content:center;width:100%;}
+.side-col{display:flex;flex-direction:column;gap:6px;align-items:center;flex:0 0 auto;}
 
-/* Spin button */
-.spin-btn{width:72px;height:72px;border:none;background:transparent;
-  cursor:pointer;padding:0;box-shadow:none;
+/* Spin button — ×3 */
+.spin-btn{width:min(216px,55vw);height:min(216px,55vw);border:none;background:transparent;
+  cursor:pointer;padding:0;box-shadow:none;flex-shrink:0;
   transition:transform .15s;display:flex;align-items:center;justify-content:center;}
 .spin-btn:active{transform:scale(.95);}
 .spin-btn:disabled{opacity:.4;cursor:default;}
 .spin-btn img{width:100%;height:100%;object-fit:contain;display:block;}
 
-.auto-btn{border:none;background:transparent;padding:0;cursor:pointer;box-shadow:none;transition:opacity .15s;}
-.auto-btn img{height:44px;display:block;object-fit:contain;}
+.auto-btn{border:none;background:transparent;padding:0;cursor:pointer;box-shadow:none;
+  transition:opacity .15s;
+  width:min(76px,19vw);height:min(76px,19vw);}
+.auto-btn img{width:100%;height:100%;object-fit:contain;display:block;}
 .auto-btn.active img{opacity:0.6;filter:hue-rotate(120deg);}
 
-.bonus-btn{border:none;background:transparent;padding:0;cursor:pointer;box-shadow:none;}
-.bonus-btn img{height:44px;display:block;object-fit:contain;}
+.bonus-btn{border:none;background:transparent;padding:0;cursor:pointer;box-shadow:none;
+  width:min(76px,19vw);height:min(76px,19vw);}
+.bonus-btn img{width:100%;height:100%;object-fit:contain;display:block;}
 
-.info-btn{border:none;background:transparent;padding:0;cursor:pointer;}
-.info-btn img{height:32px;display:block;object-fit:contain;}
+.info-btn{border:none;background:transparent;padding:0;cursor:pointer;
+  width:min(60px,15vw);height:min(60px,15vw);}
+.info-btn img{width:100%;height:100%;object-fit:contain;display:block;}
 
 /* ── Hold & Win overlay ── */
 .holdwin-overlay{
@@ -313,12 +320,14 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
       </div>
     </div>
     <div class="action-row">
-      <button class="bonus-btn" id="bonusBtn" onclick="doBonusBuy()"><img src="assets/h-slots/pirate/ui/btn-buy-bonus.png" alt="BUY BONUS"></button>
+      <div class="side-col">
+        <button class="bonus-btn" id="bonusBtn" onclick="doBonusBuy()"><img src="assets/h-slots/pirate/ui/btn-buy-bonus.png" alt="BUY BONUS"></button>
+        <button class="info-btn" onclick="openInfo()"><img src="assets/h-slots/pirate/ui/btn-paytable.png" alt="INFO"></button>
+      </div>
       <button class="spin-btn" id="spinBtn" onclick="doSpin()">
         <img id="spinBtnImg" src="assets/h-slots/pirate/ui/btn-spin-idle.png" alt="SPIN">
       </button>
       <button class="auto-btn" id="autoBtn" onclick="toggleAuto()"><img src="assets/h-slots/pirate/ui/btn-autoplay.png" alt="AUTO"></button>
-      <button class="info-btn" onclick="openInfo()"><img src="assets/h-slots/pirate/ui/btn-paytable.png" alt="INFO"></button>
     </div>
   </div>
 
