@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#0a1628">
 <title>PIRATE TREASURE HOLD — H-GAMES</title>
+<link rel="preload" as="image" href="assets/h-slots/pirate/symbols/sym-boost.png">
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -406,6 +407,15 @@ const SYMBOL_IMGS = [
   'assets/h-slots/pirate/symbols/sym-a.png',
 ];
 
+// Preload all symbol images, log errors with the exact URL
+const _preloaded = SYMBOL_IMGS.map(src => {
+  const img = new Image();
+  img.onerror = () => console.warn('[PIRATE] Failed to load symbol: ' + new URL(src, location.href).href);
+  img.onload  = () => console.log('[PIRATE] Loaded: ' + src);
+  img.src = src;
+  return img;
+});
+
 let betIdx = 2; // default $1.00
 let balance = DEMO_START;
 let isDemo = true;
@@ -511,11 +521,25 @@ function setCell(col, idx, symId, doubloonVal) {
   cell.className = 'sym-cell';
   cell.innerHTML = '';
   cell.dataset.sym = symId;
+
+  const src = SYMBOL_IMGS[symId] || SYMBOL_IMGS[0];
   const img = document.createElement('img');
-  img.src = SYMBOL_IMGS[symId] || SYMBOL_IMGS[0];
   img.alt = SYMBOL_NAMES[symId] || '';
   img.style.cssText = 'width:100%;height:100%;object-fit:contain;display:block;background:transparent;';
+
+  // Gold placeholder while loading (especially for large sym-boost.png)
+  if (!_preloaded[symId] || !_preloaded[symId].complete || _preloaded[symId].naturalWidth === 0) {
+    cell.style.background = 'rgba(240,192,64,0.15)';
+    img.onload = () => { cell.style.background = ''; };
+  }
+  img.onerror = () => {
+    console.warn('[PIRATE] setCell error, symId=' + symId + ' url=' + new URL(src, location.href).href);
+    cell.style.background = 'rgba(192,57,43,0.3)'; // red tint on error
+    img.style.display = 'none';
+  };
+  img.src = src;
   cell.appendChild(img);
+
   if (symId === 6 && doubloonVal !== undefined) {
     cell.classList.add('doubloon-cell');
     const dv = document.createElement('div');
