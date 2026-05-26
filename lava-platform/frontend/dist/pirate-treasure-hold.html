@@ -863,7 +863,7 @@ async function init() {
   isDemo = true;
   const stored = parseFloat(localStorage.getItem('pirate_demo_balance')) || 0;
   const crashBal = parseFloat(localStorage.getItem('crash_bal')) || 0;
-  balance = Math.max(stored, crashBal) || DEMO_START;
+  balance = Math.max(stored, crashBal, DEMO_START); // always at least DEMO_START in demo
   updateUI();
 }
 
@@ -897,14 +897,16 @@ document.getElementById('betUp').addEventListener('click', () => {
 //  SPIN LOGIC
 // ═══════════════════════════════════════════════════════════
 async function doSpin(options={}) {
-  if (isSpinning) return;
+  console.log('[PIRATE] doSpin called, isSpinning=' + isSpinning + ' balance=' + balance + ' options=' + JSON.stringify(options));
+  if (isSpinning) { console.warn('[PIRATE] doSpin blocked: isSpinning=true'); return; }
   const bet = BET_STEPS[betIdx];
 
   const isFree = freeSpinsLeft > 0 && !options.bonusBuy;
   const effectiveCost = options.bonusBuy ? bet * 65 : (isFree ? 0 : bet);
 
   if (!isFree && balance < effectiveCost) {
-    showMessage('Insufficient funds');
+    showMessage('NO FUNDS — $' + balance.toFixed(2));
+    console.warn('[PIRATE] Insufficient funds: balance=' + balance + ' need=' + effectiveCost);
     return;
   }
 
@@ -1400,7 +1402,8 @@ function toggleAuto() {
 }
 
 async function doBonusBuy() {
-  if (isSpinning) return;
+  console.log('[PIRATE] doBonusBuy called, isSpinning=' + isSpinning + ' balance=' + balance);
+  if (isSpinning) { console.warn('[PIRATE] doBonusBuy blocked: isSpinning=true'); return; }
   const bet = BET_STEPS[betIdx];
   const cost = bet * 65;
   if (balance < cost) { showMessage('Need $' + cost.toFixed(2)); return; }
