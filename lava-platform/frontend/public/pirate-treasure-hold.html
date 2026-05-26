@@ -154,6 +154,8 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
   background:radial-gradient(circle,rgba(240,192,64,.5),rgba(240,192,64,0));
   pointer-events:none;opacity:0;transition:opacity .1s;}
 .hw-boost-flash.active{opacity:1;}
+.spinning-cell{animation:cellPulse 0.3s ease-in-out infinite alternate;}
+@keyframes cellPulse{from{filter:brightness(1);}to{filter:brightness(2.2);}}
 
 /* ── Info modal ── */
 .modal{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.92);
@@ -1072,92 +1074,83 @@ async function showWins(result, bet) {
   await new Promise(r => setTimeout(r, 800));
 }
 
-async function showHoldWin(hwResult, bet, spinResult) {
-  soundHoldWin();
+// ── Hold & Win helpers ─────────────────────────────────────
+function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 
-  // Stage 1: Intro
+function waitForContinue() {
   const intro = document.getElementById('hwIntro');
-  intro.style.display = 'flex';
-  await new Promise(resolve => {
-    const btn = document.getElementById('hwIntroBtn');
-    const autoClose = setTimeout(() => { intro.style.display = 'none'; resolve(); }, 3000);
-    btn.onclick = () => { clearTimeout(autoClose); intro.style.display = 'none'; resolve(); };
+  return new Promise(resolve => {
+    function done() { intro.style.display = 'none'; resolve(); }
+    document.getElementById('hwIntroBtn').onclick = done;
+    setTimeout(done, 3000);
   });
+}
 
-  // Stage 2: Active round
-  const overlay = document.getElementById('hwOverlay');
-  overlay.style.display = 'flex';
-  buildHwGrid(hwResult);
-  updateSpinDots(hwResult.spins_left != null ? hwResult.spins_left : 3);
-  updateHwTotal(hwResult.total_value || 0);
-
-  let state = hwResult;
-  if (!hwResult.complete) {
-    while (!state.complete) {
-      await new Promise(r => setTimeout(r, skipRequested ? 100 : 1500));
-
-      let newState;
-      if (isDemo) {
-        newState = doOneRespin(state, bet);
-      } else {
-        try {
-          const res = await fetch('/tma/v1/pirate/spin', {
-            method:'POST',
-            headers:{'Authorization':'Bearer '+TOKEN,'Content-Type':'application/json'},
-            body:JSON.stringify({bet, free_spin:false, hold_respin:true, bonus_buy:false})
-          });
-          const d = await res.json();
-          newState = d.hold_win_result || state;
-          if (!isDemo) balance = d.balance || balance;
-        } catch(e) {
-          newState = doOneRespin(state, bet);
-        }
+function findNewCells(oldGrid, newGrid) {
+  const cells = [];
+  for (let row = 0; row < 3; row++) {
+    for (let col = 0; col < 5; col++) {
+      if (!oldGrid[row]?.[col] && newGrid[row]?.[col]) {
+        cells.push({ row, col, data: newGrid[row][col] });
       }
-
-      for (let r = 0; r < 3; r++) {
-        for (let c = 0; c < 5; c++) {
-          if (!state.grid[r]?.[c] && newState.grid[r]?.[c]) {
-            soundClick();
-            fillHwCell(r, c, newState.grid[r][c]);
-          }
-        }
-      }
-      state = newState;
-      updateSpinDots(state.spins_left || 0);
-      updateHwTotal(state.total_value || 0);
-
-      if (state.is_boosted) { doBoostFlash(); await new Promise(r => setTimeout(r, 500)); }
     }
   }
+  return cells;
+}
 
-  await new Promise(r => setTimeout(r, skipRequested ? 300 : 1500));
-  overlay.style.display = 'none';
+async function animateEmptyCells(state, duration) {
+  for (let row = 0; row < 3; row++) {
+    for (let col = 0; col < 5; col++) {
+      if (!state.grid[row][col]) {
+        const cell = document.getElementById('hwcell-' + row + '-' + col);
+        if (cell) cell.classList.add('spinning-cell');
+      }
+    }
+  }
+  await delay(duration);
+  document.querySelectorAll('.spinning-cell').forEach(el => el.classList.remove('spinning-cell'));
+}
 
-  // Stage 3: Win screen
-  await showHwWin(state.total_value || 0);
-
-  if (state.jackpot) {
-    await showBigWin(state.total_value, bet, state.jackpot + ' JACKPOT!');
+function updateSpinDots(spinsLeft) {
+  for (let i = 1; i <= 3; i++) {
+    const dot = document.getElementById('hwSpin' + i);
+    if (!dot) continue;
+    if (i <= spinsLeft) {
+      dot.style.background = '#cc1a1a';
+      dot.style.boxShadow = '0 0 12px #ff0000';
+      dot.style.color = '#fff';
+    } else {
+      dot.style.background = '#333';
+      dot.style.boxShadow = 'none';
+      dot.style.color = '#555';
+    }
   }
 }
 
-function doOneRespin(state, bet) {
-  const newGrid = [];
-  for (let r=0;r<3;r++) { newGrid.push([...state.grid[r]]); }
-  let total = state.total_value;
-  let added = false;
-  for (let r=0;r<3;r++) for (let c=0;c<5;c++) {
-    if (!newGrid[r][c] && demoRand()<0.22) {
-      const cell = demoCellVal(bet);
-      newGrid[r][c]=cell; total+=cell.value; added=true;
-    }
+function onNewCellLanded() {
+  ['hwSpin1','hwSpin2','hwSpin3'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.style.transform = 'scale(1.3)';
+    setTimeout(() => el.style.transform = 'scale(1)', 300);
+  });
+  updateSpinDots(3);
+}
+
+function animateTotalCount(newValue) {
+  const el = document.getElementById('hwTotal');
+  if (!el) return;
+  const startVal = parseFloat((el.textContent || '0').replace('$', '')) || 0;
+  const duration = 600, startTime = performance.now();
+  function tick(now) {
+    const t = Math.min((now - startTime) / duration, 1);
+    el.textContent = '$' + (startVal + (newValue - startVal) * t).toFixed(2);
+    if (t < 1) requestAnimationFrame(tick);
+    else el.textContent = '$' + newValue.toFixed(2);
   }
-  let spinsLeft = added ? 3 : state.spins_left-1;
-  let filled=0;
-  for (let r=0;r<3;r++) for (let c=0;c<5;c++) if(newGrid[r][c]) filled++;
-  const complete = spinsLeft<=0||filled===15;
-  return {grid:newGrid, spins_left:spinsLeft, total_value:total,
-    complete, jackpot:filled===15?'GRAND':'', is_boosted:false};
+  requestAnimationFrame(tick);
 }
 
 function _fillHwCellEl(cell, data) {
@@ -1179,9 +1172,23 @@ function _fillHwCellEl(cell, data) {
   cell.appendChild(lbl);
 }
 
-function buildHwGrid(hwResult) {
-  if (!buildHwGrid._checked) {
-    buildHwGrid._checked = true;
+function fillHwCell(row, col, cellData) {
+  const cell = document.getElementById('hwcell-' + row + '-' + col);
+  if (!cell) return;
+  _fillHwCellEl(cell, cellData);
+  cell.style.transform = 'scale(1.2)';
+  setTimeout(() => { cell.style.transform = 'scale(1)'; }, 300);
+}
+
+async function animateCellAppear(row, col, data) {
+  soundClick();
+  fillHwCell(row, col, data);
+  onNewCellLanded();
+}
+
+function renderHwGrid(state) {
+  if (!renderHwGrid._checked) {
+    renderHwGrid._checked = true;
     const t1 = new Image();
     t1.onload  = () => console.log('%cOK: hw-cell-empty','color:green');
     t1.onerror = () => console.error('FAIL: hw-cell-empty — ' + new URL('assets/h-slots/pirate/ui/hw-cell-empty.png', location.href).href);
@@ -1196,9 +1203,9 @@ function buildHwGrid(hwResult) {
   for (let r = 0; r < 3; r++) {
     for (let c = 0; c < 5; c++) {
       const cell = document.createElement('div');
-      cell.id = `hwcell-${r}-${c}`;
+      cell.id = 'hwcell-' + r + '-' + c;
       cell.style.cssText = 'position:relative;overflow:hidden;border-radius:3px;';
-      const d = hwResult.grid[r]?.[c];
+      const d = state.grid[r]?.[c];
       if (d) {
         _fillHwCellEl(cell, d);
       } else {
@@ -1212,24 +1219,89 @@ function buildHwGrid(hwResult) {
   }
 }
 
-function fillHwCell(row, col, cellData) {
-  const cell = document.getElementById(`hwcell-${row}-${col}`);
-  if (!cell) return;
-  _fillHwCellEl(cell, cellData);
-  cell.style.transform = 'scale(1.2)';
-  setTimeout(() => { cell.style.transform = 'scale(1)'; }, 300);
+// ── Main Hold & Win loop ───────────────────────────────────
+async function runHoldWinRound(initialState, bet) {
+  let state = initialState;
+
+  renderHwGrid(state);
+  updateSpinDots(state.spins_left != null ? state.spins_left : 3);
+  animateTotalCount(state.total_value || 0);
+
+  await waitForContinue();
+
+  while (!state.complete) {
+    if (!skipRequested) await animateEmptyCells(state, 1200);
+
+    let newState;
+    if (isDemo) {
+      newState = doOneRespin(state, bet);
+    } else {
+      try {
+        const res = await fetch('/tma/v1/pirate/spin', {
+          method: 'POST',
+          headers: { 'Authorization': 'Bearer ' + TOKEN, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ hold_respin: true })
+        });
+        const d = await res.json();
+        newState = d.hold_win_result || state;
+        if (!isDemo) balance = d.balance || balance;
+      } catch(e) {
+        newState = doOneRespin(state, bet);
+      }
+    }
+
+    const newCells = findNewCells(state.grid, newState.grid);
+    for (const nc of newCells) {
+      await animateCellAppear(nc.row, nc.col, nc.data);
+      await delay(300);
+    }
+
+    updateSpinDots(newState.spins_left || 0);
+    animateTotalCount(newState.total_value || 0);
+
+    if (newState.is_boosted) { doBoostFlash(); await delay(500); }
+    if (!newState.complete) await delay(skipRequested ? 200 : 900);
+    state = newState;
+  }
+
+  return state;
 }
 
-function updateSpinDots(spinsLeft) {
-  for (let i = 1; i <= 3; i++) {
-    const dot = document.getElementById(`hwSpin${i}`);
-    if (dot) dot.classList.toggle('used', i > spinsLeft);
+async function showHoldWin(hwResult, bet, spinResult) {
+  soundHoldWin();
+
+  document.getElementById('hwIntro').style.display = 'flex';
+  document.getElementById('hwOverlay').style.display = 'flex';
+
+  const finalState = await runHoldWinRound(hwResult, bet);
+
+  await delay(skipRequested ? 200 : 800);
+  document.getElementById('hwOverlay').style.display = 'none';
+
+  await showHwWin(finalState.total_value || 0);
+
+  if (finalState.jackpot) {
+    await showBigWin(finalState.total_value, bet, finalState.jackpot + ' JACKPOT!');
   }
 }
 
-function updateHwTotal(value) {
-  const el = document.getElementById('hwTotal');
-  if (el) el.textContent = '$' + (value || 0).toFixed(2);
+function doOneRespin(state, bet) {
+  const newGrid = [];
+  for (let r=0;r<3;r++) { newGrid.push([...state.grid[r]]); }
+  let total = state.total_value;
+  let added = false;
+  for (let r=0;r<3;r++) for (let c=0;c<5;c++) {
+    if (!newGrid[r][c] && demoRand()<0.22) {
+      const cell = demoCellVal(bet);
+      newGrid[r][c]=cell; total+=cell.value; added=true;
+    }
+  }
+  let spinsLeft = added ? 3 : state.spins_left-1;
+  let filled=0;
+  for (let r=0;r<3;r++) for (let c=0;c<5;c++) if(newGrid[r][c]) filled++;
+  const complete = spinsLeft<=0||filled===15;
+  return {grid:newGrid, spins_left:spinsLeft, total_value:total,
+    complete, jackpot:filled===15?'GRAND':'', is_boosted:false};
 }
 
 function showHwWin(totalValue) {
