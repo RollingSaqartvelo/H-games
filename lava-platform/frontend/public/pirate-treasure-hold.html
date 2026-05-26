@@ -1197,6 +1197,7 @@ function renderHwGrid(state) {
 // ── Main Hold & Win loop ───────────────────────────────────
 async function runHoldWinRound(initialState, bet) {
   let state = initialState;
+  let maxIter = 30;
 
   renderHwGrid(state);
   updateSpinDots(state.spins_left != null ? state.spins_left : 3);
@@ -1206,6 +1207,7 @@ async function runHoldWinRound(initialState, bet) {
   document.getElementById('hwOverlay').style.display = 'flex';
 
   while (!state.complete) {
+    if (--maxIter <= 0) { console.error('[PIRATE] HW maxIter reached, breaking'); break; }
     if (!skipRequested) await animateEmptyCells(state, 1200);
 
     let newState;
@@ -1218,10 +1220,13 @@ async function runHoldWinRound(initialState, bet) {
           headers: { 'Authorization': 'Bearer ' + TOKEN, 'Content-Type': 'application/json' },
           body: JSON.stringify({ bet: bet, hold_respin: true })
         });
+        if (!res.ok) throw new Error('respin HTTP ' + res.status);
         const d = await res.json();
-        newState = d.hold_win_result || state;
+        if (!d.hold_win_result) throw new Error('no hold_win_result in response');
+        newState = d.hold_win_result;
         if (!isDemo) balance = d.balance || balance;
       } catch(e) {
+        console.warn('[PIRATE] respin fallback to demo:', e.message);
         newState = doOneRespin(state, bet);
       }
     }

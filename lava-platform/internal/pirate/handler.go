@@ -178,8 +178,12 @@ func (h *Handler) Spin(c *gin.Context) {
 		isFree = true
 	}
 
-	if !isFree && req.Bet < 0.25 {
+	if !isFree && !req.HoldRespin && req.Bet < 0.25 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "bet must be >= 0.25"})
+		return
+	}
+	if !isFree && !req.HoldRespin && req.Bet > 30.00 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "bet must be <= 30.00"})
 		return
 	}
 
