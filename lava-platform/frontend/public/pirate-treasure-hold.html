@@ -97,8 +97,8 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
 /* Symbols are PNG images — no emoji CSS needed */
 
 /* ── Win display ── */
-.win-display{width:100%;height:28px;display:flex;align-items:center;justify-content:center;
-  flex-shrink:0;margin-top:4px;}
+.win-display{width:100%;height:24px;display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;margin-top:2px;}
 .win-text{font-size:18px;font-weight:900;color:var(--text-bright);
   text-shadow:var(--blood-glow);
   animation:win-pulse .5s ease-in-out infinite alternate;display:none;}
@@ -108,10 +108,10 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
 .free-counter{font-size:10px;color:var(--text-muted);letter-spacing:.2em;margin-left:8px;display:none;}
 
 /* ── Controls ── */
-.controls{width:100%;display:flex;flex-direction:column;gap:6px;flex-shrink:0;margin-top:6px;
+.controls{width:100%;display:flex;flex-direction:column;gap:4px;flex-shrink:0;margin-top:0;
   position:relative;z-index:6;}
 
-.bet-row{display:flex;align-items:center;gap:6px;justify-content:center;}
+.bet-row{display:flex;align-items:center;gap:6px;justify-content:center;padding-top:4px;}
 .bet-lbl{font-size:9px;color:var(--text-muted);letter-spacing:.2em;text-transform:uppercase;}
 .bet-stepper{display:flex;align-items:center;gap:4px;}
 .bet-btn{width:28px;height:28px;background:rgba(180,0,0,.1);border:1px solid var(--text-muted);
@@ -121,30 +121,23 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
 .bet-val{font-size:15px;font-weight:900;color:var(--text-bright);font-family:monospace;
   min-width:50px;text-align:center;text-shadow:var(--blood-glow);}
 
-/* action-row: side-col | spin | auto */
-.action-row{display:flex;align-items:center;gap:6px;justify-content:center;width:100%;}
-.side-col{display:flex;flex-direction:column;gap:6px;align-items:center;flex:0 0 auto;}
+/* action-row: all buttons in one line */
+.action-row{display:flex;flex-direction:row;align-items:center;justify-content:center;gap:8px;width:100%;}
 
-/* Spin button */
-.spin-btn{width:min(120px,31vw);height:min(120px,31vw);border:none;background:transparent;
+/* Spin button — biggest, stays current size */
+.spin-btn{width:min(110px,28vw);height:min(110px,28vw);border:none;background:transparent;
   cursor:pointer;padding:0;box-shadow:none;flex-shrink:0;
   transition:transform .15s;display:flex;align-items:center;justify-content:center;}
 .spin-btn:active{transform:scale(.95);}
 .spin-btn:disabled{opacity:.4;cursor:default;}
 .spin-btn img{width:100%;height:100%;object-fit:contain;display:block;}
 
-.auto-btn{border:none;background:transparent;padding:0;cursor:pointer;box-shadow:none;
-  transition:opacity .15s;width:min(48px,12vw);height:min(48px,12vw);}
-.auto-btn img{width:100%;height:100%;object-fit:contain;display:block;}
+/* Side buttons — portrait shape, 2.5× larger */
+.bonus-btn,.auto-btn,.info-btn{
+  border:none;background:transparent;padding:0;cursor:pointer;box-shadow:none;flex-shrink:0;
+  width:min(64px,16vw);height:min(80px,20vw);}
+.bonus-btn img,.auto-btn img,.info-btn img{width:100%;height:100%;object-fit:contain;display:block;}
 .auto-btn.active img{opacity:0.6;filter:hue-rotate(120deg);}
-
-.bonus-btn{border:none;background:transparent;padding:0;cursor:pointer;box-shadow:none;
-  width:min(48px,12vw);height:min(48px,12vw);}
-.bonus-btn img{width:100%;height:100%;object-fit:contain;display:block;}
-
-.info-btn{border:none;background:transparent;padding:0;cursor:pointer;
-  width:min(36px,9vw);height:min(36px,9vw);}
-.info-btn img{width:100%;height:100%;object-fit:contain;display:block;}
 
 /* ── Hold & Win overlay ── */
 .holdwin-overlay{
@@ -351,14 +344,12 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
           </div>
         </div>
         <div class="action-row">
-          <div class="side-col">
-            <button class="bonus-btn" id="bonusBtn" onclick="doBonusBuy()"><img src="assets/h-slots/pirate/ui/btn-buy-bonus.png" alt="BUY BONUS"></button>
-            <button class="info-btn" onclick="openInfo()"><img src="assets/h-slots/pirate/ui/btn-paytable.png" alt="INFO"></button>
-          </div>
+          <button class="bonus-btn" id="bonusBtn" onclick="doBonusBuy()"><img src="assets/h-slots/pirate/ui/btn-buy-bonus.png" alt="BUY BONUS"></button>
           <button class="spin-btn" id="spinBtn" onclick="doSpin()">
             <img id="spinBtnImg" src="assets/h-slots/pirate/ui/btn-spin-idle.png" alt="SPIN">
           </button>
           <button class="auto-btn" id="autoBtn" onclick="toggleAuto()"><img src="assets/h-slots/pirate/ui/btn-autoplay.png" alt="AUTO"></button>
+          <button class="info-btn" id="paytableBtn" onclick="openInfo()"><img src="assets/h-slots/pirate/ui/btn-paytable.png" alt="PAYTABLE"></button>
         </div>
       </div>
     </div>
