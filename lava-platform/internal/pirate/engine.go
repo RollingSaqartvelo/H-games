@@ -331,24 +331,24 @@ func countDoubloon(grid [NumRows][NumCols]int) int {
 // ── Hold & Win ────────────────────────────────────────────────────────────────
 
 func newDoubloonCell(r *rng, bet float64) *DoubloonCell {
-	// Weighted choice: 88% cash, 6% MINI, 3.5% MINOR, 2% MAJOR, 0.4% MEGA, 0.1% GRAND
-	roll := r.intn(1000)
+	// Cash:88%, MINI:6%, MINOR:3.5%, MAJOR:2%, MEGA:0.025%, GRAND:0.005%
+	roll := r.intn(100000)
 	switch {
-	case roll < 880: // cash
+	case roll < 88000: // cash — 88%
 		idx := r.intn(len(doubloonCashMults))
 		return &DoubloonCell{
 			Value: doubloonCashMults[idx] * bet,
 			Type:  "cash",
 		}
-	case roll < 940: // MINI
+	case roll < 94000: // MINI — 6%
 		return &DoubloonCell{Value: 20 * bet, Type: "MINI"}
-	case roll < 975: // MINOR
+	case roll < 97500: // MINOR — 3.5%
 		return &DoubloonCell{Value: 50 * bet, Type: "MINOR"}
-	case roll < 995: // MAJOR
+	case roll < 99500: // MAJOR — 2%
 		return &DoubloonCell{Value: 150 * bet, Type: "MAJOR"}
-	case roll < 999: // MEGA
+	case roll < 99525: // MEGA — 0.025%
 		return &DoubloonCell{Value: 2000 * bet, Type: "MEGA"}
-	default: // GRAND
+	default: // GRAND — 0.005%
 		return &DoubloonCell{Value: 10000 * bet, Type: "GRAND"}
 	}
 }
