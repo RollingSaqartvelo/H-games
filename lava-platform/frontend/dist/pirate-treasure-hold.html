@@ -46,7 +46,7 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
 /* ── 3-column game layout ── */
 .game-layout{display:flex;flex-direction:row;align-items:flex-start;
   width:100%;position:relative;}
-.col-character{width:60px;flex:0 0 60px;position:relative;align-self:stretch;}
+.col-character{width:90px;flex:0 0 90px;display:flex;align-items:center;justify-content:center;overflow:visible;}
 .col-reels{flex:1;display:flex;flex-direction:column;min-width:0;}
 .col-jackpot{width:90px;flex:0 0 90px;align-self:flex-start;overflow:hidden;}
 
@@ -226,12 +226,13 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
 @keyframes scatter-flash{0%,100%{opacity:1}50%{opacity:.3}}
 .scatter-anim{animation:scatter-flash .3s ease 5;}
 
-/* ── Character canvas (inside col-character, overlaps reels) ── */
+/* ── Character canvas (static flow inside col-character) ── */
 .char-canvas{
-  position:absolute;bottom:0;right:-15px;
-  width:110px;height:165px;
-  z-index:20;pointer-events:none;
+  position:static;
+  width:110px;height:200px;
+  pointer-events:none;
   background:transparent !important;mix-blend-mode:normal;
+  display:block;
 }
 </style>
 </head>
