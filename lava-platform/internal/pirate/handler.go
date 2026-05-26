@@ -88,7 +88,7 @@ func (h *Handler) setHoldWin(userID string, state *HoldWinState) {
 
 // SpinRequest is the POST /spin body.
 type SpinRequest struct {
-	Bet        float64 `json:"bet"        binding:"required,min=0.25,max=30.00"`
+	Bet        float64 `json:"bet"        binding:"min=0"`
 	FreeSpin   bool    `json:"free_spin"`
 	HoldRespin bool    `json:"hold_respin"`
 	BonusBuy   bool    `json:"bonus_buy"`
@@ -176,6 +176,11 @@ func (h *Handler) Spin(c *gin.Context) {
 	freeSess := h.getFreeSession(userID)
 	if req.FreeSpin && freeSess != nil && freeSess.SpinsLeft > 0 {
 		isFree = true
+	}
+
+	if !isFree && req.Bet < 0.25 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "bet must be >= 0.25"})
+		return
 	}
 
 	// ── 3. BonusBuy: debit Bet×65 ────────────────────────────────────────────────
