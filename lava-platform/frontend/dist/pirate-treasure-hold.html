@@ -776,7 +776,7 @@ function demoSpin(bet, isFreeSpin, bonusBuy) {
   if ((bonusBuy||demoRand()*100<threshold) && doubloonCount>=3) {
     holdWinTriggered = true;
     holdWinResult = buildDemoHoldWin(grid, bet);
-    totalPayout += holdWinResult.total_value;
+    // HW winnings tracked separately via runHoldWinRound, not pre-added here
   }
 
   return { grid, paylines, total_payout: totalPayout, scatter_count: scatterCount,
@@ -797,31 +797,22 @@ function demoCellVal(bet) {
 }
 
 function buildDemoHoldWin(grid, bet) {
-  const hwGrid = [];
-  for (let r=0;r<3;r++) { hwGrid.push([]); for(let c=0;c<5;c++) hwGrid[r].push(null); }
-  let total=0;
-  for (let r=0;r<3;r++) for (let c=0;c<5;c++) {
-    if (grid[r][c]===6||grid[r][c]===7||grid[r][c]===8) {
-      const cell = demoCellVal(bet);
-      hwGrid[r][c]=cell; total+=cell.value;
-    }
-  }
-  // Simulate a few respins (demo)
-  let spins=3;
-  while(spins>0) {
-    let added=false;
-    for (let r=0;r<3;r++) for (let c=0;c<5;c++) {
-      if (!hwGrid[r][c] && demoRand()<0.15) {
-        const cell=demoCellVal(bet);
-        hwGrid[r][c]=cell; total+=cell.value; added=true;
+  // Return only initial triggered cells — respins happen via doOneRespin in runHoldWinRound
+  const flatGrid = [];
+  let total = 0;
+  for (let r = 0; r < 3; r++) {
+    flatGrid.push([]);
+    for (let c = 0; c < 5; c++) {
+      if (grid[r][c]===6||grid[r][c]===7||grid[r][c]===8) {
+        const cell = demoCellVal(bet);
+        flatGrid[r].push(cell);
+        total += cell.value;
+      } else {
+        flatGrid[r].push(null);
       }
     }
-    if (added) spins=3; else spins--;
   }
-  // Build flat grid array for display
-  const flatGrid = [];
-  for (let r=0;r<3;r++) { flatGrid.push([]); for(let c=0;c<5;c++) flatGrid[r].push(hwGrid[r][c]); }
-  return {grid:flatGrid, spins_left:0, total_value:total, complete:true};
+  return {grid:flatGrid, spins_left:3, total_value:total, complete:false};
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -928,6 +919,8 @@ async function doSpin(options={}) {
 
   soundSpin();
 
+  try {
+
   // Start all reels spinning visually
   for (let col=0; col<NUM_COLS; col++) {
     stripEls[col].classList.add('spinning');
@@ -1008,24 +1001,22 @@ async function doSpin(options={}) {
   }
 
   // Handle Hold&Win
+  let hwWinnings = 0;
   if (result.hold_win_triggered && result.hold_win_result) {
-    await showHoldWin(result.hold_win_result, bet, result);
+    hwWinnings = await showHoldWin(result.hold_win_result, bet, result);
   }
 
   // Update balance
   if (!isDemo) {
     balance = result.balance || balance;
   } else {
-    balance += (result.total_payout||0);
-    if (result.hold_win_triggered && result.hold_win_result) {
-      // already added in total_payout
-    }
+    balance += (result.total_payout||0) + hwWinnings;
     saveDemo();
   }
   updateUI();
 
   // Big win check
-  const winAmt = result.total_payout || 0;
+  const winAmt = (result.total_payout||0) + hwWinnings;
   charReact(winAmt, bet);
   if (winAmt > bet * 10) {
     soundWin(winAmt, bet);
@@ -1035,8 +1026,12 @@ async function doSpin(options={}) {
     showWinText('WIN $' + winAmt.toFixed(2));
   }
 
-  isSpinning = false;
-  setSpinBtns(true);
+  } catch(e) {
+    console.error('[PIRATE] doSpin error:', e);
+  } finally {
+    isSpinning = false;
+    setSpinBtns(true);
+  }
 
   // Auto-play
   if (isAuto && freeSpinsLeft <= 0) {
@@ -1261,6 +1256,8 @@ async function showHoldWin(hwResult, bet, spinResult) {
   if (finalState.jackpot) {
     await showBigWin(finalState.total_value, bet, finalState.jackpot + ' JACKPOT!');
   }
+
+  return finalState.total_value || 0;
 }
 
 function doOneRespin(state, bet) {
