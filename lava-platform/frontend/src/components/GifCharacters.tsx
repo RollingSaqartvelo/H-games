@@ -111,8 +111,8 @@ export function GifCharacters() {
       const vid = document.getElementById('running-bg-video') as HTMLVideoElement | null
       if (vid) vid.pause()
 
-      // Wasted appears 250ms before GIFs end
-      wastedTimer.current = window.setTimeout(() => setShowWasted(true), CRASH_GIF_MS - 250)
+      // Wasted appears 500ms before GIFs end
+      wastedTimer.current = window.setTimeout(() => setShowWasted(true), CRASH_GIF_MS - 500)
 
       // When GIFs finish: hide crash overlay, signal betting panel to appear
       heroTimer.current = window.setTimeout(() => {
