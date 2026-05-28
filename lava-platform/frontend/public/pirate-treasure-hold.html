@@ -628,68 +628,70 @@ function easeInOutQuart(t) {
 async function animateReel(col, finalSymbols, stopDelay) {
   return new Promise(resolve => {
     setTimeout(async () => {
-      soundClick();
-      const cellH = CELL_H;
-      const strip = stripEls[col];
+      try {
+        const cellH = CELL_H;
+        const strip = stripEls[col];
+        if (!strip) { resolve(); return; }
 
-      // Reset to start position instantly (fixes distance=0 bug on spin 2+)
-      strip.style.transition = 'none';
-      setStripY(col, -SPIN_START * cellH);
+        soundClick();
+        strip.style.transition = 'none';
+        setStripY(col, -SPIN_START * cellH);
 
-      // Fill travel portion with random symbols, set finals at end
-      for (let i = 0; i < SPIN_END; i++) {
-        setCell(col, i, Math.floor(Math.random() * 9));
-      }
-      for (let r = 0; r < NUM_ROWS; r++) {
-        setCell(col, SPIN_END + r, finalSymbols[r]);
-      }
+        for (let i = 0; i < SPIN_END; i++) setCell(col, i, Math.floor(Math.random()*9));
+        for (let r = 0; r < NUM_ROWS; r++) setCell(col, SPIN_END+r, finalSymbols[r] ?? 0);
 
-      strip.classList.add('spinning');
-      const startY = -SPIN_START * cellH;
-      const targetY = -SPIN_END  * cellH; // 53 cells of travel (≈4×)
-      const distance = targetY - startY;
+        strip.classList.add('spinning');
+        const startY = -SPIN_START * cellH;
+        const targetY = -SPIN_END * cellH;
+        const spinDur = 360;
+        const startTime = performance.now();
 
-      // 40% faster: 600ms → 360ms
-      const spinDur = 360;
-      const startTime = performance.now();
-
-      await new Promise(r2 => {
-        function frame(now) {
-          if (skipRequested) {
+        await new Promise(r2 => {
+          let done = false;
+          function finish() {
+            if (done) return; done = true;
             strip.style.transition = 'none';
             setStripY(col, targetY);
             strip.classList.remove('spinning');
-            // Force-write final symbols on skip
-            for (let r = 0; r < NUM_ROWS; r++) setCell(col, SPIN_END + r, finalSymbols[r]);
-            r2(); return;
+            for (let r=0;r<NUM_ROWS;r++) setCell(col, SPIN_END+r, finalSymbols[r] ?? 0);
+            r2();
           }
-          const elapsed = now - startTime;
-          const t = Math.min(elapsed / spinDur, 1);
-          const ease = easeInOutQuart(t);
-          setStripY(col, startY + distance * ease);
-          if (t < 1) { requestAnimationFrame(frame); }
-          else { r2(); }
+          // fallback: гарантированное завершение если rAF подвис
+          setTimeout(finish, spinDur + 300);
+          function frame(now) {
+            if (skipRequested) { finish(); return; }
+            const t = Math.min((now - startTime) / spinDur, 1);
+            setStripY(col, startY + (targetY - startY) * easeInOutQuart(t));
+            if (t < 1) requestAnimationFrame(frame); else finish();
+          }
+          requestAnimationFrame(frame);
+        });
+
+        if (!skipRequested) {
+          strip.style.transition = 'transform 0.08s ease-out';
+          setStripY(col, targetY + 8);
+          await new Promise(r2 => setTimeout(r2, 80));
+          strip.style.transition = 'transform 0.06s ease-in';
+          setStripY(col, targetY);
+          await new Promise(r2 => setTimeout(r2, 60));
         }
-        requestAnimationFrame(frame);
-      });
 
-      // Overshoot bounce
-      if (!skipRequested) {
-        strip.style.transition = 'transform 0.08s ease-out';
-        setStripY(col, targetY + 8);
-        await new Promise(r2 => setTimeout(r2, 80));
-        strip.style.transition = 'transform 0.06s ease-in';
-        setStripY(col, targetY);
-        await new Promise(r2 => setTimeout(r2, 60));
+        strip.style.transition = 'none';
+        setStripY(col, -SPIN_END * CELL_H);
+        for (let r=0;r<NUM_ROWS;r++) setCell(col, SPIN_END+r, finalSymbols[r] ?? 0);
+        strip.style.transition = '';
+        strip.classList.remove('spinning');
+
+      } catch(e) {
+        console.error('[PIRATE] animateReel error col='+col, e);
+        try {
+          stripEls[col]?.classList.remove('spinning');
+          setStripY(col, -SPIN_END * CELL_H);
+          for (let r=0;r<NUM_ROWS;r++) setCell(col, SPIN_END+r, finalSymbols[r] ?? 0);
+        } catch(e2) {}
+      } finally {
+        resolve();
       }
-
-      // Lock strip at exact final position and force-write visible cells
-      strip.style.transition = 'none';
-      setStripY(col, -SPIN_END * CELL_H);
-      for (let r = 0; r < NUM_ROWS; r++) setCell(col, SPIN_END + r, finalSymbols[r]);
-      strip.style.transition = '';
-      strip.classList.remove('spinning');
-      resolve();
     }, stopDelay);
   });
 }
@@ -940,6 +942,7 @@ async function doSpin(options={}) {
         headers:{'Authorization':'Bearer '+TOKEN,'Content-Type':'application/json'},
         body:JSON.stringify({bet, free_spin:isFree, hold_respin:false, bonus_buy:options.bonusBuy||false})
       });
+      if (!res.ok) throw new Error('spin HTTP ' + res.status);
       result = await res.json();
     } catch(e) {
       result = demoSpin(bet, isFree, options.bonusBuy||false);
