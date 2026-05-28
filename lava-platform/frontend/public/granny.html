@@ -987,7 +987,7 @@ let animFrame = 0
 
 // Character state
 let grannyY = 0, grannyX = 0.62, doctorY = 0, grannyOsc = 0, doctorOsc = 0, flameT = 0
-let grannyVidReady = false, doctorVidReady = false
+let grannyImgReady = false, doctorImgReady = false
 
 // Parallax state
 let bgOff = 0, lastTs = 0
@@ -1009,33 +1009,14 @@ bgVid.addEventListener('timeupdate', () => {
 })
 bgVid.load()
 
-// ── Character assets ──────────────────────────────────────────────────────────
-const grannyVid = document.createElement('video')
-grannyVid.src = '/assets/granny/Granny%20hero.mp4'
-grannyVid.loop = true
-grannyVid.muted = true
-grannyVid.playsInline = true
-grannyVid.setAttribute('playsinline', '')
-grannyVid.setAttribute('webkit-playsinline', '')
-grannyVid.preload = 'auto'
-grannyVid.style.cssText = 'position:fixed;width:1px;height:1px;opacity:0;pointer-events:none;top:-9999px;left:-9999px'
-document.body.appendChild(grannyVid)
-grannyVid.addEventListener('loadeddata', () => { grannyVidReady = true; grannyVid.play().catch(()=>{}) }, { once: true })
-grannyVid.load()
+// ── Character assets (GIF — browser animates automatically each drawImage call) ─
+const grannyImg = new Image()
+grannyImg.onload = () => { grannyImgReady = true }
+grannyImg.src = '/assets/granny/gran.gif'
 
-// Doctor — video asset (drawn onto canvas each frame)
-const doctorVid = document.createElement('video')
-doctorVid.src = '/video/medical%20hero.mp4'
-doctorVid.loop = true
-doctorVid.muted = true
-doctorVid.playsInline = true
-doctorVid.setAttribute('playsinline', '')
-doctorVid.setAttribute('webkit-playsinline', '')
-doctorVid.preload = 'auto'
-doctorVid.style.cssText = 'position:fixed;width:1px;height:1px;opacity:0;pointer-events:none;top:-9999px;left:-9999px'
-document.body.appendChild(doctorVid)
-doctorVid.addEventListener('loadeddata', () => { doctorVidReady = true; doctorVid.play().catch(()=>{}) }, { once: true })
-doctorVid.load()
+const doctorImg = new Image()
+doctorImg.onload = () => { doctorImgReady = true }
+doctorImg.src = '/assets/granny/doc.gif'
 
 // ── Win overlay asset (preloaded so no lag on cashout) ────────────────────────
 const _grannyWinImg = new Image()
@@ -1360,8 +1341,6 @@ function drawChromaKey(mainCtx, vid, proc, cx, cy, drawH) {
   mainCtx.drawImage(proc.oc, cx - dW/2, cy - drawH/2, dW, drawH)
 }
 
-const grannyProc = makeChromaProc()
-const doctorProc = makeChromaProc()
 
 // ── Main draw loop ─────────────────────────────────────────────────────────────
 function drawScene(ts) {
@@ -1374,9 +1353,6 @@ function drawScene(ts) {
   const running = roundState === 'RUNNING'
   const crashed = roundState === 'CRASHED'
 
-  // Keep character videos playing (muted — safe from autoplay policy)
-  if (grannyVidReady && grannyVid.paused) grannyVid.play().catch(()=>{})
-  if (doctorVidReady && doctorVid.paused) doctorVid.play().catch(()=>{})
 
   // Update parallax offset
   if (running)                    bgOff += 160 * Math.pow(Math.max(multiplier,1), 0.6) * dt
@@ -1420,30 +1396,26 @@ function drawScene(ts) {
   drawCurve(W, H)
 
   // ── Doctor (drawn first — behind granny in z-order) ───────────────────────
-  const doctorH = Math.min(H * 0.82, 220)
   ctx.save()
   ctx.translate(dX, doctorY + doctorOsc)
   if (crashed) ctx.translate(gX - dX, grannyY - doctorY - 10)
-  if (doctorVidReady) {
-    drawChromaKey(ctx, doctorVid, doctorProc, 0, 0, doctorH)
+  if (doctorImgReady) {
+    ctx.drawImage(doctorImg, -doctorImg.naturalWidth / 2, -doctorImg.naturalHeight / 2)
   } else {
     ctx.font='32px serif'; ctx.textAlign='center'; ctx.textBaseline='middle'
     ctx.fillText('👨‍⚕️', 0, 0)
-    ctx.save(); ctx.rotate(-Math.PI/4); ctx.font='18px serif'; ctx.fillText('💉', -14, -14); ctx.restore()
   }
   ctx.restore()
 
   // ── Granny (drawn after doctor — in front) ─────────────────────────────────
-  const grannyH = Math.min(H * 0.92, 250)
   ctx.save()
   ctx.translate(gX, grannyY + grannyOsc)
   if (crashed) ctx.rotate(Math.PI / 10)
-  if (grannyVidReady) {
-    drawChromaKey(ctx, grannyVid, grannyProc, 0, 0, grannyH)
+  if (grannyImgReady) {
+    ctx.drawImage(grannyImg, -grannyImg.naturalWidth / 2, -grannyImg.naturalHeight / 2)
   } else {
     ctx.font='36px serif'; ctx.textAlign='center'; ctx.textBaseline='middle'
     ctx.fillText('👵', 0, 0)
-    ctx.font='20px serif'; ctx.fillText('🚀', 8, 18)
   }
   ctx.restore()
 
