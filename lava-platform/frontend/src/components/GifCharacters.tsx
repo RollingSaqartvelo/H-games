@@ -197,24 +197,31 @@ export function GifCharacters() {
         />
       </div>
 
-      {/* Wasted — rendered via portal into body so overflow:hidden ancestors can't clip it */}
+      {/* Wasted — full-screen fixed overlay via portal; flexbox center is immune to ancestor transforms */}
       {showWasted && createPortal(
-        <img
+        <div
           aria-hidden="true"
-          src={WASTED_SRC}
-          alt="WASTED"
           style={{
             position: 'fixed',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            width: 'min(88vw, 420px)',
-            height: 'auto',
+            inset: 0,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
             pointerEvents: 'none',
             zIndex: 9999,
-            animation: 'wasted-slam 320ms cubic-bezier(0.15, 1.35, 0.4, 1) both',
           }}
-        />,
+        >
+          <img
+            src={WASTED_SRC}
+            alt="WASTED"
+            style={{
+              width: 'min(88vw, 420px)',
+              height: 'auto',
+              display: 'block',
+              animation: 'wasted-slam 320ms cubic-bezier(0.15, 1.35, 0.4, 1) both',
+            }}
+          />
+        </div>,
         document.body
       )}
     </>
