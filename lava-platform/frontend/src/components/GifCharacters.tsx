@@ -56,9 +56,8 @@ export function GifCharacters() {
       if (vid && vid.duration) {
         const t = vid.currentTime
         let op = 1
-        if (t < 0.005)                     op = 0
-        else if (t < 0.03)                 op = 0.3
-        else if (t >= 6.2455 && t < 6.25) op = 0
+        if (t <= 0.05)               op = 0.15  // 0.00–0.05s: 85% transparent
+        else if (t >= 6.25 && t <= 6.27) op = 0.15  // 6.25–6.27s: 85% transparent
         setBgOpacity(op)
       }
       raf = requestAnimationFrame(tick)
