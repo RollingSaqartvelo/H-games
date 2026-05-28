@@ -3,6 +3,7 @@ import { useGame } from '../store/game'
 
 const SHERIFF_IDLE  = '/assets/sheriff/%D1%88%D0%B5%D1%80%D0%B8%D1%84.gif'
 const SHERIFF_SHOT  = '/assets/sheriff/%D0%92%D1%8B%D1%81%D1%82%D1%80%D0%B5%D0%BB.gif'
+const SHERIFF_CRASH = '/assets/sheriff/sherif%20crash.gif'
 const HERO_SRC      = '/assets/hero/%D0%B3%D0%B5%D1%80%D0%BE%D0%B9.gif'
 const CRASH_SRC     = '/assets/hero/Newcrash.gif'
 const WASTED_SRC    = '/assets/ui/Wasted/newwasted.png'
@@ -105,6 +106,14 @@ export function GifCharacters() {
     return () => window.clearTimeout(heroTimer.current)
   }, [running, preCrash, crashed])
 
+  // Pause bg video + switch sheriff on crash — fires the moment crash-gif starts
+  useEffect(() => {
+    if (heroState === 'crash-gif') {
+      const vid = document.getElementById('running-bg-video') as HTMLVideoElement | null
+      if (vid) vid.pause()
+    }
+  }, [heroState])
+
   // Flash + wasted sequence — fires once when crash-gif starts
   useEffect(() => {
     if (heroState === 'crash-gif' && !crashStarted.current) {
@@ -147,8 +156,8 @@ export function GifCharacters() {
       }}
     >
       <img
-        key={firing ? `shot-${shotKey}` : 'idle'}
-        src={firing ? SHERIFF_SHOT : SHERIFF_IDLE}
+        key={heroState === 'crash-gif' ? 'sheriff-crash' : (firing ? `shot-${shotKey}` : 'idle')}
+        src={heroState === 'crash-gif' ? SHERIFF_CRASH : (firing ? SHERIFF_SHOT : SHERIFF_IDLE)}
         alt=""
         style={{ ...charStyle, left: isMobile ? '-35%' : 0 }}
       />
