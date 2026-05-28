@@ -14,16 +14,17 @@ const SHOT_MS      = 5000
 const SHOT_SHOW_MS = 800
 
 function useCharLayout(): { size: string; isMobile: boolean } {
-  const mobile = () => window.innerWidth < 768
-  const [isMobile, setIsMobile] = useState(mobile)
+  // App container is always ≤480px — always use compact mobile character layout
+  // so both sheriff (left:-35%) and hero (left:25%) are correctly positioned.
+  const [w, setW] = useState(() => Math.min(window.innerWidth, 480))
   useEffect(() => {
-    const update = () => setIsMobile(mobile())
+    const update = () => setW(Math.min(window.innerWidth, 480))
     window.addEventListener('resize', update)
     return () => window.removeEventListener('resize', update)
   }, [])
   return {
-    size: isMobile ? '375px' : 'min(600px, 38vw)',
-    isMobile,
+    size: w + 'px',
+    isMobile: true,
   }
 }
 
