@@ -162,9 +162,7 @@ export function BettingVideo() {
       </div>
 
       {siren && (
-        <div className="bvb-siren" aria-hidden="true">
-          <div className="bvb-siren__label">⚡ LAST SECONDS!</div>
-        </div>
+        <div className="bvb-siren" aria-hidden="true" />
       )}
     </>
   )
