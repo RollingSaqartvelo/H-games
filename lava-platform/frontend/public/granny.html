@@ -992,11 +992,22 @@ let grannyVidReady = false, doctorVidReady = false
 // Parallax state
 let bgOff = 0, lastTs = 0
 
-// ── Static background image ───────────────────────────────────────────────────
-const bgImg = new Image()
-let bgImgReady = false
-bgImg.onload = () => { bgImgReady = true }
-bgImg.src = '/assets/granny%20bg/bgran.png'
+// ── Background video ──────────────────────────────────────────────────────────
+const bgVid = document.createElement('video')
+bgVid.src = '/video/grany%20bg.mp4'
+bgVid.loop = true
+bgVid.muted = true
+bgVid.playsInline = true
+bgVid.setAttribute('playsinline', '')
+bgVid.setAttribute('webkit-playsinline', '')
+bgVid.preload = 'auto'
+bgVid.style.cssText = 'position:fixed;width:1px;height:1px;opacity:0;pointer-events:none;top:-9999px;left:-9999px'
+document.body.appendChild(bgVid)
+bgVid.addEventListener('loadeddata', () => { bgVid.play().catch(()=>{}) }, { once: true })
+bgVid.addEventListener('timeupdate', () => {
+  if (bgVid.duration && bgVid.currentTime >= bgVid.duration - 0.08) bgVid.currentTime = 0
+})
+bgVid.load()
 
 // ── Character assets ──────────────────────────────────────────────────────────
 const grannyVid = document.createElement('video')
@@ -1308,14 +1319,14 @@ function drawGround(W, H, off, ts) {
   }
 }
 
-// ── Static background — cover-fit ────────────────────────────────────────────
+// ── Background video — cover-fit ─────────────────────────────────────────────
 function drawBackground(W, H) {
-  if (!bgImgReady) {
+  if (bgVid.readyState < 2 || !bgVid.videoWidth) {
     ctx.fillStyle = '#020810'; ctx.fillRect(0, 0, W, H); return
   }
-  const s = Math.max(W / bgImg.naturalWidth, H / bgImg.naturalHeight)
-  const dW = bgImg.naturalWidth * s, dH = bgImg.naturalHeight * s
-  ctx.drawImage(bgImg, (W - dW) / 2, (H - dH) / 2, dW, dH)
+  const s = Math.max(W / bgVid.videoWidth, H / bgVid.videoHeight)
+  const dW = bgVid.videoWidth * s, dH = bgVid.videoHeight * s
+  ctx.drawImage(bgVid, (W - dW) / 2, (H - dH) / 2, dW, dH)
 }
 
 
