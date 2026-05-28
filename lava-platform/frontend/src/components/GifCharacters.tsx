@@ -8,8 +8,8 @@ const HERO_SRC      = '/assets/hero/%D0%B3%D0%B5%D1%80%D0%BE%D0%B9.gif'
 const CRASH_SRC     = '/assets/hero/Newcrash.gif'
 const WASTED_SRC    = '/assets/ui/Wasted/newwasted.png'
 
-// Duration of crash GIFs — wasted appears 100ms before this, then game transitions to betting
-const CRASH_GIF_MS = 1800
+// Duration of crash GIFs — wasted appears 250ms before this, then game transitions to betting
+const CRASH_GIF_MS = 1900
 
 const SHOT_MS      = 5000
 const SHOT_SHOW_MS = 800
@@ -109,8 +109,8 @@ export function GifCharacters() {
       const vid = document.getElementById('running-bg-video') as HTMLVideoElement | null
       if (vid) vid.pause()
 
-      // Wasted appears 100ms before GIFs end
-      wastedTimer.current = window.setTimeout(() => setShowWasted(true), CRASH_GIF_MS - 100)
+      // Wasted appears 250ms before GIFs end
+      wastedTimer.current = window.setTimeout(() => setShowWasted(true), CRASH_GIF_MS - 250)
 
       // When GIFs finish: hide crash overlay, signal betting panel to appear
       heroTimer.current = window.setTimeout(() => {
