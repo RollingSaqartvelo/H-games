@@ -1110,7 +1110,7 @@ function drawFog(W, H) {
 function drawParticles(W, H, ts) {
   const t = ts * 0.001
   for (let i = 0; i < 14; i++) {
-    const px = (rnd(i + 20) * W + t * 10 * (0.3 + rnd(i + 21) * 0.7)) % (W + 10)
+    const px = (rnd(i + 20) * W + t * 10 * (0.3 + rnd(i + 21) * 0.56)) % (W + 10)
     const py = ((rnd(i + 22) * H - t * 7 * (0.2 + rnd(i + 23) * 0.6)) % H + H) % H
     const a  = (0.12 + rnd(i + 24) * 0.38) * (0.5 + Math.sin(t * 2.2 + i * 0.9) * 0.5)
     ctx.globalAlpha = a
@@ -1201,7 +1201,7 @@ function drawSkyline(W, H, off) {
 
 // ── Layer 2: Midground buildings + hospital ───────────────────────────────────
 function drawMidground(W, H, off) {
-  const mOff = off * 0.50, baseY = H * 0.77, TILE = 118
+  const mOff = off * 0.50, baseY = H * 0.567, TILE = 118
   const s = Math.floor(mOff/TILE)-1, e = s + Math.ceil(W/TILE) + 3
   for (let i = s; i <= e; i++) {
     const r1=rnd(i*13+400),r2=rnd(i*13+401),r3=rnd(i*13+402),r4=rnd(i*13+403)
@@ -1237,7 +1237,7 @@ function drawMidground(W, H, off) {
 
 // ── Layer 1: Road / streetlights / cars ──────────────────────────────────────
 function drawGround(W, H, off, ts) {
-  const gY = H * 0.78
+  const gY = H * 0.568
 
   // Sidewalk strip
   ctx.fillStyle = '#1c2334'; ctx.fillRect(0, gY, W, 10)
@@ -1391,7 +1391,7 @@ function drawScene(ts) {
   ctx.translate(dX, doctorY + doctorOsc)
   if (crashed) ctx.translate(gX - dX, grannyY - doctorY - 10)
   if (doctorImgReady) {
-    const dw = doctorImg.naturalWidth * 0.7, dh = doctorImg.naturalHeight * 0.7
+    const dw = doctorImg.naturalWidth * 0.56, dh = doctorImg.naturalHeight * 0.56
     ctx.drawImage(doctorImg, -dw / 2, -dh / 2, dw, dh)
   } else {
     ctx.font='32px serif'; ctx.textAlign='center'; ctx.textBaseline='middle'
@@ -1404,7 +1404,7 @@ function drawScene(ts) {
   ctx.translate(gX, grannyY + grannyOsc)
   if (crashed) ctx.rotate(Math.PI / 10)
   if (grannyImgReady) {
-    const gw = grannyImg.naturalWidth * 0.7, gh = grannyImg.naturalHeight * 0.7
+    const gw = grannyImg.naturalWidth * 0.56, gh = grannyImg.naturalHeight * 0.56
     ctx.drawImage(grannyImg, -gw / 2, -gh / 2, gw, gh)
   } else {
     ctx.font='36px serif'; ctx.textAlign='center'; ctx.textBaseline='middle'
