@@ -186,7 +186,7 @@ export function GifCharacters() {
           alt="WASTED"
           style={{
             position: 'absolute',
-            top: '40%',
+            top: '50%',
             left: '50%',
             transform: 'translate(-50%, -50%)',
             width: 'min(88vw, 420px)',
