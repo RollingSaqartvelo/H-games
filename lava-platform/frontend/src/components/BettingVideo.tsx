@@ -15,8 +15,9 @@ const SIREN_THRESH = 2
 type Phase = 'visible' | 'fading-out' | 'hidden'
 
 export function BettingVideo() {
-  const roundState = useGame((s) => s.roundState)
-  const startingAt = useGame((s) => s.startingAt)
+  const roundState         = useGame((s) => s.roundState)
+  const startingAt         = useGame((s) => s.startingAt)
+  const crashSequenceDone  = useGame((s) => s.crashSequenceDone)
 
   const videoRef = useRef<HTMLVideoElement>(null)
   const timerRef = useRef<number | undefined>(undefined)
@@ -41,7 +42,7 @@ export function BettingVideo() {
       return
     }
 
-    if (roundState === 'STARTING' || roundState === 'CREATED') {
+    if (roundState === 'STARTING' || roundState === 'CREATED' || crashSequenceDone) {
       setPhase('visible')
 
       const vid = videoRef.current
@@ -67,7 +68,7 @@ export function BettingVideo() {
     }
 
     return () => window.clearTimeout(timerRef.current)
-  }, [roundState])
+  }, [roundState, crashSequenceDone])
 
   // ── Siren tick ────────────────────────────────────────────────────────────
 

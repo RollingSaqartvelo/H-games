@@ -82,6 +82,9 @@ interface GameState {
   // ── Last bet_placed broadcast — consumed by BetsViewer ───────────────────────
   lastBetPlaced: BetPlacedData | null
 
+  // ── Crash sequence done — GifCharacters sets this when crash GIFs finish ─────
+  crashSequenceDone: boolean
+
   // ── Form ────────────────────────────────────────────────────────────────────
   betAmount: string
   autoCashout: string
@@ -99,6 +102,7 @@ interface GameActions {
   applyCashoutMsg(d: CashoutData, myPlayerId: string): void
   applyPreCrash(): void
   applyBetPlaced(d: BetPlacedData): void
+  setCrashSequenceDone(v: boolean): void
   setBetActive(bet: ActiveBet): void
   setBetAmount(v: string): void
   setAutoCashout(v: string): void
@@ -134,6 +138,7 @@ export const useGame = create<GameState & GameActions>()(
     lastCashoutEvent: null,
     preCrash: false,
     lastBetPlaced: null,
+    crashSequenceDone: false,
     betAmount: '1.00',
     autoCashout: '',
     balance: null,
@@ -160,8 +165,9 @@ export const useGame = create<GameState & GameActions>()(
           cashedOutCount:    newRound ? 0     : prev.cashedOutCount,
           anyBetLost:        newRound ? false : prev.anyBetLost,
           lastCashoutEvent:  newRound ? null  : prev.lastCashoutEvent,
-          preCrash:          newRound ? false : prev.preCrash,
-          lastBetPlaced:     newRound ? null  : prev.lastBetPlaced,
+          preCrash:           newRound ? false : prev.preCrash,
+          lastBetPlaced:      newRound ? null  : prev.lastBetPlaced,
+          crashSequenceDone:  newRound ? false : prev.crashSequenceDone,
           crashPoint: null,
           serverSeed: null,
         }
@@ -213,6 +219,7 @@ export const useGame = create<GameState & GameActions>()(
       }),
 
     applyPreCrash: () => set({ preCrash: true }),
+    setCrashSequenceDone: (crashSequenceDone) => set({ crashSequenceDone }),
     setBetAmount: (betAmount) => set({ betAmount }),
     setAutoCashout: (autoCashout) => set({ autoCashout }),
     setBalance: (balance) => set({ balance }),
