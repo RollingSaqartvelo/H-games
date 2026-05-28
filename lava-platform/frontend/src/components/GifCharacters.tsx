@@ -25,7 +25,7 @@ function useCharLayout(): { size: string; isMobile: boolean } {
     window.addEventListener('resize', update)
     return () => window.removeEventListener('resize', update)
   }, [])
-  return { size: w + 'px', isMobile: true }
+  return { size: Math.round(w * 0.85) + 'px', isMobile: true }
 }
 
 export function GifCharacters() {
@@ -157,7 +157,7 @@ export function GifCharacters() {
     width: size,
     height: 'auto',
     display: 'block',
-    transform: 'translateY(28%)',
+    transform: 'translateY(23%)',
   }
 
   return (
