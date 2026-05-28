@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { useGame } from '../store/game'
 
 const SHERIFF_IDLE  = '/assets/sheriff/%D1%88%D0%B5%D1%80%D0%B8%D1%84.gif'
@@ -8,8 +9,10 @@ const HERO_SRC      = '/assets/hero/%D0%B3%D0%B5%D1%80%D0%BE%D0%B9.gif'
 const CRASH_SRC     = '/assets/hero/Newcrash.gif'
 const WASTED_SRC    = '/assets/ui/Wasted/newwasted.png'
 
-// Duration of crash GIFs — wasted appears 250ms before this, then game transitions to betting
-const CRASH_GIF_MS = 1700
+// Duration of crash GIFs — wasted appears 500ms before this, then game transitions to betting
+const CRASH_GIF_MS        = 1700
+// Sheriff crash GIF starts this many ms after hero crash GIF
+const SHERIFF_CRASH_DELAY = 100
 
 const SHOT_MS      = 5000
 const SHOT_SHOW_MS = 800
@@ -26,19 +29,21 @@ function useCharLayout(): { size: string; isMobile: boolean } {
 }
 
 export function GifCharacters() {
-  const roundState          = useGame((s) => s.roundState)
-  const preCrash            = useGame((s) => s.preCrash)
+  const roundState           = useGame((s) => s.roundState)
+  const preCrash             = useGame((s) => s.preCrash)
   const setCrashSequenceDone = useGame((s) => s.setCrashSequenceDone)
 
-  const [firing, setFiring]       = useState(false)
-  const [shotKey, setShotKey]     = useState(0)
-  const [heroState, setHeroState] = useState<'run' | 'crash-gif' | 'done'>('run')
-  const [showWasted, setShowWasted] = useState(false)
+  const [firing, setFiring]             = useState(false)
+  const [shotKey, setShotKey]           = useState(0)
+  const [heroState, setHeroState]       = useState<'run' | 'crash-gif' | 'done'>('run')
+  const [sheriffCrashing, setSheriffCrashing] = useState(false)
+  const [showWasted, setShowWasted]     = useState(false)
 
-  const intervalRef  = useRef<number | undefined>(undefined)
-  const hideRef      = useRef<number | undefined>(undefined)
-  const heroTimer    = useRef<number | undefined>(undefined)
-  const wastedTimer  = useRef<number | undefined>(undefined)
+  const intervalRef    = useRef<number | undefined>(undefined)
+  const hideRef        = useRef<number | undefined>(undefined)
+  const heroTimer      = useRef<number | undefined>(undefined)
+  const wastedTimer    = useRef<number | undefined>(undefined)
+  const sheriffTimer   = useRef<number | undefined>(undefined)
 
   const { size, isMobile } = useCharLayout()
 
@@ -46,7 +51,7 @@ export function GifCharacters() {
   const crashed = roundState === 'CRASHED'
   const visible = (running || crashed) && heroState !== 'done'
 
-  // Sync opacity with bg video timestamps: fade to 30% at 0–3s and 6.25s+
+  // Sync opacity with bg video timestamps
   const [bgOpacity, setBgOpacity] = useState(1)
   useEffect(() => {
     if (!visible) return
@@ -56,10 +61,10 @@ export function GifCharacters() {
       if (vid && vid.duration) {
         const t = vid.currentTime
         let op = 1
-        if      (t <= 0.05)                  op = 0.15  // 0.00–0.05s: 85% transparent
-        else if (t <= 0.06)                  op = 0.60  // 0.05–0.06s: 40% transparent
-        else if (t >= 6.25 && t <= 6.27)     op = 0.15  // 6.25–6.27s: 85% transparent
-        else if (t >= 6.27 && t <= 6.28)     op = 0.60  // 6.27–6.28s: 40% transparent
+        if      (t <= 0.05)              op = 0.15  // 0.00–0.05s: 85% transparent
+        else if (t <= 0.06)              op = 0.60  // 0.05–0.06s: 40% transparent
+        else if (t >= 6.25 && t <= 6.27) op = 0.15  // 6.25–6.27s: 85% transparent
+        else if (t >= 6.27 && t <= 6.28) op = 0.60  // 6.27–6.28s: 40% transparent
         setBgOpacity(op)
       }
       raf = requestAnimationFrame(tick)
@@ -91,9 +96,11 @@ export function GifCharacters() {
   useEffect(() => {
     window.clearTimeout(heroTimer.current)
     window.clearTimeout(wastedTimer.current)
+    window.clearTimeout(sheriffTimer.current)
 
     if (running && !preCrash) {
       setHeroState('run')
+      setSheriffCrashing(false)
       setShowWasted(false)
       setCrashSequenceDone(false)
       return
@@ -101,6 +108,7 @@ export function GifCharacters() {
 
     if (running && preCrash) {
       setHeroState('crash-gif')
+      sheriffTimer.current = window.setTimeout(() => setSheriffCrashing(true), SHERIFF_CRASH_DELAY)
       return
     }
 
@@ -111,12 +119,16 @@ export function GifCharacters() {
       const vid = document.getElementById('running-bg-video') as HTMLVideoElement | null
       if (vid) vid.pause()
 
+      // Sheriff crash GIF starts 100ms after hero crash GIF
+      sheriffTimer.current = window.setTimeout(() => setSheriffCrashing(true), SHERIFF_CRASH_DELAY)
+
       // Wasted appears 500ms before GIFs end
       wastedTimer.current = window.setTimeout(() => setShowWasted(true), CRASH_GIF_MS - 500)
 
       // When GIFs finish: hide crash overlay, signal betting panel to appear
       heroTimer.current = window.setTimeout(() => {
         setHeroState('done')
+        setSheriffCrashing(false)
         setShowWasted(false)
         setCrashSequenceDone(true)
       }, CRASH_GIF_MS)
@@ -126,12 +138,14 @@ export function GifCharacters() {
 
     // STARTING / CREATED / null
     setHeroState('run')
+    setSheriffCrashing(false)
     setShowWasted(false)
     setCrashSequenceDone(false)
 
     return () => {
       window.clearTimeout(heroTimer.current)
       window.clearTimeout(wastedTimer.current)
+      window.clearTimeout(sheriffTimer.current)
     }
   }, [running, preCrash, crashed, setCrashSequenceDone])
 
@@ -161,10 +175,10 @@ export function GifCharacters() {
           transition: 'opacity 0.03s linear',
         }}
       >
-        {/* Sheriff */}
+        {/* Sheriff — switches to crash GIF 100ms after hero */}
         <img
-          key={heroState === 'crash-gif' ? 'sheriff-crash' : (firing ? `shot-${shotKey}` : 'idle')}
-          src={heroState === 'crash-gif' ? SHERIFF_CRASH : (firing ? SHERIFF_SHOT : SHERIFF_IDLE)}
+          key={sheriffCrashing ? 'sheriff-crash' : (firing ? `shot-${shotKey}` : 'idle')}
+          src={sheriffCrashing ? SHERIFF_CRASH : (firing ? SHERIFF_SHOT : SHERIFF_IDLE)}
           alt=""
           style={{ ...charStyle, left: isMobile ? '-35%' : 0 }}
         />
@@ -178,24 +192,25 @@ export function GifCharacters() {
         />
       </div>
 
-      {/* Wasted — outside opacity container so it always renders at full opacity on top */}
-      {showWasted && (
+      {/* Wasted — rendered via portal into body so overflow:hidden ancestors can't clip it */}
+      {showWasted && createPortal(
         <img
           aria-hidden="true"
           src={WASTED_SRC}
           alt="WASTED"
           style={{
-            position: 'absolute',
+            position: 'fixed',
             top: '50%',
             left: '50%',
             transform: 'translate(-50%, -50%)',
             width: 'min(88vw, 420px)',
             height: 'auto',
             pointerEvents: 'none',
-            zIndex: 101,
+            zIndex: 9999,
             animation: 'wasted-slam 320ms cubic-bezier(0.15, 1.35, 0.4, 1) both',
           }}
-        />
+        />,
+        document.body
       )}
     </>
   )
