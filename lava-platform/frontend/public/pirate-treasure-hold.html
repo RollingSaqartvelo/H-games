@@ -362,6 +362,28 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
     <div class="col-jackpot">
       <div class="jp-panel-wrap" id="jpPanel">
         <img class="jp-panel-img" src="assets/h-slots/pirate/ui/jackpot-panel-new.png" alt="">
+        <div class="jp-values">
+          <div class="jp-slot grand">
+            <div class="jp-name">GRAND</div>
+            <div class="jp-val" id="jp-grand-val">$10000</div>
+          </div>
+          <div class="jp-slot mega">
+            <div class="jp-name">MEGA</div>
+            <div class="jp-val" id="jp-mega-val">$2000</div>
+          </div>
+          <div class="jp-slot major">
+            <div class="jp-name">MAJOR</div>
+            <div class="jp-val" id="jp-major-val">$150</div>
+          </div>
+          <div class="jp-slot minor">
+            <div class="jp-name">MINOR</div>
+            <div class="jp-val" id="jp-minor-val">$50</div>
+          </div>
+          <div class="jp-slot mini">
+            <div class="jp-name">MINI</div>
+            <div class="jp-val" id="jp-mini-val">$20</div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -870,14 +892,16 @@ async function init() {
 }
 
 function updateUI() {
-  document.getElementById('balVal').textContent = '$' + balance.toFixed(2);
-  document.getElementById('betDisplay').textContent = '$' + BET_STEPS[betIdx].toFixed(2);
+  const balEl = document.getElementById('balVal');
+  if (balEl) balEl.textContent = '$' + balance.toFixed(2);
+  const betEl = document.getElementById('betDisplay');
+  if (betEl) betEl.textContent = '$' + BET_STEPS[betIdx].toFixed(2);
   const bet = BET_STEPS[betIdx];
-  document.getElementById('jp-grand-val').textContent = '$' + (10000*bet).toFixed(0);
-  document.getElementById('jp-mega-val').textContent = '$' + (2000*bet).toFixed(0);
-  document.getElementById('jp-major-val').textContent = '$' + (150*bet).toFixed(0);
-  document.getElementById('jp-minor-val').textContent = '$' + (50*bet).toFixed(0);
-  document.getElementById('jp-mini-val').textContent = '$' + (20*bet).toFixed(0);
+  const gv = document.getElementById('jp-grand-val'); if (gv) gv.textContent = '$' + (10000*bet).toFixed(0);
+  const mv = document.getElementById('jp-mega-val');  if (mv) mv.textContent = '$' + (2000*bet).toFixed(0);
+  const mrv= document.getElementById('jp-major-val'); if (mrv) mrv.textContent= '$' + (150*bet).toFixed(0);
+  const nv = document.getElementById('jp-minor-val'); if (nv) nv.textContent = '$' + (50*bet).toFixed(0);
+  const mnv= document.getElementById('jp-mini-val');  if (mnv) mnv.textContent= '$' + (20*bet).toFixed(0);
 }
 
 function saveDemo() {
@@ -919,11 +943,12 @@ async function doSpin(options={}) {
 
   if (!isFree) { balance -= effectiveCost; }
   if (isDemo) saveDemo();
-  updateUI();
 
   soundSpin();
 
   try {
+
+  updateUI();
 
   // Start all reels spinning visually
   for (let col=0; col<NUM_COLS; col++) {
