@@ -1208,7 +1208,7 @@ async function runHoldWinRound(initialState, bet) {
 
   while (!state.complete) {
     if (--maxIter <= 0) { console.error('[PIRATE] HW maxIter reached, breaking'); break; }
-    if (!skipRequested) await animateEmptyCells(state, 1200);
+    if (!skipRequested) await animateEmptyCells(state, 500);
 
     let newState;
     if (isDemo) {
@@ -1241,7 +1241,7 @@ async function runHoldWinRound(initialState, bet) {
     animateTotalCount(newState.total_value || 0);
 
     if (newState.is_boosted) { doBoostFlash(); await delay(500); }
-    if (!newState.complete) await delay(skipRequested ? 200 : 900);
+    if (!newState.complete) await delay(skipRequested ? 150 : 500);
     state = newState;
   }
 
@@ -1252,6 +1252,7 @@ async function showHoldWin(hwResult, bet, spinResult) {
   soundHoldWin();
 
   document.getElementById('hwIntro').style.display = 'flex';
+  document.getElementById('hwOverlay').style.display = 'flex';
 
   const finalState = await runHoldWinRound(hwResult, bet);
 
