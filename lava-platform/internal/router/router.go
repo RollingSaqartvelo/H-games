@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	adminHandler "github.com/lava-platform/internal/admin"
@@ -69,6 +70,7 @@ func Wire(cfg *config.Config, infra *infrastructure.Infra) *Deps {
 	grannyHub := realtime.NewHub()
 	grannyCfg := roundEngine.DefaultConfig()
 	grannyCfg.GameType = "granny_run"
+	grannyCfg.BettingDuration = 5 * time.Second
 	grannyEng := roundEngine.New(grannyCfg, rRepo, provider, grannyPub, grannyHub, locker)
 
 	// Bubble Gum

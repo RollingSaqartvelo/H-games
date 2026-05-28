@@ -754,7 +754,7 @@
     <!-- Countdown -->
     <div class="countdown" id="countdown" style="display:none">
       <div class="countdown-label">Heist starts in</div>
-      <div class="countdown-val" id="countdownVal">10</div>
+      <div class="countdown-val" id="countdownVal">5</div>
     </div>
 
     <!-- Crashed banner -->
@@ -1575,7 +1575,7 @@ function showCountdown() {
   el.style.display = 'block'
   const tick = () => {
     if (roundState !== 'STARTING') { el.style.display='none'; return }
-    const rem = Math.max(0, 10 - (Date.now()-startedAt)/1000)
+    const rem = Math.max(0, 5 - (Date.now()-startedAt)/1000)
     document.getElementById('countdownVal').textContent = rem.toFixed(1)
     setTimeout(tick, 100)
   }
@@ -2091,7 +2091,7 @@ function bvbStartWarningTick() {
   _bvbSirenPlayed = false
   _bvbTickTimer = setInterval(() => {
     if (roundState !== 'STARTING') { clearInterval(_bvbTickTimer); return }
-    const remaining = Math.max(0, 10 - (Date.now() - startedAt) / 1000)
+    const remaining = Math.max(0, 5 - (Date.now() - startedAt) / 1000)
     const show = remaining > 0 && remaining <= BVB_WARN_SECS
     document.getElementById('bvbWarning').style.display = show ? 'flex' : 'none'
     if (show && !_bvbSirenPlayed) {
