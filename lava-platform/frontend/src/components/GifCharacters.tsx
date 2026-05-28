@@ -4,7 +4,7 @@ import { useGame } from '../store/game'
 const SHERIFF_IDLE  = '/assets/sheriff/%D1%88%D0%B5%D1%80%D0%B8%D1%84.gif'
 const SHERIFF_SHOT  = '/assets/sheriff/%D0%92%D1%8B%D1%81%D1%82%D1%80%D0%B5%D0%BB.gif'
 const HERO_SRC      = '/assets/hero/%D0%B3%D0%B5%D1%80%D0%BE%D0%B9.gif'
-const CRASH_SRC     = '/assets/hero/newcrash.gif'
+const CRASH_SRC     = '/assets/hero/Newcrash.gif'
 const WASTED_SRC    = '/assets/ui/Wasted/newwasted.png'
 
 const CRASH_GIF_MS   = 1800
