@@ -175,13 +175,15 @@ export function GifCharacters() {
           transition: 'opacity 0.03s linear',
         }}
       >
-        {/* Sheriff — switches to crash GIF 100ms after hero */}
-        <img
-          key={sheriffCrashing ? 'sheriff-crash' : (firing ? `shot-${shotKey}` : 'idle')}
-          src={sheriffCrashing ? SHERIFF_CRASH : (firing ? SHERIFF_SHOT : SHERIFF_IDLE)}
-          alt=""
-          style={{ ...charStyle, left: isMobile ? '-35%' : 0 }}
-        />
+        {/* Sheriff — hidden during crash delay; only idle/shot while running, crash GIF after 100ms */}
+        {(heroState !== 'crash-gif' || sheriffCrashing) && (
+          <img
+            key={sheriffCrashing ? 'sheriff-crash' : (firing ? `shot-${shotKey}` : 'idle')}
+            src={sheriffCrashing ? SHERIFF_CRASH : (firing ? SHERIFF_SHOT : SHERIFF_IDLE)}
+            alt=""
+            style={{ ...charStyle, left: isMobile ? '-35%' : 0 }}
+          />
+        )}
 
         {/* Hero */}
         <img
