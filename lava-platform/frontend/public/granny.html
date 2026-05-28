@@ -1004,9 +1004,6 @@ bgVid.preload = 'auto'
 bgVid.style.cssText = 'position:fixed;width:1px;height:1px;opacity:0;pointer-events:none;top:-9999px;left:-9999px'
 document.body.appendChild(bgVid)
 bgVid.addEventListener('loadeddata', () => { bgVid.play().catch(()=>{}) }, { once: true })
-bgVid.addEventListener('timeupdate', () => {
-  if (bgVid.duration && bgVid.currentTime >= bgVid.duration - 0.08) bgVid.currentTime = 0
-})
 bgVid.load()
 
 // ── Character assets (GIF — browser animates automatically each drawImage call) ─
