@@ -147,37 +147,41 @@ export function GifCharacters() {
   }
 
   return (
-    <div
-      aria-hidden="true"
-      style={{
-        position: 'absolute',
-        inset: 0,
-        pointerEvents: 'none',
-        zIndex: 50,
-        overflow: 'hidden',
-        opacity: bgOpacity,
-        transition: 'opacity 0.03s linear',
-      }}
-    >
-      {/* Sheriff */}
-      <img
-        key={heroState === 'crash-gif' ? 'sheriff-crash' : (firing ? `shot-${shotKey}` : 'idle')}
-        src={heroState === 'crash-gif' ? SHERIFF_CRASH : (firing ? SHERIFF_SHOT : SHERIFF_IDLE)}
-        alt=""
-        style={{ ...charStyle, left: isMobile ? '-35%' : 0 }}
-      />
+    <>
+      {/* Characters — subject to bgOpacity sync with bg video */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: 'absolute',
+          inset: 0,
+          pointerEvents: 'none',
+          zIndex: 50,
+          overflow: 'hidden',
+          opacity: bgOpacity,
+          transition: 'opacity 0.03s linear',
+        }}
+      >
+        {/* Sheriff */}
+        <img
+          key={heroState === 'crash-gif' ? 'sheriff-crash' : (firing ? `shot-${shotKey}` : 'idle')}
+          src={heroState === 'crash-gif' ? SHERIFF_CRASH : (firing ? SHERIFF_SHOT : SHERIFF_IDLE)}
+          alt=""
+          style={{ ...charStyle, left: isMobile ? '-35%' : 0 }}
+        />
 
-      {/* Hero */}
-      <img
-        key={heroState}
-        src={heroState === 'run' ? HERO_SRC : CRASH_SRC}
-        alt=""
-        style={{ ...charStyle, left: isMobile ? '25%' : '55%' }}
-      />
+        {/* Hero */}
+        <img
+          key={heroState}
+          src={heroState === 'run' ? HERO_SRC : CRASH_SRC}
+          alt=""
+          style={{ ...charStyle, left: isMobile ? '25%' : '55%' }}
+        />
+      </div>
 
-      {/* Wasted — flies in 100ms before crash GIFs end */}
+      {/* Wasted — outside opacity container so it always renders at full opacity on top */}
       {showWasted && (
         <img
+          aria-hidden="true"
           src={WASTED_SRC}
           alt="WASTED"
           style={{
@@ -187,11 +191,12 @@ export function GifCharacters() {
             transform: 'translate(-50%, -50%)',
             width: 'min(88vw, 420px)',
             height: 'auto',
+            pointerEvents: 'none',
             zIndex: 101,
             animation: 'wasted-slam 320ms cubic-bezier(0.15, 1.35, 0.4, 1) both',
           }}
         />
       )}
-    </div>
+    </>
   )
 }
