@@ -44,6 +44,7 @@ export function GifCharacters() {
   const heroTimer      = useRef<number | undefined>(undefined)
   const wastedTimer    = useRef<number | undefined>(undefined)
   const sheriffTimer   = useRef<number | undefined>(undefined)
+  const sheriffOffTimer = useRef<number | undefined>(undefined)
 
   const { size, isMobile } = useCharLayout()
 
@@ -100,6 +101,7 @@ export function GifCharacters() {
     window.clearTimeout(heroTimer.current)
     window.clearTimeout(wastedTimer.current)
     window.clearTimeout(sheriffTimer.current)
+    window.clearTimeout(sheriffOffTimer.current)
 
     if (running && !preCrash) {
       setHeroState('run')
@@ -122,8 +124,9 @@ export function GifCharacters() {
       const vid = document.getElementById('running-bg-video') as HTMLVideoElement | null
       if (vid) vid.pause()
 
-      // Sheriff crash GIF starts 100ms after hero crash GIF
-      sheriffTimer.current = window.setTimeout(() => setSheriffCrashing(true), SHERIFF_CRASH_DELAY)
+      // Sheriff crash GIF starts 100ms after hero crash GIF, ends 100ms early
+      sheriffTimer.current    = window.setTimeout(() => setSheriffCrashing(true),  SHERIFF_CRASH_DELAY)
+      sheriffOffTimer.current = window.setTimeout(() => setSheriffCrashing(false), CRASH_GIF_MS - 100)
 
       // Wasted appears 500ms before GIFs end
       wastedTimer.current = window.setTimeout(() => setShowWasted(true), CRASH_GIF_MS - 500)
@@ -149,6 +152,7 @@ export function GifCharacters() {
       window.clearTimeout(heroTimer.current)
       window.clearTimeout(wastedTimer.current)
       window.clearTimeout(sheriffTimer.current)
+      window.clearTimeout(sheriffOffTimer.current)
     }
   }, [running, preCrash, crashed, setCrashSequenceDone])
 
