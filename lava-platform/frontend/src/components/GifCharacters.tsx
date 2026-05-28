@@ -9,7 +9,7 @@ const CRASH_SRC     = '/assets/hero/Newcrash.gif'
 const WASTED_SRC    = '/assets/ui/Wasted/newwasted.png'
 
 const CRASH_GIF_MS   = 1800
-const WASTED_DELAY_MS = 2000 // multi-flash + wasted appear 2s after crash-gif starts
+const WASTED_DELAY_MS = 2000
 
 const SHOT_MS      = 5000
 const SHOT_SHOW_MS = 800
@@ -38,12 +38,16 @@ export function GifCharacters() {
   const [preFlashKey, setPreFlashKey]     = useState(0)
   const [multiFlashKey, setMultiFlashKey] = useState(0)
   const [showWasted, setShowWasted]       = useState(false)
+  const [sheriffCrashed, setSheriffCrashed] = useState(false)
 
-  const intervalRef  = useRef<number | undefined>(undefined)
-  const hideRef      = useRef<number | undefined>(undefined)
-  const heroTimer    = useRef<number | undefined>(undefined)
-  const multiTimer   = useRef<number | undefined>(undefined)
-  const crashStarted = useRef(false)
+  const intervalRef        = useRef<number | undefined>(undefined)
+  const hideRef            = useRef<number | undefined>(undefined)
+  const heroTimer          = useRef<number | undefined>(undefined)
+  const multiTimer         = useRef<number | undefined>(undefined)
+  const crashStarted       = useRef(false)
+  const sheriffCrashImgRef = useRef<HTMLImageElement>(null)
+  const sheriffCanvasRef   = useRef<HTMLCanvasElement>(null)
+  const sheriffRafRef      = useRef<number | undefined>(undefined)
   const { size, isMobile } = useCharLayout()
 
   const running = roundState === 'RUNNING'
@@ -131,6 +135,44 @@ export function GifCharacters() {
     return () => window.clearTimeout(multiTimer.current)
   }, [heroState])
 
+  // Sheriff canvas freeze: draw crash GIF frames to canvas while playing,
+  // stop rAF when heroState leaves crash-gif → canvas holds last frame.
+  useEffect(() => {
+    if (heroState === 'crash-gif') {
+      setSheriffCrashed(true)
+      const draw = () => {
+        const img    = sheriffCrashImgRef.current
+        const canvas = sheriffCanvasRef.current
+        if (img && canvas && img.naturalWidth > 0) {
+          if (canvas.width !== img.naturalWidth) {
+            canvas.width  = img.naturalWidth
+            canvas.height = img.naturalHeight
+          }
+          const ctx = canvas.getContext('2d')
+          if (ctx) ctx.drawImage(img, 0, 0)
+        }
+        sheriffRafRef.current = requestAnimationFrame(draw)
+      }
+      sheriffRafRef.current = requestAnimationFrame(draw)
+    } else {
+      // Stop draw loop — canvas freezes on last drawn frame
+      if (sheriffRafRef.current !== undefined) {
+        cancelAnimationFrame(sheriffRafRef.current)
+        sheriffRafRef.current = undefined
+      }
+      // Reset sticky crash state only when a fresh run begins
+      if (heroState === 'run') {
+        setSheriffCrashed(false)
+      }
+    }
+    return () => {
+      if (sheriffRafRef.current !== undefined) {
+        cancelAnimationFrame(sheriffRafRef.current)
+        sheriffRafRef.current = undefined
+      }
+    }
+  }, [heroState])
+
   if (!visible) return null
 
   const charStyle: React.CSSProperties = {
@@ -141,6 +183,11 @@ export function GifCharacters() {
     display: 'block',
     transform: 'translateY(28%)',
   }
+
+  // Show crash canvas (frozen last frame) once crash GIF has finished playing.
+  // While crash GIF is actively playing (heroState === 'crash-gif') show the img
+  // directly — canvas draws from it in background for the freeze-on-exit.
+  const showFrozenCanvas = sheriffCrashed && heroState !== 'crash-gif'
 
   return (
     <div
@@ -155,12 +202,22 @@ export function GifCharacters() {
         transition: 'opacity 0.03s linear',
       }}
     >
-      <img
-        key={heroState === 'crash-gif' ? 'sheriff-crash' : (firing ? `shot-${shotKey}` : 'idle')}
-        src={heroState === 'crash-gif' ? SHERIFF_CRASH : (firing ? SHERIFF_SHOT : SHERIFF_IDLE)}
-        alt=""
-        style={{ ...charStyle, left: isMobile ? '-35%' : 0 }}
-      />
+      {/* Sheriff */}
+      {showFrozenCanvas ? (
+        <canvas
+          ref={sheriffCanvasRef}
+          style={{ ...charStyle, left: isMobile ? '-35%' : 0 }}
+        />
+      ) : (
+        <img
+          ref={heroState === 'crash-gif' ? sheriffCrashImgRef : null}
+          key={heroState === 'crash-gif' ? 'sheriff-crash' : (firing ? `shot-${shotKey}` : 'idle')}
+          src={heroState === 'crash-gif' ? SHERIFF_CRASH : (firing ? SHERIFF_SHOT : SHERIFF_IDLE)}
+          alt=""
+          style={{ ...charStyle, left: isMobile ? '-35%' : 0 }}
+        />
+      )}
+
       {heroState !== 'hidden' && (
         <img
           key={heroState}
