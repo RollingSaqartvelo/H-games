@@ -9,7 +9,7 @@ const CRASH_SRC     = '/assets/hero/Newcrash.gif'
 const WASTED_SRC    = '/assets/ui/Wasted/newwasted.png'
 
 // Duration of crash GIFs — wasted appears 250ms before this, then game transitions to betting
-const CRASH_GIF_MS = 1900
+const CRASH_GIF_MS = 1700
 
 const SHOT_MS      = 5000
 const SHOT_SHOW_MS = 800
