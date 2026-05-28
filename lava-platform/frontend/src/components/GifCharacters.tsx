@@ -207,6 +207,7 @@ export function GifCharacters() {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
+            paddingBottom: '20vh',
             pointerEvents: 'none',
             zIndex: 9999,
           }}
