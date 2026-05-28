@@ -1540,3 +1540,38 @@ ul, li { list-style: none; }
   color: rgba(251,191,36,.3);
   text-align: center;
 }
+
+/* ─── Desktop / large tablet (≥ 769px) ──────────────────────────────────── */
+@media (min-width: 769px) {
+  body {
+    background: #020101;
+  }
+
+  /* Centered phone-width column */
+  .app {
+    max-width: 480px;
+    margin: 0 auto;
+    /* Gold hairline borders — show the app edges against dark bg */
+    box-shadow:
+      -1px 0 0 rgba(217,119,6,.18),
+       1px 0 0 rgba(217,119,6,.18),
+       0 0 60px rgba(0,0,0,.75);
+  }
+
+  /* Game canvas — fixed height so panels always get room */
+  .game-area {
+    flex: 0 0 auto;
+    height: 42vh;
+  }
+
+  /* Footer takes remaining space, scrolls if needed */
+  .app__footer {
+    flex: 1 1 auto;
+    overflow-y: auto;
+  }
+
+  /* You Win overlays — realign to match the centered 480px column */
+  .ywi       { width: 240px; }
+  .ywi--a    { left: calc(50vw - 240px); }
+  .ywi--b    { left: 50vw; }
+}
