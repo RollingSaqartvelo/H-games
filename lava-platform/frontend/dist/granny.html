@@ -1380,8 +1380,8 @@ function drawScene(ts) {
     doctorY += (H*0.62 + Math.sin(ts*0.0015+1.2)*4 - doctorY) * 0.05
   }
 
-  const gX = W * grannyX   // 0.62 — granny ahead (right)
-  const dX = W * 0.28       // doctor behind (left)
+  const gX = W * grannyX         // 0.62 — granny ahead (right)
+  const dX = gX - W * 0.40       // doctor 40% of screen width to the left of granny
 
   // ── Trajectory curve (under characters) ─────────────────────────────────
   drawCurve(W, H)
@@ -1391,7 +1391,8 @@ function drawScene(ts) {
   ctx.translate(dX, doctorY + doctorOsc)
   if (crashed) ctx.translate(gX - dX, grannyY - doctorY - 10)
   if (doctorImgReady) {
-    ctx.drawImage(doctorImg, -doctorImg.naturalWidth / 2, -doctorImg.naturalHeight / 2)
+    const dw = doctorImg.naturalWidth * 0.7, dh = doctorImg.naturalHeight * 0.7
+    ctx.drawImage(doctorImg, -dw / 2, -dh / 2, dw, dh)
   } else {
     ctx.font='32px serif'; ctx.textAlign='center'; ctx.textBaseline='middle'
     ctx.fillText('👨‍⚕️', 0, 0)
@@ -1403,7 +1404,8 @@ function drawScene(ts) {
   ctx.translate(gX, grannyY + grannyOsc)
   if (crashed) ctx.rotate(Math.PI / 10)
   if (grannyImgReady) {
-    ctx.drawImage(grannyImg, -grannyImg.naturalWidth / 2, -grannyImg.naturalHeight / 2)
+    const gw = grannyImg.naturalWidth * 0.7, gh = grannyImg.naturalHeight * 0.7
+    ctx.drawImage(grannyImg, -gw / 2, -gh / 2, gw, gh)
   } else {
     ctx.font='36px serif'; ctx.textAlign='center'; ctx.textBaseline='middle'
     ctx.fillText('👵', 0, 0)
