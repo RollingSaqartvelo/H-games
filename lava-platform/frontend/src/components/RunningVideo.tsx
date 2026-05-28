@@ -1,8 +1,8 @@
 import { useEffect, useRef } from 'react'
 import { useGame } from '../store/game'
 
-const LOOP_GUARD_S  = 0.15
-const CRASH_PAUSE_MS = 1700 // pause 100ms before crash GIF freezes (GIF = 1800ms)
+const LOOP_GUARD_S  = 0.01  // minimal guard — allows video to reach 6.25–6.28s before looping
+const CRASH_PAUSE_MS = 1600  // pause video 100ms before crash sequence ends (GIF = 1700ms)
 
 export function RunningVideo() {
   const roundState = useGame((s) => s.roundState)

@@ -73,7 +73,7 @@ export function GifCharacters() {
     return () => cancelAnimationFrame(raf)
   }, [visible])
 
-  // Sheriff shooting — only while running
+  // Sheriff shooting — only while running; first shot delayed so hero establishes scene
   useEffect(() => {
     window.clearInterval(intervalRef.current)
     window.clearTimeout(hideRef.current)
@@ -84,8 +84,11 @@ export function GifCharacters() {
       setFiring(true)
       hideRef.current = window.setTimeout(() => setFiring(false), SHOT_SHOW_MS)
     }
-    fire()
-    intervalRef.current = window.setInterval(fire, SHOT_MS)
+    // First shot after 1500ms, then every SHOT_MS
+    hideRef.current = window.setTimeout(() => {
+      fire()
+      intervalRef.current = window.setInterval(fire, SHOT_MS)
+    }, 1500)
     return () => {
       window.clearInterval(intervalRef.current)
       window.clearTimeout(hideRef.current)
