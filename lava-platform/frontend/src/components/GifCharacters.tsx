@@ -11,9 +11,9 @@ const CRASH_SRC     = '/assets/hero/Newcrash.gif'
 const WASTED_SRC    = '/assets/ui/Wasted/newwasted.png'
 
 // Duration of crash GIFs — wasted appears 500ms before this, then game transitions to betting
-const CRASH_GIF_MS        = 1700
-// Sheriff crash GIF starts this many ms after hero crash GIF
-const SHERIFF_CRASH_DELAY = 100
+const CRASH_GIF_MS      = 1700
+// Hero crash GIF starts this many ms after sheriff crash GIF
+const HERO_CRASH_DELAY  = 100
 
 const SHOT_MS      = 5000
 const SHOT_SHOW_MS = 800
@@ -49,6 +49,7 @@ export function GifCharacters() {
   const sheriffTimer    = useRef<number | undefined>(undefined)
   const sheriffOffTimer = useRef<number | undefined>(undefined)
   const sheriffEndTimer = useRef<number | undefined>(undefined)
+  const heroDelayTimer  = useRef<number | undefined>(undefined)
 
   const { size, sizeNum, isMobile } = useCharLayout()
 
@@ -107,6 +108,7 @@ export function GifCharacters() {
     window.clearTimeout(sheriffTimer.current)
     window.clearTimeout(sheriffOffTimer.current)
     window.clearTimeout(sheriffEndTimer.current)
+    window.clearTimeout(heroDelayTimer.current)
 
     if (running && !preCrash) {
       setHeroState('run')
@@ -118,23 +120,25 @@ export function GifCharacters() {
     }
 
     if (running && preCrash) {
-      setHeroState('crash-gif')
-      sheriffTimer.current = window.setTimeout(() => setSheriffCrashing(true), SHERIFF_CRASH_DELAY)
+      // Sheriff starts immediately, hero GIF 100ms later
+      setSheriffCrashing(true)
+      heroDelayTimer.current = window.setTimeout(() => setHeroState('crash-gif'), HERO_CRASH_DELAY)
       return
     }
 
     if (crashed) {
-      setHeroState('crash-gif')
       setSheriffCrashEnded(false)
 
       // Pause bg video immediately
       const vid = document.getElementById('running-bg-video') as HTMLVideoElement | null
       if (vid) vid.pause()
 
-      // Sheriff crash GIF starts 100ms after hero crash GIF
-      sheriffTimer.current    = window.setTimeout(() => setSheriffCrashing(true),  SHERIFF_CRASH_DELAY)
+      // Sheriff crash GIF starts immediately
+      setSheriffCrashing(true)
+      // Hero crash GIF starts 100ms later
+      heroDelayTimer.current  = window.setTimeout(() => setHeroState('crash-gif'), HERO_CRASH_DELAY)
       // 1100ms after sheriff GIF starts → freeze frame (crash end.png)
-      sheriffEndTimer.current = window.setTimeout(() => setSheriffCrashEnded(true), SHERIFF_CRASH_DELAY + 1100)
+      sheriffEndTimer.current = window.setTimeout(() => setSheriffCrashEnded(true), 1100)
       // Sheriff hidden 100ms before sequence ends
       sheriffOffTimer.current = window.setTimeout(() => setSheriffCrashing(false), CRASH_GIF_MS - 100)
 
@@ -166,6 +170,7 @@ export function GifCharacters() {
       window.clearTimeout(sheriffTimer.current)
       window.clearTimeout(sheriffOffTimer.current)
       window.clearTimeout(sheriffEndTimer.current)
+      window.clearTimeout(heroDelayTimer.current)
     }
   }, [running, preCrash, crashed, setCrashSequenceDone])
 
