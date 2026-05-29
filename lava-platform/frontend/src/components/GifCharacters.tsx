@@ -187,7 +187,6 @@ export function GifCharacters() {
 
   const sheriffStyle: React.CSSProperties = {
     ...charStyle,
-    transform: 'translateY(38%)',  // sheriff GIF has character higher in frame — push down more
   }
 
   return (
