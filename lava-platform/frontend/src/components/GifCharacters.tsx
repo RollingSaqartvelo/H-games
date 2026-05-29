@@ -200,7 +200,12 @@ export function GifCharacters() {
             key={sheriffCrashEnded ? 'sheriff-crash-end' : sheriffCrashing ? 'sheriff-crash' : (firing ? `shot-${shotKey}` : 'idle')}
             src={sheriffCrashEnded ? SHERIFF_CRASH_END : sheriffCrashing ? SHERIFF_CRASH : (firing ? SHERIFF_SHOT : SHERIFF_IDLE)}
             alt=""
-            style={{ ...charStyle, left: isMobile ? '-35%' : 0 }}
+            style={{
+              ...charStyle,
+              left: isMobile ? '-35%' : 0,
+              // crash end PNG (255×196) must match GIF's square footprint (500×500)
+              ...(sheriffCrashEnded && { height: size, objectFit: 'contain' as const }),
+            }}
           />
         )}
 
