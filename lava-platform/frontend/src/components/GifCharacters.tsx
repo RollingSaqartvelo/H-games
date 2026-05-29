@@ -4,7 +4,8 @@ import { useGame } from '../store/game'
 
 const SHERIFF_IDLE  = '/assets/sheriff/%D1%88%D0%B5%D1%80%D0%B8%D1%84.gif'
 const SHERIFF_SHOT  = '/assets/sheriff/%D0%92%D1%8B%D1%81%D1%82%D1%80%D0%B5%D0%BB.gif'
-const SHERIFF_CRASH = '/assets/sheriff/sherif%20crash.gif'
+const SHERIFF_CRASH     = '/assets/sheriff/sherif%20crash.gif'
+const SHERIFF_CRASH_END = '/assets/sheriff/crash%20end.png'
 const HERO_SRC      = '/assets/hero/%D0%B3%D0%B5%D1%80%D0%BE%D0%B9.gif'
 const CRASH_SRC     = '/assets/hero/Newcrash.gif'
 const WASTED_SRC    = '/assets/ui/Wasted/newwasted.png'
@@ -36,15 +37,17 @@ export function GifCharacters() {
   const [firing, setFiring]             = useState(false)
   const [shotKey, setShotKey]           = useState(0)
   const [heroState, setHeroState]       = useState<'run' | 'crash-gif' | 'done'>('run')
-  const [sheriffCrashing, setSheriffCrashing] = useState(false)
-  const [showWasted, setShowWasted]     = useState(false)
+  const [sheriffCrashing, setSheriffCrashing]     = useState(false)
+  const [sheriffCrashEnded, setSheriffCrashEnded] = useState(false)
+  const [showWasted, setShowWasted]               = useState(false)
 
   const intervalRef    = useRef<number | undefined>(undefined)
   const hideRef        = useRef<number | undefined>(undefined)
   const heroTimer      = useRef<number | undefined>(undefined)
   const wastedTimer    = useRef<number | undefined>(undefined)
-  const sheriffTimer   = useRef<number | undefined>(undefined)
+  const sheriffTimer    = useRef<number | undefined>(undefined)
   const sheriffOffTimer = useRef<number | undefined>(undefined)
+  const sheriffEndTimer = useRef<number | undefined>(undefined)
 
   const { size, isMobile } = useCharLayout()
 
@@ -102,10 +105,12 @@ export function GifCharacters() {
     window.clearTimeout(wastedTimer.current)
     window.clearTimeout(sheriffTimer.current)
     window.clearTimeout(sheriffOffTimer.current)
+    window.clearTimeout(sheriffEndTimer.current)
 
     if (running && !preCrash) {
       setHeroState('run')
       setSheriffCrashing(false)
+      setSheriffCrashEnded(false)
       setShowWasted(false)
       setCrashSequenceDone(false)
       return
@@ -119,13 +124,17 @@ export function GifCharacters() {
 
     if (crashed) {
       setHeroState('crash-gif')
+      setSheriffCrashEnded(false)
 
       // Pause bg video immediately
       const vid = document.getElementById('running-bg-video') as HTMLVideoElement | null
       if (vid) vid.pause()
 
-      // Sheriff crash GIF starts 100ms after hero crash GIF, ends 100ms early
+      // Sheriff crash GIF starts 100ms after hero crash GIF
       sheriffTimer.current    = window.setTimeout(() => setSheriffCrashing(true),  SHERIFF_CRASH_DELAY)
+      // 1100ms after sheriff GIF starts → freeze frame (crash end.png)
+      sheriffEndTimer.current = window.setTimeout(() => setSheriffCrashEnded(true), SHERIFF_CRASH_DELAY + 1100)
+      // Sheriff hidden 100ms before sequence ends
       sheriffOffTimer.current = window.setTimeout(() => setSheriffCrashing(false), CRASH_GIF_MS - 100)
 
       // Wasted appears 500ms before GIFs end
@@ -135,6 +144,7 @@ export function GifCharacters() {
       heroTimer.current = window.setTimeout(() => {
         setHeroState('done')
         setSheriffCrashing(false)
+        setSheriffCrashEnded(false)
         setShowWasted(false)
         setCrashSequenceDone(true)
       }, CRASH_GIF_MS)
@@ -145,6 +155,7 @@ export function GifCharacters() {
     // STARTING / CREATED / null
     setHeroState('run')
     setSheriffCrashing(false)
+    setSheriffCrashEnded(false)
     setShowWasted(false)
     setCrashSequenceDone(false)
 
@@ -153,6 +164,7 @@ export function GifCharacters() {
       window.clearTimeout(wastedTimer.current)
       window.clearTimeout(sheriffTimer.current)
       window.clearTimeout(sheriffOffTimer.current)
+      window.clearTimeout(sheriffEndTimer.current)
     }
   }, [running, preCrash, crashed, setCrashSequenceDone])
 
@@ -182,11 +194,11 @@ export function GifCharacters() {
           transition: 'opacity 0.03s linear',
         }}
       >
-        {/* Sheriff — hidden during crash delay; only idle/shot while running, crash GIF after 100ms */}
+        {/* Sheriff — hidden during crash delay; crash GIF → freeze frame after 1100ms */}
         {(heroState !== 'crash-gif' || sheriffCrashing) && (
           <img
-            key={sheriffCrashing ? 'sheriff-crash' : (firing ? `shot-${shotKey}` : 'idle')}
-            src={sheriffCrashing ? SHERIFF_CRASH : (firing ? SHERIFF_SHOT : SHERIFF_IDLE)}
+            key={sheriffCrashEnded ? 'sheriff-crash-end' : sheriffCrashing ? 'sheriff-crash' : (firing ? `shot-${shotKey}` : 'idle')}
+            src={sheriffCrashEnded ? SHERIFF_CRASH_END : sheriffCrashing ? SHERIFF_CRASH : (firing ? SHERIFF_SHOT : SHERIFF_IDLE)}
             alt=""
             style={{ ...charStyle, left: isMobile ? '-35%' : 0 }}
           />
