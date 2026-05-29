@@ -18,7 +18,7 @@ const SHERIFF_CRASH_DELAY = 100
 const SHOT_MS      = 5000
 const SHOT_SHOW_MS = 800
 
-function useCharLayout(): { size: string; isMobile: boolean } {
+function useCharLayout(): { size: string; sizeNum: number; isMobile: boolean } {
   // App container is always ≤480px — always use compact mobile character layout
   const [w, setW] = useState(() => Math.min(window.innerWidth, 480))
   useEffect(() => {
@@ -26,7 +26,8 @@ function useCharLayout(): { size: string; isMobile: boolean } {
     window.addEventListener('resize', update)
     return () => window.removeEventListener('resize', update)
   }, [])
-  return { size: Math.round(w * 0.85) + 'px', isMobile: true }
+  const sizeNum = Math.round(w * 0.85)
+  return { size: sizeNum + 'px', sizeNum, isMobile: true }
 }
 
 export function GifCharacters() {
@@ -49,7 +50,7 @@ export function GifCharacters() {
   const sheriffOffTimer = useRef<number | undefined>(undefined)
   const sheriffEndTimer = useRef<number | undefined>(undefined)
 
-  const { size, isMobile } = useCharLayout()
+  const { size, sizeNum, isMobile } = useCharLayout()
 
   const running = roundState === 'RUNNING'
   const crashed = roundState === 'CRASHED'
@@ -203,8 +204,12 @@ export function GifCharacters() {
             style={{
               ...charStyle,
               left: isMobile ? '-35%' : 0,
-              // crash end PNG (255×196) must match GIF's square footprint (500×500)
-              ...(sheriffCrashEnded && { height: size, objectFit: 'contain' as const }),
+              // crash end PNG (255×196) has less padding than GIF (500×500) — scale down to match silhouette
+              ...(sheriffCrashEnded && {
+                width:  Math.round(sizeNum * 0.6) + 'px',
+                height: Math.round(sizeNum * 0.6) + 'px',
+                objectFit: 'contain' as const,
+              }),
             }}
           />
         )}
