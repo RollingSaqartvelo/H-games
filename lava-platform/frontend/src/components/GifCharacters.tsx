@@ -182,7 +182,7 @@ export function GifCharacters() {
     width: size,
     height: 'auto',
     display: 'block',
-    transform: 'translateY(23%)',
+    transform: 'translateY(28%)',
   }
 
   const sheriffStyle: React.CSSProperties = {
