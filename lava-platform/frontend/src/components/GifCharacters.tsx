@@ -203,7 +203,7 @@ export function GifCharacters() {
             alt=""
             style={{
               ...charStyle,
-              left: isMobile ? '-35%' : 0,
+              left: sheriffCrashEnded ? (isMobile ? '-5%' : 0) : (isMobile ? '-35%' : 0),
               // crash end PNG (255×196) has less padding than GIF (500×500) — scale down to match silhouette
               ...(sheriffCrashEnded && {
                 width:  Math.round(sizeNum * 0.6) + 'px',
