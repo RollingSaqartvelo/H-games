@@ -185,6 +185,11 @@ export function GifCharacters() {
     transform: 'translateY(23%)',
   }
 
+  const sheriffStyle: React.CSSProperties = {
+    ...charStyle,
+    transform: 'translateY(38%)',  // sheriff GIF has character higher in frame — push down more
+  }
+
   return (
     <>
       {/* Characters — subject to bgOpacity sync with bg video */}
@@ -207,7 +212,7 @@ export function GifCharacters() {
             src={sheriffCrashEnded ? SHERIFF_CRASH_END : sheriffCrashing ? SHERIFF_CRASH : (firing ? SHERIFF_SHOT : SHERIFF_IDLE)}
             alt=""
             style={{
-              ...charStyle,
+              ...sheriffStyle,
               left: sheriffCrashEnded ? (isMobile ? '-5%' : 0) : (isMobile ? '-35%' : 0),
               // crash end PNG (255×196) has less padding than GIF (500×500) — scale down to match silhouette
               ...(sheriffCrashEnded && {
