@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useGame } from '../store/game'
+import { playWastedSound } from '../audio/WastedSound'
 
 const SHERIFF_IDLE  = '/assets/sheriff/%D1%88%D0%B5%D1%80%D0%B8%D1%84.gif'
 const SHERIFF_SHOT  = '/assets/sheriff/%D0%92%D1%8B%D1%81%D1%82%D1%80%D0%B5%D0%BB.gif'
@@ -120,10 +121,11 @@ export function GifCharacters() {
       // Sheriff hidden 100ms before sequence ends
       sheriffOffTimer.current = window.setTimeout(() => setSheriffCrashing(false), CRASH_GIF_MS - 100)
 
-      // Wasted appears 500ms before GIFs end
+      // Wasted appears 500ms before GIFs end — play wasted.mp3 at same moment
       wastedTimer.current = window.setTimeout(() => {
         setShowWasted(true)
         document.body.classList.add('wasted-showing')
+        playWastedSound()
       }, CRASH_GIF_MS - 500)
 
       // When GIFs finish: hide crash overlay, signal betting panel to appear

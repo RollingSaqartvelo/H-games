@@ -31,7 +31,6 @@ import { SheriffRider }    from './entities/SheriffRider'
 import { useGame }         from '../store/game'
 import { lerp, expLerp } from './utils/easing'
 import type { RoundState } from '../ws/types'
-import { playKnutSound }  from '../audio/KnutSound'
 
 // Outlaw is pinned at 38% from left — leaves room for sheriff behind
 const CHAR_X_FRAC = 0.38
@@ -232,7 +231,6 @@ export class GameScene {
   }
 
   private startCapture(): void {
-    playKnutSound()
     this.alreadyCaptured = true
     this.captureElapsed  = 0
     this.captureDone     = false
