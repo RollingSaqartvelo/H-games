@@ -778,13 +778,14 @@ ul, li { list-style: none; }
 /* Panel card — new pannel.png background */
 .dbp-block {
   width: 100%;
+  aspect-ratio: 1404 / 853;
   background: url('/assets/betting/buttons/pannel_cropped.png') center/100% 100% no-repeat;
   border: none;
   border-radius: 22px;
-  padding: 14px 14px 10px;
+  padding: 14px 14px 8px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
   overflow: hidden;
   flex-shrink: 0;
   box-shadow: none;
@@ -818,7 +819,7 @@ ul, li { list-style: none; }
 }
 
 /* Toggles — Granny-style rectangular with sliding knob */
-.dbp-options { display: flex; gap: 10px; }
+.dbp-options { display: flex; justify-content: space-between; padding: 0 28%; }
 .dbp-toggle {
   flex: 1;
   display: flex;
@@ -835,39 +836,13 @@ ul, li { list-style: none; }
 .dbp-toggle--on { background: none; border-color: transparent; }
 
 .dbp-toggle__track {
-  position: relative;
-  width: 40px;
-  height: 24px;
-  flex-shrink: 0;
-  background: linear-gradient(180deg, #0d0901 0%, #110c02 100%);
-  border: 1px solid rgba(217,119,6,.22);
-  border-radius: 7px;
-  cursor: pointer;
-  box-shadow: inset 0 1px 4px rgba(0,0,0,.55);
-  transition: all .25s;
+  display: none;
 }
-.dbp-toggle--on .dbp-toggle__track {
-  background: linear-gradient(180deg, #2a1500 0%, #3d1e00 100%);
-  border-color: var(--gold);
-  box-shadow: 0 0 12px rgba(217,119,6,.45), inset 0 1px 0 rgba(251,191,36,.12);
-}
-.dbp-toggle__track::after {
-  content: '';
-  position: absolute;
-  top: 4px; left: 4px;
-  width: 14px; height: 14px;
-  background: linear-gradient(135deg, #2e2010 0%, #1c1408 100%);
-  border-radius: 3px;
-  box-shadow: 0 1px 3px rgba(0,0,0,.5);
-  transition: all .25s;
-}
-.dbp-toggle--on .dbp-toggle__track::after {
-  left: 20px;
-  background: linear-gradient(135deg, var(--gold-bright) 0%, var(--gold) 100%);
-  box-shadow: 0 0 8px rgba(217,119,6,.9), 0 1px 3px rgba(0,0,0,.3);
-}
+.dbp-toggle--on .dbp-toggle__track { display: none; }
+.dbp-toggle__track::after { display: none; }
+.dbp-toggle--on .dbp-toggle__track::after { display: none; }
 .dbp-toggle__label {
-  font-size: 8px;
+  font-size: 7px;
   color: rgba(251,191,36,.55);
   letter-spacing: 1.5px;
   text-transform: uppercase;
@@ -883,8 +858,8 @@ ul, li { list-style: none; }
   gap: 8px;
 }
 .dbp-step-btn {
-  width: 42px;
-  height: 42px;
+  width: 40px;
+  height: 40px;
   flex-shrink: 0;
   background: transparent;
   border: none;
@@ -928,7 +903,7 @@ ul, li { list-style: none; }
   background: transparent;
   border: none;
   color: #fbbf24;
-  font-size: 26px;
+  font-size: 22px;
   font-weight: 700;
   font-family: 'Rye', Georgia, serif;
   text-align: center;
@@ -951,12 +926,12 @@ ul, li { list-style: none; }
 }
 .dbp-chip {
   flex: 0 0 calc(50% - 3px);
-  height: 36px;
+  height: 26px;
   border-radius: 10px;
   background: transparent;
   border: none;
   color: #fbbf24;
-  font-size: 13px;
+  font-size: 11px;
   font-family: 'Rye', Georgia, serif;
   font-weight: 600;
   cursor: pointer;
@@ -1004,7 +979,7 @@ ul, li { list-style: none; }
 /* ─── Action Buttons — transparent over new panel image ──────────────────────── */
 .dbp-btn {
   width: 100%;
-  padding: 14px;
+  padding: 8px 14px;
   border-radius: 14px;
   font-family: 'Rye', Georgia, serif;
   font-size: 15px;
