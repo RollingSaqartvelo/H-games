@@ -778,7 +778,7 @@ ul, li { list-style: none; }
 /* Panel card — new pannel.png background */
 .dbp-block {
   width: 100%;
-  background: url('/assets/betting/buttons/new%20pannel.png') center/100% 100% no-repeat;
+  background: url('/assets/betting/buttons/pannel_cropped.png') center/100% 100% no-repeat;
   border: none;
   border-radius: 22px;
   padding: 14px 14px 10px;
