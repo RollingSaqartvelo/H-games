@@ -16,13 +16,15 @@ export function RoundCountdown() {
   const tickTimer    = useRef<number | undefined>(undefined)
   const countdownFired = useRef(false)
 
-  // "RIDE!" flash when round starts
+  // "LET'S GO" flash exactly when RUNNING starts, for 300ms only
   useEffect(() => {
     if (roundState === 'RUNNING') {
       stopCountdownSound()
       setShowRide(true)
       window.clearTimeout(rideTimer.current)
-      rideTimer.current = window.setTimeout(() => setShowRide(false), 900)
+      rideTimer.current = window.setTimeout(() => setShowRide(false), 300)
+    } else {
+      setShowRide(false)
     }
     return () => window.clearTimeout(rideTimer.current)
   }, [roundState])

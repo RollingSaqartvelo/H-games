@@ -121,7 +121,10 @@ export function GifCharacters() {
       sheriffOffTimer.current = window.setTimeout(() => setSheriffCrashing(false), CRASH_GIF_MS - 100)
 
       // Wasted appears 500ms before GIFs end
-      wastedTimer.current = window.setTimeout(() => setShowWasted(true), CRASH_GIF_MS - 500)
+      wastedTimer.current = window.setTimeout(() => {
+        setShowWasted(true)
+        document.body.classList.add('wasted-showing')
+      }, CRASH_GIF_MS - 500)
 
       // When GIFs finish: hide crash overlay, signal betting panel to appear
       heroTimer.current = window.setTimeout(() => {
@@ -129,6 +132,7 @@ export function GifCharacters() {
         setSheriffCrashing(false)
         setSheriffCrashEnded(false)
         setShowWasted(false)
+        document.body.classList.remove('wasted-showing')
         setCrashSequenceDone(true)
       }, CRASH_GIF_MS)
 
@@ -140,6 +144,7 @@ export function GifCharacters() {
     setSheriffCrashing(false)
     setSheriffCrashEnded(false)
     setShowWasted(false)
+    document.body.classList.remove('wasted-showing')
     setCrashSequenceDone(false)
 
     return () => {
