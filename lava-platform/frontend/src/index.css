@@ -797,47 +797,60 @@ ul, li { list-style: none; }
   padding: 1px 5px;
 }
 
-/* Toggles — positioned over pre-drawn circles in image (Y≈55-63%, X=37% and 63%) */
+/* Toggles — Button.png overlaid on panel gear circles (Y≈52-70%, X=37% and 63%) */
 .dbp-options {
   position: absolute;
-  top: 55%; left: 0; width: 100%; height: 8%;
+  top: 52%; left: 0; width: 100%; height: 18%;
 }
 /* Auto Cash toggle — only present when 2 toggles (unlocked) */
 .dbp-options .dbp-toggle:first-child:not(:last-child) {
   position: absolute;
-  left: calc(37% - 30px); width: 60px;
+  left: 25%; width: 24%;
   top: 0; bottom: 0;
-  display: flex; align-items: center; justify-content: center;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
 }
 /* Auto Bet toggle — always last child */
 .dbp-options .dbp-toggle:last-child {
   position: absolute;
-  left: calc(63% - 30px); width: 60px;
+  left: 51%; width: 24%;
   top: 0; bottom: 0;
-  display: flex; align-items: center; justify-content: center;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
 }
 .dbp-toggle {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1px;
+  gap: 2px;
   cursor: pointer;
   background: none;
   border: none;
   padding: 0;
 }
-.dbp-toggle input { display: none; }
+.dbp-toggle input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
 .dbp-toggle--on { background: none; }
 
 .dbp-toggle__track {
-  display: none;
+  display: block;
+  width: 100%;
+  aspect-ratio: 2000 / 1216;
+  background: url('/assets/betting/buttons/Button.png') center / contain no-repeat;
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.25s ease;
+  filter: brightness(0.7) saturate(0.8);
 }
-.dbp-toggle--on .dbp-toggle__track { display: none; }
+.dbp-toggle--on .dbp-toggle__track {
+  transform: scaleX(-1);
+  filter: brightness(1.1) saturate(1.2);
+}
 .dbp-toggle__track::after { display: none; }
-.dbp-toggle--on .dbp-toggle__track::after { display: none; }
 .dbp-toggle__label {
-  font-size: 7px;
-  color: rgba(251,191,36,.55);
+  font-size: 6px;
+  color: rgba(251,191,36,.5);
   letter-spacing: 1.5px;
   text-transform: uppercase;
   font-weight: 700;
