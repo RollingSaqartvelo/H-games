@@ -775,17 +775,16 @@ ul, li { list-style: none; }
 }
 .dbp-divider { display: none; }
 
-/* Panel card — new pannel.png background */
+/* Panel card — absolute layout over pannel_cropped.png */
 .dbp-block {
   width: 100%;
   aspect-ratio: 1404 / 853;
   background: url('/assets/betting/buttons/pannel_cropped.png') center/100% 100% no-repeat;
   border: none;
   border-radius: 22px;
-  padding: 14px 14px 8px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+  padding: 0;
+  position: relative;
+  display: block;
   overflow: hidden;
   flex-shrink: 0;
   box-shadow: none;
@@ -818,22 +817,37 @@ ul, li { list-style: none; }
   padding: 1px 5px;
 }
 
-/* Toggles — Granny-style rectangular with sliding knob */
-.dbp-options { display: flex; justify-content: space-between; padding: 0 28%; }
+/* Toggles — positioned over pre-drawn circles in image (Y≈55-63%, X=37% and 63%) */
+.dbp-options {
+  position: absolute;
+  top: 55%; left: 0; width: 100%; height: 8%;
+}
+/* Auto Cash toggle — only present when 2 toggles (unlocked) */
+.dbp-options .dbp-toggle:first-child:not(:last-child) {
+  position: absolute;
+  left: calc(37% - 30px); width: 60px;
+  top: 0; bottom: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+/* Auto Bet toggle — always last child */
+.dbp-options .dbp-toggle:last-child {
+  position: absolute;
+  left: calc(63% - 30px); width: 60px;
+  top: 0; bottom: 0;
+  display: flex; align-items: center; justify-content: center;
+}
 .dbp-toggle {
-  flex: 1;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 6px;
+  gap: 1px;
   cursor: pointer;
   background: none;
   border: none;
-  border-radius: 0;
   padding: 0;
-  transition: none;
 }
 .dbp-toggle input { display: none; }
-.dbp-toggle--on { background: none; border-color: transparent; }
+.dbp-toggle--on { background: none; }
 
 .dbp-toggle__track {
   display: none;
@@ -851,21 +865,23 @@ ul, li { list-style: none; }
 }
 .dbp-toggle--on .dbp-toggle__label { color: var(--gold); }
 
-/* Stepper row */
+/* Stepper row — Y=15-31% of block, padding aligns children to image cells */
 .dbp-amount-row {
+  position: absolute;
+  top: 15%; left: 0; width: 100%; height: 16%;
   display: flex;
   align-items: center;
-  gap: 8px;
+  padding: 0 14%;
+  box-sizing: border-box;
 }
 .dbp-step-btn {
-  width: 40px;
-  height: 40px;
-  flex-shrink: 0;
+  flex: 0 0 11%;
+  height: 80%;
   background: transparent;
   border: none;
-  border-radius: 10px;
+  border-radius: 8px;
   color: #fbbf24;
-  font-size: 24px;
+  font-size: 22px;
   font-family: 'Rye', Georgia, serif;
   line-height: 1;
   display: flex;
@@ -882,19 +898,19 @@ ul, li { list-style: none; }
 
 .dbp-amount-display {
   flex: 1;
+  margin: 0 7%;
   display: flex;
   align-items: center;
+  justify-content: center;
   background: transparent;
   border: none;
-  border-radius: 16px;
-  padding: 8px 4px;
-  height: auto;
-  min-width: 0;
   box-shadow: none;
+  min-width: 0;
+  overflow: hidden;
 }
 .dbp-amount-currency {
   color: rgba(251,191,36,.7);
-  font-size: 18px;
+  font-size: 16px;
   font-family: 'Rye', Georgia, serif;
   flex-shrink: 0;
 }
@@ -903,7 +919,7 @@ ul, li { list-style: none; }
   background: transparent;
   border: none;
   color: #fbbf24;
-  font-size: 22px;
+  font-size: 18px;
   font-weight: 700;
   font-family: 'Rye', Georgia, serif;
   text-align: center;
@@ -918,25 +934,31 @@ ul, li { list-style: none; }
 .dbp-amount-input:disabled { opacity: 0.6; }
 .dbp-amount-input:focus { outline: none; }
 
-/* Quick chips */
+/* Quick chips — 4 in single row, Y=43-54%, X=9-91% */
 .dbp-chips {
+  position: absolute;
+  top: 43%; left: 9%; width: 82%; height: 11%;
   display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  gap: 4.7%;
 }
 .dbp-chip {
-  flex: 0 0 calc(50% - 3px);
-  height: 26px;
-  border-radius: 10px;
+  flex: 1;
+  height: 100%;
+  min-width: 0;
+  border-radius: 8px;
   background: transparent;
   border: none;
   color: #fbbf24;
-  font-size: 11px;
+  font-size: 10px;
   font-family: 'Rye', Georgia, serif;
   font-weight: 600;
   cursor: pointer;
   transition: all .15s;
   box-shadow: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .dbp-chip:active:not(:disabled) {
   background: rgba(251,191,36,.18);
@@ -947,8 +969,15 @@ ul, li { list-style: none; }
 .dbp-chip--active { background: rgba(217,119,6,.25); border: none; color: #fff8e0; }
 .dbp-chip--sm { height: 22px; font-size: 9px; border-radius: 8px; flex: 0 0 auto; }
 
-/* Auto cashout row */
-.dbp-ac-row { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+/* Auto cashout row — second dark area Y=78-89% */
+.dbp-ac-row {
+  position: absolute;
+  top: 78%; left: 9%; width: 82%; height: 11%;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
 .dbp-ac-label { font-size: 9px; color: var(--text-dim); flex-shrink: 0; }
 .dbp-ac-chips { display: flex; gap: 3px; flex-wrap: wrap; }
 .dbp-ac-input {
@@ -968,21 +997,23 @@ ul, li { list-style: none; }
 .dbp-ac-input[type=number] { -moz-appearance: textfield; }
 
 .dbp-error {
-  font-size: 10px;
+  position: absolute;
+  top: 60%; left: 5%; width: 90%;
+  font-size: 9px;
   color: var(--red-light);
-  padding: 3px 5px;
-  background: rgba(239,68,68,0.1);
-  border-radius: 5px;
-  border: 1px solid var(--red-dim);
+  text-align: center;
+  background: rgba(239,68,68,0.12);
+  border-radius: 4px;
 }
 
-/* ─── Action Buttons — transparent over new panel image ──────────────────────── */
+/* ─── Action Buttons — aligned to BET NOW rectangle (Y=63-74%) ───────────────── */
 .dbp-btn {
   width: 100%;
-  padding: 8px 14px;
-  border-radius: 14px;
+  height: 100%;
+  padding: 0;
+  border-radius: 8px;
   font-family: 'Rye', Georgia, serif;
-  font-size: 15px;
+  font-size: 13px;
   font-weight: 700;
   letter-spacing: 2px;
   cursor: pointer;
@@ -1098,10 +1129,12 @@ ul, li { list-style: none; }
 .co-btn__amount { font-size: 20px; font-weight: bold; }
 .co-profit { text-align: center; font-size: 11px; padding-top: 4px; font-weight: bold; }
 
-/* ─── Button area — grows to fill remaining panel height ─────────────────────── */
+/* ─── Button area — BET NOW rectangle (Y=63-74%) ────────────────────────────── */
 .dbp-btn-area {
+  position: absolute;
+  top: 63%; left: 5%; width: 90%; height: 11%;
   display: flex;
-  flex-direction: column;
+  align-items: center;
 }
 
 /* ─── Image action buttons (btn_bet_now / btn_cashout PNG) ───────────────────── */
