@@ -765,11 +765,11 @@ ul, li { list-style: none; }
   box-shadow: none !important;
 }
 
-/* Panel card — absolute layout over pannel_cropped.png */
+/* Panel card — full pannel1.png visible, children confined to inner content zone */
 .dbp-block {
   width: 96%;
   aspect-ratio: 1404 / 853;
-  background: url('/assets/betting/buttons/pannel1.png') center/140% 126% no-repeat;
+  background: url('/assets/betting/buttons/pannel1.png') center/100% 100% no-repeat;
   border: none;
   border-radius: 22px;
   padding: 0;
@@ -783,6 +783,14 @@ ul, li { list-style: none; }
   transform: translateZ(0);
   -webkit-transform: translateZ(0);
   transition: filter .3s;
+}
+/* Inner zone — maps 0-100% child positions onto the panel's dark-rectangle area */
+.dbp-content {
+  position: absolute;
+  left: 15.2%;
+  top: 11.4%;
+  right: 13.4%;
+  bottom: 9%;
 }
 /* Active bet: subtle brightness boost */
 .dbp-block--active {

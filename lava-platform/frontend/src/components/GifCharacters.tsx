@@ -221,11 +221,13 @@ export function GifCharacters() {
           aria-hidden="true"
           style={{
             position: 'fixed',
-            inset: 0,
+            top: 0,
+            left: 0,
+            right: 0,
+            height: '62vh',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            paddingBottom: '40vh',
             pointerEvents: 'none',
             zIndex: 9999,
           }}

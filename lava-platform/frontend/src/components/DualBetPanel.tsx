@@ -340,64 +340,66 @@ function BetBlockUI({
         {autoBet && <span className="dbp-block__auto-tag">AUTO</span>}
       </div>
 
-      {/* Bet amount stepper */}
-      <div className="dbp-amount-row">
-        <button
-          className="dbp-step-btn"
-          onClick={onDecrement}
-          disabled={inputLocked || loading}
-          aria-label="Decrease bet"
-        >−</button>
-        <div className="dbp-amount-display">
-          <span className="dbp-amount-currency">$</span>
-          <input
-            className="dbp-amount-input"
-            type="number"
-            min={BET_MIN}
-            step={BET_STEP}
-            value={betAmount}
-            onChange={(e) => onBetAmountChange(e.target.value)}
+      <div className="dbp-content">
+        {/* Bet amount stepper */}
+        <div className="dbp-amount-row">
+          <button
+            className="dbp-step-btn"
+            onClick={onDecrement}
             disabled={inputLocked || loading}
-            inputMode="decimal"
-          />
+            aria-label="Decrease bet"
+          >−</button>
+          <div className="dbp-amount-display">
+            <span className="dbp-amount-currency">$</span>
+            <input
+              className="dbp-amount-input"
+              type="number"
+              min={BET_MIN}
+              step={BET_STEP}
+              value={betAmount}
+              onChange={(e) => onBetAmountChange(e.target.value)}
+              disabled={inputLocked || loading}
+              inputMode="decimal"
+            />
+          </div>
+          <button
+            className="dbp-step-btn"
+            onClick={onIncrement}
+            disabled={inputLocked || loading}
+            aria-label="Increase bet"
+          >+</button>
         </div>
-        <button
-          className="dbp-step-btn"
-          onClick={onIncrement}
-          disabled={inputLocked || loading}
-          aria-label="Increase bet"
-        >+</button>
-      </div>
 
-      {/* Quick chips — hidden while bet is active or queued */}
-      {!inputLocked && (
-        <div className="dbp-chips">
-          {QUICK_CHIPS.map((v) => (
-            <button
-              key={v}
-              className={`dbp-chip ${betAmount === v ? 'dbp-chip--active' : ''}`}
-              onClick={() => onBetAmountChange(v)}
-              disabled={loading}
-            >
-              ${v.replace('.00', '')}
-            </button>
-          ))}
+        {/* Quick chips — hidden while bet is active or queued */}
+        {!inputLocked && (
+          <div className="dbp-chips">
+            {QUICK_CHIPS.map((v) => (
+              <button
+                key={v}
+                className={`dbp-chip ${betAmount === v ? 'dbp-chip--active' : ''}`}
+                onClick={() => onBetAmountChange(v)}
+                disabled={loading}
+              >
+                ${v.replace('.00', '')}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* Auto Bet toggle */}
+        <div className="dbp-options">
+          <label className={`dbp-toggle ${autoBet ? 'dbp-toggle--on' : ''}`}>
+            <input type="checkbox" checked={autoBet} onChange={onAutoBetToggle} />
+            <span className="dbp-toggle__track" />
+            <span className="dbp-toggle__label">Auto bet</span>
+          </label>
         </div>
-      )}
 
-      {/* Auto Bet toggle — overlaid on pre-drawn gear circle at X=81-92% of panel */}
-      <div className="dbp-options">
-        <label className={`dbp-toggle ${autoBet ? 'dbp-toggle--on' : ''}`}>
-          <input type="checkbox" checked={autoBet} onChange={onAutoBetToggle} />
-          <span className="dbp-toggle__track" />
-          <span className="dbp-toggle__label">Auto bet</span>
-        </label>
-      </div>
+        {error && <div className="dbp-error">{error}</div>}
 
-      {error && <div className="dbp-error">{error}</div>}
-
-      <div className="dbp-btn-area">
-        <ActionButton state={buttonState} loading={loading} onAction={onAction} />
+        <div className="dbp-btn-area">
+          <ActionButton state={buttonState} loading={loading} onAction={onAction} />
+        </div>
       </div>
     </div>
   )
