@@ -810,12 +810,12 @@ ul, li { list-style: none; }
 /* Toggles — Button.png overlaid exactly on pre-drawn gear at X=81-92%, Y=56.5-73.5% */
 .dbp-options {
   position: absolute;
-  top: 56.5%; left: 0; width: 100%; height: 17%;
+  top: 56.1%; left: 0; width: 100%; height: 17%;
 }
 /* Auto Bet toggle — label LEFT, button RIGHT via row-reverse */
 .dbp-options .dbp-toggle {
   position: absolute;
-  left: 41.7%; width: 54%;
+  left: 41.4%; width: 54%;
   top: 0; bottom: 0;
   display: flex; flex-direction: row-reverse; align-items: center; justify-content: flex-start; gap: 4%;
 }
