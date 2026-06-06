@@ -1057,7 +1057,7 @@ ul, li { list-style: none; }
 
 .dbp-btn--join {
   color: #fbbf24;
-  animation: gold-pulse 1.8s ease-in-out infinite;
+  animation: dbp-text-pulse 1.8s ease-in-out infinite;
 }
 .dbp-btn--join:disabled { opacity: .35; cursor: default; animation: none; }
 
@@ -1099,7 +1099,7 @@ ul, li { list-style: none; }
 }
 .dbp-btn--next-round {
   color: #fbbf24;
-  animation: gold-pulse 1.8s ease-in-out infinite;
+  animation: dbp-text-pulse 1.8s ease-in-out infinite;
 }
 .dbp-btn--cancel {
   color: #fca5a5;
@@ -1212,6 +1212,11 @@ ul, li { list-style: none; }
 @keyframes gold-pulse {
   0%, 100% { box-shadow: 0 0 10px var(--gold-glow), 0 2px 8px rgba(0,0,0,0.4); }
   50%       { box-shadow: 0 0 24px rgba(251,191,36,0.6), 0 2px 8px rgba(0,0,0,0.4); }
+}
+/* Text-only glow for transparent-bg panel buttons — no box-shadow rectangle */
+@keyframes dbp-text-pulse {
+  0%, 100% { text-shadow: 0 0 10px rgba(251,191,36,0.5); }
+  50%       { text-shadow: 0 0 26px rgba(251,191,36,1), 0 0 50px rgba(217,119,6,0.5); }
 }
 @keyframes green-pulse {
   0%, 100% { box-shadow: 0 0 10px var(--green-glow), 0 2px 8px rgba(0,0,0,0.4); }

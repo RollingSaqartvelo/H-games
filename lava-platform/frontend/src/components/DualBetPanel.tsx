@@ -94,7 +94,13 @@ function useBetPanel(token: string) {
       addActiveBet()
       haptic('success')
     } catch (e) {
-      setError(e instanceof ApiError ? e.message : 'Failed to join')
+      const msg = e instanceof ApiError ? e.message : 'Failed to join'
+      if (msg.toLowerCase().includes('session expired')) {
+        localStorage.removeItem('crash_token')
+        window.location.reload()
+        return
+      }
+      setError(msg)
       haptic('error')
     } finally {
       setLoading(false)
@@ -151,7 +157,13 @@ function useBetPanel(token: string) {
       playWinSound()
       haptic('success')
     } catch (e) {
-      setError(e instanceof ApiError ? e.message : 'Failed to escape')
+      const msg = e instanceof ApiError ? e.message : 'Failed to escape'
+      if (msg.toLowerCase().includes('session expired')) {
+        localStorage.removeItem('crash_token')
+        window.location.reload()
+        return
+      }
+      setError(msg)
       haptic('error')
     } finally {
       setLoading(false)
