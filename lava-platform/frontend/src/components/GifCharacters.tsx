@@ -57,28 +57,6 @@ export function GifCharacters() {
   const crashed = roundState === 'CRASHED'
   const visible = (running || crashed) && heroState !== 'done'
 
-  // Sync opacity with bg video timestamps
-  const [bgOpacity, setBgOpacity] = useState(1)
-  useEffect(() => {
-    if (!visible) return
-    let raf: number
-    const tick = () => {
-      const vid = document.getElementById('running-bg-video') as HTMLVideoElement | null
-      if (vid && vid.duration) {
-        const t = vid.currentTime
-        let op = 1
-        if      (t <= 0.05)              op = 0.15  // 0.00–0.05s: 85% transparent
-        else if (t <= 0.06)              op = 0.60  // 0.05–0.06s: 40% transparent
-        else if (t >= 6.25 && t <= 6.27) op = 0.15  // 6.25–6.27s: 85% transparent
-        else if (t >= 6.27 && t <= 6.28) op = 0.60  // 6.27–6.28s: 40% transparent
-        setBgOpacity(op)
-      }
-      raf = requestAnimationFrame(tick)
-    }
-    raf = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(raf)
-  }, [visible])
-
   // Sheriff shooting — only while running; first shot delayed so hero establishes scene
   useEffect(() => {
     window.clearInterval(intervalRef.current)
@@ -191,7 +169,6 @@ export function GifCharacters() {
 
   return (
     <>
-      {/* Characters — subject to bgOpacity sync with bg video */}
       <div
         aria-hidden="true"
         style={{
@@ -200,8 +177,6 @@ export function GifCharacters() {
           pointerEvents: 'none',
           zIndex: 50,
           overflow: 'hidden',
-          opacity: bgOpacity,
-          transition: 'opacity 0.03s linear',
         }}
       >
         {/* Sheriff — hidden during crash delay; crash GIF → freeze frame after 1100ms */}
