@@ -754,6 +754,16 @@ ul, li { list-style: none; }
   padding: 0;
 }
 .dbp-divider { display: none; }
+/* Kill browser tap highlights and focus rings on all panel elements */
+.dbp-root * {
+  -webkit-tap-highlight-color: transparent;
+  tap-highlight-color: transparent;
+}
+.dbp-root *:focus,
+.dbp-root *:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
 
 /* Panel card — absolute layout over pannel_cropped.png */
 .dbp-block {
@@ -797,15 +807,15 @@ ul, li { list-style: none; }
   padding: 1px 5px;
 }
 
-/* Toggles — Button.png overlaid exactly on pre-drawn gear at X=81-92%, Y=56-69% */
+/* Toggles — Button.png overlaid exactly on pre-drawn gear at X=81-92%, Y=59-76% */
 .dbp-options {
   position: absolute;
-  top: 56%; left: 0; width: 100%; height: 13%;
+  top: 59%; left: 0; width: 100%; height: 17%;
 }
 /* Auto Bet toggle — single toggle, aligned to right gear circle in panel */
 .dbp-options .dbp-toggle {
   position: absolute;
-  left: 80%; width: 13%;
+  left: 78%; width: 17%;
   top: 0; bottom: 0;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
 }
@@ -1118,10 +1128,10 @@ ul, li { list-style: none; }
 .co-btn__amount { font-size: 20px; font-weight: bold; }
 .co-profit { text-align: center; font-size: 11px; padding-top: 4px; font-weight: bold; }
 
-/* ─── Button area — lower black rectangle (Y=74-84%) ───────────────────────── */
+/* ─── Button area — lower black rectangle (Y=76-86%) ───────────────────────── */
 .dbp-btn-area {
   position: absolute;
-  top: 74%; left: 5%; width: 90%; height: 10%;
+  top: 76%; left: 5%; width: 90%; height: 10%;
   display: flex;
   align-items: center;
 }
