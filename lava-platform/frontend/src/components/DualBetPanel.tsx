@@ -10,7 +10,6 @@ import { playWinSound } from '../audio/WinSound'
 // ─── Shared constants ────────────────────────────────────────────────────────
 
 const QUICK_CHIPS    = ['1.00', '5.00', '10.00', '50.00']
-const QUICK_CASHOUTS = ['1.5', '2.0', '3.0', '5.0', '10.0']
 const BET_STEP       = 0.50
 const BET_MIN        = 0.50
 
@@ -51,15 +50,13 @@ function useBetPanel(token: string) {
   const [cashoutPayout, setCashoutPayout] = useState<number | null>(null)
 
   const [betAmount,   setBetAmount]   = useState('1.00')
-  const [autoCashout, setAutoCashout] = useState('')
-  const [acEnabled,   setAcEnabled]   = useState(false)
   const [autoBet,     setAutoBet]     = useState(false)
   const [loading,     setLoading]     = useState(false)
   const [error,       setError]       = useState<string | null>(null)
 
   // ── Queued next-round bet ────────────────────────────────────────────────────
   const [queuedBet, setQueuedBet] = useState<{
-    amount: string; acEnabled: boolean; autoCashout: string
+    amount: string
   } | null>(null)
 
   // ── Derived ─────────────────────────────────────────────────────────────────
@@ -87,14 +84,13 @@ function useBetPanel(token: string) {
   }, [roundId])
 
   // ── Shared bet placement ─────────────────────────────────────────────────────
-  const placeBet = useCallback(async (amount: string, acOn: boolean, ac: string) => {
+  const placeBet = useCallback(async (amount: string) => {
     setError(null)
     setLoading(true)
     haptic('tap')
     try {
-      const acValue = acOn && ac ? parseFloat(ac) : undefined
-      const resp = await api.placeBet(token, { amount, currency: 'USD', auto_cashout: acValue })
-      setActiveBet({ betId: resp.bet_id, amount, currency: 'USD', autoCashout: acValue ?? 0 })
+      const resp = await api.placeBet(token, { amount, currency: 'USD' })
+      setActiveBet({ betId: resp.bet_id, amount, currency: 'USD', autoCashout: 0 })
       addActiveBet()
       haptic('success')
     } catch (e) {
@@ -109,15 +105,15 @@ function useBetPanel(token: string) {
   const handleBet = useCallback(async () => {
     if (!token) { alert('Открой игру через Telegram бот чтобы делать ставки'); return }
     if (roundState !== 'STARTING' || locked || loading) return
-    await placeBet(betAmount, acEnabled, autoCashout)
-  }, [token, roundState, locked, loading, betAmount, acEnabled, autoCashout, placeBet])
+    await placeBet(betAmount)
+  }, [token, roundState, locked, loading, betAmount, placeBet])
 
   // ── Queue next-round bet ─────────────────────────────────────────────────────
   const handleQueueNextRound = useCallback(() => {
     if (!canQueue) return
-    setQueuedBet({ amount: betAmount, acEnabled, autoCashout })
+    setQueuedBet({ amount: betAmount })
     haptic('tap')
-  }, [canQueue, betAmount, acEnabled, autoCashout])
+  }, [canQueue, betAmount])
 
   // ── Cancel queued bet ────────────────────────────────────────────────────────
   const handleCancelQueue = useCallback(() => {
@@ -132,7 +128,7 @@ function useBetPanel(token: string) {
     if (!queuedBet || roundState !== 'STARTING' || locked || loading) return
     const q = queuedBet
     setQueuedBet(null)
-    void placeBetRef.current(q.amount, q.acEnabled, q.autoCashout)
+    void placeBetRef.current(q.amount)
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [roundState, locked, loading, queuedBet])
 
@@ -220,9 +216,7 @@ function useBetPanel(token: string) {
     betAmount, setBetAmount,
     betAmt,
     // Options
-    acEnabled,   setAcEnabled,
-    autoCashout, setAutoCashout,
-    autoBet,     setAutoBet,
+    autoBet, setAutoBet,
     // Status
     loading, error, locked,
     hasQueuedBet: queuedBet !== null,
@@ -311,10 +305,6 @@ interface BetBlockUIProps {
   onBetAmountChange: (v: string) => void
   onIncrement: () => void
   onDecrement: () => void
-  acEnabled: boolean
-  onAcToggle: () => void
-  autoCashout: string
-  onAutoCashoutChange: (v: string) => void
   autoBet: boolean
   onAutoBetToggle: () => void
   loading: boolean
@@ -327,7 +317,6 @@ interface BetBlockUIProps {
 
 function BetBlockUI({
   label, betAmount, onBetAmountChange, onIncrement, onDecrement,
-  acEnabled, onAcToggle, autoCashout, onAutoCashoutChange,
   autoBet, onAutoBetToggle,
   loading, error, buttonState, onAction, locked, hasQueuedBet,
 }: BetBlockUIProps) {
@@ -384,54 +373,14 @@ function BetBlockUI({
         </div>
       )}
 
-      {/* Options row — auto cash hidden while locked, auto bet always visible */}
+      {/* Auto Bet toggle — overlaid on pre-drawn gear circle at X=81-92% of panel */}
       <div className="dbp-options">
-        {!inputLocked && (
-          <label className={`dbp-toggle ${acEnabled ? 'dbp-toggle--on' : ''}`}>
-            <input type="checkbox" checked={acEnabled} onChange={onAcToggle} disabled={loading} />
-            <span className="dbp-toggle__track" />
-            <span className="dbp-toggle__label">
-              Auto {acEnabled && autoCashout ? `${autoCashout}×` : 'cash'}
-            </span>
-          </label>
-        )}
-
         <label className={`dbp-toggle ${autoBet ? 'dbp-toggle--on' : ''}`}>
           <input type="checkbox" checked={autoBet} onChange={onAutoBetToggle} />
           <span className="dbp-toggle__track" />
           <span className="dbp-toggle__label">Auto bet</span>
         </label>
       </div>
-
-      {/* Auto cashout multiplier picker */}
-      {acEnabled && !inputLocked && (
-        <div className="dbp-ac-row">
-          <span className="dbp-ac-label">Cash at</span>
-          <div className="dbp-ac-chips">
-            {QUICK_CASHOUTS.map((v) => (
-              <button
-                key={v}
-                className={`dbp-chip dbp-chip--sm ${autoCashout === v ? 'dbp-chip--active' : ''}`}
-                onClick={() => onAutoCashoutChange(v)}
-                disabled={inputLocked || loading}
-              >
-                {v}×
-              </button>
-            ))}
-          </div>
-          <input
-            className="dbp-ac-input"
-            type="number"
-            min="1.01"
-            step="0.01"
-            placeholder="2.00"
-            value={autoCashout}
-            onChange={(e) => onAutoCashoutChange(e.target.value)}
-            disabled={inputLocked || loading}
-            inputMode="decimal"
-          />
-        </div>
-      )}
 
       {error && <div className="dbp-error">{error}</div>}
 
@@ -460,10 +409,6 @@ function PanelA({ token }: { token: string; playerId: string }) {
         onBetAmountChange={p.setBetAmount}
         onIncrement={() => p.setBetAmount((Math.max(BET_MIN, p.betAmt + BET_STEP)).toFixed(2))}
         onDecrement={() => p.setBetAmount((Math.max(BET_MIN, p.betAmt - BET_STEP)).toFixed(2))}
-        acEnabled={p.acEnabled}
-        onAcToggle={() => p.setAcEnabled((v) => !v)}
-        autoCashout={p.autoCashout}
-        onAutoCashoutChange={p.setAutoCashout}
         autoBet={p.autoBet}
         onAutoBetToggle={() => p.setAutoBet((v) => !v)}
         loading={p.loading}
@@ -493,10 +438,6 @@ function PanelB({ token }: { token: string }) {
         onBetAmountChange={p.setBetAmount}
         onIncrement={() => p.setBetAmount((Math.max(BET_MIN, p.betAmt + BET_STEP)).toFixed(2))}
         onDecrement={() => p.setBetAmount((Math.max(BET_MIN, p.betAmt - BET_STEP)).toFixed(2))}
-        acEnabled={p.acEnabled}
-        onAcToggle={() => p.setAcEnabled((v) => !v)}
-        autoCashout={p.autoCashout}
-        onAutoCashoutChange={p.setAutoCashout}
         autoBet={p.autoBet}
         onAutoBetToggle={() => p.setAutoBet((v) => !v)}
         loading={p.loading}
