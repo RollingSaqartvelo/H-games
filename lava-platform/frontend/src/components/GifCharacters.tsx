@@ -9,7 +9,7 @@ const SHERIFF_CRASH     = '/assets/sheriff/sherif%20crash.gif'
 const SHERIFF_CRASH_END = '/assets/sheriff/crash%20end.png'
 const HERO_SRC      = '/assets/hero/%D0%B3%D0%B5%D1%80%D0%BE%D0%B9.gif'
 const CRASH_SRC     = '/assets/hero/Newcrash.gif'
-const WASTED_SRC    = '/assets/ui/Wasted/newwasted.png'
+const WASTED_SRC    = '/assets/ui/Wasted/wasted1.png'
 
 // Duration of crash GIFs — wasted appears 500ms before this, then game transitions to betting
 const CRASH_GIF_MS      = 1700
@@ -234,7 +234,7 @@ export function GifCharacters() {
             src={WASTED_SRC}
             alt="WASTED"
             style={{
-              width: 'min(88vw, 420px)',
+              width: '115vw',
               height: 'auto',
               display: 'block',
               animation: 'wasted-slam 320ms cubic-bezier(0.15, 1.35, 0.4, 1) both',
