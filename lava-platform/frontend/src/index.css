@@ -132,16 +132,17 @@ ul, li { list-style: none; }
 
 .app__footer {
   flex: 1 1 auto;
+  min-height: 0;
   overflow: visible;
   background: linear-gradient(180deg, #0a0602 0%, #060401 60%, #080502 100%);
   border-top: 1px solid rgba(217,119,6,.2);
-  padding: 8px 10px;
-  padding-bottom: max(env(safe-area-inset-bottom, 16px), 16px);
+  padding: 4px 4px;
+  padding-bottom: max(env(safe-area-inset-bottom, 8px), 8px);
   position: relative;
   z-index: 1;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 4px;
 }
 
 /* ─── Splash screen ──────────────────────────────────────────────────────────── */
@@ -748,9 +749,11 @@ ul, li { list-style: none; }
 
 /* ─── Dual Bet Panel — Granny-style gold plasma ──────────────────────────────── */
 .dbp-root {
+  flex: 1 1 auto;
+  min-height: 0;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 0;
   padding: 0;
 }
 .dbp-divider { display: none; }
@@ -765,10 +768,11 @@ ul, li { list-style: none; }
   box-shadow: none !important;
 }
 
-/* Panel card — full pannel1.png visible, children confined to inner content zone */
+/* Panel card — stretches to fill footer, bg 100%x100% scales with it */
 .dbp-block {
-  width: 96%;
-  aspect-ratio: 1404 / 853;
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
   background: url('/assets/betting/buttons/pannel1.png') center/100% 100% no-repeat;
   border: none;
   border-radius: 22px;
@@ -776,10 +780,7 @@ ul, li { list-style: none; }
   position: relative;
   display: block;
   overflow: hidden;
-  flex-shrink: 0;
   box-shadow: none;
-  margin-top: -2px;
-  margin-left: -2px;
   transform: translateZ(0);
   -webkit-transform: translateZ(0);
   transition: filter .3s;
