@@ -807,23 +807,23 @@ ul, li { list-style: none; }
   padding: 1px 5px;
 }
 
-/* Toggles — Button.png overlaid exactly on pre-drawn gear at X=81-92%, Y=59-76% */
+/* Toggles — Button.png overlaid exactly on pre-drawn gear at X=81-92%, Y=57-74% */
 .dbp-options {
   position: absolute;
-  top: 59%; left: 0; width: 100%; height: 17%;
+  top: 57%; left: 0; width: 100%; height: 17%;
 }
-/* Auto Bet toggle — single toggle, aligned to right gear circle in panel */
+/* Auto Bet toggle — label LEFT, button RIGHT via row-reverse */
 .dbp-options .dbp-toggle {
   position: absolute;
-  left: 78%; width: 17%;
+  left: 42%; width: 54%;
   top: 0; bottom: 0;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  display: flex; flex-direction: row-reverse; align-items: center; justify-content: flex-start; gap: 4%;
 }
 .dbp-toggle {
   display: flex;
-  flex-direction: column;
+  flex-direction: row-reverse;
   align-items: center;
-  gap: 2px;
+  gap: 4%;
   cursor: pointer;
   background: none;
   border: none;
@@ -840,8 +840,8 @@ ul, li { list-style: none; }
 
 .dbp-toggle__track {
   display: block;
-  width: 100%;
-  height: 100%;
+  flex: 0 0 30%;
+  aspect-ratio: 2000 / 1216;
   background: url('/assets/betting/buttons/Button.png') center / cover no-repeat;
   transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.25s ease;
   filter: brightness(0.75) saturate(0.85);
@@ -851,15 +851,44 @@ ul, li { list-style: none; }
   filter: brightness(1.1) saturate(1.2);
 }
 .dbp-toggle__track::after { display: none; }
+
+/* Engraved ivory label — left of button */
 .dbp-toggle__label {
-  font-size: 6px;
-  color: rgba(251,191,36,.5);
-  letter-spacing: 1.5px;
+  flex: 1;
+  font-family: 'Rye', serif;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 2.5px;
   text-transform: uppercase;
-  font-weight: 700;
   white-space: nowrap;
+  text-align: right;
+  /* Ivory patterned gradient — diagonal cross-hatched bone texture */
+  background: repeating-linear-gradient(
+    135deg,
+    #e8d5a8 0px, #f5edd5 3px, #c4a878 6px, #e0cca0 9px, #f2e4c0 12px, #cdb48a 15px
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  /* Engraved depth — shadow punches text into wood */
+  filter:
+    drop-shadow(0 1px 2px rgba(0,0,0,0.85))
+    drop-shadow(0 -0.5px 0 rgba(255,240,190,0.25));
 }
-.dbp-toggle--on .dbp-toggle__label { color: var(--gold); }
+.dbp-toggle--on .dbp-toggle__label {
+  background: repeating-linear-gradient(
+    135deg,
+    #fce08a 0px, #fff5b8 3px, #c89820 6px, #f0d050 9px, #fffae0 12px, #d4a020 15px
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  filter:
+    drop-shadow(0 1px 2px rgba(0,0,0,0.85))
+    drop-shadow(0 -0.5px 0 rgba(255,240,120,0.4));
+}
 
 /* Stepper row — Y=15-31% of block, padding aligns children to image cells */
 .dbp-amount-row {
