@@ -767,9 +767,9 @@ ul, li { list-style: none; }
 
 /* Panel card — absolute layout over pannel_cropped.png */
 .dbp-block {
-  width: 100%;
+  width: 96%;
   aspect-ratio: 1404 / 853;
-  background: url('/assets/betting/buttons/pannel1.png') 47% 46%/140% 126% no-repeat;
+  background: url('/assets/betting/buttons/pannel1.png') center/140% 126% no-repeat;
   border: none;
   border-radius: 22px;
   padding: 0;
@@ -778,6 +778,8 @@ ul, li { list-style: none; }
   overflow: hidden;
   flex-shrink: 0;
   box-shadow: none;
+  margin-top: -2px;
+  margin-left: -2px;
   transform: translateZ(0);
   -webkit-transform: translateZ(0);
   transition: filter .3s;
