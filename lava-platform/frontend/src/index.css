@@ -807,15 +807,15 @@ ul, li { list-style: none; }
   padding: 1px 5px;
 }
 
-/* Toggles — Button.png overlaid exactly on pre-drawn gear at X=81-92%, Y=57-74% */
+/* Toggles — Button.png overlaid exactly on pre-drawn gear at X=81-92%, Y=56.5-73.5% */
 .dbp-options {
   position: absolute;
-  top: 57%; left: 0; width: 100%; height: 17%;
+  top: 56.5%; left: 0; width: 100%; height: 17%;
 }
 /* Auto Bet toggle — label LEFT, button RIGHT via row-reverse */
 .dbp-options .dbp-toggle {
   position: absolute;
-  left: 42%; width: 54%;
+  left: 41.7%; width: 54%;
   top: 0; bottom: 0;
   display: flex; flex-direction: row-reverse; align-items: center; justify-content: flex-start; gap: 4%;
 }
@@ -1056,8 +1056,19 @@ ul, li { list-style: none; }
 .dbp-btn:disabled { cursor: not-allowed; }
 
 .dbp-btn--join {
-  color: #fbbf24;
-  animation: dbp-text-pulse 1.8s ease-in-out infinite;
+  /* Ivory engraved gradient — no background, no glow box */
+  background: repeating-linear-gradient(
+    135deg,
+    #e8d5a8 0px, #f5edd5 3px, #c4a878 6px, #e0cca0 9px, #f2e4c0 12px, #cdb48a 15px
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  filter: drop-shadow(0 1.5px 3px rgba(0,0,0,0.9)) drop-shadow(0 -0.5px 0 rgba(255,240,190,0.3));
+  font-size: 15px;
+  padding-top: 4px;
+  animation: dbp-ivory-breathe 2s ease-in-out infinite;
 }
 .dbp-btn--join:disabled { opacity: .35; cursor: default; animation: none; }
 
@@ -1098,8 +1109,18 @@ ul, li { list-style: none; }
   color: var(--red-light);
 }
 .dbp-btn--next-round {
-  color: #fbbf24;
-  animation: dbp-text-pulse 1.8s ease-in-out infinite;
+  background: repeating-linear-gradient(
+    135deg,
+    #e8d5a8 0px, #f5edd5 3px, #c4a878 6px, #e0cca0 9px, #f2e4c0 12px, #cdb48a 15px
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  filter: drop-shadow(0 1.5px 3px rgba(0,0,0,0.9)) drop-shadow(0 -0.5px 0 rgba(255,240,190,0.3));
+  font-size: 15px;
+  padding-top: 4px;
+  animation: dbp-ivory-breathe 2s ease-in-out infinite;
 }
 .dbp-btn--cancel {
   color: #fca5a5;
@@ -1217,6 +1238,11 @@ ul, li { list-style: none; }
 @keyframes dbp-text-pulse {
   0%, 100% { text-shadow: 0 0 10px rgba(251,191,36,0.5); }
   50%       { text-shadow: 0 0 26px rgba(251,191,36,1), 0 0 50px rgba(217,119,6,0.5); }
+}
+/* Subtle opacity breathe for ivory engraved text buttons */
+@keyframes dbp-ivory-breathe {
+  0%, 100% { opacity: 0.82; }
+  50%       { opacity: 1; }
 }
 @keyframes green-pulse {
   0%, 100% { box-shadow: 0 0 10px var(--green-glow), 0 2px 8px rgba(0,0,0,0.4); }
