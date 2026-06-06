@@ -882,6 +882,7 @@ ul, li { list-style: none; }
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 3px;
   background: transparent;
   border: none;
   box-shadow: none;
@@ -903,9 +904,11 @@ ul, li { list-style: none; }
   font-weight: 700;
   font-family: 'Rye', Georgia, serif;
   text-align: center;
-  min-width: 0;
+  min-width: 3ch;
+  max-width: 8ch;
   padding: 0;
-  width: 100%;
+  flex: 0 0 auto;
+  width: auto;
   letter-spacing: 1px;
 }
 .dbp-amount-input::-webkit-outer-spin-button,
@@ -1109,10 +1112,10 @@ ul, li { list-style: none; }
 .co-btn__amount { font-size: 20px; font-weight: bold; }
 .co-profit { text-align: center; font-size: 11px; padding-top: 4px; font-weight: bold; }
 
-/* ─── Button area — BET NOW rectangle (Y=63-74%) ────────────────────────────── */
+/* ─── Button area — lower black rectangle (Y=70-82%) ───────────────────────── */
 .dbp-btn-area {
   position: absolute;
-  top: 63%; left: 5%; width: 90%; height: 11%;
+  top: 70%; left: 5%; width: 90%; height: 12%;
   display: flex;
   align-items: center;
 }
