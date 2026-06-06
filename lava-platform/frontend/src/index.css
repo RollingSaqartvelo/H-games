@@ -544,53 +544,27 @@ ul, li { list-style: none; }
 .rcd--urgent .rcd__bar-fill{ background: linear-gradient(90deg, var(--red-dim), var(--red)); }
 .rcd--urgent .rcd__label   { color: var(--red-light); }
 
-.rcd__final-number {
+/* Countdown image — flies out from center, fades as it zooms */
+.rcd__final-img {
   position: fixed;
   top: 28%;
   left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: clamp(140px, 32vw, 260px);
-  font-weight: 900;
-  font-family: 'Rye', Georgia, serif;
-  color: #f0c040;
-  text-shadow:
-    0 6px 0 #7a3000,
-    0 10px 0 #4a1800,
-    0 14px 32px rgba(180,60,0,0.85),
-    0 0 80px rgba(240,160,0,0.5);
-  -webkit-text-stroke: 2px #3d1500;
+  width: min(72vw, 300px);
+  height: auto;
   pointer-events: none;
   z-index: 48;
-  animation: final-num-pop 280ms cubic-bezier(0.34,1.56,0.64,1) both;
-  letter-spacing: -2px;
+  user-select: none;
+  -webkit-user-drag: none;
+  animation: countdown-fly 900ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
 }
 
-@keyframes final-num-pop {
-  from { opacity: 0; transform: translate(-50%, -50%) scale(0.4); }
-  to   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+@keyframes countdown-fly {
+  0%   { opacity: 0;   transform: translate(-50%, -50%) scale(0.15) rotate(-8deg); }
+  18%  { opacity: 1;   transform: translate(-50%, -50%) scale(1.12) rotate(2deg); }
+  55%  { opacity: 1;   transform: translate(-50%, -50%) scale(0.96) rotate(0deg); }
+  100% { opacity: 0;   transform: translate(-50%, -50%) scale(1.9)  rotate(1deg); }
 }
 
-.rcd__sheriff-warning {
-  position: absolute;
-  top: 0;
-  left: 50%;
-  width: clamp(560px, 136vw, 960px);
-  max-width: 100vw;
-  height: auto;
-  object-fit: contain;
-  pointer-events: none;
-  z-index: 10;
-  animation: sheriff-fadein 250ms ease-out forwards, sheriff-pulse 550ms 280ms ease-in-out infinite;
-}
-
-@keyframes sheriff-fadein {
-  from { opacity: 0; transform: translateX(-50%) translateY(-50%) scale(0.88); }
-  to   { opacity: 1; transform: translateX(-50%) translateY(-50%) scale(1); }
-}
-@keyframes sheriff-pulse {
-  0%, 100% { transform: translateX(-50%) translateY(-50%) scale(1);    filter: brightness(1); }
-  50%       { transform: translateX(-50%) translateY(-50%) scale(1.05); filter: brightness(1.18); }
-}
 
 .rcd--ride {
   background: transparent;

@@ -77,20 +77,17 @@ export function RoundCountdown() {
   return (
     <>
       {isFinal && (
-        <div key={seconds} className="rcd__final-number" aria-live="assertive">
-          {seconds}
-        </div>
+        <img
+          key={seconds}
+          className="rcd__final-img"
+          src={`/assets/betting/Warnings/${seconds}.png`}
+          alt={String(seconds)}
+          aria-live="assertive"
+          draggable={false}
+        />
       )}
 
       <div className={`rcd rcd--${urgency}`} aria-live="polite">
-        {isFinal && (
-          <img
-            className="rcd__sheriff-warning"
-            src="/assets/betting/Warnings/sheriff_warning.png.png"
-            alt=""
-            aria-hidden="true"
-          />
-        )}
         {!isFinal && <div className="rcd__label">HEIST STARTS IN</div>}
         {!isFinal && <div className="rcd__number">{seconds}</div>}
         <div className="rcd__bar-wrap">
