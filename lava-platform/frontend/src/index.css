@@ -572,10 +572,12 @@ ul, li { list-style: none; }
 }
 
 @keyframes countdown-fly {
-  0%   { opacity: 0;   transform: translate(-50%, -50%) scale(0.15) rotate(-8deg); }
-  18%  { opacity: 1;   transform: translate(-50%, -50%) scale(1.12) rotate(2deg); }
-  55%  { opacity: 1;   transform: translate(-50%, -50%) scale(0.96) rotate(0deg); }
-  100% { opacity: 0;   transform: translate(-50%, -50%) scale(1.9)  rotate(1deg); }
+  0%   { opacity: 0;   transform: translate(-50%, -50%) scale(0.15)  rotate(-9deg); }
+  18%  { opacity: 1;   transform: translate(-50%, -50%) scale(1.12)  rotate(7deg);  }
+  35%  { opacity: 1;   transform: translate(-50%, -50%) scale(1.047) rotate(-6deg); }
+  55%  { opacity: 1;   transform: translate(-50%, -50%) scale(0.96)  rotate(6deg);  }
+  78%  { opacity: 1;   transform: translate(-50%, -50%) scale(1.44)  rotate(-4deg); }
+  100% { opacity: 0;   transform: translate(-50%, -50%) scale(1.9)   rotate(3deg);  }
 }
 
 
