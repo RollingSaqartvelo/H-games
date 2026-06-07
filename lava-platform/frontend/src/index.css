@@ -135,7 +135,7 @@ ul, li { list-style: none; }
   overflow: visible;
   background: linear-gradient(180deg, #0a0602 0%, #060401 60%, #080502 100%);
   border-top: 1px solid rgba(217,119,6,.2);
-  padding: 8px 0;
+  padding: 8px 10px;
   padding-bottom: max(env(safe-area-inset-bottom, 16px), 16px);
   position: relative;
   z-index: 1;
@@ -765,9 +765,9 @@ ul, li { list-style: none; }
   box-shadow: none !important;
 }
 
-/* Panel card — 140% zoom so content fills container (frame edges cropped), full width */
+/* Panel card — 140% zoom so content fills container (frame edges cropped) */
 .dbp-block {
-  width: 100%;
+  width: 96%;
   aspect-ratio: 1404 / 853;
   background: url('/assets/betting/buttons/pannel1.png') center/140% 126% no-repeat;
   border: none;
