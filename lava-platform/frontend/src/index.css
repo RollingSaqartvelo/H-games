@@ -793,8 +793,8 @@ ul, li { list-style: none; }
   overflow: hidden;
   flex-shrink: 0;
   box-shadow: none;
-  transform: translate3d(-2px, 0, 0);
-  -webkit-transform: translate3d(-2px, 0, 0);
+  transform: translate3d(0px, 0, 0);
+  -webkit-transform: translate3d(0px, 0, 0);
   transition: filter .3s;
 }
 /* Content wrapper — fills full container (140% zoom makes content ≈ full container) */
