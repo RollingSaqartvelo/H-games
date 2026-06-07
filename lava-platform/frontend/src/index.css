@@ -135,7 +135,7 @@ ul, li { list-style: none; }
   overflow: visible;
   background: linear-gradient(180deg, #0a0602 0%, #060401 60%, #080502 100%);
   border-top: 1px solid rgba(217,119,6,.2);
-  padding: 8px 2px;
+  padding: 8px 0;
   padding-bottom: max(env(safe-area-inset-bottom, 16px), 16px);
   position: relative;
   z-index: 1;
@@ -765,11 +765,11 @@ ul, li { list-style: none; }
   box-shadow: none !important;
 }
 
-/* Panel card — full width edge-to-edge, height from aspect-ratio */
+/* Panel card — 140% zoom so content fills container (frame edges cropped), full width */
 .dbp-block {
   width: 100%;
   aspect-ratio: 1404 / 853;
-  background: url('/assets/betting/buttons/pannel1.png') center/100% 100% no-repeat;
+  background: url('/assets/betting/buttons/pannel1.png') center/140% 126% no-repeat;
   border: none;
   border-radius: 22px;
   padding: 0;
@@ -782,13 +782,10 @@ ul, li { list-style: none; }
   -webkit-transform: translateZ(0);
   transition: filter .3s;
 }
-/* Inner zone — maps 0-100% child positions onto the panel's dark-rectangle area */
+/* Content wrapper — fills full container (140% zoom makes content ≈ full container) */
 .dbp-content {
   position: absolute;
-  left: 15.2%;
-  top: 11.4%;
-  right: 13.4%;
-  bottom: 9%;
+  inset: 0;
 }
 /* Active bet: subtle brightness boost */
 .dbp-block--active {
