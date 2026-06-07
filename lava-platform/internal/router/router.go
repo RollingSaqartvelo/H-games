@@ -63,6 +63,7 @@ func Wire(cfg *config.Config, infra *infrastructure.Infra) *Deps {
 	outlawHub := realtime.NewHub()
 	outlawCfg := roundEngine.DefaultConfig()
 	outlawCfg.GameType = "outlaw_escape"
+	outlawCfg.RTPExact = 93.8 // exact 93.8% RTP → house edge 0.062
 	outlawEng := roundEngine.New(outlawCfg, rRepo, provider, outlawPub, outlawHub, locker)
 
 	// Granny Run

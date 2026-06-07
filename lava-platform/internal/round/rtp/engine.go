@@ -31,6 +31,19 @@ func Get(pct int) (Profile, error) {
 	return p, nil
 }
 
+// Custom builds a Profile for an arbitrary RTP percentage (e.g. 93.8).
+// Used when an operator needs a precise RTP outside the standard integer set.
+// HouseEdge is exact; RTPPercent is rounded to the nearest whole percent for
+// the integer record/display field (rtp_profile column).
+func Custom(rtpPercent float64) Profile {
+	frac := rtpPercent / 100
+	return Profile{
+		RTPPercent: int(rtpPercent + 0.5),
+		RTP:        frac,
+		HouseEdge:  1 - frac,
+	}
+}
+
 // MustGet panics if the profile is invalid — use only with constants.
 func MustGet(pct int) Profile {
 	p, err := Get(pct)

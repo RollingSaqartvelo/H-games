@@ -41,6 +41,7 @@ type Config struct {
 	GrowthRate      float64       // multiplier = exp(growthRate * t)
 	TickInterval    time.Duration // how often multiplier is broadcast
 	DefaultRTP      int           // 92 | 94 | 96 | 98
+	RTPExact        float64       // optional precise RTP % (e.g. 93.8); 0 = use DefaultRTP
 	MaxCrashPoint   float64       // cap for extremely long rounds
 }
 
@@ -99,9 +100,15 @@ func New(cfg Config, repo repository.Repository, wallet domain.WalletProvider,
 
 // CreateRound generates a new sealed round (crash point hidden).
 func (e *Engine) CreateRound(ctx context.Context) (*domain.Round, error) {
-	rtpProfile, err := rtp.Get(e.cfg.DefaultRTP)
-	if err != nil {
-		return nil, err
+	var rtpProfile rtp.Profile
+	if e.cfg.RTPExact > 0 {
+		rtpProfile = rtp.Custom(e.cfg.RTPExact)
+	} else {
+		p, err := rtp.Get(e.cfg.DefaultRTP)
+		if err != nil {
+			return nil, err
+		}
+		rtpProfile = p
 	}
 
 	serverSeed, err := fair.ServerSeed()
