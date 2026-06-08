@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#0a0a0c">
   <title>Granny Run — H-GAMES</title>
   <!-- Force Telegram WebView to bypass cache on stale versions -->
-  <script>if(!location.search.includes('v=34'))location.replace('/granny.html?v=34')</script>
+  <script>if(!location.search.includes('v=35'))location.replace('/granny.html?v=35')</script>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap');
@@ -332,8 +332,8 @@
       background:transparent;border:none;padding:0;cursor:pointer;
       -webkit-tap-highlight-color:transparent;
     }
-    .bps-min{left:1%;width:52%}
-    .bps-max{left:57%;width:38%}
+    .bps-min{left:2%;width:47%}
+    .bps-max{left:51%;width:47%}
     .bps-min img,.bps-max img{width:100%;height:100%;object-fit:contain}
 
     /* ── Toggle Row ──────────────────────────────────────────── */
@@ -823,12 +823,12 @@
       <button class="bps-plus"  onclick="stepAmount(0,1)">+</button>
       <div class="bp-btn-pair" id="btnPair0">
         <button class="bp-slot-btn" id="btnSlot0" onclick="handleSlotBtn(0)">
-          <img class="bp-slot-img" id="imgSlot0" src="/assets/betting/buttons/bet%20on.png" alt="BET" data-state="bet">
+          <img class="bp-slot-img" id="imgSlot0" src="/assets/betting/buttons/bet%20on.png?v=2" alt="BET" data-state="bet">
         </button>
       </div>
       <button class="bp-btn bp-btn-bet" id="btn0" onclick="handleBtn(0)">BET</button>
-      <button class="bps-min" onclick="setMinAmount(0)"><img src="/assets/betting/buttons/min.png" alt="MIN"></button>
-      <button class="bps-max" onclick="setMaxAmount(0)"><img src="/assets/betting/buttons/max.png" alt="MAX"></button>
+      <button class="bps-min" onclick="setMinAmount(0)"><img src="/assets/betting/buttons/min.png?v=2" alt="MIN"></button>
+      <button class="bps-max" onclick="setMaxAmount(0)"><img src="/assets/betting/buttons/max.png?v=2" alt="MAX"></button>
       <button id="btnAutoBetQ0" onclick="toggleAutoBet(0)" style="display:none"></button>
       <input type="number" id="cashout0" style="display:none">
       <div id="payout0" style="display:none"></div>
@@ -841,12 +841,12 @@
       <button class="bps-plus"  onclick="stepAmount(1,1)">+</button>
       <div class="bp-btn-pair" id="btnPair1">
         <button class="bp-slot-btn" id="btnSlot1" onclick="handleSlotBtn(1)">
-          <img class="bp-slot-img" id="imgSlot1" src="/assets/betting/buttons/bet%20on.png" alt="BET" data-state="bet">
+          <img class="bp-slot-img" id="imgSlot1" src="/assets/betting/buttons/bet%20on.png?v=2" alt="BET" data-state="bet">
         </button>
       </div>
       <button class="bp-btn bp-btn-bet" id="btn1" onclick="handleBtn(1)">BET</button>
-      <button class="bps-min" onclick="setMinAmount(1)"><img src="/assets/betting/buttons/min.png" alt="MIN"></button>
-      <button class="bps-max" onclick="setMaxAmount(1)"><img src="/assets/betting/buttons/max.png" alt="MAX"></button>
+      <button class="bps-min" onclick="setMinAmount(1)"><img src="/assets/betting/buttons/min.png?v=2" alt="MIN"></button>
+      <button class="bps-max" onclick="setMaxAmount(1)"><img src="/assets/betting/buttons/max.png?v=2" alt="MAX"></button>
       <button id="btnAutoBetQ1" onclick="toggleAutoBet(1)" style="display:none"></button>
       <input type="number" id="cashout1" style="display:none">
       <div id="payout1" style="display:none"></div>
@@ -1690,8 +1690,8 @@ function updateBtnState(i) {
     if (imgSlot && imgSlot.dataset.state !== wantState) {
       imgSlot.dataset.state = wantState
       swapSlotImage(i, b.active
-        ? '/assets/betting/buttons/cancel%20on.png'
-        : '/assets/betting/buttons/bet%20on.png')
+        ? '/assets/betting/buttons/cancel%20on.png?v=2'
+        : '/assets/betting/buttons/bet%20on.png?v=2')
     }
     if (slotBtn) slotBtn.disabled = false
   } else {
@@ -1710,7 +1710,7 @@ function updateBtnState(i) {
       btn.style.display = 'none'
       if (imgSlot && imgSlot.dataset.state !== 'nextround') {
         imgSlot.dataset.state = 'nextround'
-        swapSlotImage(i, '/assets/betting/buttons/Next%20Round%20BET.png')
+        swapSlotImage(i, '/assets/betting/buttons/Next%20Round%20BET.png?v=2')
       }
       if (slotBtn) slotBtn.disabled = false
     } else {
