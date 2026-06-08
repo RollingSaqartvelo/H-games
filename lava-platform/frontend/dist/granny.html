@@ -3,32 +3,38 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <meta name="theme-color" content="#020a03">
+  <meta name="theme-color" content="#0a0a0c">
   <title>Granny Run — H-GAMES</title>
   <!-- Force Telegram WebView to bypass cache on stale versions -->
-  <script>if(!location.search.includes('v=29'))location.replace('/granny.html?v=29')</script>
+  <script>if(!location.search.includes('v=30'))location.replace('/granny.html?v=30')</script>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Orbitron:wght@600;700;900&family=Share+Tech+Mono&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap');
     *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
     :root{
-      --green:      #22c55e;
-      --green-b:    #4ade80;
-      --green-dim:  #14532d;
-      --green-glow: rgba(34,197,94,.4);
+      --bg:         #0a0a0c;
+      --surface:    #17171d;
+      --bg-raised:  #1f1f27;
+      --titanium:   #2a2a35;
+      --gunmetal:   #1c1c24;
+      --bronze:     #b5860d;
+      --bronze-b:   #d4a435;
+      --copper:     #c87533;
+      --amber:      #e8a020;
+      --amber-glow: rgba(232,160,32,.28);
+      --border:     rgba(181,134,13,.22);
+      --ivory:      #f5ead8;
+      --ivory-dim:  rgba(245,234,216,.55);
+      --ivory-muted:rgba(245,234,216,.28);
       --red:        #ef4444;
       --red-glow:   rgba(239,68,68,.4);
-      --bg:         #020a03;
-      --surface:    #041008;
-      --border:     #0d2e12;
-      --text:       #d4ffd8;
-      --muted:      #3a7a42;
-      --gold:       #d97706;
+      --muted:      #8b7040;
+      --gold:       #d4a435;
     }
     html,body{
       width:100%;height:100%;overflow:hidden;
-      background:var(--bg);color:var(--text);
-      font-family:'Fredoka One',sans-serif;
+      background:var(--bg);color:var(--ivory);
+      font-family:'Rajdhani',sans-serif;
     }
 
     /* ── Layout ──────────────────────────────────────────────── */
@@ -44,22 +50,22 @@
       flex-shrink:0;height:48px;
       display:flex;align-items:center;justify-content:space-between;
       padding:0 14px;
-      background:rgba(2,10,3,.95);
+      background:rgba(10,10,12,.98);
       border-bottom:1px solid var(--border);
       z-index:10;
     }
-    .topbar-logo{font-size:13px;letter-spacing:2px;color:var(--green);text-transform:uppercase}
-    .topbar-back{background:none;border:1px solid rgba(34,197,94,.3);border-radius:6px;color:var(--green);font-size:16px;line-height:1;padding:2px 7px 3px;cursor:pointer;flex-shrink:0}
+    .topbar-logo{font-family:'Cinzel',serif;font-size:12px;letter-spacing:3px;color:var(--bronze-b);text-transform:uppercase;text-shadow:0 0 10px var(--amber-glow)}
+    .topbar-back{background:none;border:1px solid rgba(181,134,13,.3);border-radius:6px;color:var(--bronze);font-size:16px;line-height:1;padding:2px 7px 3px;cursor:pointer;flex-shrink:0}
     .topbar-balance{
       font-family:'Courier New',monospace;font-size:13px;
-      color:var(--green-b);display:flex;align-items:center;gap:6px;
+      color:var(--bronze-b);display:flex;align-items:center;gap:6px;
     }
     .topbar-balance .coin{font-size:16px}
     .state-badge{
       font-family:'Courier New',monospace;font-size:10px;letter-spacing:1px;
       padding:3px 9px;border-radius:20px;text-transform:uppercase;
     }
-    .state-badge.betting { background:rgba(34,197,94,.15);color:var(--green);border:1px solid var(--green-dim) }
+    .state-badge.betting { background:rgba(181,134,13,.15);color:var(--bronze);border:1px solid var(--gunmetal) }
     .state-badge.running { background:rgba(239,68,68,.15);color:#f87171;border:1px solid #7f1d1d }
     .state-badge.crashed { background:rgba(239,68,68,.2);color:#ef4444;border:1px solid #991b1b }
 
@@ -68,9 +74,9 @@
       flex-shrink:0;
       display:flex;align-items:center;gap:6px;
       padding:6px 8px 6px 6px;
-      background:rgba(2,12,5,.97);
-      border-bottom:1px solid rgba(34,197,94,.10);
-      box-shadow:inset 0 -1px 0 rgba(0,0,0,.5);
+      background:rgba(10,10,12,.97);
+      border-bottom:1px solid rgba(181,134,13,.10);
+      box-shadow:none;
       min-height:48px;
     }
 
@@ -82,13 +88,13 @@
     .hist-cur-pill{
       display:flex;align-items:center;justify-content:center;
       min-width:58px;height:30px;
-      background:rgba(4,26,10,.95);
-      border:1.5px solid var(--green);
+      background:rgba(14,12,8,.95);
+      border:1.5px solid var(--bronze);
       border-radius:10px;
       font-family:'Courier New',monospace;font-size:11px;font-weight:bold;
-      color:var(--green-b);
+      color:var(--bronze-b);
       padding:0 10px;white-space:nowrap;letter-spacing:.5px;
-      box-shadow:0 0 10px rgba(34,197,94,.2),inset 0 1px 0 rgba(74,222,128,.08);
+      box-shadow:0 0 10px rgba(181,134,13,.2),inset 0 1px 0 rgba(212,164,53,.08);
       transition:border-color .25s,color .25s,box-shadow .25s;
     }
     .hist-cur-pill.crashed{
@@ -99,7 +105,7 @@
       width:0;height:0;
       border-left:5px solid transparent;
       border-right:5px solid transparent;
-      border-top:5px solid var(--green);
+      border-top:5px solid var(--bronze);
       transition:border-top-color .25s;
     }
     .hist-cur-ptr.crashed{ border-top-color:#ef4444 }
@@ -134,14 +140,14 @@
       box-shadow:0 0 5px rgba(239,68,68,.18);
     }
     .pill.med{
-      background:rgba(4,22,8,.9);
+      background:rgba(14,12,8,.9);
       border:1px solid #0d3014;
-      color:#4ade80;
+      color:#d4a435;
     }
     .pill.high{
       background:rgba(22,14,2,.9);
       border:1px solid #3d2800;
-      color:#d97706;
+      color:#d4a435;
       box-shadow:0 0 6px rgba(217,119,6,.22);
     }
     .pill.epic{
@@ -156,7 +162,7 @@
       flex-shrink:0;
       width:34px;height:34px;
       display:flex;align-items:center;justify-content:center;
-      background:rgba(4,22,8,.9);
+      background:rgba(14,12,8,.9);
       border:1px solid #0d3014;
       border-radius:10px;
       color:var(--muted);
@@ -164,8 +170,8 @@
       transition:all .15s;
     }
     .hist-clock:active{
-      border-color:var(--green);color:var(--green);
-      box-shadow:0 0 8px rgba(34,197,94,.25);
+      border-color:var(--bronze);color:var(--bronze);
+      box-shadow:0 0 8px rgba(181,134,13,.25);
       transform:scale(.94);
     }
 
@@ -175,14 +181,8 @@
       position:relative;
       height:230px;
       transition:height 0.35s ease;
-      margin:0 8px;
-      background:#020d04;
-      border:1px solid rgba(34,197,94,.25);
-      border-radius:20px;
-      box-shadow:
-        0 0 0 1px rgba(34,197,94,.05),
-        0 0 36px rgba(34,197,94,.08),
-        inset 0 0 80px rgba(0,0,0,.45);
+      margin:0;
+      background:#0a0a0c;
       overflow:hidden;
     }
     .game-area--betting{ height:360px; }
@@ -199,13 +199,13 @@
     }
     .mult-val{
       font-size:62px;letter-spacing:-2px;
-      text-shadow:0 0 36px var(--green-glow);
+      text-shadow:0 2px 20px var(--amber-glow);
       transition:color .3s;
       line-height:1;
     }
-    .mult-val.normal { color:var(--green-b) }
-    .mult-val.hot    { color:#a3e635 }
-    .mult-val.epic   { color:#fbbf24 }
+    .mult-val.normal { color:var(--ivory);text-shadow:0 2px 20px var(--amber-glow) }
+    .mult-val.hot    { color:#e8a020 }
+    .mult-val.epic   { color:#d4a435 }
     .mult-val.crashed{ color:var(--red);text-shadow:0 0 36px var(--red-glow) }
     .mult-x{font-size:26px;color:var(--muted);vertical-align:super}
 
@@ -219,8 +219,8 @@
       text-transform:uppercase;color:var(--muted);margin-bottom:2px;
     }
     .countdown-val{
-      font-size:32px;color:var(--green-b);
-      text-shadow:0 0 16px var(--green-glow);
+      font-size:32px;color:var(--bronze-b);
+      text-shadow:0 0 16px var(--amber-glow);
     }
 
     /* ── Crashed banner ─────────────────────────────────────── */
@@ -248,8 +248,8 @@
       overflow-y:auto;
       -webkit-overflow-scrolling:touch;
       scrollbar-width:none;
-      background:url('/assets/betting/buttons/game%20pannel.png') center/cover no-repeat,linear-gradient(180deg,#010804 0%,#020d06 60%,#010a04 100%);
-      border-top:1px solid rgba(34,197,94,.18);
+      background:url('/assets/betting/buttons/game%20pannel.png') center/cover no-repeat,linear-gradient(180deg,#0e0e12 0%,#0f0f12 60%,#0a0a0e 100%);
+      border-top:1px solid rgba(181,134,13,.18);
       padding:8px 10px;
       padding-bottom:max(env(safe-area-inset-bottom,8px),8px);
       position:relative;z-index:1;
@@ -261,7 +261,7 @@
     .bet-panel{
       width:100%;
       background:url('/assets/betting/buttons/bet_panel_1.png') center/100% 100% no-repeat;
-      border:1px solid rgba(34,197,94,.12);
+      border:1px solid rgba(181,134,13,.12);
       border-radius:22px;
       padding:10px 14px 12px;
       display:flex;flex-direction:column;gap:7px;
@@ -273,8 +273,8 @@
       transition:border-color .3s,box-shadow .3s;
     }
     .bet-panel.active-bet{
-      border-color:rgba(34,197,94,.5);
-      box-shadow:0 0 16px rgba(34,197,94,.2);
+      border-color:rgba(181,134,13,.5);
+      box-shadow:0 0 16px rgba(181,134,13,.2);
     }
     .bet-panel.crashed-bet{ border-color:rgba(239,68,68,.45) }
 
@@ -287,22 +287,22 @@
     }
     .bp-toggle-item--inject{ flex:1.5 }
     .bp-toggle-label{
-      font-family:'Orbitron',sans-serif;
+      font-family:'Rajdhani',sans-serif;
       font-size:8px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
-      color:rgba(74,222,128,.55);white-space:nowrap;
+      color:rgba(212,164,53,.55);white-space:nowrap;
     }
     .bp-toggle{
       position:relative;width:40px;height:24px;flex-shrink:0;
-      background:linear-gradient(180deg,#081408 0%,#0b1c0e 100%);
-      border:1px solid rgba(34,197,94,.2);
+      background:linear-gradient(180deg,#141218 0%,#16141c 100%);
+      border:1px solid rgba(181,134,13,.2);
       border-radius:7px;cursor:pointer;padding:0;
       box-shadow:inset 0 1px 4px rgba(0,0,0,.55);
       transition:all .25s;
     }
     .bp-toggle.on{
-      background:linear-gradient(180deg,#0a3015 0%,#0e4a1c 100%);
-      border-color:var(--green);
-      box-shadow:0 0 12px rgba(34,197,94,.45),inset 0 1px 0 rgba(74,222,128,.12);
+      background:linear-gradient(180deg,#201408 0%,#2e1e0a 100%);
+      border-color:var(--bronze);
+      box-shadow:0 0 12px rgba(181,134,13,.45),inset 0 1px 0 rgba(212,164,53,.12);
     }
     .bp-toggle-knob{
       position:absolute;top:4px;left:4px;
@@ -314,21 +314,21 @@
     }
     .bp-toggle.on .bp-toggle-knob{
       left:20px;
-      background:linear-gradient(135deg,#4ade80 0%,#22c55e 100%);
-      box-shadow:0 0 8px rgba(34,197,94,.9),0 1px 3px rgba(0,0,0,.3);
+      background:linear-gradient(135deg,#d4a435 0%,#b5860d 100%);
+      box-shadow:0 0 8px rgba(181,134,13,.9),0 1px 3px rgba(0,0,0,.3);
     }
     .bp-inject-val{
       flex:1;min-width:0;
-      background:linear-gradient(180deg,#020c05 0%,#030f07 100%);
-      border:1px solid rgba(34,197,94,.18);
+      background:linear-gradient(180deg,#0c0c14 0%,#0e0e14 100%);
+      border:1px solid rgba(181,134,13,.18);
       border-radius:10px;padding:4px 8px;
       font-family:'Share Tech Mono',monospace;font-size:12px;
-      color:var(--green-b);text-align:center;outline:none;
+      color:var(--bronze-b);text-align:center;outline:none;
       box-shadow:inset 0 1px 4px rgba(0,0,0,.55);
       transition:opacity .2s;
     }
-    .bp-inject-val:focus{ border-color:rgba(34,197,94,.5) }
-    .bp-inject-val::placeholder{ color:rgba(34,197,94,.18) }
+    .bp-inject-val:focus{ border-color:rgba(181,134,13,.5) }
+    .bp-inject-val::placeholder{ color:rgba(181,134,13,.18) }
     .bp-inject-val:disabled{ opacity:.3 }
 
     /* ── Stepper Row ─────────────────────────────────────────── */
@@ -338,36 +338,36 @@
     .bp-step-btn{
       width:42px;height:42px;flex-shrink:0;
       background:linear-gradient(145deg,#081a0e 0%,#0b2212 50%,#060e08 100%);
-      border:1px solid rgba(34,197,94,.28);
-      border-radius:12px;color:var(--green-b);
+      border:1px solid rgba(181,134,13,.28);
+      border-radius:12px;color:var(--bronze-b);
       font-size:22px;line-height:1;cursor:pointer;
       display:flex;align-items:center;justify-content:center;
       transition:all .15s;
       box-shadow:
-        0 0 6px rgba(34,197,94,.07),
-        inset 0 1px 0 rgba(74,222,128,.12),
+        0 0 6px rgba(181,134,13,.07),
+        inset 0 1px 0 rgba(212,164,53,.12),
         inset 0 -1px 0 rgba(0,0,0,.35);
     }
     .bp-step-btn:active{
-      background:linear-gradient(145deg,#0e2e18 0%,#163a20 100%);
-      border-color:var(--green);
-      box-shadow:0 0 14px rgba(34,197,94,.4),inset 0 1px 0 rgba(74,222,128,.2);
+      background:linear-gradient(145deg,#0e2e18 0%,#2e2010 100%);
+      border-color:var(--bronze);
+      box-shadow:0 0 14px rgba(181,134,13,.4),inset 0 1px 0 rgba(212,164,53,.2);
       transform:scale(.94);
     }
     .bp-amount{
       flex:1;
-      background:linear-gradient(180deg,#010a04 0%,#020e06 100%);
-      border:1px solid rgba(34,197,94,.22);
+      background:linear-gradient(180deg,#0a0a0e 0%,#020e06 100%);
+      border:1px solid rgba(181,134,13,.22);
       border-radius:16px;padding:10px 8px;
-      font-family:'Orbitron',monospace;
+      font-family:'Share Tech Mono',monospace;
       font-size:24px;font-weight:700;color:#e8fff2;
       text-align:center;outline:none;
       letter-spacing:1px;
       box-shadow:
         inset 0 2px 10px rgba(0,0,0,.65),
-        0 0 0 1px rgba(34,197,94,.04);
+        0 0 0 1px rgba(181,134,13,.04);
     }
-    .bp-amount:focus{ border-color:rgba(34,197,94,.55) }
+    .bp-amount:focus{ border-color:rgba(181,134,13,.55) }
 
     /* ── Quick Amounts (image buttons) ─────────────────────── */
     .bp-quick{ display:flex;flex-wrap:wrap;gap:5px;justify-content:center }
@@ -380,16 +380,16 @@
     }
     .bp-q img{ height:34px;width:auto;display:block }
     .bp-q:active{ transform:scale(.92) }
-    .bp-q.on img{ filter:brightness(1.5) saturate(1.3) drop-shadow(0 0 5px rgba(34,197,94,.8)) }
+    .bp-q.on img{ filter:brightness(1.5) saturate(1.3) drop-shadow(0 0 5px rgba(181,134,13,.8)) }
 
     /* ── Payout strip ────────────────────────────────────────── */
     .bp-payout{
-      font-family:'Orbitron',monospace;font-size:10px;font-weight:600;
-      color:var(--green);text-align:center;
-      background:linear-gradient(90deg,rgba(34,197,94,.04) 0%,rgba(34,197,94,.1) 50%,rgba(34,197,94,.04) 100%);
-      border:1px solid rgba(34,197,94,.2);
+      font-family:'Share Tech Mono',monospace;font-size:10px;font-weight:600;
+      color:var(--bronze);text-align:center;
+      background:linear-gradient(90deg,rgba(181,134,13,.04) 0%,rgba(181,134,13,.1) 50%,rgba(181,134,13,.04) 100%);
+      border:1px solid rgba(181,134,13,.2);
       border-radius:10px;padding:6px;
-      box-shadow:0 0 8px rgba(34,197,94,.1);
+      box-shadow:0 0 8px rgba(181,134,13,.1);
       letter-spacing:1px;
     }
 
@@ -414,29 +414,29 @@
     /* ── Main Buttons ────────────────────────────────────────── */
     .bp-btn{
       width:100%;padding:16px;border-radius:20px;
-      font-family:'Orbitron',sans-serif;font-size:15px;font-weight:700;letter-spacing:2px;
+      font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;letter-spacing:2px;
       cursor:pointer;transition:all .15s;
     }
     .bp-btn:not(:disabled):active{ transform:scale(.98) }
     .bp-btn-bet{
-      background:linear-gradient(160deg,#0a4018 0%,#187530 40%,#0a4018 100%);
-      border:1.5px solid rgba(34,197,94,.65);color:#d4ffd8;
+      background:linear-gradient(160deg,#201408 0%,#362010 40%,#201408 100%);
+      border:1.5px solid rgba(181,134,13,.65);color:#f5ead8;
       box-shadow:
-        0 0 28px rgba(34,197,94,.3),
-        0 0 8px rgba(34,197,94,.15),
-        inset 0 1px 0 rgba(74,222,128,.22),
+        0 0 28px rgba(181,134,13,.3),
+        0 0 8px rgba(181,134,13,.15),
+        inset 0 1px 0 rgba(212,164,53,.22),
         inset 0 0 24px rgba(0,0,0,.35);
     }
     .bp-btn-bet:disabled{ opacity:.35;cursor:default;box-shadow:none }
     .bp-btn-placed{
-      background:linear-gradient(160deg,#062010 0%,#0a3018 100%);
-      border:1px solid rgba(34,197,94,.28);color:#4ade80;
-      box-shadow:0 0 10px rgba(74,222,128,.12);
+      background:linear-gradient(160deg,#12101a 0%,#201408 100%);
+      border:1px solid rgba(181,134,13,.28);color:#d4a435;
+      box-shadow:0 0 10px rgba(212,164,53,.12);
       opacity:.9;cursor:default;
     }
     .bp-btn-next-round{
-      background:linear-gradient(160deg,#4a2d00 0%,#b45309 50%,#d97706 100%);
-      border:1.5px solid #d97706;color:#fff8e8;
+      background:linear-gradient(160deg,#4a2d00 0%,#b45309 50%,#d4a435 100%);
+      border:1.5px solid #d4a435;color:#fff8e8;
       box-shadow:0 0 20px rgba(217,119,6,.4),inset 0 1px 0 rgba(255,220,100,.18);
       animation:btnPulse 1.8s ease-in-out infinite;
     }
@@ -452,26 +452,26 @@
       50%    { box-shadow:0 0 32px rgba(217,119,6,.75) }
     }
     .bp-btn-cashout{
-      background:linear-gradient(160deg,#062a0a 0%,#0f7020 50%,#062a0a 100%);
-      border:2px solid var(--green);color:#d4ffd8;
-      box-shadow:0 0 28px rgba(34,197,94,.5),inset 0 1px 0 rgba(74,222,128,.2);
+      background:linear-gradient(160deg,#1a1420 0%,#2e1e08 50%,#1a1420 100%);
+      border:2px solid var(--bronze);color:#f5ead8;
+      box-shadow:0 0 28px rgba(181,134,13,.5),inset 0 1px 0 rgba(212,164,53,.2);
       animation:cashoutPulse 1s ease-in-out infinite;
       font-size:20px;
     }
     @keyframes cashoutPulse{
-      0%,100%{ box-shadow:0 0 18px rgba(34,197,94,.4) }
-      50%    { box-shadow:0 0 36px rgba(34,197,94,.75),0 0 60px rgba(34,197,94,.2) }
+      0%,100%{ box-shadow:0 0 18px rgba(181,134,13,.4) }
+      50%    { box-shadow:0 0 36px rgba(181,134,13,.75),0 0 60px rgba(181,134,13,.2) }
     }
 
     /* ── Lower Info Panel ───────────────────────────────────── */
     .lip{
       flex-shrink:0;
       background:
-        radial-gradient(ellipse 70% 30% at 50% 0%,rgba(34,197,94,.06) 0%,transparent 60%),
-        linear-gradient(160deg,#071812 0%,#020d06 50%,#041008 100%);
-      border:1.5px solid rgba(34,197,94,.25);
+        radial-gradient(ellipse 70% 30% at 50% 0%,rgba(181,134,13,.06) 0%,transparent 60%),
+        linear-gradient(160deg,#131018 0%,#0f0f12 50%,#17171d 100%);
+      border:1.5px solid rgba(181,134,13,.25);
       border-radius:20px;overflow:hidden;
-      box-shadow:0 0 0 1px rgba(34,197,94,.05),inset 0 0 40px rgba(0,0,0,.5);
+      box-shadow:0 0 0 1px rgba(181,134,13,.05),inset 0 0 40px rgba(0,0,0,.5);
     }
     .lip-header{
       display:flex;align-items:center;gap:8px;
@@ -480,37 +480,37 @@
     .lip-tabs{ display:flex;gap:3px;flex:1 }
     .lip-tab{
       flex:1;padding:7px 4px;border-radius:10px;
-      font-family:'Orbitron',sans-serif;font-size:10px;font-weight:700;letter-spacing:1.5px;
-      background:transparent;border:1px solid rgba(34,197,94,.15);
-      color:rgba(74,222,128,.45);cursor:pointer;transition:all .2s;
+      font-family:'Rajdhani',sans-serif;font-size:10px;font-weight:700;letter-spacing:1.5px;
+      background:transparent;border:1px solid rgba(181,134,13,.15);
+      color:rgba(212,164,53,.45);cursor:pointer;transition:all .2s;
     }
     .lip-tab--active{
-      background:linear-gradient(160deg,#0a3018 0%,#0e4020 100%);
-      border-color:rgba(34,197,94,.6);color:#d4ffd8;
-      box-shadow:0 0 10px rgba(34,197,94,.18),inset 0 1px 0 rgba(74,222,128,.12);
+      background:linear-gradient(160deg,#201408 0%,#281c10 100%);
+      border-color:rgba(181,134,13,.6);color:#f5ead8;
+      box-shadow:0 0 10px rgba(181,134,13,.18),inset 0 1px 0 rgba(212,164,53,.12);
     }
     .lip-pill{
       padding:5px 10px;border-radius:20px;
-      font-family:'Orbitron',sans-serif;font-size:8px;font-weight:700;letter-spacing:1px;
-      background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.25);
-      color:rgba(74,222,128,.7);white-space:nowrap;
+      font-family:'Rajdhani',sans-serif;font-size:8px;font-weight:700;letter-spacing:1px;
+      background:rgba(181,134,13,.08);border:1px solid rgba(181,134,13,.25);
+      color:rgba(212,164,53,.7);white-space:nowrap;
     }
     .lip-stats{
       display:flex;gap:0;padding:8px 12px 6px;
-      border-bottom:1px solid rgba(34,197,94,.1);
+      border-bottom:1px solid rgba(181,134,13,.1);
     }
     .lip-stat{
       flex:1;display:flex;flex-direction:column;align-items:center;gap:1px;
-      border-right:1px solid rgba(34,197,94,.1);
+      border-right:1px solid rgba(181,134,13,.1);
     }
     .lip-stat:last-child{ border-right:none }
     .lip-stat-lbl{
-      font-family:'Orbitron',sans-serif;font-size:7px;font-weight:700;
-      letter-spacing:1px;color:rgba(74,222,128,.4);
+      font-family:'Rajdhani',sans-serif;font-size:7px;font-weight:700;
+      letter-spacing:1px;color:rgba(212,164,53,.4);
     }
     .lip-stat-val{
-      font-family:'Orbitron',sans-serif;font-size:11px;font-weight:700;
-      color:#d4ffd8;letter-spacing:.5px;
+      font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;
+      color:#f5ead8;letter-spacing:.5px;
     }
     .lip-list{
       overflow-y:auto;max-height:150px;
@@ -521,14 +521,14 @@
     .lip-row{
       display:flex;align-items:center;gap:7px;
       padding:6px 4px;
-      border-bottom:1px solid rgba(34,197,94,.07);
+      border-bottom:1px solid rgba(181,134,13,.07);
     }
     .lip-row:last-child{ border-bottom:none }
     .lip-avatar{
       width:26px;height:26px;flex-shrink:0;
       border-radius:8px;
       display:flex;align-items:center;justify-content:center;
-      font-family:'Orbitron',sans-serif;font-size:9px;font-weight:900;
+      font-family:'Rajdhani',sans-serif;font-size:9px;font-weight:900;
       color:#fff;
     }
     .lip-name{
@@ -541,29 +541,29 @@
       color:rgba(212,255,216,.5);white-space:nowrap;flex-shrink:0;
     }
     .lip-mult{
-      font-family:'Orbitron',sans-serif;font-size:11px;font-weight:700;
-      color:#d4ffd8;white-space:nowrap;flex-shrink:0;min-width:42px;text-align:right;
+      font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;
+      color:#f5ead8;white-space:nowrap;flex-shrink:0;min-width:42px;text-align:right;
     }
     .lip-mult--crashed{ color:rgba(239,68,68,.7) }
     .lip-profit{
-      font-family:'Orbitron',sans-serif;font-size:10px;font-weight:700;
+      font-family:'Rajdhani',sans-serif;font-size:10px;font-weight:700;
       white-space:nowrap;flex-shrink:0;min-width:52px;text-align:right;
     }
-    .lip-profit--win{ color:#4ade80 }
+    .lip-profit--win{ color:#d4a435 }
     .lip-profit--loss{ color:#f87171 }
     .lip-rank{
       width:22px;flex-shrink:0;
-      font-family:'Orbitron',sans-serif;font-size:9px;font-weight:900;
+      font-family:'Rajdhani',sans-serif;font-size:9px;font-weight:900;
       text-align:center;
     }
-    .lip-rank--1{ color:#fbbf24 }
+    .lip-rank--1{ color:#d4a435 }
     .lip-rank--2{ color:#d1d5db }
     .lip-rank--3{ color:#b45309 }
-    .lip-rank--n{ color:rgba(74,222,128,.35) }
+    .lip-rank--n{ color:rgba(212,164,53,.35) }
     .lip-empty{
       padding:20px 0;text-align:center;
-      font-family:'Orbitron',sans-serif;font-size:9px;font-weight:600;
-      color:rgba(74,222,128,.25);letter-spacing:1px;
+      font-family:'Rajdhani',sans-serif;font-size:9px;font-weight:600;
+      color:rgba(212,164,53,.25);letter-spacing:1px;
     }
 
     /* ── No session ─────────────────────────────────────────── */
@@ -579,11 +579,11 @@
       pointer-events:none;max-width:175px;
     }
     .social-tick{
-      background:rgba(2,16,4,0.88);
-      border:1px solid var(--green-dim);
+      background:rgba(8,8,10,0.88);
+      border:1px solid var(--gunmetal);
       border-radius:8px;padding:4px 8px;
       font-family:'Courier New',monospace;font-size:10px;
-      color:var(--green-b);
+      color:var(--bronze-b);
       white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
       animation:tickIn .3s ease;
     }
@@ -602,7 +602,7 @@
     .bvb-wrap--hidden { display:none }
     .bvb-vignette{
       position:absolute;inset:0;
-      background:radial-gradient(ellipse at center,transparent 30%,rgba(2,10,3,.65) 100%);
+      background:radial-gradient(ellipse at center,transparent 30%,rgba(10,10,12,.65) 100%);
       pointer-events:none;
     }
 
@@ -619,7 +619,7 @@
     .bvb-warning-text{
       font-size:30px;color:#ef4444;letter-spacing:4px;text-align:center;
       text-shadow:0 0 30px rgba(239,68,68,.8);
-      font-family:'Fredoka One',sans-serif;
+      font-family:'Rajdhani',sans-serif;
     }
     @keyframes warningPulse{
       from{opacity:.8;transform:scale(.97)}
@@ -1026,8 +1026,8 @@ function drawCurve(W, H) {
   const gX = W * grannyX
   const gY = grannyY
   const crashed = roundState === 'CRASHED'
-  const col  = crashed ? '#ef4444' : '#22c55e'
-  const glowA = crashed ? 'rgba(239,68,68,' : 'rgba(34,197,94,'
+  const col  = crashed ? '#ef4444' : '#b5860d'
+  const glowA = crashed ? 'rgba(239,68,68,' : 'rgba(181,134,13,'
   const sx = W * 0.04, sy = H * 0.94
   const cpX = sx + (gX - sx) * 0.42, cpY = sy
 
@@ -1060,9 +1060,9 @@ function drawCurve(W, H) {
 function drawFog(W, H) {
   const fogH = H * 0.30
   const gy = ctx.createLinearGradient(0, H - fogH, 0, H)
-  gy.addColorStop(0, 'rgba(2,18,6,0)')
-  gy.addColorStop(0.55, 'rgba(3,24,8,.28)')
-  gy.addColorStop(1, 'rgba(4,32,10,.65)')
+  gy.addColorStop(0, 'rgba(8,8,10,0)')
+  gy.addColorStop(0.55, 'rgba(12,10,8,.28)')
+  gy.addColorStop(1, 'rgba(16,14,10,.65)')
   ctx.fillStyle = gy; ctx.fillRect(0, H - fogH, W, fogH)
 
   for (let i = 0; i < 5; i++) {
@@ -1070,7 +1070,7 @@ function drawFog(W, H) {
     const by = H - 6 - rnd(i+61) * fogH * 0.55
     const rx = 60 + rnd(i+62) * 80, ry = 13 + rnd(i+63) * 12
     const g = ctx.createRadialGradient(bx, by, 0, bx, by, rx)
-    g.addColorStop(0, 'rgba(8,42,14,.38)'); g.addColorStop(1, 'rgba(2,12,4,0)')
+    g.addColorStop(0, 'rgba(20,16,10,.38)'); g.addColorStop(1, 'rgba(8,8,10,0)')
     ctx.fillStyle = g
     ctx.save(); ctx.scale(1, ry / rx)
     ctx.beginPath(); ctx.arc(bx, by * rx / ry, rx, 0, Math.PI * 2); ctx.fill()
@@ -1086,7 +1086,7 @@ function drawParticles(W, H, ts) {
     const py = ((rnd(i + 22) * H - t * 7 * (0.2 + rnd(i + 23) * 0.6)) % H + H) % H
     const a  = (0.12 + rnd(i + 24) * 0.38) * (0.5 + Math.sin(t * 2.2 + i * 0.9) * 0.5)
     ctx.globalAlpha = a
-    ctx.fillStyle = '#4ade80'
+    ctx.fillStyle = '#d4a435'
     ctx.fillRect(px, py, 1.5, 1.5)
   }
   ctx.globalAlpha = 1
@@ -1136,7 +1136,7 @@ function drawForest(W, H, off) {
   const fOff  = off * 0.14
   const baseY = H * 0.63
   const TILE  = 72
-  ctx.fillStyle = '#0c2212'
+  ctx.fillStyle = '#100e0a'
   const s = Math.floor(fOff/TILE)-1, e = s + Math.ceil(W/TILE) + 3
   for (let i = s; i <= e; i++) {
     const x  = i*TILE - (fOff % TILE)
@@ -1843,9 +1843,9 @@ function lipAvatarColor(id) {
   let h = 0
   const s = String(id)
   for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) & 0xffff
-  const hues = [145,160,175,120,200,130,155,140,190,170]
+  const hues = [30,42,50,35,46,28,52,38,44,40]
   const hue = hues[h % hues.length]
-  return `hsl(${hue},55%,28%)`
+  return `hsl(${hue},45%,22%)`
 }
 
 function lipMaskId(id) { return '…' + String(id).slice(-5) }
@@ -1975,14 +1975,14 @@ function lipRender() {
       const pending = r.cashoutAt === null
       const won     = r.cashoutAt > 0
       const profit  = won ? (r.payout - r.amount) : pending ? null : -r.amount
-      const multTxt = pending ? '<span style="color:rgba(74,222,128,.4)">…</span>' : won ? r.cashoutAt.toFixed(2) + '×' : '✗'
+      const multTxt = pending ? '<span style="color:rgba(212,164,53,.4)">…</span>' : won ? r.cashoutAt.toFixed(2) + '×' : '✗'
       const profitTxt = pending
-        ? '<span style="color:rgba(74,222,128,.3)">LIVE</span>'
+        ? '<span style="color:rgba(212,164,53,.3)">LIVE</span>'
         : won
           ? '+$' + r.payout.toFixed(2)
           : '-$' + r.amount.toFixed(2)
       return `<div class="lip-row">
-        <div class="lip-avatar" style="background:#0e3020">ME</div>
+        <div class="lip-avatar" style="background:#1a1408">ME</div>
         <span class="lip-name">MY BET</span>
         <span class="lip-bet">$${r.amount.toFixed(2)}</span>
         <span class="lip-mult ${won ? '' : (!pending ? 'lip-mult--crashed' : '')}">${multTxt}</span>
