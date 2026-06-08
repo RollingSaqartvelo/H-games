@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#0a0a0c">
   <title>Granny Run — H-GAMES</title>
   <!-- Force Telegram WebView to bypass cache on stale versions -->
-  <script>if(!location.search.includes('v=30'))location.replace('/granny.html?v=30')</script>
+  <script>if(!location.search.includes('v=31'))location.replace('/granny.html?v=31')</script>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap');
@@ -43,6 +43,8 @@
       height:100dvh;
       padding-top:env(safe-area-inset-top,0px);
       padding-bottom:env(safe-area-inset-bottom,0px);
+      background:url('/assets/betting/buttons/game%20pannel.png') top center/100% 100% no-repeat,#0a0a0c;
+      position:relative;
     }
 
     /* ── TopBar ─────────────────────────────────────────────── */
@@ -50,8 +52,8 @@
       flex-shrink:0;height:48px;
       display:flex;align-items:center;justify-content:space-between;
       padding:0 14px;
-      background:rgba(10,10,12,.98);
-      border-bottom:1px solid var(--border);
+      background:rgba(10,10,12,.45);
+      border-bottom:1px solid rgba(181,134,13,.10);
       z-index:10;
     }
     .topbar-logo{font-family:'Cinzel',serif;font-size:12px;letter-spacing:3px;color:var(--bronze-b);text-transform:uppercase;text-shadow:0 0 10px var(--amber-glow)}
@@ -74,8 +76,8 @@
       flex-shrink:0;
       display:flex;align-items:center;gap:6px;
       padding:6px 8px 6px 6px;
-      background:rgba(10,10,12,.97);
-      border-bottom:1px solid rgba(181,134,13,.10);
+      background:rgba(10,10,12,.35);
+      border-bottom:1px solid rgba(181,134,13,.08);
       box-shadow:none;
       min-height:48px;
     }
@@ -182,7 +184,7 @@
       height:230px;
       transition:height 0.35s ease;
       margin:0;
-      background:#0a0a0c;
+      background:transparent;
       overflow:hidden;
     }
     .game-area--betting{ height:360px; }
@@ -248,8 +250,8 @@
       overflow-y:auto;
       -webkit-overflow-scrolling:touch;
       scrollbar-width:none;
-      background:url('/assets/betting/buttons/game%20pannel.png') center/cover no-repeat,linear-gradient(180deg,#0e0e12 0%,#0f0f12 60%,#0a0a0e 100%);
-      border-top:1px solid rgba(181,134,13,.18);
+      background:transparent;
+      border-top:none;
       padding:8px 10px;
       padding-bottom:max(env(safe-area-inset-bottom,8px),8px);
       position:relative;z-index:1;
