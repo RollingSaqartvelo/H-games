@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#0a0a0c">
   <title>Granny Run — H-GAMES</title>
   <!-- Force Telegram WebView to bypass cache on stale versions -->
-  <script>if(!location.search.includes('v=33'))location.replace('/granny.html?v=33')</script>
+  <script>if(!location.search.includes('v=34'))location.replace('/granny.html?v=34')</script>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap');
@@ -295,7 +295,8 @@
     .bps-amount{
       position:absolute;
       left:25.8%;top:8%;width:47.2%;height:27%;
-      background:transparent;border:none;outline:none;
+      background:rgba(0,0,0,.88);border:none;outline:none;
+      border-radius:6px;
       color:var(--ivory);
       font-family:'Share Tech Mono',monospace;
       font-size:18px;font-weight:700;text-align:center;
@@ -306,7 +307,7 @@
 
     /* BET circle slot */
     .bet-panel .bp-btn-pair{
-      position:absolute;left:35%;top:37%;width:30%;
+      position:absolute;left:34.7%;top:37.4%;width:30%;
       aspect-ratio:1/1;
       display:none;align-items:center;justify-content:center;
     }
@@ -316,7 +317,7 @@
 
     /* Text BET/CASHOUT button at circle position */
     .bet-panel .bp-btn{
-      position:absolute!important;left:35%;top:37%;
+      position:absolute!important;left:34.7%;top:37.4%;
       width:30%!important;aspect-ratio:1/1;
       border-radius:50%!important;
       padding:0!important;margin:0;
@@ -327,12 +328,12 @@
     }
 
     .bps-min,.bps-max{
-      position:absolute;top:72%;height:19%;
+      position:absolute;top:72%;height:20%;
       background:transparent;border:none;padding:0;cursor:pointer;
       -webkit-tap-highlight-color:transparent;
     }
-    .bps-min{left:3%;width:44%}
-    .bps-max{left:47%;width:50%}
+    .bps-min{left:1%;width:52%}
+    .bps-max{left:57%;width:38%}
     .bps-min img,.bps-max img{width:100%;height:100%;object-fit:contain}
 
     /* ── Toggle Row ──────────────────────────────────────────── */
