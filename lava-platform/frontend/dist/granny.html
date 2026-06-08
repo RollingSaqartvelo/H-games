@@ -248,7 +248,7 @@
       overflow-y:auto;
       -webkit-overflow-scrolling:touch;
       scrollbar-width:none;
-      background:linear-gradient(180deg,#010804 0%,#020d06 60%,#010a04 100%);
+      background:url('/assets/betting/buttons/game%20pannel.png') center/cover no-repeat,linear-gradient(180deg,#010804 0%,#020d06 60%,#010a04 100%);
       border-top:1px solid rgba(34,197,94,.18);
       padding:8px 10px;
       padding-bottom:max(env(safe-area-inset-bottom,8px),8px);
@@ -260,36 +260,23 @@
     /* ── Green Plasma Panel Card ─────────────────────────────── */
     .bet-panel{
       width:100%;
-      background:
-        radial-gradient(ellipse 80% 35% at 50% 0%,rgba(34,197,94,.07) 0%,transparent 65%),
-        radial-gradient(ellipse 60% 25% at 50% 100%,rgba(20,83,45,.12) 0%,transparent 70%),
-        linear-gradient(160deg,#071812 0%,#020d06 45%,#041008 100%);
-      border:1.5px solid rgba(34,197,94,.3);
+      background:url('/assets/betting/buttons/bet_panel_1.png') center/100% 100% no-repeat;
+      border:1px solid rgba(34,197,94,.12);
       border-radius:22px;
-      padding:12px 22px 14px 8px;
-      display:flex;flex-direction:column;gap:8px;
+      padding:10px 14px 12px;
+      display:flex;flex-direction:column;gap:7px;
       overflow:hidden;
       flex-shrink:0;
-      box-shadow:
-        0 0 0 1px rgba(34,197,94,.06),
-        0 0 18px rgba(34,197,94,.1),
-        inset 0 1px 0 rgba(74,222,128,.1),
-        inset 0 0 50px rgba(0,0,0,.55);
-      /* Force GPU layer so overflow:hidden + border-radius clips correctly in WKWebView */
+      box-shadow:none;
       transform:translateZ(0);
       -webkit-transform:translateZ(0);
       transition:border-color .3s,box-shadow .3s;
     }
     .bet-panel.active-bet{
-      border-color:rgba(34,197,94,.75);
-      box-shadow:
-        0 0 0 1px rgba(34,197,94,.15),
-        0 0 28px rgba(34,197,94,.22),
-        0 0 56px rgba(34,197,94,.07),
-        inset 0 1px 0 rgba(74,222,128,.15),
-        inset 0 0 50px rgba(0,0,0,.4);
+      border-color:rgba(34,197,94,.5);
+      box-shadow:0 0 16px rgba(34,197,94,.2);
     }
-    .bet-panel.crashed-bet{ border-color:rgba(239,68,68,.5) }
+    .bet-panel.crashed-bet{ border-color:rgba(239,68,68,.45) }
 
     /* ── Toggle Row ──────────────────────────────────────────── */
     .bp-toggle-row{
@@ -382,25 +369,18 @@
     }
     .bp-amount:focus{ border-color:rgba(34,197,94,.55) }
 
-    /* ── Quick Amounts ───────────────────────────────────────── */
-    .bp-quick{ display:flex;gap:6px }
+    /* ── Quick Amounts (image buttons) ─────────────────────── */
+    .bp-quick{ display:flex;flex-wrap:wrap;gap:5px;justify-content:center }
     .bp-q{
-      flex:1;padding:8px 0;font-size:11px;
-      background:linear-gradient(160deg,#071610 0%,#091d12 100%);
-      border:1px solid rgba(34,197,94,.2);
-      border-radius:12px;
-      color:rgba(74,222,128,.6);
-      cursor:pointer;
-      font-family:'Orbitron',sans-serif;font-weight:600;
-      transition:all .15s;
-      box-shadow:inset 0 1px 0 rgba(74,222,128,.07),inset 0 0 16px rgba(0,0,0,.3);
+      flex:0 0 auto;padding:0;border:none;
+      background:none;cursor:pointer;
+      -webkit-tap-highlight-color:transparent;
+      border-radius:8px;overflow:hidden;
+      transition:transform .1s,filter .1s;
     }
-    .bp-q:active{
-      background:linear-gradient(160deg,#0a2218 0%,#0f2e1c 100%);
-      border-color:rgba(34,197,94,.6);
-      color:var(--green);
-      box-shadow:0 0 10px rgba(34,197,94,.2),inset 0 1px 0 rgba(74,222,128,.1);
-    }
+    .bp-q img{ height:34px;width:auto;display:block }
+    .bp-q:active{ transform:scale(.92) }
+    .bp-q.on img{ filter:brightness(1.5) saturate(1.3) drop-shadow(0 0 5px rgba(34,197,94,.8)) }
 
     /* ── Payout strip ────────────────────────────────────────── */
     .bp-payout{
@@ -413,20 +393,23 @@
       letter-spacing:1px;
     }
 
-    /* ── Image Button Pair (betting phase only) ─────────────── */
+    /* ── Single bet/cancel slot (betting phase only) ─────────── */
     .bp-btn-pair{
-      display:none;width:100%;gap:8px;
+      display:none;width:100%;
+      justify-content:center;align-items:center;
+      padding:4px 0;
     }
     .bp-btn-pair.visible{ display:flex }
-    .bp-img-btn{
-      flex:1;border:none;background:none;padding:0;
+    .bp-slot-btn{
+      border:none;background:none;padding:0;
       cursor:pointer;-webkit-tap-highlight-color:transparent;
-      border-radius:12px;overflow:hidden;
-      transition:transform .1s;
     }
-    .bp-img-btn:not([disabled]):active{ transform:scale(.96) }
-    .bp-img-btn[disabled]{ cursor:default;pointer-events:none }
-    .bp-img-btn img{ width:100%;height:auto;display:block }
+    .bp-slot-btn:not([disabled]):active{ transform:scale(.95) }
+    .bp-slot-btn[disabled]{ cursor:default;pointer-events:none }
+    .bp-slot-img{
+      width:160px;height:auto;display:block;
+      transition:opacity .15s ease,transform .15s ease;
+    }
 
     /* ── Main Buttons ────────────────────────────────────────── */
     .bp-btn{
@@ -778,12 +761,6 @@
     <!-- Panel A -->
     <div class="bet-panel" id="panel0" style="display:none">
       <div class="bp-toggle-row">
-        <div class="bp-toggle-item">
-          <button class="bp-toggle" id="togAutoBet0" onclick="toggleAutoBet(0)">
-            <span class="bp-toggle-knob"></span>
-          </button>
-          <span class="bp-toggle-label">AUTO BET</span>
-        </div>
         <div class="bp-toggle-item bp-toggle-item--inject">
           <button class="bp-toggle" id="togAutoInject0" onclick="toggleAutoInject(0)">
             <span class="bp-toggle-knob"></span>
@@ -798,19 +775,19 @@
         <button class="bp-step-btn" onclick="stepAmount(0,1)">+</button>
       </div>
       <div class="bp-quick">
-        <button class="bp-q" onclick="addAmount(0,1)">+1</button>
-        <button class="bp-q" onclick="addAmount(0,5)">+5</button>
-        <button class="bp-q" onclick="addAmount(0,10)">+10</button>
-        <button class="bp-q" onclick="halvAmount(0)">½</button>
+        <button class="bp-q" onclick="addAmount(0,1)"><img src="/assets/betting/buttons/btn_plus_1.png" alt="+1"></button>
+        <button class="bp-q" onclick="addAmount(0,5)"><img src="/assets/betting/buttons/btn_plus_5.png" alt="+5"></button>
+        <button class="bp-q" onclick="addAmount(0,10)"><img src="/assets/betting/buttons/btn_plus_10.png" alt="+10"></button>
+        <button class="bp-q" onclick="halvAmount(0)"><img src="/assets/betting/buttons/btn_half.png" alt="½"></button>
+        <button class="bp-q" id="btnAutoBetQ0" onclick="toggleAutoBet(0)"><img src="/assets/betting/buttons/auto%20bet.png" alt="AUTO"></button>
+        <button class="bp-q" onclick="setMinAmount(0)"><img src="/assets/betting/buttons/min.png" alt="MIN"></button>
+        <button class="bp-q" onclick="setMaxAmount(0)"><img src="/assets/betting/buttons/max.png" alt="MAX"></button>
       </div>
       <div id="payout0" class="bp-payout" style="display:none"></div>
-      <!-- Betting phase: image pair -->
+      <!-- Betting phase: single slot -->
       <div class="bp-btn-pair" id="btnPair0">
-        <button class="bp-img-btn" id="btnBetImg0" onclick="handleBtn(0)">
-          <img id="imgBet0" src="/assets/ui/granny%20wins/bet%20on.png" alt="BET">
-        </button>
-        <button class="bp-img-btn" id="btnCancelImg0" onclick="handleCancelBet(0)" disabled>
-          <img id="imgCancel0" src="/assets/ui/granny%20wins/cancel%20off.png" alt="CANCEL">
+        <button class="bp-slot-btn" id="btnSlot0" onclick="handleSlotBtn(0)">
+          <img class="bp-slot-img" id="imgSlot0" src="/assets/betting/buttons/bet%20on.png" alt="BET" data-state="bet">
         </button>
       </div>
       <!-- Non-betting phase: text button -->
@@ -820,12 +797,6 @@
     <!-- Panel B -->
     <div class="bet-panel" id="panel1" style="display:none">
       <div class="bp-toggle-row">
-        <div class="bp-toggle-item">
-          <button class="bp-toggle" id="togAutoBet1" onclick="toggleAutoBet(1)">
-            <span class="bp-toggle-knob"></span>
-          </button>
-          <span class="bp-toggle-label">AUTO BET</span>
-        </div>
         <div class="bp-toggle-item bp-toggle-item--inject">
           <button class="bp-toggle" id="togAutoInject1" onclick="toggleAutoInject(1)">
             <span class="bp-toggle-knob"></span>
@@ -840,19 +811,19 @@
         <button class="bp-step-btn" onclick="stepAmount(1,1)">+</button>
       </div>
       <div class="bp-quick">
-        <button class="bp-q" onclick="addAmount(1,1)">+1</button>
-        <button class="bp-q" onclick="addAmount(1,5)">+5</button>
-        <button class="bp-q" onclick="addAmount(1,10)">+10</button>
-        <button class="bp-q" onclick="halvAmount(1)">½</button>
+        <button class="bp-q" onclick="addAmount(1,1)"><img src="/assets/betting/buttons/btn_plus_1.png" alt="+1"></button>
+        <button class="bp-q" onclick="addAmount(1,5)"><img src="/assets/betting/buttons/btn_plus_5.png" alt="+5"></button>
+        <button class="bp-q" onclick="addAmount(1,10)"><img src="/assets/betting/buttons/btn_plus_10.png" alt="+10"></button>
+        <button class="bp-q" onclick="halvAmount(1)"><img src="/assets/betting/buttons/btn_half.png" alt="½"></button>
+        <button class="bp-q" id="btnAutoBetQ1" onclick="toggleAutoBet(1)"><img src="/assets/betting/buttons/auto%20bet.png" alt="AUTO"></button>
+        <button class="bp-q" onclick="setMinAmount(1)"><img src="/assets/betting/buttons/min.png" alt="MIN"></button>
+        <button class="bp-q" onclick="setMaxAmount(1)"><img src="/assets/betting/buttons/max.png" alt="MAX"></button>
       </div>
       <div id="payout1" class="bp-payout" style="display:none"></div>
-      <!-- Betting phase: image pair -->
+      <!-- Betting phase: single slot -->
       <div class="bp-btn-pair" id="btnPair1">
-        <button class="bp-img-btn" id="btnBetImg1" onclick="handleBtn(1)">
-          <img id="imgBet1" src="/assets/ui/granny%20wins/bet%20on.png" alt="BET">
-        </button>
-        <button class="bp-img-btn" id="btnCancelImg1" onclick="handleCancelBet(1)" disabled>
-          <img id="imgCancel1" src="/assets/ui/granny%20wins/cancel%20off.png" alt="CANCEL">
+        <button class="bp-slot-btn" id="btnSlot1" onclick="handleSlotBtn(1)">
+          <img class="bp-slot-img" id="imgSlot1" src="/assets/betting/buttons/bet%20on.png" alt="BET" data-state="bet">
         </button>
       </div>
       <!-- Non-betting phase: text button -->
@@ -1662,7 +1633,8 @@ let autoInjectEnabled = [false, false]
 
 function toggleAutoBet(i) {
   autoBetEnabled[i] = !autoBetEnabled[i]
-  document.getElementById('togAutoBet' + i).classList.toggle('on', autoBetEnabled[i])
+  const btn = document.getElementById('btnAutoBetQ'+i)
+  if (btn) btn.classList.toggle('on', autoBetEnabled[i])
   tg?.HapticFeedback?.impactOccurred('light')
 }
 
@@ -1681,39 +1653,28 @@ function stepAmount(i, dir) {
 }
 
 function updateBtnState(i) {
-  const btn        = document.getElementById('btn'+i)
-  const pair       = document.getElementById('btnPair'+i)
-  const btnBetImg  = document.getElementById('btnBetImg'+i)
-  const imgBet     = document.getElementById('imgBet'+i)
-  const btnCanImg  = document.getElementById('btnCancelImg'+i)
-  const imgCancel  = document.getElementById('imgCancel'+i)
-  const b          = bets[i]
-  const isBetting  = roundState === 'STARTING'
-  const isRunning  = roundState === 'RUNNING'
+  const btn      = document.getElementById('btn'+i)
+  const pair     = document.getElementById('btnPair'+i)
+  const imgSlot  = document.getElementById('imgSlot'+i)
+  const slotBtn  = document.getElementById('btnSlot'+i)
+  const b        = bets[i]
+  const isBetting = roundState === 'STARTING'
+  const isRunning = roundState === 'RUNNING'
 
   if (isBetting) {
-    // ── Betting phase: show image pair, hide text button ──────
     pair.classList.add('visible')
     btn.style.display = 'none'
-
-    if (b.active) {
-      // Bet placed → BET OFF + CANCEL ON
-      imgBet.src         = '/assets/ui/granny%20wins/bet%20off.png'
-      btnBetImg.disabled = true
-      imgCancel.src      = '/assets/ui/granny%20wins/cancel%20on.png'
-      btnCanImg.disabled = false
-    } else {
-      // No bet → BET ON + CANCEL OFF
-      imgBet.src         = '/assets/ui/granny%20wins/bet%20on.png'
-      btnBetImg.disabled = false
-      imgCancel.src      = '/assets/ui/granny%20wins/cancel%20off.png'
-      btnCanImg.disabled = true
+    const wantState = b.active ? 'cancel' : 'bet'
+    if (imgSlot && imgSlot.dataset.state !== wantState) {
+      imgSlot.dataset.state = wantState
+      swapSlotImage(i, b.active
+        ? '/assets/betting/buttons/cancel%20on.png'
+        : '/assets/betting/buttons/bet%20on.png')
     }
+    if (slotBtn) slotBtn.disabled = false
   } else {
-    // ── Non-betting phase: hide image pair, show text button ──
     pair.classList.remove('visible')
     btn.style.display = ''
-
     if (b.active && !b.cashedOut && isRunning) {
       btn.innerHTML = 'CASH OUT'
       btn.className = 'bp-btn bp-btn-cashout'
@@ -1736,6 +1697,32 @@ function updateBtnState(i) {
 
 function updateAutoCashoutPreviews() {
   bets.forEach((_,i) => updateBtnState(i))
+}
+
+function swapSlotImage(i, newSrc) {
+  const img = document.getElementById('imgSlot'+i)
+  if (!img) return
+  img.style.opacity = '0'
+  img.style.transform = 'scale(1.05)'
+  setTimeout(() => {
+    img.src = newSrc
+    img.style.opacity = '1'
+    img.style.transform = 'scale(1.0)'
+  }, 150)
+}
+
+function handleSlotBtn(i) {
+  if (bets[i].active) handleCancelBet(i)
+  else handleBtn(i)
+}
+
+function setMinAmount(i) {
+  document.getElementById('amount'+i).value = '0.10'
+}
+
+function setMaxAmount(i) {
+  const bal = parseFloat((document.getElementById('balance').textContent||'').replace('$','')) || 0
+  if (bal > 0) document.getElementById('amount'+i).value = bal.toFixed(2)
 }
 
 function handleCancelBet(i) {
@@ -1781,10 +1768,10 @@ async function doBet(i) {
   const autoCashout = parseFloat(document.getElementById('cashout'+i).value) || 0
   if (!amount || amount <= 0) return
 
-  const btn       = document.getElementById('btn'+i)
-  const btnBetImg = document.getElementById('btnBetImg'+i)
+  const btn      = document.getElementById('btn'+i)
+  const slotBtn  = document.getElementById('btnSlot'+i)
   btn.disabled = true
-  if (btnBetImg) btnBetImg.disabled = true
+  if (slotBtn) slotBtn.disabled = true
 
   try {
     const r = await fetch('/tma/v1/granny/bet', {
@@ -1793,7 +1780,7 @@ async function doBet(i) {
       body: JSON.stringify({ amount: amount.toFixed(2), currency: CURRENCY, auto_cashout: autoCashout || undefined }),
     })
     const d = await r.json()
-    if (!r.ok) { alert(d.error || 'Bet failed'); btn.disabled=false; if (btnBetImg) btnBetImg.disabled=false; return }
+    if (!r.ok) { alert(d.error || 'Bet failed'); btn.disabled=false; if (slotBtn) slotBtn.disabled=false; return }
     bets[i].id = d.bet_id
     bets[i].active = true
     bets[i].cashedOut = false
