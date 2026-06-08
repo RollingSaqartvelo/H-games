@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#0a0a0c">
   <title>Granny Run — H-GAMES</title>
   <!-- Force Telegram WebView to bypass cache on stale versions -->
-  <script>if(!location.search.includes('v=31'))location.replace('/granny.html?v=31')</script>
+  <script>if(!location.search.includes('v=32'))location.replace('/granny.html?v=32')</script>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap');
@@ -259,26 +259,81 @@
     }
     .bet-footer::-webkit-scrollbar{display:none}
 
-    /* ── Green Plasma Panel Card ─────────────────────────────── */
+    /* ── Slot-mapped Panel Card (bet_panel_1.png 1600×1076) ─────── */
     .bet-panel{
       width:100%;
+      aspect-ratio:1600/1076;
+      position:relative;
       background:url('/assets/betting/buttons/bet_panel_1.png') center/100% 100% no-repeat;
-      border:1px solid rgba(181,134,13,.12);
-      border-radius:22px;
-      padding:10px 14px 12px;
-      display:flex;flex-direction:column;gap:7px;
-      overflow:hidden;
-      flex-shrink:0;
+      border:none;border-radius:0;padding:0;
+      overflow:hidden;flex-shrink:0;
       box-shadow:none;
-      transform:translateZ(0);
-      -webkit-transform:translateZ(0);
-      transition:border-color .3s,box-shadow .3s;
+      transform:translateZ(0);-webkit-transform:translateZ(0);
+      transition:box-shadow .3s;
+      margin-top:0;
     }
-    .bet-panel.active-bet{
-      border-color:rgba(181,134,13,.5);
-      box-shadow:0 0 16px rgba(181,134,13,.2);
+    .bet-panel.active-bet{ box-shadow:0 0 16px rgba(181,134,13,.2) }
+    .bet-panel.crashed-bet{ box-shadow:0 0 10px rgba(239,68,68,.2) }
+
+    /* ── Slot controls (absolute, mapped to image cutouts) ─────── */
+    .bps-minus,.bps-plus{
+      position:absolute;top:6%;height:31%;
+      background:rgba(245,234,216,.06);
+      border:none;border-radius:8px;
+      color:var(--ivory);font-size:20px;font-weight:700;
+      cursor:pointer;
+      display:flex;align-items:center;justify-content:center;
+      -webkit-tap-highlight-color:transparent;
+      transition:background .12s,transform .12s;
     }
-    .bet-panel.crashed-bet{ border-color:rgba(239,68,68,.45) }
+    .bps-minus{left:8.4%;width:12.3%}
+    .bps-plus {left:79.25%;width:11.45%}
+    .bps-minus:active,.bps-plus:active{
+      background:rgba(245,234,216,.16);transform:scale(.91)
+    }
+
+    .bps-amount{
+      position:absolute;
+      left:25.8%;top:8%;width:47.2%;height:27%;
+      background:transparent;border:none;outline:none;
+      color:var(--ivory);
+      font-family:'Share Tech Mono',monospace;
+      font-size:18px;font-weight:700;text-align:center;
+      padding:0;-webkit-appearance:none;
+    }
+    .bps-amount::-webkit-inner-spin-button,
+    .bps-amount::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+
+    /* BET circle slot */
+    .bet-panel .bp-btn-pair{
+      position:absolute;left:35%;top:37%;width:30%;
+      aspect-ratio:1/1;
+      display:none;align-items:center;justify-content:center;
+    }
+    .bet-panel .bp-btn-pair.visible{display:flex}
+    .bet-panel .bp-slot-btn{width:100%;height:100%;border:none;background:none;padding:0;cursor:pointer}
+    .bet-panel .bp-slot-img{width:100%;height:100%;object-fit:contain;transition:opacity .15s,transform .15s}
+
+    /* Text BET/CASHOUT button at circle position */
+    .bet-panel .bp-btn{
+      position:absolute!important;left:35%;top:37%;
+      width:30%!important;aspect-ratio:1/1;
+      border-radius:50%!important;
+      padding:0!important;margin:0;
+      font-family:'Rajdhani',sans-serif;
+      font-size:10px;letter-spacing:.5px;
+      display:flex;align-items:center;justify-content:center;
+      text-align:center;
+    }
+
+    .bps-min,.bps-max{
+      position:absolute;top:84%;height:13%;
+      background:transparent;border:none;padding:0;cursor:pointer;
+      -webkit-tap-highlight-color:transparent;
+    }
+    .bps-min{left:3%;width:42%}
+    .bps-max{left:47%;width:50%}
+    .bps-min img,.bps-max img{width:100%;height:100%;object-fit:contain}
 
     /* ── Toggle Row ──────────────────────────────────────────── */
     .bp-toggle-row{
@@ -762,74 +817,38 @@
 
     <!-- Panel A -->
     <div class="bet-panel" id="panel0" style="display:none">
-      <div class="bp-toggle-row">
-        <div class="bp-toggle-item bp-toggle-item--inject">
-          <button class="bp-toggle" id="togAutoInject0" onclick="toggleAutoInject(0)">
-            <span class="bp-toggle-knob"></span>
-          </button>
-          <span class="bp-toggle-label">AUTO ×</span>
-          <input class="bp-inject-val" id="cashout0" type="number" min="1.1" step="0.1" placeholder="off" disabled>
-        </div>
-      </div>
-      <div class="bp-stepper-row">
-        <button class="bp-step-btn" onclick="stepAmount(0,-1)">−</button>
-        <input class="bp-amount" id="amount0" type="number" min="0.1" step="0.1" value="1.00" placeholder="0.00">
-        <button class="bp-step-btn" onclick="stepAmount(0,1)">+</button>
-      </div>
-      <div class="bp-quick">
-        <button class="bp-q" onclick="addAmount(0,1)"><img src="/assets/betting/buttons/btn_plus_1.png" alt="+1"></button>
-        <button class="bp-q" onclick="addAmount(0,5)"><img src="/assets/betting/buttons/btn_plus_5.png" alt="+5"></button>
-        <button class="bp-q" onclick="addAmount(0,10)"><img src="/assets/betting/buttons/btn_plus_10.png" alt="+10"></button>
-        <button class="bp-q" onclick="halvAmount(0)"><img src="/assets/betting/buttons/btn_half.png" alt="½"></button>
-        <button class="bp-q" id="btnAutoBetQ0" onclick="toggleAutoBet(0)"><img src="/assets/betting/buttons/auto%20bet.png" alt="AUTO"></button>
-        <button class="bp-q" onclick="setMinAmount(0)"><img src="/assets/betting/buttons/min.png" alt="MIN"></button>
-        <button class="bp-q" onclick="setMaxAmount(0)"><img src="/assets/betting/buttons/max.png" alt="MAX"></button>
-      </div>
-      <div id="payout0" class="bp-payout" style="display:none"></div>
-      <!-- Betting phase: single slot -->
+      <button class="bps-minus" onclick="stepAmount(0,-1)">−</button>
+      <input class="bps-amount" id="amount0" type="number" min="0.1" step="0.1" value="1.00" placeholder="0.00">
+      <button class="bps-plus"  onclick="stepAmount(0,1)">+</button>
       <div class="bp-btn-pair" id="btnPair0">
         <button class="bp-slot-btn" id="btnSlot0" onclick="handleSlotBtn(0)">
           <img class="bp-slot-img" id="imgSlot0" src="/assets/betting/buttons/bet%20on.png" alt="BET" data-state="bet">
         </button>
       </div>
-      <!-- Non-betting phase: text button -->
       <button class="bp-btn bp-btn-bet" id="btn0" onclick="handleBtn(0)">BET</button>
+      <button class="bps-min" onclick="setMinAmount(0)"><img src="/assets/betting/buttons/min.png" alt="MIN"></button>
+      <button class="bps-max" onclick="setMaxAmount(0)"><img src="/assets/betting/buttons/max.png" alt="MAX"></button>
+      <button id="btnAutoBetQ0" onclick="toggleAutoBet(0)" style="display:none"></button>
+      <input type="number" id="cashout0" style="display:none">
+      <div id="payout0" style="display:none"></div>
     </div>
 
     <!-- Panel B -->
     <div class="bet-panel" id="panel1" style="display:none">
-      <div class="bp-toggle-row">
-        <div class="bp-toggle-item bp-toggle-item--inject">
-          <button class="bp-toggle" id="togAutoInject1" onclick="toggleAutoInject(1)">
-            <span class="bp-toggle-knob"></span>
-          </button>
-          <span class="bp-toggle-label">AUTO ×</span>
-          <input class="bp-inject-val" id="cashout1" type="number" min="1.1" step="0.1" placeholder="off" disabled>
-        </div>
-      </div>
-      <div class="bp-stepper-row">
-        <button class="bp-step-btn" onclick="stepAmount(1,-1)">−</button>
-        <input class="bp-amount" id="amount1" type="number" min="0.1" step="0.1" value="1.00" placeholder="0.00">
-        <button class="bp-step-btn" onclick="stepAmount(1,1)">+</button>
-      </div>
-      <div class="bp-quick">
-        <button class="bp-q" onclick="addAmount(1,1)"><img src="/assets/betting/buttons/btn_plus_1.png" alt="+1"></button>
-        <button class="bp-q" onclick="addAmount(1,5)"><img src="/assets/betting/buttons/btn_plus_5.png" alt="+5"></button>
-        <button class="bp-q" onclick="addAmount(1,10)"><img src="/assets/betting/buttons/btn_plus_10.png" alt="+10"></button>
-        <button class="bp-q" onclick="halvAmount(1)"><img src="/assets/betting/buttons/btn_half.png" alt="½"></button>
-        <button class="bp-q" id="btnAutoBetQ1" onclick="toggleAutoBet(1)"><img src="/assets/betting/buttons/auto%20bet.png" alt="AUTO"></button>
-        <button class="bp-q" onclick="setMinAmount(1)"><img src="/assets/betting/buttons/min.png" alt="MIN"></button>
-        <button class="bp-q" onclick="setMaxAmount(1)"><img src="/assets/betting/buttons/max.png" alt="MAX"></button>
-      </div>
-      <div id="payout1" class="bp-payout" style="display:none"></div>
-      <!-- Betting phase: single slot -->
+      <button class="bps-minus" onclick="stepAmount(1,-1)">−</button>
+      <input class="bps-amount" id="amount1" type="number" min="0.1" step="0.1" value="1.00" placeholder="0.00">
+      <button class="bps-plus"  onclick="stepAmount(1,1)">+</button>
       <div class="bp-btn-pair" id="btnPair1">
         <button class="bp-slot-btn" id="btnSlot1" onclick="handleSlotBtn(1)">
           <img class="bp-slot-img" id="imgSlot1" src="/assets/betting/buttons/bet%20on.png" alt="BET" data-state="bet">
         </button>
       </div>
-      <!-- Non-betting phase: text button -->
       <button class="bp-btn bp-btn-bet" id="btn1" onclick="handleBtn(1)">BET</button>
+      <button class="bps-min" onclick="setMinAmount(1)"><img src="/assets/betting/buttons/min.png" alt="MIN"></button>
+      <button class="bps-max" onclick="setMaxAmount(1)"><img src="/assets/betting/buttons/max.png" alt="MAX"></button>
+      <button id="btnAutoBetQ1" onclick="toggleAutoBet(1)" style="display:none"></button>
+      <input type="number" id="cashout1" style="display:none">
+      <div id="payout1" style="display:none"></div>
     </div>
 
     <!-- ── Lower Info Panel ──────────────────────────────────── -->
