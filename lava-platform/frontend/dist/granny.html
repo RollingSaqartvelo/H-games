@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#0a0a0c">
   <title>Granny Run — H-GAMES</title>
   <!-- Force Telegram WebView to bypass cache on stale versions -->
-  <script>if(!location.search.includes('v=41'))location.replace('/granny.html?v=41')</script>
+  <script>if(!location.search.includes('v=42'))location.replace('/granny.html?v=42')</script>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap');
@@ -291,7 +291,7 @@
 
     .bps-amount{
       position:absolute;
-      left:34%;top:calc(12% + 8px);width:32%;height:14%;
+      left:34%;top:calc(12% + 11px);width:32%;height:14%;
       background:rgba(12,6,20,.92);
       border:1.5px solid rgba(180,120,20,.4);outline:none;
       border-radius:999px;
@@ -332,7 +332,7 @@
 
     /* ── BET circle slot ─────────────────────────────────────── */
     .bet-panel .bp-btn-pair{
-      position:absolute;left:43%;top:calc(54% + 11px);width:14%;
+      position:absolute;left:43%;top:calc(54% + 14px);width:14%;
       aspect-ratio:1/1;z-index:5;
       display:none;align-items:center;justify-content:center;
     }
@@ -342,7 +342,7 @@
 
     /* Text BET/CASHOUT button at circle position */
     .bet-panel .bp-btn{
-      position:absolute!important;left:43%;top:calc(54% + 11px);
+      position:absolute!important;left:43%;top:calc(54% + 14px);
       width:14%!important;aspect-ratio:1/1;
       border-radius:50%!important;
       padding:0!important;margin:0;z-index:5;
@@ -361,6 +361,15 @@
     .bps-min{left:3%;width:22%}
     .bps-max{left:75%;width:22%}
     .bps-min:active,.bps-max:active{opacity:.5}
+
+    /* ── Button press bounce animation ──────────────────────── */
+    @keyframes btn-bounce {
+      0%   { transform:scale(1)    }
+      35%  { transform:scale(.93)  }
+      68%  { transform:scale(1.04) }
+      100% { transform:scale(1)    }
+    }
+    .btn-pressed { animation:btn-bounce .18s ease-out forwards !important; opacity:.85 !important }
 
     /* ── Toggle Row ──────────────────────────────────────────── */
     .bp-toggle-row{
@@ -1063,6 +1072,82 @@ function playGrannyWinSound() {
   })
 }
 
+// ── Background Music ──────────────────────────────────────────────────────────
+let _bgm = null
+function initBGM() {
+  if (_bgm) return
+  _bgm = new Audio('/audio/' + encodeURIComponent('в стиле комп игры из 90х.mp3'))
+  _bgm.loop = true
+  _bgm.volume = 0.22
+  _bgm.play().catch(() => {})
+}
+document.addEventListener('touchstart', initBGM, { once:true, passive:true })
+document.addEventListener('click',      initBGM, { once:true })
+
+// ── UI Sound Engine (Web Audio API) ──────────────────────────────────────────
+let _audioCtx = null
+function _getCtx() {
+  if (!_audioCtx) _audioCtx = new (window.AudioContext || window.webkitAudioContext)()
+  if (_audioCtx.state === 'suspended') _audioCtx.resume()
+  return _audioCtx
+}
+function playBtnClick() {
+  try {
+    const ctx = _getCtx(), t = ctx.currentTime
+    const osc = ctx.createOscillator(), g = ctx.createGain()
+    osc.type = 'triangle'
+    osc.frequency.setValueAtTime(860, t)
+    osc.frequency.exponentialRampToValueAtTime(560, t + 0.045)
+    g.gain.setValueAtTime(0.20, t)
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.06)
+    osc.connect(g); g.connect(ctx.destination)
+    osc.start(t); osc.stop(t + 0.06)
+  } catch(e) {}
+}
+function playAutoBetOn() {
+  try {
+    const ctx = _getCtx(), t = ctx.currentTime
+    const osc = ctx.createOscillator(), g = ctx.createGain()
+    osc.type = 'sine'
+    osc.frequency.setValueAtTime(480, t)
+    osc.frequency.exponentialRampToValueAtTime(920, t + 0.13)
+    g.gain.setValueAtTime(0.22, t)
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.16)
+    osc.connect(g); g.connect(ctx.destination)
+    osc.start(t); osc.stop(t + 0.16)
+  } catch(e) {}
+}
+function playAutoBetOff() {
+  try {
+    const ctx = _getCtx(), t = ctx.currentTime
+    const osc = ctx.createOscillator(), g = ctx.createGain()
+    osc.type = 'sine'
+    osc.frequency.setValueAtTime(920, t)
+    osc.frequency.exponentialRampToValueAtTime(340, t + 0.13)
+    g.gain.setValueAtTime(0.18, t)
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.16)
+    osc.connect(g); g.connect(ctx.destination)
+    osc.start(t); osc.stop(t + 0.16)
+  } catch(e) {}
+}
+function playBtnAnim(el) {
+  el.classList.remove('btn-pressed')
+  void el.offsetWidth
+  el.classList.add('btn-pressed')
+  el.addEventListener('animationend', () => el.classList.remove('btn-pressed'), { once:true })
+}
+// Attach click → sound + bounce to all bet-panel buttons
+setTimeout(() => {
+  document.querySelectorAll('.bet-panel').forEach(panel => {
+    panel.addEventListener('pointerdown', e => {
+      const btn = e.target.closest('button')
+      if (!btn) return
+      playBtnAnim(btn)
+      if (!btn.classList.contains('bps-autobet')) playBtnClick()
+    }, { passive:true })
+  })
+}, 0)
+
 function resizeCanvas() {
   const ga = canvas.parentElement
   canvas.width  = ga.clientWidth
@@ -1691,6 +1776,7 @@ function toggleAutoBet(i) {
   autoBetEnabled[i] = !autoBetEnabled[i]
   const btn = document.getElementById('btnAutoBetQ'+i)
   if (btn) btn.classList.toggle('on', autoBetEnabled[i])
+  if (autoBetEnabled[i]) playAutoBetOn(); else playAutoBetOff()
   tg?.HapticFeedback?.impactOccurred('light')
 }
 
