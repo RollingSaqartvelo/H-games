@@ -731,7 +731,7 @@ function runCursor(cursorSym) {
     const targetCW  = positions[Math.floor(Math.random() * positions.length)]
 
     // 1 full lap + steps to reach target
-    const totalSteps = 38 + targetCW + 1
+    const totalSteps = CW_ORDER.length + targetCW + 1
 
     let step = 0
     let prevEl = null
