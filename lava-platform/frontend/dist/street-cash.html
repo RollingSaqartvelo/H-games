@@ -44,11 +44,11 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:url('/assets
 .fc img{object-fit:contain;display:block}
 .fc::after{display:none}
 
-/* Cursor highlight on outer frame */
+/* Cursor highlight on outer frame — ivory volumetric */
 .fc.cursor-lit{
   opacity:1 !important;
-  outline:2px solid rgba(255,215,0,.95) !important;
-  box-shadow:0 0 6px rgba(255,215,0,.8),inset 0 0 4px rgba(255,215,0,.25) !important;
+  outline:2px solid #f5ead8 !important;
+  box-shadow:0 1px 0 #8b6914,0 2px 0 #7a5c10,0 3px 4px rgba(0,0,0,.5),0 0 8px rgba(245,234,216,.25),inset 0 1px 2px rgba(245,234,216,.2) !important;
   transform:none !important;
   z-index:6 !important;
 }
@@ -56,15 +56,15 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:url('/assets
 /* Cursor final stop — stays lit */
 .fc.cursor-stop{
   opacity:1 !important;
-  outline:2px solid rgba(255,215,0,1) !important;
-  box-shadow:0 0 8px rgba(255,215,0,1),inset 0 0 6px rgba(255,215,0,.35) !important;
+  outline:2px solid #f5ead8 !important;
+  box-shadow:0 1px 0 #8b6914,0 2px 0 #7a5c10,0 3px 4px rgba(0,0,0,.5),0 0 12px rgba(245,234,216,.5),inset 0 1px 2px rgba(245,234,216,.2) !important;
   transform:none !important;
   z-index:6 !important;
   animation:cursor-pulse .5s ease-in-out infinite alternate;
 }
 @keyframes cursor-pulse{
-  from{box-shadow:0 0 6px rgba(255,215,0,.8),inset 0 0 4px rgba(255,215,0,.2)}
-  to{box-shadow:0 0 12px rgba(255,215,0,1),0 0 18px rgba(255,215,0,.4),inset 0 0 6px rgba(255,215,0,.35)}
+  from{box-shadow:0 1px 0 #8b6914,0 2px 0 #7a5c10,0 3px 4px rgba(0,0,0,.5),0 0 6px rgba(245,234,216,.3)}
+  to{box-shadow:0 1px 0 #8b6914,0 2px 0 #7a5c10,0 3px 4px rgba(0,0,0,.5),0 0 18px rgba(245,234,216,.8),0 0 28px rgba(245,234,216,.3)}
 }
 
 .fc-black{background:transparent}
@@ -175,7 +175,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:url('/assets
 #sc-idle-txt{display:none}
 
 /* ── x-panel paytable ── */
-#xpanel{position:relative;width:calc(100% - 16px);max-width:424px;margin:0 8px 1px;background:url('/assets/street-cash/x%20panel.png') center/100% 100% no-repeat;aspect-ratio:2000/1090;flex-shrink:0}
+#xpanel{position:relative;width:calc(100% - 16px);max-width:424px;margin:3px 8px 1px;background:url('/assets/street-cash/x%20panel.png') center/100% 100% no-repeat;aspect-ratio:2000/1090;flex-shrink:0}
 .xp-slot{position:absolute;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2%}
 .xp-img{width:52%;height:auto;object-fit:contain;clip-path:inset(8%);transition:all .15s}
 .xp-mult{font-family:'Orbitron',sans-serif;font-weight:900;font-size:min(2.8vw,12px);color:#f5ead8;text-shadow:0 1px 0 #8b6914,0 2px 0 #7a5c10,0 3px 4px rgba(0,0,0,.5),0 0 12px rgba(245,234,216,.1);letter-spacing:1px;line-height:1}
@@ -446,20 +446,24 @@ const SYMS = [
 // Demo weights matching backend (out of 100000)
 const DEMO_W = [73200, 21500, 3000, 1500, 700, 80, 20]
 
-// 36 cells: 10 top + 8 right + 10 bottom + 8 left (corners fc0,fc9,fc18,fc27)
+// 35 cells: 12 top + 5 right + 13 bottom + 5 left (corners fc0,fc11,fc17,fc29)
 const FRAME_LAYOUT = [
-  0,1,2,0,3,4,2,1,0,1,   // top   fc0–fc9  (10) — corners at fc0, fc9
-  0,2,1,3,0,2,1,4,       // right fc10–fc17 (8)
-  1,0,2,3,5,1,4,0,2,0,   // bot   fc18–fc27 (10) — corners at fc18, fc27
-  1,3,0,5,2,1,4,0        // left  fc28–fc35 (8)
+  // Top row L→R (fc0=TL … fc11=TR): 12
+  0,1,2,0,3,4,2,1,3,0,6,2,
+  // Right col T→B interior (fc12-fc16): 5
+  0,2,1,3,4,
+  // Bottom row R→L (fc17=BR … fc29=BL): 13
+  0,4,1,2,3,5,1,3,0,2,6,4,0,
+  // Left col B→T interior (fc30-fc34): 5
+  2,0,3,1,4
 ]
 
-// Clockwise traversal: 36 cells
+// Clockwise traversal: 35 cells
 const CW_ORDER = [
-  0,1,2,3,4,5,6,7,8,9,
-  10,11,12,13,14,15,16,17,
-  18,19,20,21,22,23,24,25,26,27,
-  35,34,33,32,31,30,29,28
+  0,1,2,3,4,5,6,7,8,9,10,11,
+  12,13,14,15,16,
+  17,18,19,20,21,22,23,24,25,26,27,28,29,
+  34,33,32,31,30
 ]
 
 // For each symbol, which CW positions contain it
@@ -537,14 +541,10 @@ function setup() {
   scBot.style.top   = (drumT + drumH + 4) + 'px'
   scBot.style.width = drumW + 'px'
 
-  // ── 38 frame cells — 4 corners + 8 top + 9 right + 8 bottom + 9 left ──
-  const fW  = fR - fL
-  const scW = iL - fL        // side band width  ≈ 43px
-  const tcH = iT - fT        // top band height  ≈ 43px
-  const cW  = scW, cH = tcH  // corner square
-  const tcW = (fW - 2*scW) / 8  // interior cell width (8 cells fit between corners)
-  const scH = iH / 8             // side cell height (8 per side)
-  CELL = Math.floor(Math.min(tcW, scH))
+  // ── 35 frame cells — artwork-exact positions from street panel.png (1600×872) ──
+  const scaleX = W / 1600
+  const scaleY = imgH / 872
+  CELL = Math.round(90 * scaleX)
 
   // Per-symbol icon dims [width%, height%] relative to each cell's own W×H
   const ICON_DIMS = [
@@ -581,28 +581,29 @@ function setup() {
     return d
   }
 
-  // 4 corners
-  {const el=makeAbsFC(0,FRAME_LAYOUT[0],fL,fT,cW,cH);const i=el.querySelector('img');i.style.left='5px';i.style.top='2px'}  // top-left
-  makeAbsFC(9,  FRAME_LAYOUT[9],  iR, fT, cW, cH)  // top-right
-  makeAbsFC(18, FRAME_LAYOUT[18], iR, iB, cW, cH)  // bottom-right
-  makeAbsFC(27, FRAME_LAYOUT[27], fL, iB, cW, cH)  // bottom-left
+  // Artwork cell bounding boxes in original 1600×872 coordinates
+  const ART_CELLS = [
+    // Top row L→R  (fc0=TL corner … fc11=TR corner)
+    [68,59,160,146],[192,59,286,146],[317,59,410,146],[442,60,535,146],
+    [567,60,659,146],[691,60,784,142],[815,60,909,142],[940,60,1033,145],
+    [1064,60,1158,146],[1189,60,1282,146],[1313,59,1407,146],[1439,59,1531,146],
+    // Right col T→B interior (fc12-fc16)
+    [1439,174,1531,259],[1439,286,1531,370],[1439,396,1531,481],
+    [1439,507,1531,592],[1439,620,1531,703],
+    // Bottom row R→L  (fc17=BR corner … fc29=BL corner)
+    [1441,729,1531,820],[1327,731,1414,820],[1212,730,1300,820],
+    [1098,731,1186,819],[985,731,1071,819],[870,731,957,819],[756,731,843,819],
+    [642,731,729,819],[528,731,615,819],[414,731,501,820],[300,731,387,820],
+    [185,729,273,820],[69,728,158,820],
+    // Left col B→T interior (fc30-fc34)
+    [68,620,160,703],[68,505,160,592],[68,396,160,481],[68,286,160,370],[68,174,160,259]
+  ]
 
-  // Top interior fc1-8: 8 cells L→R between corners
-  for (let i = 0; i < 8; i++)
-    makeAbsFC(1+i, FRAME_LAYOUT[1+i], fL+cW + i*tcW, fT, tcW, tcH)
-
-  // Right col fc10-17: 8 cells T→B
-  for (let i = 0; i < 8; i++)
-    makeAbsFC(10+i, FRAME_LAYOUT[10+i], iR, iT + i*scH, scW, scH)
-
-  // Bottom interior fc19-26: 8 cells R→L between corners
-  for (let i = 0; i < 8; i++)
-    makeAbsFC(19+i, FRAME_LAYOUT[19+i], iR - (i+1)*tcW, iB, tcW, tcH)
-
-  // Left col fc28-35: 8 cells T→B
-  {const el=makeAbsFC(28,FRAME_LAYOUT[28],fL,iT,scW,scH);const ig=el.querySelector('img');ig.style.left=(parseInt(ig.style.left)-1)+'px';ig.style.top=(parseInt(ig.style.top)-2)+'px'}
-  for (let i = 1; i < 8; i++)
-    makeAbsFC(28+i, FRAME_LAYOUT[28+i], fL, iT + i*scH, scW, scH)
+  ART_CELLS.forEach(([ox1,oy1,ox2,oy2], id) => {
+    makeAbsFC(id, FRAME_LAYOUT[id],
+      Math.round(ox1*scaleX), Math.round(oy1*scaleY),
+      Math.round((ox2-ox1)*scaleX), Math.round((oy2-oy1)*scaleY))
+  })
 
   for (let ri = 0; ri < 3; ri++) setRC(`r${ri}c`, randSym())
 }
