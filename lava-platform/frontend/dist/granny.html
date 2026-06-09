@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#0a0a0c">
   <title>Granny Run — H-GAMES</title>
   <!-- Force Telegram WebView to bypass cache on stale versions -->
-  <script>if(!location.search.includes('v=44'))location.replace('/granny.html?v=44')</script>
+  <script>if(!location.search.includes('v=45'))location.replace('/granny.html?v=45')</script>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap');
@@ -276,27 +276,26 @@
     .bet-panel.active-bet{ box-shadow:0 0 20px rgba(120,40,200,.3) }
     .bet-panel.crashed-bet{ box-shadow:0 0 14px rgba(239,68,68,.25) }
 
-    /* ── [−] and [+] top-corner square holes ────────────────── */
+    /* ── [−] and [+] top-corner square slots ────────────────── */
     .bps-minus,.bps-plus{
       position:absolute;
-      top:19.82%;height:8.16%;
+      top:16.23%;height:11.84%;
       background:transparent;border:none;
       color:transparent;font-size:0;cursor:pointer;
       -webkit-tap-highlight-color:transparent;
       touch-action:manipulation;
       transition:opacity .1s,transform .1s;
     }
-    .bps-minus{left:24.95%;width:4.95%}
-    .bps-plus {left:70.20%;width:4.90%}
+    .bps-minus{left:23.30%;width:7.25%}
+    .bps-plus {left:69.45%;width:7.30%}
     .bps-minus:active,.bps-plus:active{opacity:.5;transform:scale(.93)}
 
     /* ── LED amount display ──────────────────────────────────── */
     .bps-amount{
       position:absolute;
-      left:34%;top:13.5%;width:32%;height:16%;
-      background:rgba(12,6,20,.0);
+      left:33.85%;top:12.20%;width:32.35%;height:18.12%;
+      background:transparent;
       border:none;outline:none;
-      border-radius:4px;
       color:#d4a435;
       font-family:'Share Tech Mono',monospace;
       font-size:clamp(13px,3.5vw,20px);font-weight:700;text-align:center;
@@ -306,19 +305,20 @@
     .bps-amount::-webkit-inner-spin-button,
     .bps-amount::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
 
-    /* ── 4 rectangular quick-amount holes ───────────────────── */
+    /* ── 4 rectangular quick-amount slots ───────────────────── */
     .bps-quick{
       position:absolute;
       background:transparent;border:none;cursor:pointer;
+      padding:0;overflow:hidden;
       -webkit-tap-highlight-color:transparent;
       z-index:10;touch-action:manipulation;
     }
-    .bps-q1  {left:23.50%;top:38.48%;width:5.65%;height:8.25%}
-    .bps-q5  {left:39.20%;top:38.57%;width:5.75%;height:8.16%}
-    .bps-q10 {left:55.10%;top:38.57%;width:5.75%;height:8.16%}
-    .bps-half{left:70.95%;top:38.48%;width:5.65%;height:8.25%}
+    .bps-q1  {left:19.20%;top:35.69%;width:13.00%;height:11.57%}
+    .bps-q5  {left:35.35%;top:35.69%;width:13.10%;height:11.57%}
+    .bps-q10 {left:51.55%;top:35.69%;width:13.10%;height:11.57%}
+    .bps-half{left:67.80%;top:35.69%;width:13.00%;height:11.84%}
     .bps-quick:active{opacity:.45;transform:scale(.94)}
-    .bps-btn-img{display:block;width:100%;height:100%;object-fit:fill;pointer-events:none;border-radius:4px}
+    .bps-btn-img{display:block;width:100%;height:100%;object-fit:fill;pointer-events:none}
 
     /* ── AUTO BET inset bar ──────────────────────────────────── */
     .bps-autobet{
@@ -333,9 +333,9 @@
     .bps-autobet.on{background:rgba(110,30,200,.45)}
     .bps-autobet:active{opacity:.6}
 
-    /* ── BET circle hole ─────────────────────────────────────── */
+    /* ── BET circle slot ─────────────────────────────────────── */
     .bet-panel .bp-btn-pair{
-      position:absolute;left:45%;top:66.82%;width:10.15%;
+      position:absolute;left:43.70%;top:64.30%;width:12.60%;
       aspect-ratio:1/1;z-index:5;
       display:none;align-items:center;justify-content:center;
     }
@@ -343,10 +343,10 @@
     .bet-panel .bp-slot-btn{width:100%;height:100%;border:none;background:none;padding:0;cursor:pointer;touch-action:manipulation}
     .bet-panel .bp-slot-img{width:100%;height:100%;object-fit:contain;transition:opacity .15s,transform .15s}
 
-    /* Text BET/CASHOUT at circle hole */
+    /* Text BET/CASHOUT at circle slot */
     .bet-panel .bp-btn{
-      position:absolute!important;left:45%;top:66.82%;
-      width:10.15%!important;aspect-ratio:1/1;
+      position:absolute!important;left:43.70%;top:64.30%;
+      width:12.60%!important;aspect-ratio:1/1;
       border-radius:50%!important;
       padding:0!important;margin:0;z-index:5;
       font-family:'Rajdhani',sans-serif;
@@ -355,15 +355,15 @@
       text-align:center;touch-action:manipulation;
     }
 
-    /* ── MIN  [BET circle]  MAX bottom row ───────────────────── */
+    /* ── MIN  [BET]  MAX bottom row ──────────────────────────── */
     .bps-min,.bps-max{
       position:absolute;
-      top:71.93%;height:8.52%;
+      top:69.87%;height:12.47%;
       background:transparent;border:none;padding:0;cursor:pointer;
       -webkit-tap-highlight-color:transparent;touch-action:manipulation;
     }
-    .bps-min{left:29.60%;width:5.90%}
-    .bps-max{left:64.60%;width:5.90%}
+    .bps-min{left:24.85%;width:14.40%}
+    .bps-max{left:60.75%;width:14.40%}
     .bps-min:active,.bps-max:active{opacity:.5}
 
     /* ── Button press bounce animation ──────────────────────── */
