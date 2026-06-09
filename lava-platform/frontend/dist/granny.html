@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#0a0a0c">
   <title>Granny Run — H-GAMES</title>
   <!-- Force Telegram WebView to bypass cache on stale versions -->
-  <script>if(!location.search.includes('v=49'))location.replace('/granny.html?v=49')</script>
+  <script>if(!location.search.includes('v=50'))location.replace('/granny.html?v=50')</script>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap');
@@ -265,7 +265,7 @@
       width:100%;
       aspect-ratio:2000/1113;
       position:relative;
-      background:url('/assets/granny/new%20panel.png') center/100% 100% no-repeat;
+      background:url('/assets/granny/new%20panel.png?v=50') center/100% 100% no-repeat;
       border:none;border-radius:0;padding:0;
       overflow:visible;flex-shrink:0;
       box-shadow:none;
@@ -857,9 +857,9 @@
 
     <!-- Panel A -->
     <div class="bet-panel" id="panel0" style="display:none">
-      <button class="bps-minus" onclick="stepAmount(0,-1)"></button>
+      <button class="bps-minus" onclick="stepAmount(0,-1)"><img src="/assets/betting/buttons/bet_minus_btn.png" class="bps-btn-img" alt=""></button>
       <input class="bps-amount" id="amount0" type="number" min="0.1" step="0.1" value="1.00" placeholder="0.00">
-      <button class="bps-plus"  onclick="stepAmount(0,1)"></button>
+      <button class="bps-plus"  onclick="stepAmount(0,1)"><img src="/assets/betting/buttons/bet_plus_btn.png" class="bps-btn-img" alt=""></button>
       <button class="bps-quick bps-q1"   onclick="addAmount(0,1)"><img src="/assets/betting/buttons/Bet_1_plus.png" class="bps-btn-img" alt=""></button>
       <button class="bps-quick bps-q5"   onclick="addAmount(0,5)"><img src="/assets/betting/buttons/bet_5_plus.png" class="bps-btn-img" alt=""></button>
       <button class="bps-quick bps-q10"  onclick="addAmount(0,10)"><img src="/assets/betting/buttons/bet_10_plus.png" class="bps-btn-img" alt=""></button>
@@ -879,9 +879,9 @@
 
     <!-- Panel B -->
     <div class="bet-panel" id="panel1" style="display:none">
-      <button class="bps-minus" onclick="stepAmount(1,-1)"></button>
+      <button class="bps-minus" onclick="stepAmount(1,-1)"><img src="/assets/betting/buttons/bet_minus_btn.png" class="bps-btn-img" alt=""></button>
       <input class="bps-amount" id="amount1" type="number" min="0.1" step="0.1" value="1.00" placeholder="0.00">
-      <button class="bps-plus"  onclick="stepAmount(1,1)"></button>
+      <button class="bps-plus"  onclick="stepAmount(1,1)"><img src="/assets/betting/buttons/bet_plus_btn.png" class="bps-btn-img" alt=""></button>
       <button class="bps-quick bps-q1"   onclick="addAmount(1,1)"><img src="/assets/betting/buttons/Bet_1_plus.png" class="bps-btn-img" alt=""></button>
       <button class="bps-quick bps-q5"   onclick="addAmount(1,5)"><img src="/assets/betting/buttons/bet_5_plus.png" class="bps-btn-img" alt=""></button>
       <button class="bps-quick bps-q10"  onclick="addAmount(1,10)"><img src="/assets/betting/buttons/bet_10_plus.png" class="bps-btn-img" alt=""></button>
