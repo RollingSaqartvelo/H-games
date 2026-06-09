@@ -723,15 +723,16 @@ function spinReel(ri, finalCtr, stopDelay) {
 }
 
 // ── Cursor animation on outer frame ──────────────────────────────────────────
-// Runs 1 full clockwise lap then decelerates and stops at a cell with cursorSym.
+// Runs 1 or 2 full clockwise laps then decelerates and stops at a cell with cursorSym.
 function runCursor(cursorSym) {
   return new Promise(resolve => {
     // Pick target CW position (random among cells with this symbol)
     const positions = SYM_CW[cursorSym]
     const targetCW  = positions[Math.floor(Math.random() * positions.length)]
 
-    // 1 full lap + steps to reach target
-    const totalSteps = CW_ORDER.length + targetCW + 1
+    // Randomly 1 or 2 full laps + steps to reach target
+    const laps = 1 + Math.floor(Math.random() * 2)
+    const totalSteps = laps * CW_ORDER.length + targetCW + 1
 
     let step = 0
     let prevEl = null
