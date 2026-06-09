@@ -36,7 +36,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:url('/assets
 /* ── Outer frame cells ── */
 .fc{
   position:absolute;display:flex;align-items:center;justify-content:center;
-  border-radius:4px;border:none;overflow:hidden;
+  border-radius:4px;border:none;overflow:visible;
   background:transparent;opacity:1;
   transition:opacity .15s,box-shadow .08s,transform .08s;
   z-index:15;
@@ -548,13 +548,13 @@ function setup() {
 
   // Per-symbol icon dims [width%, height%] relative to each cell's own W×H
   const ICON_DIMS = [
-    [0.52, 0.64],  // 0 TNT
-    [0.58, 0.54],  // 1 Dice
-    [0.70, 0.40],  // 2 Shades
-    [0.66, 0.48],  // 3 Sneaker
-    [0.58, 0.52],  // 4 Chain
-    [0.56, 0.56],  // 5 Watch
-    [0.66, 0.44],  // 6 Card
+    [1.04, 1.28],  // 0 TNT
+    [1.16, 1.08],  // 1 Dice
+    [1.40, 0.80],  // 2 Shades
+    [1.32, 0.96],  // 3 Sneaker
+    [1.16, 1.04],  // 4 Chain
+    [1.12, 1.12],  // 5 Watch
+    [1.32, 0.88],  // 6 Card
   ]
 
   function makeAbsFC(id, symIdx, x, y, w, h) {
