@@ -785,7 +785,13 @@
   const bar=document.getElementById('ls-bar');
   const pct=document.getElementById('ls-pct');
   const snd=new Audio('/audio/H-GAMES%20provider.mp3');
-  snd.volume=0.85; snd.play().catch(()=>{});
+  snd.volume=0.85;
+  const _sp=snd.play();
+  if(_sp&&_sp.catch)_sp.catch(()=>{
+    const _r=()=>{snd.play().catch(()=>{})};
+    document.addEventListener('touchstart',_r,{once:true,passive:true});
+    document.addEventListener('click',_r,{once:true});
+  });
 
   const prog=VIDS.map(()=>[0,0]); // [loaded, total]
 

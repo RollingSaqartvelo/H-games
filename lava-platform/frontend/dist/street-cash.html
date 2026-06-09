@@ -29,7 +29,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:url('/assets
 /* ── Board ── */
 #board{
   display:block;position:relative;
-  background:url('/assets/street-cash/PANNEL%20(2).png') left top/100% auto no-repeat;
+  background:url('/assets/street-cash/street%20panel.png') left top/100% auto no-repeat;
 }
 #vokryg-img{display:none}
 
@@ -278,7 +278,13 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:url('/assets
   const bar=document.getElementById('ls-bar');
   const pct=document.getElementById('ls-pct');
   const snd=new Audio('/audio/H-GAMES%20provider.mp3');
-  snd.volume=0.85; snd.play().catch(()=>{});
+  snd.volume=0.85;
+  const _sp=snd.play();
+  if(_sp&&_sp.catch)_sp.catch(()=>{
+    const _r=()=>{snd.play().catch(()=>{})};
+    document.addEventListener('touchstart',_r,{once:true,passive:true});
+    document.addEventListener('click',_r,{once:true});
+  });
 
   const prog=VIDS.map(()=>[0,0]);
 
@@ -470,8 +476,8 @@ let cursorCell = null  // fc-element currently showing cursor-stop
 // ── Build DOM ─────────────────────────────────────────────────────────────────
 function setup() {
   const W = Math.min(window.innerWidth, 440)
-  // PANNEL (2).png is 2000×1090. Transparent hole: x=568-1431, y=323-764.
-  const imgH = Math.round(W * 1090 / 2000)
+  // street panel.png is 1600×872. Transparent hole: x=454-1145, y=257-612.
+  const imgH = Math.round(W * 872 / 1600)
 
   // Outer frame = full panel edges
   const fL = 0
@@ -479,10 +485,10 @@ function setup() {
   const fT = 0
   const fB = imgH
   // Inner transparent hole (drum goes here)
-  const iL = Math.round(W    * 568  / 2000)
-  const iR = Math.round(W    * 1431 / 2000)
-  const iT = Math.round(imgH * 323  / 1090)
-  const iB = Math.round(imgH * 764  / 1090)
+  const iL = Math.round(W    * 454  / 1600)
+  const iR = Math.round(W    * 1145 / 1600)
+  const iT = Math.round(imgH * 257  / 872)
+  const iB = Math.round(imgH * 612  / 872)
   const iW = iR - iL
   const iH = iB - iT
 

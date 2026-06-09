@@ -203,6 +203,72 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
 </style>
 </head>
 <body>
+<!-- ── Loading Screen ──────────────────────────────────────────── -->
+<div id="ls" style="position:fixed;inset:0;z-index:9999;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:32px;transition:opacity .5s">
+  <img src="/assets/hgames-logo.jpg" style="width:78%;max-width:340px;object-fit:contain">
+  <div style="width:78%;max-width:340px">
+    <div style="background:rgba(255,255,255,.1);border-radius:4px;height:5px;overflow:hidden">
+      <div id="ls-bar" style="height:100%;width:0%;background:linear-gradient(90deg,#00c6ff,#a855f7,#ff69b4);border-radius:4px;transition:width .12s ease"></div>
+    </div>
+    <div id="ls-pct" style="text-align:center;color:rgba(255,255,255,.35);font-size:11px;letter-spacing:2px;margin-top:10px;font-family:monospace">0%</div>
+  </div>
+</div>
+<script>
+(function(){
+  const VIDS=[
+    '/assets/h-slots/pirate/character/INTRO.mp4',
+    '/assets/h-slots/pirate/character/IDLE.mp4',
+    '/assets/h-slots/pirate/character/win.mp4',
+    '/assets/h-slots/pirate/character/big%20win.mp4',
+    '/assets/h-slots/pirate/character/lose.mp4',
+    '/video/win%20video.mp4'
+  ];
+  const scr=document.getElementById('ls');
+  const bar=document.getElementById('ls-bar');
+  const pct=document.getElementById('ls-pct');
+  const snd=new Audio('/audio/H-GAMES%20provider.mp3');
+  snd.volume=0.85;
+  const _sp=snd.play();
+  if(_sp&&_sp.catch)_sp.catch(()=>{
+    const _r=()=>{snd.play().catch(()=>{})};
+    document.addEventListener('touchstart',_r,{once:true,passive:true});
+    document.addEventListener('click',_r,{once:true});
+  });
+  const prog=VIDS.map(()=>[0,0]);
+  function upd(){
+    const tl=prog.reduce((s,[l])=>s+l,0);
+    const tt=prog.reduce((s,[,t])=>s+t,0);
+    const p=tt>0?Math.min(tl/tt,1):0;
+    bar.style.width=(p*100).toFixed(1)+'%';
+    pct.textContent=Math.round(p*100)+'%';
+  }
+  function finish(){
+    bar.style.width='100%'; pct.textContent='100%';
+    setTimeout(()=>{
+      scr.style.opacity='0'; scr.style.pointerEvents='none';
+      setTimeout(()=>scr.remove(),520);
+    },250);
+  }
+  async function load(url,i){
+    try{
+      const r=await fetch(url);
+      const cl=parseInt(r.headers.get('Content-Length')||'0');
+      prog[i][1]=cl||1;
+      const reader=r.body.getReader();
+      while(true){
+        const{done,value}=await reader.read();
+        if(done)break;
+        prog[i][0]+=value.length;
+        if(cl>0)upd();
+      }
+      if(!cl){prog[i][0]=prog[i][1]=1;upd();}
+    }catch(e){prog[i][0]=prog[i][1]=1;upd();}
+  }
+  const guard=setTimeout(finish,15000);
+  Promise.all(VIDS.map((u,i)=>load(u,i))).then(()=>{clearTimeout(guard);finish();});
+})();
+</script>
+<!-- ── / Loading Screen ─────────────────────────────────────────── -->
 
 <audio id="bgMusic" loop preload="auto">
   <source src="audio/pirat.mp3" type="audio/mpeg">
