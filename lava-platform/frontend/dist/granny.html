@@ -265,13 +265,21 @@
       width:100%;
       aspect-ratio:2000/1111;
       position:relative;
-      background:url('/assets/betting/buttons/new%20new%20new.png') center/100% 100% no-repeat;
+      background:none;
       border:none;border-radius:0;padding:0;
       overflow:visible;flex-shrink:0;
       box-shadow:none;
       transform:translateZ(0);-webkit-transform:translateZ(0);
       transition:box-shadow .3s;
       margin-top:0;
+    }
+    .bet-panel::before{
+      content:'';
+      position:absolute;inset:0;
+      background:url('/assets/betting/buttons/new%20new%20new.png') center/100% 100% no-repeat;
+      opacity:0.25;
+      z-index:-1;
+      pointer-events:none;
     }
     .bet-panel.active-bet{ box-shadow:0 0 20px rgba(120,40,200,.3) }
     .bet-panel.crashed-bet{ box-shadow:0 0 14px rgba(239,68,68,.25) }
