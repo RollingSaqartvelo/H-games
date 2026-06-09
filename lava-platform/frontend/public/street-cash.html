@@ -29,9 +29,9 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:url('/assets
 /* ── Board ── */
 #board{
   display:block;position:relative;
-  background:url('/assets/street-cash/pannel.png') left top/100% auto no-repeat;
+  background:url('/assets/street-cash/PANNEL%20(2).png') left top/100% auto no-repeat;
 }
-#vokryg-img{position:absolute;object-fit:fill;z-index:5;pointer-events:none}
+#vokryg-img{display:none}
 
 /* ── Outer frame cells ── */
 .fc{
@@ -412,37 +412,31 @@ let cursorCell = null  // fc-element currently showing cursor-stop
 // ── Build DOM ─────────────────────────────────────────────────────────────────
 function setup() {
   const W = Math.min(window.innerWidth, 440)
-  // pannel.png is 2000×3585. Frame outer: x=116-1884, y=75-1730.
-  // Inner transparent area: x=339-1663, y=296-1524.
-  const imgH = Math.round(W * 3585 / 2000)
+  // PANNEL (2).png is 2000×1090. Transparent hole: x=568-1431, y=323-764.
+  const imgH = Math.round(W * 1090 / 2000)
 
-  const fL = Math.round(W    * 116  / 2000)   // frame outer left
-  const fR = Math.round(W    * 1884 / 2000)   // frame outer right
-  const fT = Math.round(imgH * 75   / 3585)   // frame outer top
-  const fB = Math.round(imgH * 1730 / 3585)   // frame outer bottom
-  const iL = Math.round(W    * 339  / 2000)   // inner area left
-  const iR = Math.round(W    * 1663 / 2000)   // inner area right
-  const iT = Math.round(imgH * 296  / 3585)   // inner area top
-  const iB = Math.round(imgH * 1524 / 3585)   // inner area bottom
-  const iW = iR - iL                          // inner width
-  const iH = iB - iT                          // inner height
+  // Outer frame = full panel edges
+  const fL = 0
+  const fR = W
+  const fT = 0
+  const fB = imgH
+  // Inner transparent hole (drum goes here)
+  const iL = Math.round(W    * 568  / 2000)
+  const iR = Math.round(W    * 1431 / 2000)
+  const iT = Math.round(imgH * 323  / 1090)
+  const iB = Math.round(imgH * 764  / 1090)
+  const iW = iR - iL
+  const iH = iB - iT
 
-  // Board: clip to frame height, no extra padding
+  // Board height matches new panel aspect ratio
   const board = document.getElementById('board')
-  board.style.minHeight = fB + 'px'
+  board.style.minHeight = imgH + 'px'
 
-  // ── Layer 2: vokryg.jpeg fills inner area exactly ──
-  const vok = document.getElementById('vokryg-img')
-  vok.style.left   = iL + 'px'
-  vok.style.top    = iT + 'px'
-  vok.style.width  = iW + 'px'
-  vok.style.height = iH + 'px'
-
-  // ── Layer 3: baraban.jpeg over white area in vokryg ──
-  const drumL = Math.round(iL + iW * 0.235)
-  const drumT = Math.round(iT + iH * 0.220)
-  const drumW = Math.round(iW * 0.531)
-  const drumH = Math.round(iH * 0.470)
+  // Drum fills the transparent hole exactly
+  const drumL = iL
+  const drumT = iT
+  const drumW = iW
+  const drumH = iH
 
   REEL_H = drumH
   IMG_SZ = Math.round(Math.floor(drumW / 3) * 0.80)
