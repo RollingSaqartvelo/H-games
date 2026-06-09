@@ -174,20 +174,14 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:url('/assets
 @keyframes win-pop{from{transform:scale(.3);opacity:0}to{transform:scale(1);opacity:1}}
 #sc-idle-txt{display:none}
 
-/* ── Mini paytable ── */
-#legend-wrap{position:relative;margin:0 8px 1px}
-#pt-btn{position:absolute;top:-2px;right:-2px;width:18px;height:18px;border-radius:50%;background:linear-gradient(145deg,#f5f0ff,#ede0ff);border:1.5px solid rgba(192,132,252,.5);color:#7c3aed;font-size:9px;font-weight:900;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:10;box-shadow:0 0 8px rgba(168,85,247,.15);font-family:'Orbitron',sans-serif}
-#pt-btn:active{transform:scale(.9)}
-#legend{background:rgba(0,0,0,.45);border:1px solid rgba(255,215,0,.2);border-radius:12px;padding:4px 4px 3px;display:flex;flex-direction:column;gap:3px}
-.legend-row{display:flex;gap:3px;align-items:stretch}
-.li{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;border-radius:8px;padding:3px 1px;background:rgba(240,232,255,0.82);border:1px solid rgba(255,215,0,.15);transition:border-color .15s,transform .1s}
-.li.feat{flex:1.2;background:rgba(235,225,255,0.88);border:1px solid rgba(255,215,0,.35)}
-.li img{width:22px;height:22px;object-fit:contain;clip-path:inset(10%)}
-.li.feat img{width:28px;height:28px;clip-path:inset(10%)}
-.li-mult{font-family:'Orbitron',sans-serif;font-size:7px;font-weight:900;color:#7c3aed;line-height:1}
-.li.feat .li-mult{font-size:9px}
-.li.active{border-color:rgba(168,85,247,.9);transform:scale(1.06);box-shadow:0 0 12px rgba(168,85,247,.3)}
-.li.active .li-mult{color:#6d28d9;text-shadow:0 0 8px rgba(168,85,247,.4)}
+/* ── x-panel paytable ── */
+#xpanel{position:relative;width:calc(100% - 16px);max-width:424px;margin:0 8px 1px;background:url('/assets/street-cash/x%20panel.png') center/100% 100% no-repeat;aspect-ratio:2000/1090;flex-shrink:0}
+.xp-slot{position:absolute;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2%}
+.xp-img{width:52%;height:auto;object-fit:contain;clip-path:inset(8%);transition:all .15s}
+.xp-mult{font-family:'Orbitron',sans-serif;font-weight:900;font-size:min(2.8vw,12px);color:#f5ead8;text-shadow:0 1px 0 #8b6914,0 2px 0 #7a5c10,0 3px 4px rgba(0,0,0,.5),0 0 12px rgba(245,234,216,.1);letter-spacing:1px;line-height:1}
+.xp-loss{color:#ef4444;text-shadow:0 1px 0 #8b0000,0 2px 0 #700000,0 3px 4px rgba(0,0,0,.5)}
+.xp-slot.active .xp-img{filter:drop-shadow(0 0 5px rgba(255,220,80,.9));transform:scale(1.08)}
+.xp-slot.active .xp-mult{color:#ffe97a;text-shadow:0 0 10px rgba(255,215,0,.7)}
 
 /* ── Paytable modal ── */
 #pt-modal{display:none;position:fixed;inset:0;z-index:300;background:rgba(30,0,60,.6);backdrop-filter:blur(4px);align-items:flex-end;justify-content:center}
@@ -262,7 +256,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:url('/assets
 </head>
 <body>
 <!-- ── Loading Screen ─────────────────────────────────────────── -->
-<div id="ls" style="position:fixed;inset:0;z-index:9999;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:32px;transition:opacity .5s">
+<div id="ls" style="position:fixed;inset:0;z-index:99999;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:32px;transition:opacity .5s;cursor:pointer" onclick="if(window._lsAud)window._lsAud.play().catch(()=>{})">
   <img src="/assets/hgames-logo.jpg" style="width:78%;max-width:340px;object-fit:contain">
   <div style="width:78%;max-width:340px">
     <div style="background:rgba(255,255,255,.1);border-radius:4px;height:5px;overflow:hidden">
@@ -270,7 +264,9 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:url('/assets
     </div>
     <div id="ls-pct" style="text-align:center;color:rgba(255,255,255,.35);font-size:11px;letter-spacing:2px;margin-top:10px;font-family:monospace">0%</div>
   </div>
+  <div style="color:rgba(255,255,255,.22);font-size:10px;letter-spacing:3px;font-family:monospace;animation:ls-p 1.4s ease-in-out infinite">&#9654; TAP TO START</div>
 </div>
+<style>@keyframes ls-p{0%,100%{opacity:.15}50%{opacity:.6}}</style>
 <script>
 (function(){
   const VIDS=[0,1,2,3,4,5,6].map(i=>`/video/street-cash/win-${i}.mp4`);
@@ -278,13 +274,10 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:url('/assets
   const bar=document.getElementById('ls-bar');
   const pct=document.getElementById('ls-pct');
   const snd=new Audio('/audio/H-GAMES%20provider.mp3');
+  window._lsAud=snd;
+  window._lsActive=true;
   snd.volume=0.85;
-  const _sp=snd.play();
-  if(_sp&&_sp.catch)_sp.catch(()=>{
-    const _r=()=>{snd.play().catch(()=>{})};
-    document.addEventListener('touchstart',_r,{once:true,passive:true});
-    document.addEventListener('click',_r,{once:true});
-  });
+  snd.play().catch(()=>{});
 
   const prog=VIDS.map(()=>[0,0]);
 
@@ -297,6 +290,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:url('/assets
   }
 
   function finish(){
+    window._lsActive=false;
     bar.style.width='100%'; pct.textContent='100%';
     setTimeout(()=>{
       scr.style.opacity='0'; scr.style.pointerEvents='none';
@@ -355,20 +349,37 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:url('/assets
       <!-- fc0–fc37 added dynamically by setup() -->
     </div>
 
-    <!-- Mini paytable -->
-    <div id="legend-wrap">
-      <div id="legend">
-        <div class="legend-row">
-          <div class="li feat sym-bg-6" data-sym="6"><img src="/assets/street-cash/sym-6.png"><div class="li-mult">×100</div></div>
-          <div class="li sym-bg-5" data-sym="5"><img src="/assets/street-cash/sym-4.png"><div class="li-mult">×75</div></div>
-          <div class="li sym-bg-4" data-sym="4"><img src="/assets/street-cash/sym-3.png"><div class="li-mult">×20</div></div>
-          <div class="li sym-bg-3" data-sym="3"><img src="/assets/street-cash/sym-2.png"><div class="li-mult">×8</div></div>
-        </div>
-        <div class="legend-row">
-          <div class="li sym-bg-2" data-sym="2"><img src="/assets/street-cash/sym-1.png"><div class="li-mult">×3</div></div>
-          <div class="li sym-bg-1" data-sym="1"><img src="/assets/street-cash/sym-0.png"><div class="li-mult">×2</div></div>
-          <div class="li sym-bg-0" data-sym="0"><img src="/assets/street-cash/tnt.png"><div class="li-mult">LOSS</div></div>
-        </div>
+    <!-- x-panel paytable -->
+    <div id="xpanel">
+      <!-- Row 1: 4 slots (x=141-1858, y=189-540) -->
+      <div class="xp-slot" data-sym="6" style="left:7.05%;top:17.34%;width:21.45%;height:32.20%">
+        <img src="/assets/street-cash/sym-6.png" class="xp-img">
+        <div class="xp-mult">×100</div>
+      </div>
+      <div class="xp-slot" data-sym="5" style="left:28.50%;top:17.34%;width:21.45%;height:32.20%">
+        <img src="/assets/street-cash/sym-4.png" class="xp-img">
+        <div class="xp-mult">×75</div>
+      </div>
+      <div class="xp-slot" data-sym="4" style="left:49.95%;top:17.34%;width:21.45%;height:32.20%">
+        <img src="/assets/street-cash/sym-3.png" class="xp-img">
+        <div class="xp-mult">×20</div>
+      </div>
+      <div class="xp-slot" data-sym="3" style="left:71.40%;top:17.34%;width:21.45%;height:32.20%">
+        <img src="/assets/street-cash/sym-2.png" class="xp-img">
+        <div class="xp-mult">×8</div>
+      </div>
+      <!-- Row 2: 3 slots (x=345-1656, y=560-923) -->
+      <div class="xp-slot" data-sym="2" style="left:17.25%;top:51.38%;width:21.85%;height:33.30%">
+        <img src="/assets/street-cash/sym-1.png" class="xp-img">
+        <div class="xp-mult">×3</div>
+      </div>
+      <div class="xp-slot" data-sym="1" style="left:39.10%;top:51.38%;width:21.85%;height:33.30%">
+        <img src="/assets/street-cash/sym-0.png" class="xp-img">
+        <div class="xp-mult">×2</div>
+      </div>
+      <div class="xp-slot" data-sym="0" style="left:60.95%;top:51.38%;width:21.85%;height:33.30%">
+        <img src="/assets/street-cash/tnt.png" class="xp-img">
+        <div class="xp-mult xp-loss">LOSS</div>
       </div>
     </div>
 
@@ -787,8 +798,8 @@ function stopLights() {
 
 // ── Legend highlight ──────────────────────────────────────────────────────────
 function highlightLegend(sym) {
-  document.querySelectorAll('.li').forEach(el => el.classList.remove('active'))
-  const el = document.querySelector(`.li[data-sym="${sym}"]`)
+  document.querySelectorAll('.xp-slot').forEach(el => el.classList.remove('active'))
+  const el = document.querySelector(`.xp-slot[data-sym="${sym}"]`)
   if (el) el.classList.add('active')
 }
 
@@ -814,7 +825,7 @@ function clearWin() {
   document.getElementById('win-stripe').style.display = 'none'
   document.getElementById('sc-win-txt').style.display  = 'none'
   // sc-idle-txt hidden permanently
-  document.querySelectorAll('.li').forEach(el => el.classList.remove('active'))
+  document.querySelectorAll('.xp-slot').forEach(el => el.classList.remove('active'))
 }
 
 // ── Win display ───────────────────────────────────────────────────────────────
@@ -1046,7 +1057,7 @@ async function preprocessAssets() {
   await Promise.all(SYMS.map(async sym => {
     sym.src = await removeBg(sym._orig)
   }))
-  document.querySelectorAll('#legend img, #pt-sheet img').forEach(img => {
+  document.querySelectorAll('#xpanel .xp-img, #pt-sheet img').forEach(img => {
     const attr = img.getAttribute('src')
     const sym = SYMS.find(s => s._orig === attr)
     if (sym) img.src = sym.src

@@ -769,7 +769,7 @@
 </head>
 <body>
 <!-- ── Loading Screen ─────────────────────────────────────────── -->
-<div id="ls" style="position:fixed;inset:0;z-index:9999;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:32px;transition:opacity .5s">
+<div id="ls" style="position:fixed;inset:0;z-index:99999;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:32px;transition:opacity .5s;cursor:pointer" onclick="if(window._lsAud)window._lsAud.play().catch(()=>{})">
   <img src="/assets/hgames-logo.jpg" style="width:78%;max-width:340px;object-fit:contain">
   <div style="width:78%;max-width:340px">
     <div style="background:rgba(255,255,255,.1);border-radius:4px;height:5px;overflow:hidden">
@@ -777,7 +777,9 @@
     </div>
     <div id="ls-pct" style="text-align:center;color:rgba(255,255,255,.35);font-size:11px;letter-spacing:2px;margin-top:10px;font-family:monospace">0%</div>
   </div>
+  <div style="color:rgba(255,255,255,.22);font-size:10px;letter-spacing:3px;font-family:monospace;animation:ls-p 1.4s ease-in-out infinite">&#9654; TAP TO START</div>
 </div>
+<style>@keyframes ls-p{0%,100%{opacity:.15}50%{opacity:.6}}</style>
 <script>
 (function(){
   const VIDS=['/video/granny-betting-loop.mp4','/video/grany%20bg.mp4'];
@@ -785,13 +787,10 @@
   const bar=document.getElementById('ls-bar');
   const pct=document.getElementById('ls-pct');
   const snd=new Audio('/audio/H-GAMES%20provider.mp3');
+  window._lsAud=snd;
+  window._lsActive=true;
   snd.volume=0.85;
-  const _sp=snd.play();
-  if(_sp&&_sp.catch)_sp.catch(()=>{
-    const _r=()=>{snd.play().catch(()=>{})};
-    document.addEventListener('touchstart',_r,{once:true,passive:true});
-    document.addEventListener('click',_r,{once:true});
-  });
+  snd.play().catch(()=>{});
 
   const prog=VIDS.map(()=>[0,0]); // [loaded, total]
 
@@ -804,6 +803,7 @@
   }
 
   function finish(){
+    window._lsActive=false;
     bar.style.width='100%'; pct.textContent='100%';
     setTimeout(()=>{
       scr.style.opacity='0'; scr.style.pointerEvents='none';
@@ -1143,13 +1143,16 @@ function playGrannyWinSound() {
 let _bgm = null
 function initBGM() {
   if (_bgm) return
+  if (window._lsActive) return
+  document.removeEventListener('touchstart', initBGM)
+  document.removeEventListener('click', initBGM)
   _bgm = new Audio('/audio/' + encodeURIComponent('в стиле комп игры из 90х.mp3'))
   _bgm.loop = true
   _bgm.volume = 0.22
   _bgm.play().catch(() => {})
 }
-document.addEventListener('touchstart', initBGM, { once:true, passive:true })
-document.addEventListener('click',      initBGM, { once:true })
+document.addEventListener('touchstart', initBGM, { passive:true })
+document.addEventListener('click',      initBGM)
 
 // ── UI Sound Engine (Web Audio API) ──────────────────────────────────────────
 let _audioCtx = null
