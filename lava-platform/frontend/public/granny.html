@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#0a0a0c">
   <title>Granny Run — H-GAMES</title>
   <!-- Force Telegram WebView to bypass cache on stale versions -->
-  <script>if(!location.search.includes('v=45'))location.replace('/granny.html?v=45')</script>
+  <script>if(!location.search.includes('v=46'))location.replace('/granny.html?v=46')</script>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap');
@@ -260,10 +260,10 @@
     }
     .bet-footer::-webkit-scrollbar{display:none}
 
-    /* ── new panel.png (2000×1115) — pixel-perfect button layout ── */
+    /* ── new panel.png (2000×1113) — pixel-perfect button layout ── */
     .bet-panel{
       width:100%;
-      aspect-ratio:2000/1115;
+      aspect-ratio:2000/1113;
       position:relative;
       background:url('/assets/granny/new%20panel.png') center/100% 100% no-repeat;
       border:none;border-radius:0;padding:0;
@@ -279,21 +279,21 @@
     /* ── [−] and [+] top-corner square slots ────────────────── */
     .bps-minus,.bps-plus{
       position:absolute;
-      top:16.23%;height:11.84%;
+      top:16.26%;height:12.22%;
       background:transparent;border:none;
       color:transparent;font-size:0;cursor:pointer;
       -webkit-tap-highlight-color:transparent;
       touch-action:manipulation;
       transition:opacity .1s,transform .1s;
     }
-    .bps-minus{left:23.30%;width:7.25%}
-    .bps-plus {left:69.45%;width:7.30%}
+    .bps-minus{left:23.30%;width:7.30%}
+    .bps-plus {left:69.50%;width:7.35%}
     .bps-minus:active,.bps-plus:active{opacity:.5;transform:scale(.93)}
 
-    /* ── LED amount display ──────────────────────────────────── */
+    /* ── display input ───────────────────────────────────────── */
     .bps-amount{
       position:absolute;
-      left:33.85%;top:12.20%;width:32.35%;height:18.12%;
+      left:33.70%;top:12.22%;width:32.75%;height:19.05%;
       background:transparent;
       border:none;outline:none;
       color:#d4a435;
@@ -313,17 +313,17 @@
       -webkit-tap-highlight-color:transparent;
       z-index:10;touch-action:manipulation;
     }
-    .bps-q1  {left:19.20%;top:35.69%;width:13.00%;height:11.57%}
-    .bps-q5  {left:35.35%;top:35.69%;width:13.10%;height:11.57%}
-    .bps-q10 {left:51.55%;top:35.69%;width:13.10%;height:11.57%}
-    .bps-half{left:67.80%;top:35.69%;width:13.00%;height:11.84%}
+    .bps-q1  {left:19.20%;top:35.67%;width:13.05%;height:11.95%}
+    .bps-q5  {left:35.35%;top:35.67%;width:13.20%;height:11.77%}
+    .bps-q10 {left:51.60%;top:35.67%;width:13.15%;height:11.77%}
+    .bps-half{left:67.85%;top:35.67%;width:13.05%;height:11.95%}
     .bps-quick:active{opacity:.45;transform:scale(.94)}
     .bps-btn-img{display:block;width:100%;height:100%;object-fit:fill;pointer-events:none}
 
-    /* ── AUTO BET inset bar ──────────────────────────────────── */
+    /* ── AUTO BET bar ────────────────────────────────────────── */
     .bps-autobet{
       position:absolute;
-      left:32%;top:51%;width:36%;height:11%;
+      left:31.25%;top:51.48%;width:37.60%;height:11.41%;
       background:transparent;border:none;cursor:pointer;
       border-radius:8px;
       -webkit-tap-highlight-color:transparent;
@@ -335,7 +335,7 @@
 
     /* ── BET circle slot ─────────────────────────────────────── */
     .bet-panel .bp-btn-pair{
-      position:absolute;left:43.70%;top:64.30%;width:12.60%;
+      position:absolute;left:43.75%;top:64.24%;width:12.60%;
       aspect-ratio:1/1;z-index:5;
       display:none;align-items:center;justify-content:center;
     }
@@ -345,7 +345,7 @@
 
     /* Text BET/CASHOUT at circle slot */
     .bet-panel .bp-btn{
-      position:absolute!important;left:43.70%;top:64.30%;
+      position:absolute!important;left:43.75%;top:64.24%;
       width:12.60%!important;aspect-ratio:1/1;
       border-radius:50%!important;
       padding:0!important;margin:0;z-index:5;
@@ -358,12 +358,12 @@
     /* ── MIN  [BET]  MAX bottom row ──────────────────────────── */
     .bps-min,.bps-max{
       position:absolute;
-      top:69.87%;height:12.47%;
+      top:69.72%;height:12.76%;
       background:transparent;border:none;padding:0;cursor:pointer;
       -webkit-tap-highlight-color:transparent;touch-action:manipulation;
     }
-    .bps-min{left:24.85%;width:14.40%}
-    .bps-max{left:60.75%;width:14.40%}
+    .bps-min{left:24.90%;width:14.35%}
+    .bps-max{left:60.90%;width:14.40%}
     .bps-min:active,.bps-max:active{opacity:.5}
 
     /* ── Button press bounce animation ──────────────────────── */
