@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#0a0a0c">
   <title>Granny Run — H-GAMES</title>
   <!-- Force Telegram WebView to bypass cache on stale versions -->
-  <script>if(!location.search.includes('v=36'))location.replace('/granny.html?v=36')</script>
+  <script>if(!location.search.includes('v=37'))location.replace('/granny.html?v=37')</script>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap');
@@ -291,34 +291,34 @@
 
     .bps-amount{
       position:absolute;
-      left:17%;top:7%;width:66%;height:17%;
-      background:rgba(60,15,110,.78);border:none;outline:none;
-      border-radius:12px;
-      color:#e2d0ff;
+      left:15%;top:8.5%;width:70%;height:15%;
+      background:rgba(55,12,105,.82);border:none;outline:none;
+      border-radius:10px;
+      color:#ddc8ff;
       font-family:'Share Tech Mono',monospace;
-      font-size:clamp(14px,4vw,20px);font-weight:700;text-align:center;
+      font-size:clamp(13px,3.8vw,19px);font-weight:700;text-align:center;
       padding:0;-webkit-appearance:none;
-      box-shadow:inset 0 2px 8px rgba(0,0,0,.5);
+      box-shadow:inset 0 2px 10px rgba(0,0,0,.55);
     }
     .bps-amount::-webkit-inner-spin-button,
     .bps-amount::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
 
     /* ── Row 2: quick-amount buttons (+1 +5 +10 ½) ──────────── */
     .bps-quick{
-      position:absolute;top:27%;height:13%;
+      position:absolute;top:28%;height:12%;
       background:transparent;border:none;cursor:pointer;
       -webkit-tap-highlight-color:transparent;
     }
-    .bps-q1  {left:4%;   width:19.5%}
-    .bps-q5  {left:26%;  width:19.5%}
-    .bps-q10 {left:48%;  width:19.5%}
-    .bps-half{left:70%;  width:19.5%}
+    .bps-q1  {left:3.5%; width:20%}
+    .bps-q5  {left:26%;  width:20%}
+    .bps-q10 {left:48.5%;width:20%}
+    .bps-half{left:71%;  width:20%}
     .bps-quick:active{opacity:.45;transform:scale(.94)}
 
     /* ── Row 3: AUTO BET pill ────────────────────────────────── */
     .bps-autobet{
       position:absolute;
-      left:23%;top:42%;width:54%;height:9%;
+      left:24%;top:43%;width:52%;height:9%;
       background:transparent;border:none;cursor:pointer;
       border-radius:30px;
       -webkit-tap-highlight-color:transparent;
@@ -329,7 +329,7 @@
 
     /* ── BET circle slot ─────────────────────────────────────── */
     .bet-panel .bp-btn-pair{
-      position:absolute;left:43%;top:49%;width:14%;
+      position:absolute;left:43%;top:54%;width:14%;
       aspect-ratio:1/1;
       display:none;align-items:center;justify-content:center;
     }
@@ -339,7 +339,7 @@
 
     /* Text BET/CASHOUT button at circle position */
     .bet-panel .bp-btn{
-      position:absolute!important;left:43%;top:49%;
+      position:absolute!important;left:43%;top:54%;
       width:14%!important;aspect-ratio:1/1;
       border-radius:50%!important;
       padding:0!important;margin:0;
@@ -351,7 +351,7 @@
 
     /* ── Row 4: MIN  [circle]  MAX ───────────────────────────── */
     .bps-min,.bps-max{
-      position:absolute;top:53%;height:15%;
+      position:absolute;top:55%;height:15%;
       background:transparent;border:none;padding:0;cursor:pointer;
       -webkit-tap-highlight-color:transparent;
     }
