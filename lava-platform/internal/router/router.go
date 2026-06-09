@@ -156,6 +156,7 @@ func New(cfg *config.Config, infra *infrastructure.Infra, deps *Deps) *gin.Engin
 		admin.GET("/stats",                adm.Stats)
 		admin.POST("/deploy",              adm.Deploy)
 		admin.POST("/credit-all",          adm.CreditAll)
+		admin.POST("/credit-one",          adm.CreditOne)
 
 		// Gemini image + Veo video generation (admin-only, server-side key)
 		if cfg.Gemini.APIKey != "" {

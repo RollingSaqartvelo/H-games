@@ -201,6 +201,35 @@ func (h *Handler) Deploy(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"status": "ok", "message": "Deploy started — server will restart in ~2s", "log": log})
 }
 
+// CreditOne POST /admin/v1/credit-one → add balance to a specific player wallet
+func (h *Handler) CreditOne(c *gin.Context) {
+	var body struct {
+		PlayerID string  `json:"player_id"`
+		Amount   float64 `json:"amount"`
+	}
+	if err := c.ShouldBindJSON(&body); err != nil || body.PlayerID == "" || body.Amount <= 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "player_id and positive amount required"})
+		return
+	}
+
+	ctx, cancel := context.WithTimeout(c.Request.Context(), 5*time.Second)
+	defer cancel()
+
+	tag, err := h.db.Exec(ctx,
+		`UPDATE wallets SET balance = balance + $1, updated_at = NOW() WHERE user_id = $2`,
+		body.Amount, body.PlayerID,
+	)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	if tag.RowsAffected() == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"error": "wallet not found for player_id"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"player_id": body.PlayerID, "credited": body.Amount, "rows": tag.RowsAffected()})
+}
+
 // CreditAll POST /admin/v1/credit-all → add balance to all wallets
 func (h *Handler) CreditAll(c *gin.Context) {
 	var body struct {
