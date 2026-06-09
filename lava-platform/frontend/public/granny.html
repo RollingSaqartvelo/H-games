@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#0a0a0c">
   <title>Granny Run — H-GAMES</title>
   <!-- Force Telegram WebView to bypass cache on stale versions -->
-  <script>if(!location.search.includes('v=46'))location.replace('/granny.html?v=46')</script>
+  <script>if(!location.search.includes('v=47'))location.replace('/granny.html?v=47')</script>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap');
@@ -860,19 +860,19 @@
       <button class="bps-minus" onclick="stepAmount(0,-1)"></button>
       <input class="bps-amount" id="amount0" type="number" min="0.1" step="0.1" value="1.00" placeholder="0.00">
       <button class="bps-plus"  onclick="stepAmount(0,1)"></button>
-      <button class="bps-quick bps-q1"   onclick="addAmount(0,1)"><img src="/assets/betting/buttons/btn_plus_1.png" class="bps-btn-img" alt=""></button>
-      <button class="bps-quick bps-q5"   onclick="addAmount(0,5)"></button>
-      <button class="bps-quick bps-q10"  onclick="addAmount(0,10)"></button>
+      <button class="bps-quick bps-q1"   onclick="addAmount(0,1)"><img src="/assets/betting/buttons/Bet_1_plus.png" class="bps-btn-img" alt=""></button>
+      <button class="bps-quick bps-q5"   onclick="addAmount(0,5)"><img src="/assets/betting/buttons/bet_5_plus.png" class="bps-btn-img" alt=""></button>
+      <button class="bps-quick bps-q10"  onclick="addAmount(0,10)"><img src="/assets/betting/buttons/bet_10_plus.png" class="bps-btn-img" alt=""></button>
       <button class="bps-quick bps-half" onclick="halvAmount(0)"></button>
-      <button class="bps-autobet" id="btnAutoBetQ0" onclick="toggleAutoBet(0)"></button>
+      <button class="bps-autobet" id="btnAutoBetQ0" onclick="toggleAutoBet(0)"><img src="/assets/betting/buttons/auto%20bet.png" class="bps-btn-img" alt=""></button>
       <div class="bp-btn-pair" id="btnPair0">
         <button class="bp-slot-btn" id="btnSlot0" onclick="handleSlotBtn(0)">
           <img class="bp-slot-img" id="imgSlot0" src="/assets/betting/buttons/bet%20on.png?v=2" alt="BET" data-state="bet">
         </button>
       </div>
       <button class="bp-btn bp-btn-bet" id="btn0" onclick="handleBtn(0)">BET</button>
-      <button class="bps-min" onclick="setMinAmount(0)"></button>
-      <button class="bps-max" onclick="setMaxAmount(0)"></button>
+      <button class="bps-min" onclick="setMinAmount(0)"><img src="/assets/betting/buttons/MIN.png" class="bps-btn-img" alt=""></button>
+      <button class="bps-max" onclick="setMaxAmount(0)"><img src="/assets/betting/buttons/MAX.png" class="bps-btn-img" alt=""></button>
       <input type="number" id="cashout0" style="display:none">
       <div id="payout0" style="display:none"></div>
     </div>
@@ -882,19 +882,19 @@
       <button class="bps-minus" onclick="stepAmount(1,-1)"></button>
       <input class="bps-amount" id="amount1" type="number" min="0.1" step="0.1" value="1.00" placeholder="0.00">
       <button class="bps-plus"  onclick="stepAmount(1,1)"></button>
-      <button class="bps-quick bps-q1"   onclick="addAmount(1,1)"></button>
-      <button class="bps-quick bps-q5"   onclick="addAmount(1,5)"></button>
-      <button class="bps-quick bps-q10"  onclick="addAmount(1,10)"></button>
+      <button class="bps-quick bps-q1"   onclick="addAmount(1,1)"><img src="/assets/betting/buttons/Bet_1_plus.png" class="bps-btn-img" alt=""></button>
+      <button class="bps-quick bps-q5"   onclick="addAmount(1,5)"><img src="/assets/betting/buttons/bet_5_plus.png" class="bps-btn-img" alt=""></button>
+      <button class="bps-quick bps-q10"  onclick="addAmount(1,10)"><img src="/assets/betting/buttons/bet_10_plus.png" class="bps-btn-img" alt=""></button>
       <button class="bps-quick bps-half" onclick="halvAmount(1)"></button>
-      <button class="bps-autobet" id="btnAutoBetQ1" onclick="toggleAutoBet(1)"></button>
+      <button class="bps-autobet" id="btnAutoBetQ1" onclick="toggleAutoBet(1)"><img src="/assets/betting/buttons/auto%20bet.png" class="bps-btn-img" alt=""></button>
       <div class="bp-btn-pair" id="btnPair1">
         <button class="bp-slot-btn" id="btnSlot1" onclick="handleSlotBtn(1)">
           <img class="bp-slot-img" id="imgSlot1" src="/assets/betting/buttons/bet%20on.png?v=2" alt="BET" data-state="bet">
         </button>
       </div>
       <button class="bp-btn bp-btn-bet" id="btn1" onclick="handleBtn(1)">BET</button>
-      <button class="bps-min" onclick="setMinAmount(1)"></button>
-      <button class="bps-max" onclick="setMaxAmount(1)"></button>
+      <button class="bps-min" onclick="setMinAmount(1)"><img src="/assets/betting/buttons/MIN.png" class="bps-btn-img" alt=""></button>
+      <button class="bps-max" onclick="setMaxAmount(1)"><img src="/assets/betting/buttons/MAX.png" class="bps-btn-img" alt=""></button>
       <input type="number" id="cashout1" style="display:none">
       <div id="payout1" style="display:none"></div>
     </div>
