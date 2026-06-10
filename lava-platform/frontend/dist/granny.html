@@ -186,7 +186,7 @@
 
     /* ── Game area — compact premium panel ─────────────────── */
     .game-area{
-      flex:2 1 0;            /* 2/5 of the play area (screen) */
+      flex:5 1 0;            /* ~2.5/5 of the play area (bigger screen) */
       min-height:0;
       position:relative;
       margin:0;
@@ -260,7 +260,7 @@
 
     /* ── Bet footer ─────────────────────────────────────────── */
     .bet-footer{
-      flex:2 1 0;            /* 2/5 of the play area (two panels side by side) */
+      flex:3 1 0;            /* ~1.5/5 of the play area (two panels side by side) */
       min-height:0;
       overflow:hidden;       /* no scroll — panels are sized to fit */
       background:transparent;
@@ -277,7 +277,7 @@
 
     /* ── new new new.png (2000×1111) — pixel-perfect button layout ── */
     .bet-panel{
-      width:47%;                /* two panels side by side in the 2/5 band */
+      width:45%;                /* two panels side by side (fits the smaller band) */
       aspect-ratio:600/617;     /* matches the trimmed panel_new.png (панель 2) */
       position:relative;
       background:none;
@@ -647,7 +647,7 @@
 
     /* ── Lower Info Panel (stats — bottom 1/5) ──────────────── */
     .lip{
-      flex:1 1 0;
+      flex:2 1 0;
       min-height:0;
       margin:0 8px 8px;
       position:relative;
@@ -669,7 +669,7 @@
     .lip-corner--br{ bottom:2px;right:2px;transform:scale(-1,-1) }
     .lip-header{
       display:flex;align-items:center;gap:8px;
-      padding:10px 12px 0;
+      padding:6px 10px 0;
     }
     .lip-tabs{ display:flex;gap:3px;flex:1 }
     .lip-tab{
@@ -690,7 +690,7 @@
       color:rgba(212,164,53,.7);white-space:nowrap;
     }
     .lip-stats{
-      display:flex;gap:0;padding:8px 12px 6px;
+      display:flex;gap:0;padding:5px 10px 4px;
       border-bottom:1px solid rgba(181,134,13,.1);
     }
     .lip-stat{
