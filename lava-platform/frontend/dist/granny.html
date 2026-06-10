@@ -286,12 +286,12 @@
     .bps-quick:active,.bps-autobet:active{opacity:.4;transform:scale(.92)}
     .bps-btn-img{display:none}
 
-    /* ── Row 1: [−]  amount  [+] — y≈39–45% of panel ─────────── */
-    .bps-minus{left:3.6%;top:39.4%;width:16%;height:5.5%}
-    .bps-plus {left:80.5%;top:39.4%;width:16%;height:5.5%}
+    /* ── Row 1: [−]  amount  [+] — top 22% of panel ────────────── */
+    .bps-minus{left:4%;top:5%;width:30%;height:17%}
+    .bps-plus {left:66%;top:5%;width:30%;height:17%}
     .bps-amount{
       position:absolute;
-      left:22%;top:37%;width:54%;height:9%;
+      left:35%;top:5%;width:30%;height:17%;
       background:transparent;border:none;outline:none;
       color:#5c3d1e;
       font-family:'Share Tech Mono',monospace;
@@ -302,21 +302,21 @@
     .bps-amount::-webkit-inner-spin-button,
     .bps-amount::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
 
-    /* ── Row 2: MIN +1 +5 +10 MAX — y≈48–57% of panel ────────── */
-    .bps-min {left:3.6%; top:48.7%;width:14.4%;height:7.8%}
-    .bps-q1  {left:20.5%;top:48.7%;width:14.4%;height:7.8%}
-    .bps-q5  {left:37%;  top:48.7%;width:14.4%;height:7.8%}
-    .bps-q10 {left:53.4%;top:48.7%;width:14.4%;height:7.8%}
-    .bps-max {left:69.7%;top:48.7%;width:14.4%;height:7.8%}
+    /* ── Row 2: MIN +1 +5 +10 MAX — middle section ──────────────── */
+    .bps-min {left:1%;  top:39%;width:19%;height:25%}
+    .bps-q1  {left:21%; top:39%;width:15%;height:25%}
+    .bps-q5  {left:37%; top:39%;width:15%;height:25%}
+    .bps-q10 {left:53%; top:39%;width:15%;height:25%}
+    .bps-max {left:79%; top:39%;width:19%;height:25%}
     .bps-half{display:none}
     .bps-autobet{display:none}
 
-    /* ── BET / CASHOUT button — y≈65–86% of panel ────────────── */
+    /* ── BET / CASHOUT — pixel-exact over golden pill (y=79.7–98%) ─ */
     .bet-panel .bp-btn-pair{display:none!important}
     .bet-panel .bp-btn{
       position:absolute!important;
-      left:3.6%;top:65.9%;width:92%!important;height:20%!important;
-      aspect-ratio:unset!important;border-radius:12px!important;
+      left:6.7%;top:79.7%;width:86.4%!important;height:18.4%!important;
+      aspect-ratio:unset!important;border-radius:50px!important;
       background:transparent!important;box-shadow:none!important;
       color:transparent;
       font-family:'Rajdhani',sans-serif;
@@ -324,12 +324,14 @@
       display:flex!important;align-items:center;justify-content:center;
       touch-action:manipulation;cursor:pointer;border:none;padding:0!important;margin:0;
       transition:opacity .1s,transform .1s;
+      z-index:4;
     }
     .bet-panel .bp-btn:active{opacity:.45;transform:scale(.97)}
+    .bet-panel .bp-btn-bet{color:#fff!important}
+    .bet-panel .bp-btn-placed{color:rgba(255,255,255,.5)!important;background:transparent!important}
     .bet-panel .bp-btn-cashout{color:#15803d!important;background:rgba(21,128,61,.07)!important}
     .bet-panel .bp-btn-next-round{color:#92400e!important;animation:none!important;background:transparent!important}
     .bet-panel .bp-btn-cancel{color:#b91c1c!important;background:transparent!important}
-    .bet-panel .bp-btn-placed{color:rgba(92,61,30,.5)!important;background:transparent!important}
 
 
     /* ── Button press bounce animation ──────────────────────── */
@@ -530,7 +532,7 @@
     /* ── Lower Info Panel (stats — bottom 1/5) ──────────────── */
     .lip{
       position:absolute;
-      left:3.5%;top:77.5%;width:93%;
+      left:3.5%;top:79%;width:93%;
       margin:0;
       display:flex;flex-direction:column;
       /* Ivory + gold frame, matching the bet panel */
@@ -877,7 +879,7 @@
     <div class="bvb-wrap" id="bvbWrap" aria-hidden="true">
       <video
         id="bvbVideo"
-        src="/assets/granny/betting%20video%20gran.mp4"
+        src="/assets/granny/new.mp4"
         autoplay loop muted playsinline preload="auto"
         webkit-playsinline="true"
         style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center;display:block;background:#000"
@@ -1576,8 +1578,8 @@ function drawScene(ts) {
   }
 
   const gX = W * grannyX         // 0.82 — granny ahead (right)
-  // Doctor closes in X as multiplier rises: gap 0.55 → 0.15
-  const _prog = running ? Math.min((multiplier - 1) / 9, 1) : 0
+  // Doctor approaches only at high multiplier (>7x), stays put otherwise
+  const _prog = running ? Math.min(Math.max((multiplier - 7) / 8, 0), 1) : 0
   const dX = gX - W * (0.55 - _prog * 0.40)
 
   // ── Trajectory curve (under characters) ─────────────────────────────────
@@ -1777,7 +1779,7 @@ function showCountdown() {
   el.style.display = 'block'
   const tick = () => {
     if (roundState !== 'STARTING') { el.style.display='none'; return }
-    const rem = Math.max(0, 5 - (Date.now()-startedAt)/1000)
+    const rem = Math.max(0, 10 - (Date.now()-startedAt)/1000)
     document.getElementById('countdownVal').textContent = rem.toFixed(1)
     setTimeout(tick, 100)
   }

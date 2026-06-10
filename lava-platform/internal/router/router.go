@@ -71,7 +71,7 @@ func Wire(cfg *config.Config, infra *infrastructure.Infra) *Deps {
 	grannyHub := realtime.NewHub()
 	grannyCfg := roundEngine.DefaultConfig()
 	grannyCfg.GameType = "granny_run"
-	grannyCfg.BettingDuration = 5 * time.Second
+	grannyCfg.BettingDuration = 10 * time.Second
 	grannyEng := roundEngine.New(grannyCfg, rRepo, provider, grannyPub, grannyHub, locker)
 
 	// Bubble Gum
