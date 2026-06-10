@@ -262,6 +262,14 @@
       padding-bottom:max(env(safe-area-inset-bottom,8px),8px);
       position:relative;z-index:1;
       display:flex;flex-direction:column;gap:8px;
+      isolation:isolate;
+    }
+    .bet-footer::before{
+      content:'';
+      position:absolute;inset:0;
+      background:url('/assets/granny/bet%20bg.png') center/cover no-repeat;
+      z-index:-1;
+      pointer-events:none;
     }
     .bet-footer::-webkit-scrollbar{display:none}
 
