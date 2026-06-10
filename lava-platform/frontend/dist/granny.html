@@ -43,9 +43,14 @@
       height:100dvh;
       padding-top:env(safe-area-inset-top,0px);
       padding-bottom:env(safe-area-inset-bottom,0px);
-      background:url('/assets/granny/bet%20bg.png') center/cover no-repeat;
-      background-attachment:fixed;
+      background:none;
       position:relative;
+      overflow:hidden;
+      isolation:isolate;
+    }
+    .app-bg-video{
+      position:absolute;inset:0;width:100%;height:100%;
+      object-fit:cover;z-index:-1;pointer-events:none;
     }
 
     /* ── TopBar ─────────────────────────────────────────────── */
@@ -842,6 +847,9 @@
 </script>
 <!-- ── / Loading Screen ───────────────────────────────────────── -->
 <div class="app">
+  <video class="app-bg-video" autoplay muted loop playsinline>
+    <source src="/assets/granny/%D1%81%20%D1%83%D1%81%D0%BA%D0%BE%D1%80%D0%B5%D0%BD%D0%B8%D0%B5%D0%BC.mp4" type="video/mp4">
+  </video>
 
   <!-- TopBar -->
   <div class="topbar">
