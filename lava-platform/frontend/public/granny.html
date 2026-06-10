@@ -48,6 +48,10 @@
       overflow:hidden;
       isolation:isolate;
     }
+    .app-bg-video{
+      position:absolute;inset:0;width:100%;height:100%;
+      object-fit:cover;z-index:-1;pointer-events:none;
+    }
 
     /* ── TopBar ─────────────────────────────────────────────── */
     .topbar{
@@ -294,8 +298,8 @@
       touch-action:manipulation;
       transition:opacity .1s,transform .1s;
     }
-    .bps-minus{left:23.45%;top:16.92%;width:6.85%;height:10.98%}
-    .bps-plus {left:69.75%;top:16.65%;width:6.90%;height:11.34%}
+    .bps-minus{left:20.03%;top:11.43%;width:13.70%;height:21.96%}
+    .bps-plus {left:66.30%;top:10.98%;width:13.80%;height:22.68%}
     .bps-minus:active,.bps-plus:active{opacity:.5;transform:scale(.93)}
 
     /* ── display input ───────────────────────────────────────── */
@@ -843,7 +847,9 @@
 </script>
 <!-- ── / Loading Screen ───────────────────────────────────────── -->
 <div class="app">
-
+  <video class="app-bg-video" autoplay muted loop playsinline>
+    <source src="/assets/granny/%D1%81%20%D1%83%D1%81%D0%BA%D0%BE%D1%80%D0%B5%D0%BD%D0%B8%D0%B5%D0%BC.mp4" type="video/mp4">
+  </video>
 
   <!-- TopBar -->
   <div class="topbar">
