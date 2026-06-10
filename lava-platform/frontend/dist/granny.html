@@ -43,7 +43,7 @@
       height:100dvh;
       padding-top:env(safe-area-inset-top,0px);
       padding-bottom:env(safe-area-inset-bottom,0px);
-      background:none;
+      background:#2a1d12 url('/assets/granny/BG.jpeg') center/cover no-repeat;
       position:relative;
       overflow:hidden;
       isolation:isolate;
@@ -197,6 +197,12 @@
     /* ── Scene canvas ───────────────────────────────────────── */
     #scene{
       position:absolute;inset:0;width:100%;height:100%;
+    }
+    /* Fade the bottom of the broadcast screen into the BG.jpeg behind it —
+       no hard seam between the game screen and the panel background. */
+    #scene, .bvb-wrap{
+      -webkit-mask-image:linear-gradient(to bottom,#000 68%,transparent 100%);
+      mask-image:linear-gradient(to bottom,#000 68%,transparent 100%);
     }
 
     /* ── Multiplier center display ──────────────────────────── */
@@ -587,11 +593,11 @@
     .bet-panel .bps-minus{ left:9%;  top:22%; width:17%; height:14%; border-radius:18% }
     .bet-panel .bps-plus { left:74%; top:22%; width:17%; height:14%; border-radius:18% }
     .bet-panel .bps-amount{
-      left:30%; top:24.5%; width:40%; height:10%;
-      background:linear-gradient(180deg,#e9dcc1 0%,#ddccac 100%);
-      border-radius:50px;
-      box-shadow:inset 0 2px 5px rgba(120,90,40,.22);
-      color:#6f4d22; font-weight:700; letter-spacing:1px;
+      left:27.5%; top:23%; width:45%; height:12%;   /* fills the recess exactly */
+      background:linear-gradient(180deg,#d8c6a2 0%,#c9b58c 100%);   /* darker */
+      border-radius:60px;
+      box-shadow:inset 0 2px 7px rgba(110,80,35,.34);
+      color:#5e3f1c; font-weight:700; letter-spacing:1px;
     }
 
     /* Second row: MIN  +1  +5  +10  MAX */
@@ -640,14 +646,23 @@
       flex:1 1 0;
       min-height:0;
       margin:0 8px 8px;
+      position:relative;
       display:flex;flex-direction:column;
-      background:
-        radial-gradient(ellipse 70% 30% at 50% 0%,rgba(181,134,13,.06) 0%,transparent 60%),
-        linear-gradient(160deg,#131018 0%,#0f0f12 50%,#17171d 100%);
-      border:1.5px solid rgba(181,134,13,.25);
-      border-radius:20px;overflow:hidden;
-      box-shadow:0 0 0 1px rgba(181,134,13,.05),inset 0 0 40px rgba(0,0,0,.5);
+      /* Ivory + gold frame, matching the bet panel */
+      background:linear-gradient(160deg,#f6efdd 0%,#efe4ca 55%,#e7dabd 100%);
+      border:3px solid #c9a44e;
+      border-radius:22px;overflow:hidden;
+      box-shadow:0 0 0 1.5px #9a7b2e, inset 0 0 0 2px #f3e6c2, inset 0 2px 12px rgba(120,90,40,.18);
     }
+    /* Gold corner ornaments cut from the panel art (mirrored into 4 corners) */
+    .lip-corner{
+      position:absolute;width:46px;height:36px;z-index:2;pointer-events:none;
+      background:url('/assets/granny/corner.png') center/contain no-repeat;
+    }
+    .lip-corner--tl{ top:2px;left:2px }
+    .lip-corner--tr{ top:2px;right:2px;transform:scaleX(-1) }
+    .lip-corner--bl{ bottom:2px;left:2px;transform:scaleY(-1) }
+    .lip-corner--br{ bottom:2px;right:2px;transform:scale(-1,-1) }
     .lip-header{
       display:flex;align-items:center;gap:8px;
       padding:10px 12px 0;
@@ -741,6 +756,24 @@
       font-family:'Rajdhani',sans-serif;font-size:9px;font-weight:600;
       color:rgba(212,164,53,.25);letter-spacing:1px;
     }
+
+    /* ── Ivory theme for the stats panel (dark text on cream) ── */
+    .lip-tab{ color:#8a6230; border-color:rgba(150,110,40,.4) }
+    .lip-tab--active{
+      background:linear-gradient(180deg,#f0892a 0%,#df6c16 100%);
+      border-color:#c9651a; color:#fff7ec;
+      box-shadow:0 1px 4px rgba(150,70,10,.3);
+    }
+    .lip-pill{ background:rgba(150,110,40,.12); border-color:rgba(150,110,40,.35); color:#8a6230 }
+    .lip-stats{ border-bottom-color:rgba(150,110,40,.28) }
+    .lip-stat{ border-right-color:rgba(150,110,40,.22) }
+    .lip-stat-lbl{ color:#9a7338 }
+    .lip-stat-val{ color:#5e3f1c }
+    .lip-row{ border-bottom-color:rgba(150,110,40,.16) }
+    .lip-name{ color:#6b4a22 }
+    .lip-bet{ color:#8a6e44 }
+    .lip-mult{ color:#5e3f1c }
+    .lip-empty{ color:rgba(120,90,40,.55) }
 
     /* ── No session ─────────────────────────────────────────── */
     .no-session{
@@ -915,9 +948,7 @@
 </script>
 <!-- ── / Loading Screen ───────────────────────────────────────── -->
 <div class="app">
-  <video class="app-bg-video" autoplay muted loop playsinline>
-    <source src="/assets/granny/%D1%81%20%D1%83%D1%81%D0%BA%D0%BE%D1%80%D0%B5%D0%BD%D0%B8%D0%B5%D0%BC.mp4" type="video/mp4">
-  </video>
+  <!-- background video removed — app uses BG.jpeg as the static background -->
 
   <!-- TopBar -->
   <div class="topbar">
@@ -1049,6 +1080,10 @@
 
     <!-- ── Lower Info Panel ──────────────────────────────────── -->
     <div class="lip" id="lip">
+      <span class="lip-corner lip-corner--tl"></span>
+      <span class="lip-corner lip-corner--tr"></span>
+      <span class="lip-corner lip-corner--bl"></span>
+      <span class="lip-corner lip-corner--br"></span>
       <div class="lip-header">
         <div class="lip-tabs">
           <button class="lip-tab lip-tab--active" id="lipTabAll" onclick="lipSetTab('all')">ALL</button>
