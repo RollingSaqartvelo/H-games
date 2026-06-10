@@ -192,8 +192,15 @@
       margin:0;
       background:transparent;
       overflow:hidden;
+      border-radius:0 0 20px 20px;
     }
     .game-area--betting{ height:360px; }
+    .game-area::after{
+      content:'';
+      position:absolute;bottom:0;left:0;right:0;height:48px;
+      background:linear-gradient(to bottom,transparent,rgba(0,0,0,0.45));
+      pointer-events:none;z-index:10;
+    }
 
     /* ── Scene canvas ───────────────────────────────────────── */
     #scene{
@@ -529,8 +536,8 @@
 
     /* ── Main Buttons ────────────────────────────────────────── */
     .bp-btn{
-      width:100%;padding:16px;border-radius:20px;
-      font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;letter-spacing:2px;
+      width:100%;padding:24px;border-radius:26px;
+      font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;letter-spacing:2px;
       cursor:pointer;transition:all .15s;
     }
     .bp-btn:not(:disabled):active{ transform:scale(.98) }
@@ -959,6 +966,7 @@
       <button class="bp-btn bp-btn-bet" id="btn0" onclick="handleBtn(0)">BET</button>
       <button class="bps-min" onclick="setMinAmount(0)"><img src="/assets/betting/buttons/min.png" class="bps-btn-img" alt=""></button>
       <button class="bps-max" onclick="setMaxAmount(0)"><img src="/assets/betting/buttons/max.png" class="bps-btn-img" alt=""></button>
+      <button class="bps-autobet" onclick="toggleAutoBet(0)" aria-label="Auto Bet"></button>
       <input type="number" id="cashout0" style="display:none">
       <div id="payout0" style="display:none"></div>
     </div>
@@ -980,6 +988,7 @@
       <button class="bp-btn bp-btn-bet" id="btn1" onclick="handleBtn(1)">BET</button>
       <button class="bps-min" onclick="setMinAmount(1)"><img src="/assets/betting/buttons/min.png" class="bps-btn-img" alt=""></button>
       <button class="bps-max" onclick="setMaxAmount(1)"><img src="/assets/betting/buttons/max.png" class="bps-btn-img" alt=""></button>
+      <button class="bps-autobet" onclick="toggleAutoBet(1)" aria-label="Auto Bet"></button>
       <input type="number" id="cashout1" style="display:none">
       <div id="payout1" style="display:none"></div>
     </div>
@@ -1600,7 +1609,7 @@ function drawScene(ts) {
   ctx.save()
   ctx.translate(dX, doctorY + doctorOsc)
   if (doctorImgReady) {
-    const dw = doctorImg.naturalWidth * 0.524, dh = doctorImg.naturalHeight * 0.524
+    const dw = doctorImg.naturalWidth * 0.419, dh = doctorImg.naturalHeight * 0.419
     ctx.drawImage(doctorImg, -dw / 2, -dh / 2, dw, dh)
   } else {
     ctx.font='32px serif'; ctx.textAlign='center'; ctx.textBaseline='middle'
@@ -1617,7 +1626,7 @@ function drawScene(ts) {
     ctx.scale(s, s)
   }
   if (grannyImgReady && (!crashed || crashP < 1)) {
-    const gw = grannyImg.naturalWidth * 0.524, gh = grannyImg.naturalHeight * 0.524
+    const gw = grannyImg.naturalWidth * 0.419, gh = grannyImg.naturalHeight * 0.419
     ctx.drawImage(grannyImg, -gw / 2, -gh / 2, gw, gh)
   } else if (!grannyImgReady) {
     ctx.font='36px serif'; ctx.textAlign='center'; ctx.textBaseline='middle'
