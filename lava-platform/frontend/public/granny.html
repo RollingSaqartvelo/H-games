@@ -43,10 +43,18 @@
       height:100dvh;
       padding-top:env(safe-area-inset-top,0px);
       padding-bottom:env(safe-area-inset-bottom,0px);
-      background:#2a1d12 url('/assets/granny/BG.jpeg') center/cover no-repeat;
+      background:#2a1d12;
       position:relative;
-      overflow:hidden;
+      overflow-y:auto;overflow-x:hidden;
       isolation:isolate;
+    }
+    /* ── Gran Panel — full UI skin ───────────────────────────── */
+    .gran-panel{
+      width:100%;
+      aspect-ratio:893/1600;
+      position:relative;
+      background:url('/assets/granny/new%20gran%20panel.jpeg') center/100% 100% no-repeat;
+      flex-shrink:0;
     }
     .app-bg-video{
       position:absolute;inset:0;width:100%;height:100%;
@@ -186,24 +194,13 @@
 
     /* ── Game area — compact premium panel ─────────────────── */
     .game-area{
-      flex:5 1 0;            /* ~2.5/5 of the play area (bigger screen) */
-      min-height:0;
-      position:relative;
-      margin:0;
-      background:transparent;
+      position:absolute;
+      left:5.15%;top:6.50%;
+      width:89.81%;height:35.75%;
       overflow:hidden;
-      border-radius:26px;     /* rounded broadcast screen */
-      /* very subtle feather on all edges so the seams fade just a touch */
-      -webkit-mask-image:
-        linear-gradient(to right,  transparent 0, #000 2.5%, #000 97.5%, transparent 100%),
-        linear-gradient(to bottom, transparent 0, #000 2%,   #000 98%,   transparent 100%);
-      -webkit-mask-composite:source-in;
-      mask-image:
-        linear-gradient(to right,  transparent 0, #000 2.5%, #000 97.5%, transparent 100%),
-        linear-gradient(to bottom, transparent 0, #000 2%,   #000 98%,   transparent 100%);
-      mask-composite:intersect;
+      background:transparent;
     }
-    .game-area--betting{ }   /* fixed 40/40/20 layout — game keeps its 2/5 height */
+    .game-area--betting{}
     /* ── Scene canvas ───────────────────────────────────────── */
     #scene{
       position:absolute;inset:0;width:100%;height:100%;
@@ -259,123 +256,79 @@
     @keyframes crashPulse{0%{transform:scale(1.4)}100%{transform:scale(1)}}
 
     /* ── Bet footer ─────────────────────────────────────────── */
-    .bet-footer{
-      flex:3 1 0;            /* ~1.5/5 of the play area (two panels side by side) */
-      min-height:0;
-      overflow:hidden;       /* no scroll — panels are sized to fit */
-      background:transparent;
-      border-top:none;
-      padding:6px 8px;
-      position:relative;z-index:1;
-      display:flex;flex-direction:row;align-items:center;justify-content:center;gap:3%;
-      isolation:isolate;
-    }
-    .bet-footer::before{
-      display:none;   /* transparent background behind the panels */
-    }
-    .bet-footer::-webkit-scrollbar{display:none}
+    /* ── Bet footer — dissolved, children absolute in gran-panel ── */
+    .bet-footer{ display:contents; }
 
-    /* ── new new new.png (2000×1111) — pixel-perfect button layout ── */
+    /* ── Bet panels — transparent overlays on gran-panel ──────── */
     .bet-panel{
-      width:45%;                /* two panels side by side (fits the smaller band) */
-      aspect-ratio:600/617;     /* matches the trimmed panel_new.png (панель 2) */
-      position:relative;
-      background:none;
-      border:none;border-radius:0;padding:0;
-      overflow:visible;flex-shrink:0;
-      box-shadow:none;
-      transform:translateZ(0);-webkit-transform:translateZ(0);
-      transition:box-shadow .3s;
-      margin-top:0;
-    }
-    .bet-panel::before{
-      content:'';
-      position:absolute;inset:0;
-      background:url('/assets/betting/buttons/panel_new.png') center/100% 100% no-repeat;
-      opacity:1;
-      z-index:-1;
-      pointer-events:none;
-    }
-    .bet-panel.active-bet{ box-shadow:0 0 20px rgba(120,40,200,.3) }
-    .bet-panel.crashed-bet{ box-shadow:0 0 14px rgba(239,68,68,.25) }
-
-    /* ── [−] and [+] top-corner square slots ────────────────── */
-    .bps-minus,.bps-plus{
       position:absolute;
-      background:transparent;border:none;padding:0;overflow:hidden;
-      color:transparent;font-size:0;cursor:pointer;
-      -webkit-tap-highlight-color:transparent;
+      background:none!important;
+      border:none;padding:0;margin:0;
+      display:none;
+    }
+    .bet-panel::before{ display:none!important; }
+    #panel0.bet-panel{ left:4.03%;top:43.38%;width:43.67%;height:32%; }
+    #panel1.bet-panel{ left:52.41%;top:43.38%;width:43.89%;height:32%; }
+    .bet-panel.active-bet{}
+    .bet-panel.crashed-bet{}
+
+    /* ── Gran-panel button base ──────────────────────────────── */
+    .bps-minus,.bps-plus,.bps-min,.bps-max,.bps-quick,.bps-autobet{
+      position:absolute;
+      background:transparent;border:none;padding:0;
+      color:transparent;font-size:0;
+      cursor:pointer;-webkit-tap-highlight-color:transparent;
       touch-action:manipulation;
       transition:opacity .1s,transform .1s;
     }
-    .bps-minus{left:16.61%;top:11.43%;width:20.55%;height:21.96%}
-    .bps-plus {left:62.85%;top:10.98%;width:20.70%;height:22.68%}
-    .bps-minus:active,.bps-plus:active{opacity:.5;transform:scale(.93)}
+    .bps-minus:active,.bps-plus:active,.bps-min:active,.bps-max:active,
+    .bps-quick:active,.bps-autobet:active{opacity:.4;transform:scale(.92)}
+    .bps-btn-img{display:none}
 
-    /* ── display input ───────────────────────────────────────── */
+    /* ── Row 1: [−]  amount  [+] — y≈39–45% of panel ─────────── */
+    .bps-minus{left:3.6%;top:39.4%;width:16%;height:5.5%}
+    .bps-plus {left:80.5%;top:39.4%;width:16%;height:5.5%}
     .bps-amount{
       position:absolute;
-      left:33.70%;top:12.22%;width:32.75%;height:19.05%;
-      background:transparent;
-      border:none;outline:none;
-      color:#d4a435;
+      left:22%;top:37%;width:54%;height:9%;
+      background:transparent;border:none;outline:none;
+      color:#5c3d1e;
       font-family:'Share Tech Mono',monospace;
-      font-size:clamp(13px,3.5vw,20px);font-weight:700;text-align:center;
-      padding:0;-webkit-appearance:none;
-      letter-spacing:2px;
+      font-size:clamp(11px,3.5vw,18px);font-weight:700;text-align:center;
+      padding:0;-webkit-appearance:none;letter-spacing:1px;
+      z-index:5;
     }
     .bps-amount::-webkit-inner-spin-button,
     .bps-amount::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
 
-    /* ── 4 rectangular quick-amount slots ───────────────────── */
-    .bps-quick{
-      position:absolute;
-      background:transparent;border:none;cursor:pointer;
-      padding:0;overflow:hidden;
-      -webkit-tap-highlight-color:transparent;
-      z-index:10;touch-action:manipulation;
-    }
-    .bps-q1  {left:19.35%;top:36.18%;width:12.65%;height:10.80%}
-    .bps-q5  {left:35.55%;top:36.18%;width:12.75%;height:10.80%}
-    .bps-q10 {left:51.80%;top:36.18%;width:12.75%;height:10.71%}
-    .bps-half{left:68.05%;top:36.27%;width:12.70%;height:10.44%}
-    .bps-quick:active{opacity:.45;transform:scale(.94)}
-    .bps-btn-img{display:block;width:100%;height:100%;object-fit:fill;pointer-events:none}
+    /* ── Row 2: MIN +1 +5 +10 MAX — y≈48–57% of panel ────────── */
+    .bps-min {left:3.6%; top:48.7%;width:14.4%;height:7.8%}
+    .bps-q1  {left:20.5%;top:48.7%;width:14.4%;height:7.8%}
+    .bps-q5  {left:37%;  top:48.7%;width:14.4%;height:7.8%}
+    .bps-q10 {left:53.4%;top:48.7%;width:14.4%;height:7.8%}
+    .bps-max {left:69.7%;top:48.7%;width:14.4%;height:7.8%}
+    .bps-half{display:none}
+    .bps-autobet{display:none}
 
-    /* ── AUTO BET bar ────────────────────────────────────────── */
-    .bps-autobet{
-      position:absolute;
-      left:31.25%;top:51.48%;width:37.60%;height:11.41%;
-      background:transparent;border:none;cursor:pointer;
-      border-radius:8px;
-      -webkit-tap-highlight-color:transparent;
-      transition:background .2s;
-      z-index:10;touch-action:manipulation;
-    }
-    .bps-autobet.on{background:rgba(110,30,200,.45)}
-    .bps-autobet:active{opacity:.6}
-
-    /* ── BET circle slot ─────────────────────────────────────── */
-    .bet-panel .bp-btn-pair{
-      position:absolute;left:45.05%;top:66.79%;width:10.00%;
-      aspect-ratio:1/1;z-index:5;
-      display:none;align-items:center;justify-content:center;
-    }
-    .bet-panel .bp-btn-pair.visible{display:flex}
-    .bet-panel .bp-slot-btn{width:100%;height:100%;border:none;background:none;padding:0;cursor:pointer;touch-action:manipulation}
-    .bet-panel .bp-slot-img{width:100%;height:100%;object-fit:contain;transition:opacity .15s,transform .15s}
-
-    /* Text BET/CASHOUT at circle slot */
+    /* ── BET / CASHOUT button — y≈65–86% of panel ────────────── */
+    .bet-panel .bp-btn-pair{display:none!important}
     .bet-panel .bp-btn{
-      position:absolute!important;left:45.05%;top:66.79%;
-      width:10.00%!important;aspect-ratio:1/1;
-      border-radius:50%!important;
-      padding:0!important;margin:0;z-index:5;
+      position:absolute!important;
+      left:3.6%;top:65.9%;width:92%!important;height:20%!important;
+      aspect-ratio:unset!important;border-radius:12px!important;
+      background:transparent!important;box-shadow:none!important;
+      color:transparent;
       font-family:'Rajdhani',sans-serif;
-      font-size:9px;font-weight:700;letter-spacing:.4px;
-      display:flex;align-items:center;justify-content:center;
-      text-align:center;touch-action:manipulation;
+      font-size:clamp(14px,3.5vw,22px)!important;font-weight:700;letter-spacing:3px;
+      display:flex!important;align-items:center;justify-content:center;
+      touch-action:manipulation;cursor:pointer;border:none;padding:0!important;margin:0;
+      transition:opacity .1s,transform .1s;
     }
+    .bet-panel .bp-btn:active{opacity:.45;transform:scale(.97)}
+    .bet-panel .bp-btn-cashout{color:#15803d!important;background:rgba(21,128,61,.07)!important}
+    .bet-panel .bp-btn-next-round{color:#92400e!important;animation:none!important;background:transparent!important}
+    .bet-panel .bp-btn-cancel{color:#b91c1c!important;background:transparent!important}
+    .bet-panel .bp-btn-placed{color:rgba(92,61,30,.5)!important;background:transparent!important}
 
     /* ── MIN  [BET]  MAX bottom row ──────────────────────────── */
     .bps-min,.bps-max{
@@ -647,10 +600,9 @@
 
     /* ── Lower Info Panel (stats — bottom 1/5) ──────────────── */
     .lip{
-      flex:2 1 0;
-      min-height:0;
-      margin:0 8px 8px;
-      position:relative;
+      position:absolute;
+      left:3.5%;top:77.5%;width:93%;
+      margin:0;
       display:flex;flex-direction:column;
       /* Ivory + gold frame, matching the bet panel */
       background:linear-gradient(160deg,#f6efdd 0%,#efe4ca 55%,#e7dabd 100%);
@@ -781,8 +733,9 @@
 
     /* ── No session ─────────────────────────────────────────── */
     .no-session{
+      position:absolute;left:4%;top:45%;width:92%;
       text-align:center;padding:16px;
-      font-family:'Courier New',monospace;font-size:11px;color:var(--muted);
+      font-family:'Courier New',monospace;font-size:11px;color:#7a5c3a;
     }
 
     /* ── Social cashout ticker ───────────────────────────────── */
@@ -984,6 +937,9 @@
     </button>
   </div>
 
+  <!-- Gran panel (background image + all game UI inside) -->
+  <div class="gran-panel">
+
   <!-- Game area -->
   <div class="game-area">
     <canvas id="scene"></canvas>
@@ -992,7 +948,7 @@
     <div class="bvb-wrap" id="bvbWrap" aria-hidden="true">
       <video
         id="bvbVideo"
-        src="/video/granny-betting-loop.mp4"
+        src="/assets/granny/new%20preview%20video.mp4"
         autoplay loop muted playsinline preload="auto"
         webkit-playsinline="true"
         style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;display:block"
@@ -1113,6 +1069,8 @@
       <div class="lip-list" id="lipList"></div>
     </div>
 
+  </div><!-- /.gran-panel -->
+
   <!-- Win overlays -->
   <div class="gywi gywi--a" id="gywi0" aria-hidden="true">
     <div class="gywi__inner">
@@ -1215,7 +1173,7 @@ let crashAnimT = 0  // 0→1.5s crash spin/shrink timer
 
 // ── Background video ──────────────────────────────────────────────────────────
 const bgVid = document.createElement('video')
-bgVid.src = '/assets/granny/%D1%81%20%D1%83%D1%81%D0%BA%D0%BE%D1%80%D0%B5%D0%BD%D0%B8%D0%B5%D0%BC.mp4'
+bgVid.src = '/assets/granny/NEW%20GRAN%20BG.mp4'
 bgVid.loop = true
 bgVid.muted = true
 bgVid.playsInline = true
