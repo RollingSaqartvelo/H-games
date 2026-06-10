@@ -199,6 +199,7 @@
       width:89.81%;height:35.75%;
       overflow:hidden;
       background:transparent;
+      border-radius:4%;
     }
     .game-area--betting{}
     /* ── Scene canvas ───────────────────────────────────────── */
@@ -330,15 +331,6 @@
     .bet-panel .bp-btn-cancel{color:#b91c1c!important;background:transparent!important}
     .bet-panel .bp-btn-placed{color:rgba(92,61,30,.5)!important;background:transparent!important}
 
-    /* ── MIN  [BET]  MAX bottom row ──────────────────────────── */
-    .bps-min,.bps-max{
-      position:absolute;
-      background:transparent;border:none;padding:0;overflow:hidden;cursor:pointer;
-      -webkit-tap-highlight-color:transparent;touch-action:manipulation;
-    }
-    .bps-min{left:19.10%;top:64.90%;width:26.81%;height:21.96%}
-    .bps-max{left:54.20%;top:64.90%;width:26.81%;height:21.96%}
-    .bps-min:active,.bps-max:active{opacity:.5}
 
     /* ── Button press bounce animation ──────────────────────── */
     @keyframes btn-bounce {
@@ -534,69 +526,6 @@
       50%    { box-shadow:0 0 36px rgba(181,134,13,.75),0 0 60px rgba(181,134,13,.2) }
     }
 
-    /* ════════════════════════════════════════════════════════════════
-       NEW PANEL (панель 2 → panel_new.png): the art is baked in. Each
-       control is a transparent hit-area placed over its drawn button.
-       The amount field and the BET button are opaque overlays (their
-       content changes): amount covers the baked "1.00"; BET sits in the
-       empty bottom pill and shows BET / NEXT ROUND BET / CASH OUT.
-       Coordinates measured from the asset (% of the panel). No CANCEL.
-       ════════════════════════════════════════════════════════════════ */
-    .bet-panel .bps-btn-img{ display:none }              /* button art is baked in */
-    .bet-panel .bps-half,
-    .bet-panel .bps-autobet{ display:none }              /* not present in the new art */
-
-    /* Top row: [−] [1.00] [+] */
-    .bet-panel .bps-minus{ left:9%;  top:22%; width:17%; height:14%; border-radius:18% }
-    .bet-panel .bps-plus { left:74%; top:22%; width:17%; height:14%; border-radius:18% }
-    .bet-panel .bps-amount{
-      left:27.5%; top:23%; width:45%; height:12%;   /* fills the recess exactly */
-      background:linear-gradient(180deg,#d8c6a2 0%,#c9b58c 100%);   /* darker */
-      border-radius:60px;
-      box-shadow:inset 0 2px 7px rgba(110,80,35,.34);
-      color:#5e3f1c; font-weight:700; letter-spacing:1px;
-    }
-
-    /* Second row: MIN  +1  +5  +10  MAX */
-    .bet-panel .bps-min{ left:9.5%; top:46%;   width:19%;   height:10.5%; border-radius:22% }
-    .bet-panel .bps-q1 { left:29.5%;top:46%;   width:13%;   height:10.5%; border-radius:50% }
-    .bet-panel .bps-q5 { left:43.5%;top:46%;   width:13%;   height:10.5%; border-radius:50% }
-    .bet-panel .bps-q10{ left:57%;  top:46%;   width:13.5%; height:10.5%; border-radius:50% }
-    .bet-panel .bps-max{ left:72%;  top:46.5%; width:18%;   height:9.5%;  border-radius:28% }
-
-    /* Bottom pill: BET / NEXT ROUND BET / CASH OUT (image slot unused) */
-    .bet-panel .bp-btn-pair{ display:none !important }
-    .bet-panel .bp-btn{
-      left:30% !important; top:72.5% !important;
-      width:40% !important; height:13.5% !important;
-      aspect-ratio:auto !important;
-      border-radius:50px !important;
-      padding:0 !important;
-      display:flex !important; align-items:center; justify-content:center;
-      font-size:clamp(11px,3.2vw,17px) !important; letter-spacing:.5px !important; line-height:1;
-    }
-    .bet-panel .bp-btn-bet{
-      background:linear-gradient(180deg,#f0892a 0%,#df6c16 100%);
-      border:1px solid rgba(150,70,10,.5); color:#fff7ec;
-      box-shadow:0 2px 6px rgba(150,70,10,.35), inset 0 1px 0 rgba(255,220,160,.5);
-    }
-    /* Disabled states must stay OPAQUE — the bottom pill is a baked hole,
-       so any transparency would reveal the checkerboard behind the button. */
-    .bet-panel .bp-btn:disabled{
-      opacity:1 !important;
-      background:linear-gradient(180deg,#b89a6a 0%,#9c7e4e 100%) !important;
-      color:#fff4e4 !important; box-shadow:none !important; cursor:default;
-    }
-    .bet-panel .bp-btn-cashout{ font-size:clamp(11px,3vw,16px) !important }
-    .bet-panel .bp-btn-next-round{ font-size:clamp(8px,2.3vw,12px) !important; letter-spacing:0 !important }
-
-    /* Press feedback — darken + push the pressed control */
-    .bet-panel .bps-minus, .bet-panel .bps-plus,
-    .bet-panel .bps-min,   .bet-panel .bps-max,
-    .bet-panel .bps-quick{ transition:background .07s, transform .07s }
-    .bet-panel .bps-minus:active, .bet-panel .bps-plus:active,
-    .bet-panel .bps-min:active,   .bet-panel .bps-max:active,
-    .bet-panel .bps-quick:active{ background:rgba(80,45,5,.22); transform:scale(.9) }
 
     /* ── Lower Info Panel (stats — bottom 1/5) ──────────────── */
     .lip{
@@ -951,7 +880,7 @@
         src="/assets/granny/betting%20video%20gran.mp4"
         autoplay loop muted playsinline preload="auto"
         webkit-playsinline="true"
-        style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;display:block"
+        style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center;display:block;background:#000"
       ></video>
       <!-- Fallback static image if video fails -->
       <img
