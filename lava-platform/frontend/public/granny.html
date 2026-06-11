@@ -53,7 +53,7 @@
       width:100%;
       aspect-ratio:893/1600;
       position:relative;
-      background:url('/assets/granny/new%20gran%20panel.jpeg?v=9') center/100% 100% no-repeat;
+      background:url('/assets/granny/new%20gran%20panel.jpeg?v=10') center/100% 100% no-repeat;
       flex-shrink:0;
     }
     /* hide remaining overlays not yet used (kept in DOM, not removed) */
@@ -71,7 +71,7 @@
       padding:0 14px;
       background:rgba(13,28,24,.98);
       border-bottom:1px solid rgba(70,232,154,.20);
-      z-index:10;
+      position:sticky;top:0;z-index:60;
     }
     .topbar-logo{font-family:'Cinzel',serif;font-size:12px;letter-spacing:3px;color:#5fe0b4;text-transform:uppercase;text-shadow:0 0 10px rgba(70,232,154,.45)}
     .topbar-back{background:none;border:1px solid rgba(70,232,154,.35);border-radius:6px;color:#5fe0b4;font-size:16px;line-height:1;padding:2px 7px 3px;cursor:pointer;flex-shrink:0}
@@ -197,14 +197,18 @@
     /* ── Game area — compact premium panel ─────────────────── */
     .game-area{
       position:absolute;
-      /* centered inside the screen frame of new gran panel.jpeg
-         (frame x31-861, y127-827 → inset to interior, center 446/477) */
       left:4.26%;top:8.38%;
       width:91.38%;height:42.88%;
       overflow:hidden;
-      background:transparent;
-      border-radius:4%;
+      background:#0a1714;
+      border-radius:18px;
+      border:1.5px solid rgba(120,205,175,.35);
+      box-shadow:0 6px 20px rgba(0,0,0,.35), inset 0 0 0 1px rgba(255,255,255,.04);
+      will-change:top,height,width;
+      z-index:50;
     }
+    /* collapsed thin-oval state (scroll-driven) */
+    .game-area.collapsed{ box-shadow:0 4px 14px rgba(0,0,0,.45); }
     .game-area--betting{}
     /* ── Scene canvas ───────────────────────────────────────── */
     #scene{
@@ -983,7 +987,7 @@
         src="/assets/granny/new.mp4"
         autoplay loop muted playsinline preload="auto"
         webkit-playsinline="true"
-        style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center;display:block;background:#000"
+        style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;display:block;background:#000"
       ></video>
       <!-- Fallback static image if video fails -->
       <img
@@ -2491,6 +2495,45 @@ connectWS()
 // Show betting video immediately on load (CREATED state)
 bvbOnStateChange('CREATED')
 updateMultVis()
+
+/* ── Collapsing game screen on scroll (Lucky-Jet style) ── */
+(function(){
+  const app = document.querySelector('.app');
+  const topbar = document.querySelector('.topbar');
+  const gp = document.querySelector('.gran-panel');
+  const stage = document.querySelector('.game-area');
+  if(!app || !gp || !stage) return;
+  const MIN_H = 58;          // collapsed strip height (px)
+  const COLLAPSE_W = 0.64;   // collapsed width as fraction of full
+  let ticking = false;
+  function apply(){
+    ticking = false;
+    const r = gp.getBoundingClientRect();
+    const pin = topbar ? topbar.getBoundingClientRect().bottom : 0;
+    const natLeft = r.left + 0.0426*r.width;
+    const natTop  = r.top  + 0.0838*r.height;
+    const natW    = 0.9138*r.width;
+    const natH    = 0.4288*r.height;
+    let top = natTop, c = 0;
+    if (natTop < pin){
+      top = pin;
+      c = Math.min((pin - natTop) / Math.max(natH - MIN_H, 1), 1);
+    }
+    const h = natH - (natH - MIN_H)*c;
+    const w = natW - natW*(1 - COLLAPSE_W)*c;
+    const left = natLeft + (natW - w)/2;
+    const s = stage.style;
+    s.position = 'fixed';
+    s.left = left+'px'; s.top = top+'px';
+    s.width = w+'px'; s.height = h+'px';
+    s.borderRadius = (18 + c*42)+'px';
+    stage.classList.toggle('collapsed', c > 0.03);
+  }
+  function onScroll(){ if(!ticking){ ticking = true; requestAnimationFrame(apply); } }
+  app.addEventListener('scroll', onScroll, {passive:true});
+  window.addEventListener('resize', apply);
+  apply(); requestAnimationFrame(apply); setTimeout(apply,200); setTimeout(apply,600);
+})();
 </script>
 </body>
 </html>
