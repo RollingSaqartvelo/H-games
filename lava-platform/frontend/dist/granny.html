@@ -57,7 +57,6 @@
       flex-shrink:0;
     }
     /* hide remaining overlays not yet used (kept in DOM, not removed) */
-    .lip,
     .social-ticker{ display:none!important; }
     .app-bg-video{
       position:absolute;inset:0;width:100%;height:100%;
@@ -422,7 +421,7 @@
     }
     .lip-corner{ display:none!important }
     .lip-tab{ color:rgba(212,231,236,.6)!important;border-color:rgba(184,224,232,.2)!important;background:transparent!important }
-    .lip-tab--active{ background:linear-gradient(180deg,#f0892a,#df6c16)!important;color:#fff!important;border-color:#c9651a!important }
+    .lip-tab--active{ background:linear-gradient(180deg,#2bbf94,#179f7d)!important;color:#fff!important;border-color:#46e89a!important }
     .lip-pill{ background:rgba(184,224,232,.1)!important;border-color:rgba(184,224,232,.25)!important;color:rgba(212,231,236,.8)!important }
     .lip-stats{ border-bottom-color:rgba(184,224,232,.2)!important }
     .lip-stat{ border-right-color:rgba(184,224,232,.16)!important }
@@ -633,9 +632,10 @@
 
     /* ── Lower Info Panel (stats — bottom 1/5) ──────────────── */
     .lip{
-      position:absolute;
-      left:3.5%;top:79%;width:93%;
-      margin:0;
+      position:relative;
+      width:calc(100% - 16px);max-width:520px;
+      margin:6px auto 18px;
+      flex-shrink:0;
       display:flex;flex-direction:column;
       /* Ivory + gold frame, matching the bet panel */
       background:linear-gradient(160deg,#f6efdd 0%,#efe4ca 55%,#e7dabd 100%);
@@ -692,7 +692,7 @@
       color:#f5ead8;letter-spacing:.5px;
     }
     .lip-list{
-      flex:1;min-height:0;
+      max-height:55vh;
       overflow-y:auto;
       padding:4px 8px 8px;
       scrollbar-width:none;
@@ -1050,9 +1050,11 @@
       <div id="payout1" style="display:none"></div>
       <div id="btnPair1" style="display:none"></div>
     </div>
-  </div><!-- /.bet-footer · stats below is a separate 1/5 section -->
+  </div><!-- /.bet-footer -->
 
-    <!-- ── Lower Info Panel ──────────────────────────────────── -->
+  </div><!-- /.gran-panel -->
+
+    <!-- ── Lower Info Panel (stats — below both panels, page scrolls) ── -->
     <div class="lip" id="lip">
       <span class="lip-corner lip-corner--tl"></span>
       <span class="lip-corner lip-corner--tr"></span>
@@ -1082,8 +1084,6 @@
       </div>
       <div class="lip-list" id="lipList"></div>
     </div>
-
-  </div><!-- /.gran-panel -->
 
   <!-- Win overlays -->
   <div class="gywi gywi--a" id="gywi0" aria-hidden="true">
