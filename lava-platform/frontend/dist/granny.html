@@ -301,27 +301,27 @@
     /* Row 1 — Auto Bet / Auto Cash Out toggles + x2.00 multiplier */
     .bps-toggle{ position:absolute;background:transparent;border:none;padding:0;cursor:pointer;
       -webkit-tap-highlight-color:transparent;touch-action:manipulation;z-index:6; }
-    .np-autobet { left:23.5%; top:11%; width:6%; height:8%; }
-    .np-autocash{ left:66%;   top:11%; width:6%; height:8%; }
-    .np-sw{ position:absolute;inset:0;border-radius:99px;background:#26382e;
-      border:1px solid rgba(255,255,255,.12);transition:background .2s; }
-    .np-sw .knob{ position:absolute;top:9%;left:6%;height:82%;aspect-ratio:1/1;border-radius:50%;
-      background:#9fb8aa;box-shadow:0 1px 2px rgba(0,0,0,.4);transition:left .2s,right .2s,background .2s; }
-    .bps-toggle.on .np-sw{ background:#1f7a52; }
-    .bps-toggle.on .np-sw .knob{ left:auto;right:6%;background:#46e89a; }
-    .bps-toggle:active{ transform:scale(.95); }
+    /* square checkboxes right of the baked Auto Bet / Auto Cash Out labels */
+    .np-autobet { left:23.5%; top:9.9%; width:4.5%; height:9.66%; }
+    .np-autocash{ left:65.8%; top:9.9%; width:4.5%; height:9.66%; }
+    .np-sw{ position:absolute;inset:0;border-radius:5px;background:rgba(8,20,16,.55);
+      border:1.5px solid rgba(120,205,175,.55);transition:background .15s,border-color .15s; }
+    .np-sw .knob{ display:none!important; }
+    .bps-toggle.on .np-sw{ background:#1f9e74;border-color:#5fe6b0; }
+    /* checkmark when active */
+    .bps-toggle.on .np-sw::after{ content:'';position:absolute;left:30%;top:13%;
+      width:26%;height:50%;border:solid #fff;border-width:0 2.4px 2.4px 0;transform:rotate(40deg); }
+    .bps-toggle:active{ transform:scale(.9); }
 
-    /* x2.00 auto-cashout multiplier field */
-    .np-mult{ position:absolute;left:80.5%;top:4%;width:19.5%;height:23%;
-      display:flex;align-items:center;justify-content:center;z-index:6; }
+    /* auto-cashout multiplier input — right of the Auto Cash Out checkbox */
+    .np-mult{ position:absolute;left:71%;top:8%;width:6.4%;height:12%;
+      display:flex;align-items:center;justify-content:center;z-index:6;
+      background:rgba(8,20,16,.5);border:1px solid rgba(120,205,175,.35);border-radius:6px; }
     .np-mult-inp{ width:100%;height:100%;background:transparent;border:none;outline:none;
-      color:#fff;text-align:center;font-family:'Rajdhani',sans-serif;font-weight:700;font-style:italic;
-      font-size:clamp(11px,3vw,17px);padding:0;-webkit-appearance:none; }
-    .np-mult-inp:disabled{ color:#fff;opacity:.85; }
-
-    /* small toggles sit right of the baked Auto Bet / Auto Cash Out labels;
-       no box behind them — just the switch. Multiplier field stays hidden. */
-    .np-mult{ display:none!important; }
+      color:#d2efe1;text-align:center;font-family:'Rajdhani',sans-serif;font-weight:800;
+      font-size:clamp(7px,1.9vw,12px);padding:0;-webkit-appearance:none; }
+    .np-mult-inp:disabled{ color:#8fb3a4;opacity:.9; }
+    .np-mult-inp::-webkit-inner-spin-button,.np-mult-inp::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
 
     /* Row 2 — [−]  amount  [+] (BET PANEL.png fractions) */
     .bps-minus{ left:4.92%; top:30.89%; width:11.87%; height:27.64%; }
