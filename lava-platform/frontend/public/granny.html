@@ -2530,8 +2530,12 @@ updateMultVis()
     stage.classList.toggle('collapsed', c > 0.03);
   }
   function onScroll(){ if(!ticking){ ticking = true; requestAnimationFrame(apply); } }
+  // capture-phase catches scroll from ANY scrolling element (.app, window, etc.)
+  document.addEventListener('scroll', onScroll, {capture:true, passive:true});
+  window.addEventListener('scroll', onScroll, {passive:true});
   app.addEventListener('scroll', onScroll, {passive:true});
   window.addEventListener('resize', apply);
+  window.addEventListener('touchmove', onScroll, {passive:true});
   apply(); requestAnimationFrame(apply); setTimeout(apply,200); setTimeout(apply,600);
 })();
 </script>
