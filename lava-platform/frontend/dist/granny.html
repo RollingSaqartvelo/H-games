@@ -291,12 +291,12 @@
     /* Row 1 — Auto Bet / Auto Cash Out toggles + x2.00 multiplier */
     .bps-toggle{ position:absolute;background:transparent;border:none;padding:0;cursor:pointer;
       -webkit-tap-highlight-color:transparent;touch-action:manipulation;z-index:6; }
-    .np-autobet { left:0%;    top:4%; width:30.5%; height:23%; }
-    .np-autocash{ left:33.5%; top:4%; width:44.5%; height:23%; }
+    .np-autobet { left:0%;  top:4%; width:25%; height:23%; }
+    .np-autocash{ left:28%; top:4%; width:44%; height:23%; }
     .np-sw{ position:absolute;top:28%;height:42%;border-radius:99px;background:#1e2f25;
       border:1px solid rgba(255,255,255,.10);transition:background .2s; }
-    .np-autobet  .np-sw{ right:4%; width:23%; }
-    .np-autocash .np-sw{ left:54%; width:15%; }
+    .np-autobet  .np-sw{ left:68%; width:28%; }
+    .np-autocash .np-sw{ left:66%; width:16%; }
     .np-sw .knob{ position:absolute;top:11%;left:7%;height:78%;aspect-ratio:1/1;border-radius:50%;
       background:#6e8a79;box-shadow:0 1px 2px rgba(0,0,0,.45);transition:left .2s,right .2s,background .2s; }
     .bps-toggle.on .np-sw{ background:#1f7a52; }
@@ -355,6 +355,55 @@
     .bet-panel .bp-btn-cashout{background:linear-gradient(160deg,#5ee88a 0%,#27b257 55%,#129447 100%)!important;color:#fff!important}
     .bet-panel .bp-btn-next-round{background:linear-gradient(160deg,#2bd0aa 0%,#149a7c 55%,#0c7560 100%)!important;color:#fff!important;animation:none!important;font-size:clamp(10px,2.6vw,15px)!important;letter-spacing:.5px!important}
     .bet-panel .bp-btn:disabled{filter:saturate(.45) brightness(.85);cursor:default}
+
+    /* ── HISTORY overlay — own pills over the baked green HISTORY bar ── */
+    .np-history{
+      position:absolute;top:1.94%;left:21%;width:74%;height:5.25%;
+      display:flex;align-items:center;gap:1.5%;overflow:hidden;z-index:7;
+    }
+    .np-history .hist-cur-pill{
+      flex:0 0 auto;height:80%;display:flex;align-items:center;padding:0 3.5%;
+      border-radius:99px;background:#1d3027;border:1px solid rgba(184,224,232,.3);
+      color:#d6e9a8;font-family:'Courier New',monospace;font-weight:700;
+      font-size:clamp(9px,2.4vw,13px);white-space:nowrap;
+    }
+    .np-history .hist-cur-pill.crashed{ color:#f87171;border-color:rgba(248,113,113,.45); }
+    .np-history .hist-scroll{
+      flex:1;min-width:0;display:flex;align-items:center;gap:6px;height:100%;
+      overflow-x:auto;scrollbar-width:none;
+    }
+    .np-history .hist-scroll::-webkit-scrollbar{ display:none }
+    .np-history .pill{
+      flex:0 0 auto;height:80%;display:flex;align-items:center;padding:0 9px;
+      border-radius:99px;background:rgba(15,26,20,.6);
+      font-family:'Courier New',monospace;font-weight:700;font-size:clamp(8px,2.1vw,12px);white-space:nowrap;
+    }
+    .np-history .pill.low { color:#9aa7a0 }
+    .np-history .pill.med { color:#f5c451 }
+    .np-history .pill.high{ color:#f59e4b }
+    .np-history .pill.epic{ color:#5fd98a }
+
+    /* ── Stats panel → green theme (overrides the old ivory look) ── */
+    .lip{
+      background:linear-gradient(160deg,rgba(48,79,64,.96) 0%,rgba(36,60,48,.96) 100%)!important;
+      border:1.5px solid rgba(184,224,232,.35)!important;
+      box-shadow:0 0 12px rgba(10,40,30,.35), inset 0 1px 0 rgba(200,235,242,.12)!important;
+      border-radius:18px!important;
+    }
+    .lip-corner{ display:none!important }
+    .lip-tab{ color:rgba(212,231,236,.6)!important;border-color:rgba(184,224,232,.2)!important;background:transparent!important }
+    .lip-tab--active{ background:linear-gradient(180deg,#f0892a,#df6c16)!important;color:#fff!important;border-color:#c9651a!important }
+    .lip-pill{ background:rgba(184,224,232,.1)!important;border-color:rgba(184,224,232,.25)!important;color:rgba(212,231,236,.8)!important }
+    .lip-stats{ border-bottom-color:rgba(184,224,232,.2)!important }
+    .lip-stat{ border-right-color:rgba(184,224,232,.16)!important }
+    .lip-stat-lbl{ color:rgba(196,222,228,.6)!important }
+    .lip-stat-val{ color:#eaf5f8!important }
+    .lip-name{ color:#dcebef!important }
+    .lip-bet{ color:rgba(212,231,236,.7)!important }
+    .lip-mult{ color:#eaf5f8!important }
+    .lip-row{ border-bottom-color:rgba(184,224,232,.12)!important }
+    .lip-row:nth-child(odd){ background:rgba(255,255,255,.04)!important }
+    .lip-empty{ color:rgba(196,222,228,.4)!important }
 
 
     /* ── Button press bounce animation ──────────────────────── */
@@ -874,25 +923,15 @@
     <div class="state-badge betting" id="stateBadge">BETTING</div>
   </div>
 
-  <!-- History bar -->
-  <div class="hist-bar">
-    <!-- Left: current-round live tab -->
-    <div class="hist-cur">
-      <div class="hist-cur-pill" id="histCurPill">?</div>
-      <div class="hist-cur-ptr"  id="histCurPtr"></div>
-    </div>
-    <!-- Center: scrollable multiplier history -->
-    <div class="hist-scroll" id="history"></div>
-    <!-- Right: scroll-to-latest button -->
-    <button class="hist-clock" aria-label="Latest" onclick="histScrollStart()">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
-      </svg>
-    </button>
-  </div>
-
   <!-- Gran panel (background image + all game UI inside) -->
   <div class="gran-panel">
+
+    <!-- HISTORY overlay — own pills drawn over the baked green HISTORY bar -->
+    <div class="np-history">
+      <span class="hist-cur-pill" id="histCurPill">?</span>
+      <span class="hist-cur-ptr" id="histCurPtr" style="display:none"></span>
+      <div class="hist-scroll" id="history"></div>
+    </div>
 
   <!-- Game area -->
   <div class="game-area">
