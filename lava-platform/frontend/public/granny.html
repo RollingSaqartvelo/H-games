@@ -269,16 +269,14 @@
       position:absolute;
       /* same BET PANEL.png shown smaller via CSS sprite (no image crop):
          panel region x46-838,y826-1195 of the 893x1600 png mapped into the box */
-      background:url('/assets/granny/BET%20PANEL.png?v=3') no-repeat!important;
-      background-size:112.75% 433.60%!important;
-      background-position:45.55% 67.10%!important;
+      background:url('/assets/granny/new%20bet%20panel%202.png?v=1') center/100% 100% no-repeat!important;
       border:none;padding:0;margin:0;
       display:none;
     }
     .bet-panel::before{ display:none!important; }
-    /* two smaller stacked panels (aspect 792/369), both fit with no scroll */
-    #panel0.bet-panel{ left:9%;top:52.6%;width:82%;height:21.32%; }
-    #panel1.bet-panel{ left:9%;top:75.0%;width:82%;height:21.32%; }
+    /* two stacked panels (new bet panel 2.png, aspect 2.16), fit with no scroll */
+    #panel0.bet-panel{ left:4%;top:51.5%;width:92%;height:23.8%; }
+    #panel1.bet-panel{ left:4%;top:75.3%;width:92%;height:23.8%; }
     .bet-panel.active-bet{}
     .bet-panel.crashed-bet{}
 
@@ -291,8 +289,18 @@
       touch-action:manipulation;
       transition:opacity .1s,transform .1s;
     }
-    .bps-minus:active,.bps-plus:active,.bps-min:active,.bps-max:active,
-    .bps-quick:active,.bps-autobet:active{opacity:.4;transform:scale(.92)}
+    /* quick amounts light up on press */
+    .bps-quick:active{
+      background:rgba(70,232,154,.24)!important;border-radius:9999px;
+      box-shadow:0 0 14px rgba(70,232,154,.6),inset 0 0 9px rgba(70,232,154,.45)!important;
+    }
+    /* minus / plus press in (depress) */
+    .bps-minus:active,.bps-plus:active{
+      transform:scale(.86);border-radius:24%;
+      background:rgba(0,0,0,.30)!important;
+      box-shadow:inset 0 3px 9px rgba(0,0,0,.65)!important;
+    }
+    .bps-min:active,.bps-max:active,.bps-autobet:active{opacity:.4;transform:scale(.92)}
     .bps-btn-img{display:none}
 
     /* ══ NEW GREEN PANEL (new gran panel.jpeg) — overlays in panel fractions ══ */
@@ -300,10 +308,10 @@
     /* Row 1 — Auto Bet / Auto Cash Out toggles + x2.00 multiplier */
     .bps-toggle{ position:absolute;background:transparent;border:none;padding:0;cursor:pointer;
       -webkit-tap-highlight-color:transparent;touch-action:manipulation;z-index:6; }
-    /* square checkboxes right of the baked Auto Bet / Auto Cash Out labels */
-    .np-autobet { left:23.5%; top:9.9%; width:4.5%; height:9.66%; }
-    .np-autocash{ left:65.8%; top:9.9%; width:4.5%; height:9.66%; }
-    .np-sw{ position:absolute;inset:0;border-radius:5px;background:rgba(8,20,16,.55);
+    /* square checkboxes over the baked Auto Bet / Auto Cash Out boxes */
+    .np-autobet { left:7.8%;  top:16.4%; width:6.8%; height:14.3%; }
+    .np-autocash{ left:35.4%; top:16.9%; width:6.6%; height:13.8%; }
+    .np-sw{ position:absolute;inset:0;border-radius:6px;background:#0e2a20;
       border:1.5px solid rgba(120,205,175,.55);transition:background .15s,border-color .15s; }
     .np-sw .knob{ display:none!important; }
     .bps-toggle.on .np-sw{ background:#1f9e74;border-color:#5fe6b0; }
@@ -313,21 +321,21 @@
     .bps-toggle:active{ transform:scale(.9); }
 
     /* auto-cashout multiplier input — right of the Auto Cash Out checkbox */
-    .np-mult{ position:absolute;left:71%;top:8%;width:6.4%;height:12%;
+    .np-mult{ position:absolute;left:72%;top:15.6%;width:20.5%;height:16%;
       display:flex;align-items:center;justify-content:center;z-index:6;
-      background:rgba(8,20,16,.5);border:1px solid rgba(120,205,175,.35);border-radius:6px; }
+      background:#0e2a20;border:1px solid rgba(120,205,175,.35);border-radius:8px; }
     .np-mult-inp{ width:100%;height:100%;background:transparent;border:none;outline:none;
       color:#d2efe1;text-align:center;font-family:'Rajdhani',sans-serif;font-weight:800;
-      font-size:clamp(7px,1.9vw,12px);padding:0;-webkit-appearance:none; }
+      font-size:clamp(9px,2.3vw,15px);padding:0;-webkit-appearance:none; }
     .np-mult-inp:disabled{ color:#8fb3a4;opacity:.9; }
     .np-mult-inp::-webkit-inner-spin-button,.np-mult-inp::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
 
-    /* Row 2 — [−]  amount  [+] (BET PANEL.png fractions) */
-    .bps-minus{ left:4.92%; top:30.89%; width:11.87%; height:27.64%; }
-    .bps-plus { left:62.88%;top:30.89%; width:11.87%; height:27.64%; }
+    /* Row 2 — [−]  amount  [+] (new bet panel 2.png fractions) */
+    .bps-minus{ left:5.5%;  top:40%; width:13.5%; height:16.5%; }
+    .bps-plus { left:46.5%; top:40%; width:13.5%; height:16.5%; }
     .bps-amount{
       position:absolute;
-      left:23.48%;top:34.15%;width:33.46%;height:20.60%;
+      left:22.5%;top:41%;width:21.5%;height:14%;
       background:transparent;border:none;outline:none;
       color:#fff;
       font-family:'Share Tech Mono',monospace;
@@ -338,19 +346,19 @@
     .bps-amount::-webkit-inner-spin-button,
     .bps-amount::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
 
-    /* Row 3 — quick amounts 5 / 25 / 50 / 100 (BET PANEL.png fractions) */
-    .np-q5  { left:4.92%;  top:65.85%; width:15.66%; height:24.12%; }
-    .np-q25 { left:23.11%; top:65.85%; width:15.66%; height:24.12%; }
-    .np-q50 { left:41.16%; top:65.85%; width:15.66%; height:24.12%; }
-    .np-q100{ left:59.22%; top:65.85%; width:15.53%; height:24.12%; }
+    /* Row 3 — quick amounts 5 / 25 / 50 / 100 (new bet panel 2.png fractions) */
+    .np-q5  { left:5.5%;  top:65%; width:11.5%; height:16%; }
+    .np-q25 { left:18%;   top:65%; width:11.5%; height:16%; }
+    .np-q50 { left:30.5%; top:65%; width:11.5%; height:16%; }
+    .np-q100{ left:43.5%; top:65%; width:13%;   height:16%; }
     .bps-min,.bps-max,.bps-q1,.bps-q10,.bps-half,.bps-autobet{ display:none!important; }
 
     /* Big action button (right side, spans rows 2–3) — BET / CASH OUT / NEXT BET */
     .bet-panel .bp-btn-pair{display:none!important}
     .bet-panel .bp-btn{
       position:absolute!important;
-      left:77.40%;top:10.30%;width:17.93%!important;height:79.67%!important;
-      aspect-ratio:unset!important;border-radius:16px!important;
+      left:59.5%;top:35%;width:35%!important;height:56%!important;
+      aspect-ratio:unset!important;border-radius:18px!important;
       background:linear-gradient(160deg,#ffb24d 0%,#ff8a1e 50%,#f56a00 100%)!important;
       box-shadow:0 3px 12px rgba(200,90,0,.45), inset 0 2px 0 rgba(255,255,255,.4)!important;
       color:#fff;
