@@ -53,9 +53,15 @@
       width:100%;
       aspect-ratio:893/1600;
       position:relative;
-      background:url('/assets/granny/new%20gran%20panel.jpeg?v=5') center/100% 100% no-repeat;
+      background:url('/assets/granny/new%20gran%20panel.jpeg?v=8') center/100% 100% no-repeat;
       flex-shrink:0;
     }
+    /* Clean state: show ONLY the panel + broadcast screen, hide all other overlays
+       (hidden, not removed — controls/history/stats stay in DOM) */
+    .np-history,
+    #panel0.bet-panel, #panel1.bet-panel,
+    .lip,
+    .social-ticker{ display:none!important; }
     .app-bg-video{
       position:absolute;inset:0;width:100%;height:100%;
       object-fit:cover;z-index:-1;pointer-events:none;
@@ -195,8 +201,10 @@
     /* ── Game area — compact premium panel ─────────────────── */
     .game-area{
       position:absolute;
-      left:5.15%;top:6.50%;
-      width:89.81%;height:35.75%;
+      /* centered inside the screen frame of new gran panel.jpeg
+         (frame x31-861, y127-827 → inset to interior, center 446/477) */
+      left:4.26%;top:8.38%;
+      width:91.38%;height:42.88%;
       overflow:hidden;
       background:transparent;
       border-radius:4%;
@@ -268,8 +276,8 @@
       display:none;
     }
     .bet-panel::before{ display:none!important; }
-    #panel0.bet-panel{ left:5.14%;top:54.32%;width:89.53%;height:21.10%; }
-    #panel1.bet-panel{ left:5.14%;top:74.01%;width:89.53%;height:21.10%; }
+    #panel0.bet-panel{ left:5.15%;top:51.62%;width:88.69%;height:23.06%; }
+    #panel1.bet-panel{ display:none!important; }
     .bet-panel.active-bet{}
     .bet-panel.crashed-bet{}
 
@@ -309,12 +317,15 @@
       font-size:clamp(11px,3vw,17px);padding:0;-webkit-appearance:none; }
     .np-mult-inp:disabled{ color:#fff;opacity:.85; }
 
-    /* Row 2 — [−]  amount  [+] (left side) */
-    .bps-minus{ left:0%;   top:34%; width:13%; height:31%; }
-    .bps-plus { left:43.5%;top:34%; width:13%; height:31%; }
+    /* Auto Bet / Auto Cash Out are baked text labels only in BET PANEL.png */
+    .np-autobet,.np-autocash,.np-mult{ display:none!important; }
+
+    /* Row 2 — [−]  amount  [+] (BET PANEL.png fractions) */
+    .bps-minus{ left:4.92%; top:30.89%; width:11.87%; height:27.64%; }
+    .bps-plus { left:62.88%;top:30.89%; width:11.87%; height:27.64%; }
     .bps-amount{
       position:absolute;
-      left:16%;top:40%;width:27%;height:21%;
+      left:23.48%;top:34.15%;width:33.46%;height:20.60%;
       background:transparent;border:none;outline:none;
       color:#fff;
       font-family:'Share Tech Mono',monospace;
@@ -325,21 +336,21 @@
     .bps-amount::-webkit-inner-spin-button,
     .bps-amount::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
 
-    /* Row 3 — quick amounts 5 / 25 / 50 / 100 (left side) */
-    .np-q5  { left:0%;   top:70%; width:13%;   height:21%; }
-    .np-q25 { left:16%;  top:70%; width:13%;   height:21%; }
-    .np-q50 { left:32%;  top:70%; width:13%;   height:21%; }
-    .np-q100{ left:47%;  top:70%; width:13.5%; height:21%; }
+    /* Row 3 — quick amounts 5 / 25 / 50 / 100 (BET PANEL.png fractions) */
+    .np-q5  { left:4.92%;  top:65.85%; width:15.66%; height:24.12%; }
+    .np-q25 { left:23.11%; top:65.85%; width:15.66%; height:24.12%; }
+    .np-q50 { left:41.16%; top:65.85%; width:15.66%; height:24.12%; }
+    .np-q100{ left:59.22%; top:65.85%; width:15.53%; height:24.12%; }
     .bps-min,.bps-max,.bps-q1,.bps-q10,.bps-half,.bps-autobet{ display:none!important; }
 
     /* Big action button (right side, spans rows 2–3) — BET / CASH OUT / NEXT BET */
     .bet-panel .bp-btn-pair{display:none!important}
     .bet-panel .bp-btn{
       position:absolute!important;
-      left:60.8%;top:28.7%;width:38.4%!important;height:46.2%!important;
-      aspect-ratio:unset!important;border-radius:14px!important;
-      background:linear-gradient(160deg,#46d9bf 0%,#23a487 55%,#127964 100%)!important;
-      box-shadow:0 3px 10px rgba(10,90,70,.4), inset 0 2px 0 rgba(255,255,255,.35)!important;
+      left:77.40%;top:10.30%;width:17.93%!important;height:79.67%!important;
+      aspect-ratio:unset!important;border-radius:16px!important;
+      background:linear-gradient(160deg,#ffb24d 0%,#ff8a1e 50%,#f56a00 100%)!important;
+      box-shadow:0 3px 12px rgba(200,90,0,.45), inset 0 2px 0 rgba(255,255,255,.4)!important;
       color:#fff;
       font-family:'Rajdhani',sans-serif;
       font-size:clamp(13px,3.4vw,21px)!important;font-weight:800;letter-spacing:2px;
@@ -349,9 +360,9 @@
       z-index:5;
     }
     .bet-panel .bp-btn:not(:disabled):active{filter:brightness(.93);transform:scale(.97)}
-    .bet-panel .bp-btn-bet{background:linear-gradient(160deg,#46d9bf 0%,#23a487 55%,#127964 100%)!important;color:#fff!important}
-    .bet-panel .bp-btn-cashout{background:linear-gradient(160deg,#5ee88a 0%,#27b257 55%,#129447 100%)!important;color:#fff!important}
-    .bet-panel .bp-btn-next-round{background:linear-gradient(160deg,#2bd0aa 0%,#149a7c 55%,#0c7560 100%)!important;color:#fff!important;animation:none!important;font-size:clamp(10px,2.6vw,15px)!important;letter-spacing:.5px!important}
+    .bet-panel .bp-btn-bet{background:linear-gradient(160deg,#ffb24d 0%,#ff8a1e 50%,#f56a00 100%)!important;color:#fff!important}
+    .bet-panel .bp-btn-cashout{background:linear-gradient(160deg,#ffc05e 0%,#ff961f 50%,#fb7500 100%)!important;color:#fff!important}
+    .bet-panel .bp-btn-next-round{background:linear-gradient(160deg,#ffa83a 0%,#ff7d10 50%,#e85f00 100%)!important;color:#fff!important;animation:none!important;font-size:clamp(9px,2.3vw,14px)!important;letter-spacing:.3px!important}
     .bet-panel .bp-btn:disabled{filter:saturate(.45) brightness(.85);cursor:default}
 
     /* ── HISTORY overlay — own pills over the baked green HISTORY bar ── */
@@ -989,13 +1000,13 @@
       <button class="bps-toggle np-autobet"  id="btnAutoBetQ0"  onclick="toggleAutoBet(0)"    aria-label="Auto Bet"><span class="np-sw"><span class="knob"></span></span></button>
       <button class="bps-toggle np-autocash" id="togAutoInject0" onclick="toggleAutoInject(0)" aria-label="Auto Cash Out"><span class="np-sw"><span class="knob"></span></span></button>
       <div class="np-mult"><input class="np-mult-inp" id="cashout0" type="number" min="1.01" step="0.01" value="2.00" disabled></div>
-      <button class="bps-minus" onclick="stepAmount(0,-1)" aria-label="minus"></button>
+      <button class="bps-minus" onclick="stepAmount(0,-0.10)" aria-label="minus"></button>
       <input class="bps-amount" id="amount0" type="number" min="0.1" step="0.1" inputmode="decimal" placeholder="0.00">
-      <button class="bps-plus"  onclick="stepAmount(0,1)" aria-label="plus"></button>
-      <button class="bps-quick np-q5"   onclick="setAmount(0,5)"></button>
-      <button class="bps-quick np-q25"  onclick="setAmount(0,25)"></button>
-      <button class="bps-quick np-q50"  onclick="setAmount(0,50)"></button>
-      <button class="bps-quick np-q100" onclick="setAmount(0,100)"></button>
+      <button class="bps-plus"  onclick="stepAmount(0,0.10)" aria-label="plus"></button>
+      <button class="bps-quick np-q5"   onclick="addAmount(0,5)"></button>
+      <button class="bps-quick np-q25"  onclick="addAmount(0,25)"></button>
+      <button class="bps-quick np-q50"  onclick="addAmount(0,50)"></button>
+      <button class="bps-quick np-q100" onclick="addAmount(0,100)"></button>
       <button class="bp-btn bp-btn-bet" id="btn0" onclick="handleBtn(0)">BET</button>
       <div id="payout0" style="display:none"></div>
       <div id="btnPair0" style="display:none"></div>
@@ -1967,7 +1978,7 @@ function updateBtnState(i) {
     btn.className = 'bp-btn bp-btn-next-round'
     btn.disabled  = true
   } else if (isRunning && !b.active && !b.cashedOut) {
-    btn.innerHTML = 'NEXT BET'
+    btn.innerHTML = 'NEXT ROUND BET'
     btn.className = 'bp-btn bp-btn-next-round'
     btn.disabled  = false
   } else {
