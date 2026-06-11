@@ -53,7 +53,7 @@
       width:100%;
       aspect-ratio:893/1600;
       position:relative;
-      background:url('/assets/granny/BET%20PANEL.png?v=2') center/100% 100% no-repeat,
+      background:url('/assets/granny/BET%20PANEL.png?v=3') center/100% 100% no-repeat,
                  url('/assets/granny/new%20gran%20panel.jpeg?v=9') center/100% 100% no-repeat;
       flex-shrink:0;
     }
@@ -299,8 +299,8 @@
     /* Row 1 — Auto Bet / Auto Cash Out toggles + x2.00 multiplier */
     .bps-toggle{ position:absolute;background:transparent;border:none;padding:0;cursor:pointer;
       -webkit-tap-highlight-color:transparent;touch-action:manipulation;z-index:6; }
-    .np-autobet { left:18%;   top:8%; width:12%; height:15%; }
-    .np-autocash{ left:57.5%; top:8%; width:12%; height:15%; }
+    .np-autobet { left:23.5%; top:11%; width:6%; height:8%; }
+    .np-autocash{ left:66%;   top:11%; width:6%; height:8%; }
     .np-sw{ position:absolute;inset:0;border-radius:99px;background:#26382e;
       border:1px solid rgba(255,255,255,.12);transition:background .2s; }
     .np-sw .knob{ position:absolute;top:9%;left:6%;height:82%;aspect-ratio:1/1;border-radius:50%;
@@ -317,8 +317,9 @@
       font-size:clamp(11px,3vw,17px);padding:0;-webkit-appearance:none; }
     .np-mult-inp:disabled{ color:#fff;opacity:.85; }
 
-    /* Auto Bet / Auto Cash Out are baked text labels only in BET PANEL.png */
-    .np-autobet,.np-autocash,.np-mult{ display:none!important; }
+    /* small toggles sit right of the baked Auto Bet / Auto Cash Out labels;
+       no box behind them — just the switch. Multiplier field stays hidden. */
+    .np-mult{ display:none!important; }
 
     /* Row 2 — [−]  amount  [+] (BET PANEL.png fractions) */
     .bps-minus{ left:4.92%; top:30.89%; width:11.87%; height:27.64%; }
