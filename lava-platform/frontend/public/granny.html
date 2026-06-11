@@ -12,7 +12,7 @@
     @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap');
     *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
     :root{
-      --bg:         #0a0a0c;
+      --bg:         #0b1815;
       --surface:    #17171d;
       --bg-raised:  #1f1f27;
       --titanium:   #2a2a35;
@@ -43,7 +43,7 @@
       height:100dvh;
       padding-top:env(safe-area-inset-top,0px);
       padding-bottom:env(safe-area-inset-bottom,0px);
-      background:#2a1d12;
+      background:#0d1c18;
       position:relative;
       overflow-y:auto;overflow-x:hidden;
       isolation:isolate;
@@ -70,22 +70,22 @@
       flex-shrink:0;height:48px;
       display:flex;align-items:center;justify-content:space-between;
       padding:0 14px;
-      background:rgba(10,10,12,.97);
-      border-bottom:1px solid var(--border);
+      background:rgba(13,28,24,.98);
+      border-bottom:1px solid rgba(70,232,154,.20);
       z-index:10;
     }
-    .topbar-logo{font-family:'Cinzel',serif;font-size:12px;letter-spacing:3px;color:var(--bronze-b);text-transform:uppercase;text-shadow:0 0 10px var(--amber-glow)}
-    .topbar-back{background:none;border:1px solid rgba(181,134,13,.3);border-radius:6px;color:var(--bronze);font-size:16px;line-height:1;padding:2px 7px 3px;cursor:pointer;flex-shrink:0}
+    .topbar-logo{font-family:'Cinzel',serif;font-size:12px;letter-spacing:3px;color:#5fe0b4;text-transform:uppercase;text-shadow:0 0 10px rgba(70,232,154,.45)}
+    .topbar-back{background:none;border:1px solid rgba(70,232,154,.35);border-radius:6px;color:#5fe0b4;font-size:16px;line-height:1;padding:2px 7px 3px;cursor:pointer;flex-shrink:0}
     .topbar-balance{
       font-family:'Courier New',monospace;font-size:13px;
-      color:var(--bronze-b);display:flex;align-items:center;gap:6px;
+      color:#9fe8cf;display:flex;align-items:center;gap:6px;
     }
     .topbar-balance .coin{font-size:16px}
     .state-badge{
       font-family:'Courier New',monospace;font-size:10px;letter-spacing:1px;
       padding:3px 9px;border-radius:20px;text-transform:uppercase;
     }
-    .state-badge.betting { background:rgba(181,134,13,.15);color:var(--bronze);border:1px solid var(--gunmetal) }
+    .state-badge.betting { background:rgba(43,212,168,.16);color:#46e89a;border:1px solid rgba(70,232,154,.35) }
     .state-badge.running { background:rgba(239,68,68,.15);color:#f87171;border:1px solid #7f1d1d }
     .state-badge.crashed { background:rgba(239,68,68,.2);color:#ef4444;border:1px solid #991b1b }
 
