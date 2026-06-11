@@ -53,12 +53,11 @@
       width:100%;
       aspect-ratio:893/1600;
       position:relative;
-      background:url('/assets/granny/new%20gran%20panel.jpeg?v=8') center/100% 100% no-repeat;
+      background:url('/assets/granny/new%20gran%20panel.jpeg?v=9') center/100% 100% no-repeat;
       flex-shrink:0;
     }
     /* Clean state: show ONLY the panel + broadcast screen, hide all other overlays
        (hidden, not removed — controls/history/stats stay in DOM) */
-    .np-history,
     #panel0.bet-panel, #panel1.bet-panel,
     .lip,
     .social-ticker{ display:none!important; }
@@ -365,32 +364,42 @@
     .bet-panel .bp-btn-next-round{background:linear-gradient(160deg,#ffa83a 0%,#ff7d10 50%,#e85f00 100%)!important;color:#fff!important;animation:none!important;font-size:clamp(9px,2.3vw,14px)!important;letter-spacing:.3px!important}
     .bet-panel .bp-btn:disabled{filter:saturate(.45) brightness(.85);cursor:default}
 
-    /* ── HISTORY overlay — own pills over the baked green HISTORY bar ── */
+    /* ── HISTORY — past-game pills, green theme (above the screen) ── */
     .np-history{
-      position:absolute;top:1.94%;left:21%;width:74%;height:5.25%;
-      display:flex;align-items:center;gap:1.5%;overflow:hidden;z-index:7;
+      position:absolute;top:1.7%;left:3%;width:94%;height:4.5%;
+      display:flex;align-items:center;gap:6px;overflow:hidden;z-index:7;
     }
     .np-history .hist-cur-pill{
-      flex:0 0 auto;height:80%;display:flex;align-items:center;padding:0 3.5%;
-      border-radius:99px;background:#1d3027;border:1px solid rgba(184,224,232,.3);
-      color:#d6e9a8;font-family:'Courier New',monospace;font-weight:700;
-      font-size:clamp(9px,2.4vw,13px);white-space:nowrap;
+      flex:0 0 auto;height:90%;display:flex;align-items:center;justify-content:center;padding:0 13px;
+      border-radius:11px;background:linear-gradient(160deg,#2bd4a8 0%,#15a07e 100%);
+      color:#fff;font-family:'Rajdhani',sans-serif;font-weight:800;
+      font-size:clamp(10px,2.6vw,15px);white-space:nowrap;
+      box-shadow:0 2px 6px rgba(10,60,45,.4),inset 0 1px 0 rgba(255,255,255,.3);
     }
-    .np-history .hist-cur-pill.crashed{ color:#f87171;border-color:rgba(248,113,113,.45); }
+    .np-history .hist-cur-pill.crashed{ background:linear-gradient(160deg,#f08a6a 0%,#d4543a 100%);color:#fff; }
+    .np-history .hist-cur-ptr{ display:none!important; }
     .np-history .hist-scroll{
       flex:1;min-width:0;display:flex;align-items:center;gap:6px;height:100%;
       overflow-x:auto;scrollbar-width:none;
     }
     .np-history .hist-scroll::-webkit-scrollbar{ display:none }
     .np-history .pill{
-      flex:0 0 auto;height:80%;display:flex;align-items:center;padding:0 9px;
-      border-radius:99px;background:rgba(15,26,20,.6);
-      font-family:'Courier New',monospace;font-weight:700;font-size:clamp(8px,2.1vw,12px);white-space:nowrap;
+      flex:0 0 auto;height:90%;display:flex;align-items:center;justify-content:center;padding:0 12px;
+      border-radius:11px;color:#eafff5;
+      font-family:'Rajdhani',sans-serif;font-weight:700;font-size:clamp(9px,2.4vw,14px);white-space:nowrap;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.12);
     }
-    .np-history .pill.low { color:#9aa7a0 }
-    .np-history .pill.med { color:#f5c451 }
-    .np-history .pill.high{ color:#f59e4b }
-    .np-history .pill.epic{ color:#5fd98a }
+    .np-history .pill.low { background:linear-gradient(160deg,#3a5a4e 0%,#2b443a 100%);color:#bfe8d6; }
+    .np-history .pill.med { background:linear-gradient(160deg,#2f7f5f 0%,#1f5742 100%); }
+    .np-history .pill.high{ background:linear-gradient(160deg,#1f9e74 0%,#147a59 100%); }
+    .np-history .pill.epic{ background:linear-gradient(160deg,#33d9ac 0%,#0f9b6f 100%);color:#fff; }
+    .np-history .hist-clock{
+      flex:0 0 auto;height:90%;aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;
+      border-radius:11px;background:linear-gradient(160deg,#274a3d 0%,#1a2e25 100%);
+      border:1px solid rgba(160,220,200,.25);color:#bfe8d6;
+      font-size:clamp(11px,2.8vw,16px);cursor:pointer;-webkit-tap-highlight-color:transparent;
+    }
+    .np-history .hist-clock:active{ filter:brightness(.9); }
 
     /* ── Stats panel → green theme (overrides the old ivory look) ── */
     .lip{
@@ -940,6 +949,7 @@
       <span class="hist-cur-pill" id="histCurPill">?</span>
       <span class="hist-cur-ptr" id="histCurPtr" style="display:none"></span>
       <div class="hist-scroll" id="history"></div>
+      <div class="hist-clock" aria-label="history">🕐</div>
     </div>
 
   <!-- Game area -->
