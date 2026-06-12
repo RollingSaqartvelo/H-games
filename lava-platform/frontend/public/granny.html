@@ -898,17 +898,25 @@
 <style>@keyframes ls-p{0%,100%{opacity:.15}50%{opacity:.6}}</style>
 <script>
 (function(){
-  const VIDS=['/video/granny-betting-loop.mp4','/video/grany%20bg.mp4'];
+  // The REAL video assets the game plays. The bar waits for THESE on every device.
+  //   new.mp4         = betting-stage video (~4 MB)
+  //   NEW GRAN BG.mp4 = running-stage background (~36 MB)
+  const VIDS=[
+    {key:'bvb', url:'/assets/granny/new.mp4'},
+    {key:'bg',  url:'/assets/granny/NEW%20GRAN%20BG.mp4'},
+  ];
   const scr=document.getElementById('ls');
   const bar=document.getElementById('ls-bar');
   const pct=document.getElementById('ls-pct');
   const snd=new Audio('/audio/H-GAMES%20provider.mp3');
   window._lsAud=snd;
   window._lsActive=true;
+  window.__VBLOB={};        // key -> object URL of the fully-downloaded video
   snd.volume=0.85;
   snd.play().catch(()=>{});
 
   const prog=VIDS.map(()=>[0,0]); // [loaded, total]
+  let done=false;
 
   function upd(){
     const tl=prog.reduce((s,[l])=>s+l,0);
@@ -919,7 +927,12 @@
   }
 
   function finish(){
+    if(done)return; done=true;
+    clearTimeout(stall);
     window._lsActive=false;
+    // Hand the downloaded bytes to the players BEFORE revealing the game.
+    window.__blobsReady=true;
+    try{ window.__applyVideoBlobs&&window.__applyVideoBlobs(); }catch(e){}
     bar.style.width='100%'; pct.textContent='100%';
     setTimeout(()=>{
       scr.style.opacity='0'; scr.style.pointerEvents='none';
@@ -927,25 +940,36 @@
     },250);
   }
 
-  async function load(url,i){
+  // Stall watchdog — never dismiss early. Resets on every received chunk; only
+  // gives up after 25s of ZERO progress (truly dead connection). A slow phone
+  // that keeps trickling bytes is allowed to finish, however long that takes.
+  let stall;
+  function arm(){ clearTimeout(stall); stall=setTimeout(finish,25000); }
+
+  async function load(v,i){
     try{
-      const r=await fetch(url);
+      const r=await fetch(v.url);
       const cl=parseInt(r.headers.get('Content-Length')||'0');
       prog[i][1]=cl||1;
       const reader=r.body.getReader();
+      const chunks=[];
       while(true){
-        const{done,value}=await reader.read();
-        if(done)break;
+        const{done:d,value}=await reader.read();
+        if(d)break;
+        chunks.push(value);
         prog[i][0]+=value.length;
+        arm();
         if(cl>0)upd();
       }
-      if(!cl){prog[i][0]=prog[i][1]=1;upd();}
+      // Keep bytes resident → element plays instantly, no re-download anywhere.
+      window.__VBLOB[v.key]=URL.createObjectURL(new Blob(chunks,{type:'video/mp4'}));
+      if(!cl){prog[i][0]=prog[i][1]=1;}
+      upd();
     }catch(e){prog[i][0]=prog[i][1]=1;upd();}
   }
 
-  // 10s safety timeout
-  const guard=setTimeout(finish,10000);
-  Promise.all(VIDS.map((u,i)=>load(u,i))).then(()=>{clearTimeout(guard);finish();});
+  arm();
+  Promise.all(VIDS.map((v,i)=>load(v,i))).then(finish);
 })();
 </script>
 <!-- ── / Loading Screen ───────────────────────────────────────── -->
@@ -984,8 +1008,8 @@
     <div class="bvb-wrap" id="bvbWrap" aria-hidden="true">
       <video
         id="bvbVideo"
-        src="/assets/granny/new.mp4"
-        autoplay loop muted playsinline preload="auto"
+        data-src="/assets/granny/new.mp4"
+        loop muted playsinline preload="auto"
         webkit-playsinline="true"
         style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;display:block;background:#000"
       ></video>
@@ -1197,9 +1221,8 @@ let grannyImgReady = false, doctorImgReady = false
 let bgOff = 0, lastTs = 0
 let crashAnimT = 0  // 0→1.5s crash spin/shrink timer
 
-// ── Background video ──────────────────────────────────────────────────────────
+// ── Background video (bytes are preloaded by the loading screen, then wired in) ─
 const bgVid = document.createElement('video')
-bgVid.src = '/assets/granny/NEW%20GRAN%20BG.mp4'
 bgVid.loop = true
 bgVid.muted = true
 bgVid.playsInline = true
@@ -1209,7 +1232,26 @@ bgVid.preload = 'auto'
 bgVid.style.cssText = 'position:fixed;width:1px;height:1px;opacity:0;pointer-events:none;top:-9999px;left:-9999px'
 document.body.appendChild(bgVid)
 bgVid.addEventListener('loadeddata', () => { bgVid.play().catch(()=>{}) }, { once: true })
-bgVid.load()
+
+// Connect the fully-downloaded videos (or fall back to the network URL if a
+// download failed). Called by the loading screen the instant the bar hits 100%.
+window.__applyVideoBlobs = function(){
+  const B = window.__VBLOB || {}
+  const bvb = document.getElementById('bvbVideo')
+  if (bvb && !bvb.src) {
+    bvb.src = B.bvb || bvb.getAttribute('data-src') || '/assets/granny/new.mp4'
+    try { bvb.load() } catch (e) {}
+    // Boot already requested the betting video (CREATED) before src existed —
+    // start it now that the source is wired. bvbPlay is a hoisted declaration.
+    try { bvbPlay() } catch (e) {}
+  }
+  if (!bgVid.src) {
+    bgVid.src = B.bg || '/assets/granny/NEW%20GRAN%20BG.mp4'
+    try { bgVid.load() } catch (e) {}
+  }
+}
+// If the loading screen finished before this script ran, wire up immediately.
+if (window.__blobsReady) window.__applyVideoBlobs()
 
 // ── Character assets (GIF — browser animates automatically each drawImage call) ─
 const grannyImg = new Image()
