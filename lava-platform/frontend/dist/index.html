@@ -14,84 +14,12 @@
 
     <!-- Telegram Mini App SDK — no-op when loaded outside Telegram -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script type="module" crossorigin src="/assets/index-DR4-hBY0.js"></script>
+    <script type="module" crossorigin src="/assets/index-DNVd8fCX.js"></script>
     <link rel="modulepreload" crossorigin href="/assets/zustand-DgPfcmaj.js">
     <link rel="modulepreload" crossorigin href="/assets/react-DWZXVlP3.js">
     <link rel="stylesheet" crossorigin href="/assets/index-C8RrwJNr.css">
-  <style>.game-area{background:#000 !important}.game-area::after{background:linear-gradient(180deg,rgba(0,0,0,0) 0%,rgba(0,0,0,.85) 70%,#000 100%) !important}</style>
   </head>
   <body>
-<!-- ── Loading Screen ──────────────────────────────────────────── -->
-<div id="ls" style="position:fixed;inset:0;z-index:99999;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:32px;transition:opacity .5s;cursor:pointer" onclick="if(window._lsAud)window._lsAud.play().catch(()=>{})">
-  <img src="/assets/hgames-logo.jpg" style="width:78%;max-width:340px;object-fit:contain">
-  <div style="width:78%;max-width:340px">
-    <div style="background:rgba(255,255,255,.1);border-radius:4px;height:5px;overflow:hidden">
-      <div id="ls-bar" style="height:100%;width:0%;background:linear-gradient(90deg,#00c6ff,#a855f7,#ff69b4);border-radius:4px;transition:width .12s ease"></div>
-    </div>
-    <div id="ls-pct" style="text-align:center;color:rgba(255,255,255,.35);font-size:11px;letter-spacing:2px;margin-top:10px;font-family:monospace">0%</div>
-  </div>
-  <div style="color:rgba(255,255,255,.22);font-size:10px;letter-spacing:3px;font-family:monospace;animation:ls-p 1.4s ease-in-out infinite">&#9654; TAP TO START</div>
-</div>
-<style>@keyframes ls-p{0%,100%{opacity:.15}50%{opacity:.6}}</style>
-<script>
-(function(){
-  const VIDS=['/video/betting-loop2.mp4','/video/outlawbgnew.mp4'];
-  const scr=document.getElementById('ls');
-  const bar=document.getElementById('ls-bar');
-  const pct=document.getElementById('ls-pct');
-  const snd=new Audio('/audio/H-GAMES%20provider.mp3');
-  window._lsAud=snd;
-  window._lsActive=true;
-  // Wrap window once-listeners so they fire only after loading screen
-  var _origProtoAddEvt=EventTarget.prototype.addEventListener;
-  EventTarget.prototype.addEventListener=function(type,fn,opts){
-    if(this===window&&(type==='touchstart'||type==='click')&&opts&&opts.once){
-      var _fn=fn,_opts=opts,wrapper=function(e){
-        if(window._lsActive){_origProtoAddEvt.call(window,type,wrapper,_opts);return;}
-        _fn.call(this,e);
-      };fn=wrapper;
-    }
-    return _origProtoAddEvt.call(this,type,fn,opts);
-  };
-  snd.volume=0.85;
-  snd.play().catch(()=>{});
-  const prog=VIDS.map(()=>[0,0]);
-  function upd(){
-    const tl=prog.reduce((s,[l])=>s+l,0);
-    const tt=prog.reduce((s,[,t])=>s+t,0);
-    const p=tt>0?Math.min(tl/tt,1):0;
-    bar.style.width=(p*100).toFixed(1)+'%';
-    pct.textContent=Math.round(p*100)+'%';
-  }
-  function finish(){
-    window._lsActive=false;
-    EventTarget.prototype.addEventListener=_origProtoAddEvt;
-    bar.style.width='100%'; pct.textContent='100%';
-    setTimeout(()=>{
-      scr.style.opacity='0'; scr.style.pointerEvents='none';
-      setTimeout(()=>scr.remove(),520);
-    },250);
-  }
-  async function load(url,i){
-    try{
-      const r=await fetch(url);
-      const cl=parseInt(r.headers.get('Content-Length')||'0');
-      prog[i][1]=cl||1;
-      const reader=r.body.getReader();
-      while(true){
-        const{done,value}=await reader.read();
-        if(done)break;
-        prog[i][0]+=value.length;
-        if(cl>0)upd();
-      }
-      if(!cl){prog[i][0]=prog[i][1]=1;upd();}
-    }catch(e){prog[i][0]=prog[i][1]=1;upd();}
-  }
-  const guard=setTimeout(finish,20000);
-  Promise.all(VIDS.map((u,i)=>load(u,i))).then(()=>{clearTimeout(guard);finish();});
-})();
-</script>
-<!-- ── / Loading Screen ─────────────────────────────────────────── -->
     <div id="root"></div>
   </body>
 </html>

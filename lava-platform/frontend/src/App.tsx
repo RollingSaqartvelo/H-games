@@ -60,9 +60,9 @@ export function App() {
 
   const pixiMount = useRef<HTMLDivElement>(null)
   usePixi(pixiMount)
-  useBgMusic()
 
   const { token, playerId, firstName, loading } = useTMAAuth()
+  useBgMusic(!loading)
   useSocket(playerId)
 
   return (

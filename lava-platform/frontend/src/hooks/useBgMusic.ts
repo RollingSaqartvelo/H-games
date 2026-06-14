@@ -7,11 +7,14 @@ import { startMusic, stopMusic } from '../audio/MusicManager'
  *   RUNNING              → startMusic() (fade in, loop)
  *   CRASHED / FINISHED   → stopMusic()  (fade out, pause)
  *
- * Mounted once in App — no cleanup needed beyond unsubscribing.
+ * `ready` gates everything: while the loading/splash screen is up the music
+ * must stay silent, so we don't subscribe (or start) until ready === true.
  */
-export function useBgMusic(): void {
+export function useBgMusic(ready: boolean): void {
   useEffect(() => {
-    // Handle already-RUNNING state on mount (mid-game join)
+    if (!ready) return
+
+    // Handle already-RUNNING state once the splash is gone (mid-game join)
     if (useGame.getState().roundState === 'RUNNING') {
       startMusic()
     }
@@ -27,5 +30,5 @@ export function useBgMusic(): void {
       },
     )
     return unsub
-  }, [])
+  }, [ready])
 }
