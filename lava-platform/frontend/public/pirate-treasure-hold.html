@@ -141,6 +141,8 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
 .spin-btn img{width:90px;height:90px;object-fit:contain;display:block;}
 /* wheel spins while the round is spinning */
 @keyframes pt-spin-wheel{ to{ transform:rotate(360deg); } }
+/* bat opens eyes briefly once per 7s cycle (opacity only — keeps the centering transform) */
+@keyframes batBlink{ 0%,88%,100%{opacity:0} 91%,97%{opacity:1} }
 .spin-btn.spinning img{ animation:pt-spin-wheel .7s linear infinite; }
 .spin-btn.spinning:disabled{ opacity:1; }
 
@@ -287,6 +289,12 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
      Opening fractions: L .2735 T .3011 R .7305 B .7509 (panel 2000×1116). */
   .pirate-panel{ display:block; position:absolute; z-index:0; pointer-events:none;
                  width:218.82%; left:-59.85%; top:-66.94%; height:auto; }
+
+  /* glowing eyes overlaid on the sleeping bat; blink open every 7s */
+  .bat-eyes{ display:block; position:absolute; z-index:2; pointer-events:none;
+             left:116%; top:57.5%; transform:translate(-50%,-50%);
+             width:21%; height:auto; opacity:0;
+             animation:batBlink 7s infinite; }
 
   /* SPIN wheel straddling the cabinet's bottom platform (50% on, 50% below).
      Relocated into .reels-outer (the cabinet) by JS on desktop. */
@@ -743,6 +751,11 @@ function buildReels() {
     panel.src = 'assets/h-slots/pirate/pirate%20baraban.png';
     panel.alt = '';
     frame.appendChild(panel);
+    const eyes = document.createElement('img');
+    eyes.className = 'bat-eyes';
+    eyes.src = 'assets/h-slots/pirate/eyes.png';
+    eyes.alt = '';
+    frame.appendChild(eyes);
     frame.style.width = (CELL_H * 3 * 1.821) + 'px';
     // reserve the panel's full height in the reels area so the wood frame
     // (which overflows the reel window) isn't clipped or overlapping Box B
