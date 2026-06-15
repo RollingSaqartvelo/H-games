@@ -1237,7 +1237,10 @@ function fitStage() {
   gw.style.transform = 'none';
   const w = gw.offsetWidth, h = gw.offsetHeight;
   if (!w || !h) return;
-  const s = Math.min(window.innerWidth / w, window.innerHeight / h, 1);
+  let s = Math.min(window.innerWidth / w, window.innerHeight / h, 1);
+  // mobile: scale the whole frame up 20% so the reel panel reads bigger
+  // (capped by viewport height so it never overflows vertically)
+  if (window.innerWidth < 1000) s = Math.min(s * 1.2, window.innerHeight / h);
   gw.style.position = 'fixed';
   gw.style.transformOrigin = 'top left';
   gw.style.left = Math.round((window.innerWidth  - w * s) / 2) + 'px';
