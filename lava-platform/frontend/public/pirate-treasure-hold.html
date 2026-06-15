@@ -343,7 +343,8 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
   .bottom-panel .bet-row #betDisplay{ position:absolute; left:50%; top:47.7%;
      transform:translate(-50%,-50%); width:37%; height:50%; min-width:0; margin:0;
      background:#000; border-radius:4px; display:flex; align-items:center; justify-content:center;
-     color:#f0c040; font-family:monospace; font-weight:900; font-size:21px; z-index:1; }
+     color:#f0c040; font-family:monospace; font-weight:900; font-size:21px; z-index:2;
+     cursor:pointer; pointer-events:auto; }
   .col-character{ display:none; }   /* hidden on desktop v1 */
   .header-logo{ display:none; }     /* replaced by the 3D logo image */
   .pt-logo{ position:absolute; left:4px; top:2px; width:224px; height:auto; z-index:6;
@@ -1287,6 +1288,12 @@ document.getElementById('betDown').addEventListener('click', () => {
 });
 document.getElementById('betUp').addEventListener('click', () => {
   if (betIdx < BET_STEPS.length-1) { betIdx++; updateUI(); }
+});
+// click the centre amount to cycle through bets (wraps around)
+document.getElementById('betDisplay').addEventListener('click', () => {
+  if (document.getElementById('betDown').disabled) return;
+  betIdx = (betIdx + 1) % BET_STEPS.length;
+  updateUI();
 });
 
 // ═══════════════════════════════════════════════════════════
