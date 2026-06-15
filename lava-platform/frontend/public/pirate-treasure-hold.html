@@ -342,6 +342,9 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
      background:#000; border-radius:4px; display:flex; align-items:center; justify-content:center;
      color:#f0c040; font-family:monospace; font-weight:900; font-size:21px; z-index:1; }
   .col-character{ display:none; }   /* hidden on desktop v1 */
+  .header-logo{ display:none; }     /* replaced by the 3D logo image */
+  .pt-logo{ position:absolute; left:4px; top:2px; width:224px; height:auto; z-index:6;
+     pointer-events:none; filter:drop-shadow(0 6px 10px rgba(0,0,0,.6)); }
 
   /* reels frame becomes the reel WINDOW that sits inside the wooden panel hole.
      No own border/bg/padding — the wood panel is the frame. */
@@ -898,6 +901,11 @@ function buildReels() {
       var lamp = document.createElement('div');
       lamp.className = 'pt-lamp';
       wrap.appendChild(lamp);
+      var logo = document.createElement('img');
+      logo.className = 'pt-logo';
+      logo.src = 'assets/h-slots/pirate/pirate%20logo.png';
+      logo.alt = 'PIRATE TREASURE';
+      wrap.appendChild(logo);
       var post = document.createElement('div');
       post.className = 'pt-post';
       wrap.appendChild(post);
