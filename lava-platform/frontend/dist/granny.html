@@ -1289,7 +1289,7 @@ const ctx    = canvas.getContext('2d')
 let animFrame = 0
 
 // Character state
-let grannyY = 0, grannyX = 0.82, doctorY = 0, grannyOsc = 0, doctorOsc = 0, flameT = 0
+let grannyY = 0, grannyX = 0.82, doctorY = 0, doctorX = 0, grannyOsc = 0, doctorOsc = 0, flameT = 0
 let grannyImgReady = false, doctorImgReady = false
 
 // Parallax state
@@ -1790,9 +1790,14 @@ function drawScene(ts) {
   }
 
   const gX = W * grannyX         // 0.82 — granny ahead (right)
-  // Doctor approaches only at high multiplier (>7x), stays put otherwise
-  const _prog = running ? Math.min(Math.max((multiplier - 7) / 8, 0), 1) : 0
-  const dX = gX - W * (0.55 - _prog * 0.40)
+  // Doctor keeps a CONSTANT distance behind granny the whole round —
+  // it does NOT close in as the multiplier rises. It only lunges in to
+  // catch her at the moment of crash (quick smoothing → ~100-150ms).
+  const FAR_GAP = W * 0.55
+  const dXtarget = crashed ? (gX - W * 0.10) : (gX - FAR_GAP)
+  if (doctorX === 0) doctorX = dXtarget   // first-frame init (avoid slide-in from 0)
+  doctorX += (dXtarget - doctorX) * (crashed ? 0.30 : 0.06)
+  const dX = doctorX
 
   // ── Trajectory curve (under characters) ─────────────────────────────────
   drawCurve(W, H)
