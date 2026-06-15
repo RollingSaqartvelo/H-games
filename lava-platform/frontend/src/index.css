@@ -1740,13 +1740,24 @@ ul, li { list-style: none; }
     margin: 8px auto 0;
   }
 
-  /* WASTED — keep it roughly over the game screen, only slightly larger */
+  /* WASTED — centered exactly on the game broadcast (game-area), not the viewport.
+     --ga-* vars are written by App.tsx from .game-area's live rect (desktop only). */
   .wasted-ov {
-    top: 120px !important;
-    height: 42vh !important;
-    align-items: flex-start !important;
+    left: var(--ga-left, 0px) !important;
+    top: var(--ga-top, 0px) !important;
+    right: auto !important;
+    width: var(--ga-w, 100vw) !important;
+    height: var(--ga-h, 62vh) !important;
+    align-items: center !important;
+    justify-content: center !important;
   }
-  .wasted-ov-img { width: min(54vw, 760px) !important; }
+  .wasted-ov-img { width: min(46%, 540px) !important; }
+
+  /* Countdown 3·2·1 — centered on the game broadcast, not the viewport */
+  .rcd__final-img {
+    left: calc(var(--ga-left, 0px) + var(--ga-w, 100vw) / 2) !important;
+    top:  calc(var(--ga-top, 0px) + var(--ga-h, 100vh) / 2) !important;
+  }
 }
 
 /* WASTED slam image base width (mobile) */

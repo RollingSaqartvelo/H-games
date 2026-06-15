@@ -939,8 +939,9 @@
         aspect-ratio:16/9;
         align-self:start;
         border:1.5px solid rgba(70,232,154,.45); border-radius:10px;
+        background:#102019;   /* side gaps of contained betting video = stats colour, not black */
       }
-      #bvbVideo{ object-fit:contain!important; }
+      #bvbVideo{ object-fit:contain!important; background:#102019!important; }
       /* both bet panels side-by-side in one row → fit without scrolling */
       .bet-footer{
         grid-area:panels;

@@ -59,6 +59,39 @@ export function App() {
     window.addEventListener('click',      unlockAllMedia, { once: true })
   }, [])
 
+  // Desktop only: publish the live .game-area rect as CSS vars so the fixed
+  // WASTED / 3·2·1 overlays center on the game broadcast (not the viewport,
+  // which is off because the stats column shifts the game screen right).
+  useEffect(() => {
+    const root = document.documentElement
+    const update = () => {
+      const ga = document.querySelector('.game-area') as HTMLElement | null
+      if (!ga || window.innerWidth < 1000) {
+        root.style.removeProperty('--ga-left')
+        root.style.removeProperty('--ga-top')
+        root.style.removeProperty('--ga-w')
+        root.style.removeProperty('--ga-h')
+        return
+      }
+      const r = ga.getBoundingClientRect()
+      root.style.setProperty('--ga-left', `${r.left}px`)
+      root.style.setProperty('--ga-top',  `${r.top}px`)
+      root.style.setProperty('--ga-w',    `${r.width}px`)
+      root.style.setProperty('--ga-h',    `${r.height}px`)
+    }
+    update()
+    window.addEventListener('resize', update)
+    window.addEventListener('scroll', update, true)
+    const ga = document.querySelector('.game-area')
+    const ro = ga ? new ResizeObserver(update) : null
+    if (ga && ro) ro.observe(ga)
+    return () => {
+      window.removeEventListener('resize', update)
+      window.removeEventListener('scroll', update, true)
+      ro?.disconnect()
+    }
+  }, [])
+
   const pixiMount = useRef<HTMLDivElement>(null)
   usePixi(pixiMount)
 
