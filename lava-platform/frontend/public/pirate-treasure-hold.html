@@ -152,6 +152,11 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
 }
 /* plaques sway gently as if hanging in a breeze */
 @keyframes plaqueSway{ 0%,100%{ transform:rotate(-1.1deg) } 50%{ transform:rotate(1.1deg) } }
+/* hanging lantern flickers (briefly dims) every 5s — extra glow over the baked lamp */
+@keyframes lampFlicker{
+  0%,82%,100%{ opacity:.85 } 84%{ opacity:.12 } 86%{ opacity:.75 }
+  89%{ opacity:.05 } 92%{ opacity:.8 } 95%{ opacity:.5 }
+}
 .spin-btn.spinning img{ animation:pt-spin-wheel .7s linear infinite; }
 .spin-btn.spinning:disabled{ opacity:1; }
 
@@ -185,20 +190,48 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
 .modal{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.92);
   display:none;flex-direction:column;align-items:center;justify-content:center;padding:16px;}
 .modal.open{display:flex;}
-.modal-box{background:#0d1e38;border:1px solid var(--text-muted);
-  max-width:380px;width:100%;max-height:85vh;overflow-y:auto;padding:20px;}
-.modal-title{font-size:14px;font-weight:900;color:var(--text-bright);letter-spacing:.3em;
-  text-transform:uppercase;margin-bottom:16px;text-align:center;text-shadow:var(--blood-glow);}
-.modal-close{float:right;background:none;border:1px solid var(--muted);
-  color:var(--muted);padding:4px 10px;cursor:pointer;font-size:12px;margin-top:-4px;}
-.pt-table{width:100%;border-collapse:collapse;font-size:11px;}
-.pt-table th{color:var(--muted);font-size:9px;letter-spacing:.2em;
-  text-transform:uppercase;text-align:left;padding:4px 8px;border-bottom:1px solid rgba(255,255,255,.05);}
-.pt-table td{padding:5px 8px;border-bottom:1px solid rgba(255,255,255,.04);color:var(--text);}
-.pt-table td:last-child{color:var(--text-main);font-weight:900;text-align:right;}
-.modal-section{font-size:10px;color:var(--muted);letter-spacing:.2em;
-  text-transform:uppercase;margin:16px 0 8px;}
-.modal-rule{font-size:11px;color:rgba(255,255,255,.6);line-height:1.6;margin-bottom:6px;}
+.modal-box{
+  background:
+    radial-gradient(120% 80% at 50% 0%, rgba(60,40,18,.55), transparent 60%),
+    linear-gradient(180deg,#15243d 0%, #0c1828 100%);
+  border:2px solid rgba(240,192,64,.5);
+  border-radius:14px;
+  box-shadow:0 0 0 1px rgba(0,0,0,.6), 0 18px 50px rgba(0,0,0,.7), inset 0 0 40px rgba(0,0,0,.5);
+  max-width:920px;width:94vw;max-height:88vh;overflow-y:auto;padding:22px 26px 26px;}
+.modal-title{font-size:20px;font-weight:900;color:var(--text-bright);letter-spacing:.28em;
+  text-transform:uppercase;margin-bottom:14px;text-align:center;text-shadow:var(--blood-glow);}
+.modal-close{float:right;background:rgba(0,0,0,.3);border:1px solid rgba(240,192,64,.5);
+  color:#f0c040;padding:4px 11px;cursor:pointer;font-size:13px;border-radius:6px;margin-top:-2px;}
+.modal-section{font-size:12px;color:#f0c040;letter-spacing:.22em;font-weight:900;
+  text-transform:uppercase;margin:18px 0 10px;text-shadow:0 1px 3px #000;}
+
+/* symbol payout grid — real reel symbols */
+.pt-symgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;}
+.pt-symcard{display:flex;align-items:center;gap:10px;padding:8px 10px;
+  background:linear-gradient(180deg,rgba(26,88,108,.35),rgba(7,33,46,.5));
+  border:1px solid rgba(240,192,64,.28);border-radius:9px;
+  box-shadow:inset 0 0 14px rgba(0,0,0,.45);}
+.pt-symcard img{width:52px;height:52px;object-fit:contain;flex-shrink:0;
+  filter:drop-shadow(0 2px 3px rgba(0,0,0,.6));}
+.pt-symcard .pt-sc-r{display:flex;flex-direction:column;gap:2px;min-width:0;}
+.pt-symcard .pt-sc-name{font-size:11px;font-weight:900;letter-spacing:.1em;color:#ffe7a0;
+  text-transform:uppercase;text-shadow:0 1px 2px #000;}
+.pt-symcard .pt-sc-pays{display:flex;gap:9px;font-size:10px;color:#9fb6c2;}
+.pt-symcard .pt-sc-pays b{color:#f0c040;font-family:monospace;font-weight:900;}
+.pt-symcard .pt-sc-pays .x5 b{color:#ff5a3c;}
+
+/* jackpots + rules side by side */
+.pt-cols{display:grid;grid-template-columns:1fr 1.4fr;gap:22px;align-items:start;}
+.pt-jp{display:flex;flex-direction:column;gap:6px;}
+.pt-jp-row{display:flex;justify-content:space-between;align-items:center;padding:6px 12px;
+  border:1px solid rgba(240,192,64,.22);border-radius:7px;
+  background:linear-gradient(90deg,rgba(0,0,0,.35),rgba(0,0,0,.1));}
+.pt-jp-row .n{font-size:12px;font-weight:900;letter-spacing:.15em;text-transform:uppercase;}
+.pt-jp-row .v{font-size:12px;font-weight:900;font-family:monospace;color:#f0c040;}
+.pt-jp-row.grand .n,.pt-jp-row.grand .v{color:#ff3030;}
+.pt-jp-row.mega .n{color:#ff8a3c;}
+.modal-rule{font-size:11px;color:rgba(255,255,255,.72);line-height:1.55;margin-bottom:5px;}
+@media (max-width:640px){ .pt-cols{grid-template-columns:1fr;} }
 
 /* ── Big Win animation ── */
 .bigwin-overlay{position:fixed;inset:0;z-index:80;background:rgba(0,0,0,.8);
@@ -337,6 +370,12 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
     pointer-events:none;
   }
   .pt-post{ display:none; }   /* no decorative cap head on top */
+
+  /* lantern flicker — warm glow over the baked lamp in the background */
+  .pt-lamp{ position:absolute; left:8%; top:11%; width:150px; height:180px; z-index:0;
+     pointer-events:none; border-radius:50%;
+     background:radial-gradient(circle, rgba(255,186,80,.6), rgba(255,150,40,.18) 48%, transparent 70%);
+     mix-blend-mode:screen; animation:lampFlicker 5s infinite; }
   .pt-plaque{ position:absolute; left:-6px; width:158px; height:96px; z-index:3;
      background:url('assets/h-slots/pirate/board-bonus.png') center/contain no-repeat;
      display:flex; align-items:center; justify-content:center; border:none; padding:0; cursor:pointer;
@@ -490,40 +529,45 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
     <button class="modal-close" onclick="closeInfo()">✕</button>
     <div class="modal-title">PAYTABLE & RULES</div>
 
-    <div class="modal-section">Symbol Payouts (× bet per line)</div>
-    <table class="pt-table">
-      <tr><th>Symbol</th><th>3×</th><th>4×</th><th>5×</th></tr>
-      <tr><td>🏴‍☠️ Chest</td><td>0.45</td><td>1.50</td><td>7.50</td></tr>
-      <tr><td>💰 Coins</td><td>0.15</td><td>1.20</td><td>6.00</td></tr>
-      <tr><td>🍾 Rum</td><td>0.15</td><td>0.90</td><td>4.50</td></tr>
-      <tr><td>⚓ Anchor</td><td>0.15</td><td>0.75</td><td>3.00</td></tr>
-      <tr><td>🃏 Wild</td><td>0.60</td><td>1.80</td><td>9.00</td></tr>
-      <tr><td>K</td><td>0.10</td><td>0.25</td><td>0.60</td></tr>
-      <tr><td>A</td><td>0.10</td><td>0.30</td><td>0.75</td></tr>
-      <tr><td>J</td><td>0.05</td><td>0.15</td><td>0.40</td></tr>
-      <tr><td>Q</td><td>0.05</td><td>0.20</td><td>0.50</td></tr>
-    </table>
+    <div class="modal-section">Symbol Payouts &nbsp;(× bet per line — 3 / 4 / 5 in a row)</div>
+    <div class="pt-symgrid">
+      <div class="pt-symcard"><img src="assets/h-slots/pirate/symbols/sym-wild.png" alt=""><div class="pt-sc-r"><div class="pt-sc-name">Wild</div><div class="pt-sc-pays"><span>3× <b>0.60</b></span><span>4× <b>1.80</b></span><span class="x5">5× <b>9.00</b></span></div></div></div>
+      <div class="pt-symcard"><img src="assets/h-slots/pirate/symbols/sym-chest.png" alt=""><div class="pt-sc-r"><div class="pt-sc-name">Chest</div><div class="pt-sc-pays"><span>3× <b>0.45</b></span><span>4× <b>1.50</b></span><span class="x5">5× <b>7.50</b></span></div></div></div>
+      <div class="pt-symcard"><img src="assets/h-slots/pirate/symbols/sym-coins.png" alt=""><div class="pt-sc-r"><div class="pt-sc-name">Coins</div><div class="pt-sc-pays"><span>3× <b>0.15</b></span><span>4× <b>1.20</b></span><span class="x5">5× <b>6.00</b></span></div></div></div>
+      <div class="pt-symcard"><img src="assets/h-slots/pirate/symbols/sym-rum.png" alt=""><div class="pt-sc-r"><div class="pt-sc-name">Rum</div><div class="pt-sc-pays"><span>3× <b>0.15</b></span><span>4× <b>0.90</b></span><span class="x5">5× <b>4.50</b></span></div></div></div>
+      <div class="pt-symcard"><img src="assets/h-slots/pirate/symbols/sym-anchor.png" alt=""><div class="pt-sc-r"><div class="pt-sc-name">Anchor</div><div class="pt-sc-pays"><span>3× <b>0.15</b></span><span>4× <b>0.75</b></span><span class="x5">5× <b>3.00</b></span></div></div></div>
+      <div class="pt-symcard"><img src="assets/h-slots/pirate/symbols/sym-a.png" alt=""><div class="pt-sc-r"><div class="pt-sc-name">A</div><div class="pt-sc-pays"><span>3× <b>0.10</b></span><span>4× <b>0.30</b></span><span class="x5">5× <b>0.75</b></span></div></div></div>
+      <div class="pt-symcard"><img src="assets/h-slots/pirate/symbols/sym-k.png" alt=""><div class="pt-sc-r"><div class="pt-sc-name">K</div><div class="pt-sc-pays"><span>3× <b>0.10</b></span><span>4× <b>0.25</b></span><span class="x5">5× <b>0.60</b></span></div></div></div>
+      <div class="pt-symcard"><img src="assets/h-slots/pirate/symbols/sym-q.png" alt=""><div class="pt-sc-r"><div class="pt-sc-name">Q</div><div class="pt-sc-pays"><span>3× <b>0.05</b></span><span>4× <b>0.20</b></span><span class="x5">5× <b>0.50</b></span></div></div></div>
+      <div class="pt-symcard"><img src="assets/h-slots/pirate/symbols/sym-j.png" alt=""><div class="pt-sc-r"><div class="pt-sc-name">J</div><div class="pt-sc-pays"><span>3× <b>0.05</b></span><span>4× <b>0.15</b></span><span class="x5">5× <b>0.40</b></span></div></div></div>
+      <div class="pt-symcard"><img src="assets/h-slots/pirate/symbols/sym-scatter.png" alt=""><div class="pt-sc-r"><div class="pt-sc-name">Scatter</div><div class="pt-sc-pays"><span>×3 = 8 FS</span><span>×4 = 12</span><span class="x5">×5 = 20</span></div></div></div>
+      <div class="pt-symcard"><img src="assets/h-slots/pirate/symbols/sym-doubloon.png" alt=""><div class="pt-sc-r"><div class="pt-sc-name">Doubloon</div><div class="pt-sc-pays"><span>×3+ → Hold &amp; Win</span></div></div></div>
+    </div>
 
-    <div class="modal-section">Hold &amp; Win Jackpots</div>
-    <table class="pt-table">
-      <tr><th>Jackpot</th><th>Value</th></tr>
-      <tr><td>MINI</td><td>20× bet</td></tr>
-      <tr><td>MINOR</td><td>50× bet</td></tr>
-      <tr><td>MAJOR</td><td>150× bet</td></tr>
-      <tr><td>MEGA</td><td>2,000× bet</td></tr>
-      <tr><td>GRAND</td><td>10,000× bet</td></tr>
-    </table>
-
-    <div class="modal-section">Rules</div>
-    <div class="modal-rule">25 fixed paylines — wins pay left to right on adjacent reels.</div>
-    <div class="modal-rule">🃏 Wild substitutes for all paying symbols.</div>
-    <div class="modal-rule">🗺️ Scatter ×3 = 8 free spins | ×4 = 12 | ×5 = 20</div>
-    <div class="modal-rule">🥇 Doubloon ×3+ may trigger Hold &amp; Win feature.</div>
-    <div class="modal-rule">During Hold &amp; Win: 3 respins, reset on each new doubloon.</div>
-    <div class="modal-rule">🧭 Boost: multiplies all doubloon values 2.5–5×.</div>
-    <div class="modal-rule">💀 Mystery: transforms to random jackpot type.</div>
-    <div class="modal-rule">Full grid (15 doubloons) = GRAND jackpot bonus!</div>
-    <div class="modal-rule">Bonus Buy: 65× bet for guaranteed Hold &amp; Win.</div>
+    <div class="pt-cols">
+      <div>
+        <div class="modal-section">Hold &amp; Win Jackpots</div>
+        <div class="pt-jp">
+          <div class="pt-jp-row grand"><span class="n">Grand</span><span class="v">10,000× bet</span></div>
+          <div class="pt-jp-row mega"><span class="n">Mega</span><span class="v">2,000× bet</span></div>
+          <div class="pt-jp-row"><span class="n">Major</span><span class="v">150× bet</span></div>
+          <div class="pt-jp-row"><span class="n">Minor</span><span class="v">50× bet</span></div>
+          <div class="pt-jp-row"><span class="n">Mini</span><span class="v">20× bet</span></div>
+        </div>
+      </div>
+      <div>
+        <div class="modal-section">Rules</div>
+        <div class="modal-rule">25 fixed paylines — wins pay left to right on adjacent reels.</div>
+        <div class="modal-rule">🃏 Wild substitutes for all paying symbols.</div>
+        <div class="modal-rule">🗺️ Scatter ×3 = 8 free spins | ×4 = 12 | ×5 = 20.</div>
+        <div class="modal-rule">🥇 Doubloon ×3+ may trigger the Hold &amp; Win feature.</div>
+        <div class="modal-rule">During Hold &amp; Win: 3 respins, reset on each new doubloon.</div>
+        <div class="modal-rule">🧭 Boost multiplies all doubloon values 2.5–5×.</div>
+        <div class="modal-rule">💀 Mystery transforms to a random jackpot type.</div>
+        <div class="modal-rule">Full grid (15 doubloons) = GRAND jackpot bonus!</div>
+        <div class="modal-rule">Bonus Buy: 65× bet for guaranteed Hold &amp; Win.</div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -824,6 +868,9 @@ function buildReels() {
       var fill = document.createElement('div');
       fill.className = 'pt-post-fill';
       wrap.appendChild(fill);
+      var lamp = document.createElement('div');
+      lamp.className = 'pt-lamp';
+      wrap.appendChild(lamp);
       var post = document.createElement('div');
       post.className = 'pt-post';
       wrap.appendChild(post);
