@@ -320,7 +320,23 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
 
   /* Two wooden plaques on the left (BUY BONUS / PAYTABLE), tucked behind the
      cabinet's left edge. Relocated into .game-wrap by JS on desktop. */
-  .pt-plaque{ position:absolute; left:-4px; width:132px; height:80px; z-index:0;
+  /* Wooden post that the plaques hang from */
+  .pt-post{
+    position:absolute; left:120px; top:20%; bottom:18%; width:18px; z-index:1;
+    background:linear-gradient(to right,
+      #2b1208 0%, #6b3515 18%, #a05c2a 40%, #c47a3e 50%, #a05c2a 60%, #6b3515 82%, #2b1208 100%);
+    border-radius:5px;
+    box-shadow: inset 1px 0 3px rgba(255,255,255,.12), 3px 0 10px rgba(0,0,0,.7);
+  }
+  /* Rope connecting each plaque to the post */
+  .pt-plaque::after{
+    content:''; position:absolute; right:-18px; top:calc(50% - 3px);
+    width:18px; height:6px;
+    background:linear-gradient(to bottom, #7a5010 0%, #c8901a 50%, #7a5010 100%);
+    border-radius:3px;
+    box-shadow:0 1px 3px rgba(0,0,0,.5);
+  }
+  .pt-plaque{ position:absolute; left:-4px; width:132px; height:80px; z-index:2;
      background:url('assets/h-slots/pirate/board-bonus.png') center/contain no-repeat;
      display:flex; align-items:center; justify-content:center; border:none; padding:0; cursor:pointer; }
   .pt-plaque img{ display:none; }
@@ -802,6 +818,10 @@ function buildReels() {
         b.appendChild(s);
         wrap.appendChild(b);
       });
+      // Wooden post the plaques hang from
+      var post = document.createElement('div');
+      post.className = 'pt-post';
+      wrap.appendChild(post);
       // sound/mute toggle into the bottom-left corner
       const mute = document.getElementById('muteBtn');
       if (mute && wrap) { mute.classList.add('pt-mute-corner'); wrap.appendChild(mute); }
