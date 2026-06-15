@@ -96,6 +96,13 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
 .sym-cell{display:flex;align-items:center;justify-content:center;
   position:relative;background:transparent!important;border:none!important;box-shadow:none!important;}
 .sym-cell img{width:100%;height:100%;object-fit:contain;display:block;background:transparent;}
+/* contour back-glow for special symbols */
+.glow-scatter{ --gc:255,205,55; } .glow-mystery{ --gc:188,82,255; } .glow-wild{ --gc:255,68,45; }
+.glow-scatter img, .glow-mystery img, .glow-wild img{ animation:symGlow 1.2s ease-in-out infinite; }
+@keyframes symGlow{
+  0%,100%{ filter:drop-shadow(0 0 4px rgba(var(--gc),.7)) drop-shadow(0 0 11px rgba(var(--gc),.45)); }
+  50%{ filter:drop-shadow(0 0 9px rgba(var(--gc),1)) drop-shadow(0 0 20px rgba(var(--gc),.8)); }
+}
 .sym-cell.doubloon-cell{background:transparent;}
 .sym-cell.doubloon-cell .dval{
   position:absolute;bottom:1px;left:0;right:0;text-align:center;
@@ -977,6 +984,10 @@ function setCell(col, idx, symId, doubloonVal) {
   cell.className = 'sym-cell';
   cell.innerHTML = '';
   cell.dataset.sym = symId;
+  // contour back-glow for special symbols (scatter=yellow, mystery=purple, wild=red)
+  if (symId === 5) cell.classList.add('glow-scatter');
+  else if (symId === 8) cell.classList.add('glow-mystery');
+  else if (symId === 4) cell.classList.add('glow-wild');
 
   const src = SYMBOL_IMGS[symId] ?? SYMBOL_IMGS[0];
   const img = document.createElement('img');
