@@ -1724,8 +1724,14 @@ ul, li { list-style: none; }
     box-shadow: 0 0 12px rgba(0,0,0,.5);
   }
   .game-area::after { display: none; }
-  #running-bg-video,
+  /* Main gameplay video is 16:9 — fill the box (no pillars, no crop) */
+  #running-bg-video { object-fit: cover !important; }
+  /* Betting video is portrait → contain (pillarbox), side gaps filled by the
+     neutral backdrop on .bvb-wrap below. Only shows during WAITING/BETTING. */
   .bvb-wrap > video { object-fit: contain !important; }
+  .bvb-wrap {
+    background: #0a0503 url('/assets/desk-bet-bg.jpg') center center / cover no-repeat;
+  }
 
   /* bet panel — bottom, centered, constrained */
   .dbp-root {
