@@ -277,8 +277,9 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
   /* reels frame becomes the reel WINDOW that sits inside the wooden panel hole.
      No own border/bg/padding — the wood panel is the frame. */
   .pt-box-reels{ display:none; }                 /* gold backer replaced by wood panel */
-  .reels-frame{ position:relative; background:transparent; border:none; padding:0;
-                overflow:visible; }
+  .reels-frame{ position:relative; border:none; padding:0; overflow:visible;
+                /* sea-coloured backdrop behind the symbols */
+                background:linear-gradient(180deg,#1a586c 0%,#0c3140 55%,#07212c 100%); }
   .reels-frame::before{ top:0; left:0; right:0; bottom:0; }   /* grid lines = exact window */
   .reel{ min-width:0; }   /* let 5 reels share the fixed window width (no overflow) */
 
