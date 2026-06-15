@@ -240,7 +240,7 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
     border-radius:16px;
     box-shadow:0 0 0 1px rgba(0,0,0,.5), 0 12px 40px rgba(0,0,0,.6);
     overflow:hidden;
-    background:#0a1628 url('assets/h-slots/pirate/bg/background.PNG') center/cover no-repeat;
+    background:#0b1422;
   }
 
   /* the two rectangles (visual backers behind the content) */
@@ -272,6 +272,7 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
   .reels-frame{ position:relative; background:transparent; border:none; padding:0;
                 overflow:visible; }
   .reels-frame::before{ top:0; left:0; right:0; bottom:0; }   /* grid lines = exact window */
+  .reel{ min-width:0; }   /* let 5 reels share the fixed window width (no overflow) */
 
   /* the wooden cabinet panel, positioned so its centre opening == the reel window.
      Opening fractions: L .2735 T .3011 R .7305 B .7509 (panel 2000×1116). */
