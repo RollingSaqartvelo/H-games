@@ -436,35 +436,6 @@ function PanelA({ token }: { token: string; playerId: string }) {
   )
 }
 
-function PanelB({ token }: { token: string }) {
-  const p = useBetPanel(token)
-  return (
-    <>
-      <YouWinOverlay
-        panel="b"
-        show={p.cashedOut && p.cashoutMult !== null}
-        amount={p.cashoutPayout ?? 0}
-        multiplier={p.cashoutMult ?? 0}
-      />
-      <BetBlockUI
-        label="PANEL B"
-        betAmount={p.betAmount}
-        onBetAmountChange={p.setBetAmount}
-        onIncrement={() => p.setBetAmount((Math.max(BET_MIN, p.betAmt + BET_STEP)).toFixed(2))}
-        onDecrement={() => p.setBetAmount((Math.max(BET_MIN, p.betAmt - BET_STEP)).toFixed(2))}
-        autoBet={p.autoBet}
-        onAutoBetToggle={() => p.setAutoBet((v) => !v)}
-        loading={p.loading}
-        error={p.error}
-        buttonState={p.buttonState}
-        onAction={p.onAction}
-        locked={p.locked}
-        hasQueuedBet={p.hasQueuedBet}
-      />
-    </>
-  )
-}
-
 // ─── Public export ────────────────────────────────────────────────────────────
 
 interface DualBetPanelProps {
@@ -472,12 +443,11 @@ interface DualBetPanelProps {
   playerId: string
 }
 
+// Single bet panel (second panel removed) — stats follow directly below.
 export function DualBetPanel({ token, playerId }: DualBetPanelProps) {
   return (
     <div className="dbp-root">
       <PanelA token={token} playerId={playerId} />
-      <div className="dbp-divider" aria-hidden="true" />
-      <PanelB token={token} />
     </div>
   )
 }
