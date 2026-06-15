@@ -896,6 +896,53 @@
       text-shadow:0 1px 4px rgba(0,0,0,.8);
       white-space:nowrap;
     }
+
+    /* ═══ Desktop Aviator-style layout (≥1000px) ═══════════════════════════════
+       Stats left, history top, 16:9 game screen (contain), bet panels bottom. */
+    @media (min-width:1000px){
+      .topbar{ position:static; }
+      .gran-panel{ display:contents; }   /* lift np-history, game-area, panels into grid */
+      .bet-footer{ display:contents; }
+
+      .app{
+        max-width:1180px; width:100%; margin:24px auto;
+        min-height:calc(100dvh - 48px);
+        display:grid;
+        grid-template-columns:300px minmax(0,1fr);
+        grid-template-rows:auto auto auto auto auto;
+        grid-template-areas:
+          "topbar topbar"
+          "stats  history"
+          "stats  game"
+          "stats  panelA"
+          "stats  panelB";
+        column-gap:14px; row-gap:10px; padding:14px;
+        align-content:start;
+        background:#16241c;
+        border:1.5px solid rgba(70,232,154,.30);
+        border-radius:12px;
+        box-shadow:none;
+      }
+      .topbar{ grid-area:topbar; }
+      .np-history{ grid-area:history; position:relative!important; left:auto!important; top:auto!important; width:auto!important; height:auto!important; }
+      .lip{ grid-area:stats; position:relative!important; width:auto!important; max-width:none!important; margin:0!important; height:100%; min-height:0; overflow-y:auto; align-self:stretch; }
+      .game-area{
+        grid-area:game;
+        position:relative!important;
+        left:auto!important; top:auto!important;
+        width:100%!important; height:auto!important;
+        aspect-ratio:16/9;
+        align-self:start;
+      }
+      #bvbVideo{ object-fit:contain!important; }
+      #panel0.bet-panel{ grid-area:panelA; }
+      #panel1.bet-panel{ grid-area:panelB; }
+      #panel0.bet-panel, #panel1.bet-panel{
+        position:relative!important; left:auto!important; top:auto!important;
+        width:100%!important; height:auto!important;
+        aspect-ratio:2000/926; max-width:520px; margin:4px auto!important;
+      }
+    }
   </style>
 </head>
 <body>
@@ -2565,6 +2612,13 @@ updateMultVis()
   let ticking = false;
   function apply(){
     ticking = false;
+    if (window.innerWidth >= 1000) {
+      // Desktop grid layout — drop the mobile fixed/collapse positioning
+      const s = stage.style;
+      s.position=''; s.left=''; s.top=''; s.width=''; s.height=''; s.borderRadius='';
+      stage.classList.remove('collapsed');
+      return;
+    }
     const r = gp.getBoundingClientRect();
     const pin = topbar ? topbar.getBoundingClientRect().bottom : 0;
     const natLeft = r.left + 0.0426*r.width;
