@@ -139,6 +139,10 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
 .spin-btn:active{transform:scale(.95);}
 .spin-btn:disabled{opacity:.4;cursor:default;}
 .spin-btn img{width:90px;height:90px;object-fit:contain;display:block;}
+/* wheel spins while the round is spinning */
+@keyframes pt-spin-wheel{ to{ transform:rotate(360deg); } }
+.spin-btn.spinning img{ animation:pt-spin-wheel .7s linear infinite; }
+.spin-btn.spinning:disabled{ opacity:1; }
 
 /* Side buttons — portrait */
 .bonus-btn,.auto-btn,.info-btn{
@@ -227,14 +231,15 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
     height:auto; min-height:0;
     margin:24px auto;
     padding:16px;
+    position:relative;
     display:grid;
-    grid-template-columns:minmax(0,1fr) 320px;
+    grid-template-columns:104px minmax(0,1fr) 150px;
     grid-template-rows:auto 1fr auto;
     grid-template-areas:
-      "reels  header"
-      "reels  jackpot"
-      "reels  controls";
-    column-gap:16px; row-gap:10px;
+      "lpad  header   jackpot"
+      "lpad  reels    jackpot"
+      "lpad  controls jackpot";
+    column-gap:14px; row-gap:8px;
     align-items:stretch;
     border:1.5px solid rgba(240,192,64,.38);
     border-radius:16px;
@@ -248,8 +253,7 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
            border:1.5px solid rgba(240,192,64,.45);
            background:rgba(7,14,26,.62);
            box-shadow:inset 0 0 24px rgba(0,0,0,.55); }
-  .pt-box-reels{ grid-area:reels; }
-  .pt-box-rest { grid-column:2; grid-row:1 / 4; }
+  .pt-box{ display:none; }   /* no gold rectangles — wood panel + bare jackpot */
 
   /* lift nested children into the grid */
   .game-layout{ display:contents; }
@@ -261,8 +265,12 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
                 width:100%; padding:0;
                 display:flex; align-items:center; justify-content:center; overflow:visible; }
   .win-display{ grid-area:reels; z-index:2; align-self:end; height:22px; margin-bottom:6px; }
-  .col-jackpot{ grid-area:jackpot; z-index:1; width:auto; max-width:150px;
-                margin:0 auto; align-self:center; overflow:visible; }
+  /* jackpot scroll — tall & narrow, no border box, right side */
+  .col-jackpot{ grid-area:jackpot; z-index:1; width:100%; max-width:none;
+                height:100%; align-self:stretch; margin:0;
+                display:flex; align-items:center; justify-content:center; overflow:visible; }
+  .col-jackpot .jp-panel-wrap{ width:auto; height:100%; }
+  .col-jackpot .jp-panel-img{ width:auto; height:100%; object-fit:contain; }
   .bottom-panel{ grid-area:controls; z-index:1; padding:6px 10px 10px; }
   .col-character{ display:none; }   /* hidden on desktop v1 */
 
@@ -278,6 +286,24 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
      Opening fractions: L .2735 T .3011 R .7305 B .7509 (panel 2000×1116). */
   .pirate-panel{ display:block; position:absolute; z-index:0; pointer-events:none;
                  width:218.82%; left:-59.85%; top:-66.94%; height:auto; }
+
+  /* SPIN wheel straddling the cabinet's bottom platform (50% on, 50% below).
+     Relocated into .reels-outer (the cabinet) by JS on desktop. */
+  .reels-outer > .spin-btn{ position:absolute; left:50%; bottom:0; margin:0;
+     transform:translate(-50%,50%); width:118px; height:118px; z-index:7; }
+  .reels-outer > .spin-btn img{ width:118px; height:118px; }
+
+  /* Two wooden plaques on the left (BUY BONUS / PAYTABLE), tucked behind the
+     cabinet's left edge. Relocated into .game-wrap by JS on desktop. */
+  .pt-plaque{ position:absolute; left:-4px; width:132px; height:80px; z-index:0;
+     background:url('assets/h-slots/pirate/board-bonus.png') center/contain no-repeat;
+     display:flex; align-items:center; justify-content:center; border:none; padding:0; cursor:pointer; }
+  .pt-plaque img{ display:none; }
+  .pt-plaque .pt-plaque-txt{ display:block; font-size:12px; font-weight:900; letter-spacing:.05em;
+     color:#f0c040; text-shadow:0 1px 2px #000, 0 0 6px rgba(0,0,0,.85); text-align:center;
+     text-transform:uppercase; line-height:1.05; transform:translateY(-6%); }
+  #bonusBtn.pt-plaque{ top:30%; }
+  #paytableBtn.pt-plaque{ top:55%; }
 }
 </style>
 </head>
@@ -588,7 +614,6 @@ const ALL_ASSETS = [
   'assets/h-slots/pirate/symbols/sym-k.png',
   'assets/h-slots/pirate/symbols/sym-a.png',
   'assets/h-slots/pirate/ui/btn-spin-idle.png',
-  'assets/h-slots/pirate/ui/btn-spin-active.png',
   'assets/h-slots/pirate/ui/btn-autoplay.png',
   'assets/h-slots/pirate/ui/btn-buy-bonus.png',
   'assets/h-slots/pirate/ui/btn-paytable.png',
@@ -721,6 +746,26 @@ function buildReels() {
     // reserve the panel's full height in the reels area so the wood frame
     // (which overflows the reel window) isn't clipped or overlapping Box B
     if (frame.parentElement) frame.parentElement.style.minHeight = (CELL_H * 3 / 0.4498) + 'px';
+
+    // Relocate controls (desktop, once): SPIN onto the cabinet bottom platform,
+    // BUY BONUS / PAYTABLE onto two wooden plaques on the left.
+    if (!window._ptDesktopLaid) {
+      window._ptDesktopLaid = true;
+      const wrap = document.querySelector('.game-wrap');
+      const ro   = frame.parentElement;            // .reels-outer (the cabinet)
+      const spin = document.getElementById('spinBtn');
+      if (ro && spin) ro.appendChild(spin);
+      [['bonusBtn', 'BUY BONUS'], ['paytableBtn', 'PAYTABLE']].forEach(function (pair) {
+        const b = document.getElementById(pair[0]);
+        if (!b || !wrap) return;
+        b.classList.add('pt-plaque');
+        const s = document.createElement('span');
+        s.className = 'pt-plaque-txt';
+        s.textContent = pair[1];
+        b.appendChild(s);
+        wrap.appendChild(b);
+      });
+    }
   }
 
   const cellH = CELL_H;
@@ -1554,9 +1599,7 @@ function setSpinBtns(enabled) {
   document.getElementById('betDown').disabled = !enabled;
   document.getElementById('betUp').disabled = !enabled;
   const spinImg = document.getElementById('spinBtnImg');
-  if (spinImg) spinImg.src = enabled
-    ? 'assets/h-slots/pirate/ui/btn-spin-idle.png'
-    : 'assets/h-slots/pirate/ui/btn-spin-active.png';
+  if (spinImg) spinImg.src = 'assets/h-slots/pirate/ui/btn-spin-idle.png';  // single spin asset
   if (enabled) {
     document.getElementById('spinBtn').classList.remove('spinning');
   } else {
