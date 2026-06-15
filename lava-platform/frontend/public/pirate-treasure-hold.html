@@ -267,6 +267,8 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
 
 .pt-box{ display:none; }   /* desktop-only backer rectangles */
 .pirate-panel{ display:none; }   /* wooden cabinet — desktop only */
+/* BUY BONUS temporarily disabled (bonus-buy math broken) */
+#bonusBtn{ pointer-events:none !important; opacity:.5; filter:grayscale(.4); }
 
 /* ═══ Desktop framed "screen" (≥1000px) — landscape 16:9 like Outlaw:
    reels in one rectangle, everything else in a second rectangle.
@@ -390,11 +392,10 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
      background:radial-gradient(circle, rgba(255,186,80,.6), rgba(255,150,40,.18) 48%, transparent 70%);
      mix-blend-mode:screen; animation:lampFlicker 5s infinite; }
 
-  /* rat peeking out of the skull's eye socket (relative to the reel window) */
-  .pt-rat{ position:absolute; left:-17%; top:18%; width:54px; height:auto; z-index:1;
-     opacity:0; pointer-events:none; transform-origin:center;
-     filter:drop-shadow(0 2px 3px rgba(0,0,0,.55));
-     animation:ratPeek 30s ease-in-out infinite; }
+  /* animated skulls (with rat peeking from the socket) overlaid on the panel's
+     static skulls — positioned so its skull content matches the baked skulls. */
+  .pt-skullvid{ position:absolute; left:-39%; top:-62%; width:51%; height:auto; z-index:2;
+     pointer-events:none; }
   .pt-plaque{ position:absolute; left:-6px; width:158px; height:96px; z-index:3;
      background:url('assets/h-slots/pirate/board-bonus.png') center/contain no-repeat;
      display:flex; align-items:center; justify-content:center; border:none; padding:0; cursor:pointer;
@@ -860,11 +861,13 @@ function buildReels() {
     eyes.src = 'assets/h-slots/pirate/eyes.png';
     eyes.alt = '';
     frame.appendChild(eyes);
-    const rat = document.createElement('img');
-    rat.className = 'pt-rat';
-    rat.src = 'assets/h-slots/pirate/rat.png';
-    rat.alt = '';
-    frame.appendChild(rat);
+    const skv = document.createElement('video');
+    skv.className = 'pt-skullvid';
+    skv.src = 'assets/h-slots/pirate/skull-rat.webm';
+    skv.muted = true; skv.loop = true; skv.autoplay = true;
+    skv.setAttribute('playsinline', ''); skv.setAttribute('muted', '');
+    frame.appendChild(skv);
+    skv.play().catch(function(){});
     frame.style.width = (CELL_H * 3 * 1.821) + 'px';
     // reserve the panel's full height in the reels area so the wood frame
     // (which overflows the reel window) isn't clipped or overlapping Box B
