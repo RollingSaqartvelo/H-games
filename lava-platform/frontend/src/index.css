@@ -818,7 +818,7 @@ ul, li { list-style: none; }
 .dbp-block {
   width: 96%;
   aspect-ratio: 1404 / 853;
-  background: url('/assets/betting/buttons/pannel1.png?v=2') 53.4% 55.8% / 140% 125.3% no-repeat;
+  background: url('/assets/betting/buttons/pannel1.png') 53.4% 55.8% / 140% 125.3% no-repeat;
   border: none;
   border-radius: 22px;
   padding: 0;
@@ -959,8 +959,7 @@ ul, li { list-style: none; }
   background: transparent;
   border: none;
   border-radius: 8px;
-  color: #3a2410;
-  text-shadow: 0 1px 0 rgba(255,245,210,.5);
+  color: #fbbf24;
   font-size: 22px;
   font-family: 'Rye', Georgia, serif;
   line-height: 1;
@@ -990,7 +989,7 @@ ul, li { list-style: none; }
   overflow: hidden;
 }
 .dbp-amount-currency {
-  color: #5a3a16;
+  color: rgba(251,191,36,.7);
   font-size: 16px;
   font-family: 'Rye', Georgia, serif;
   flex-shrink: 0;
@@ -999,8 +998,7 @@ ul, li { list-style: none; }
   flex: 1;
   background: transparent;
   border: none;
-  color: #3a2410;
-  text-shadow: 0 1px 0 rgba(255,245,210,.5);
+  color: #fbbf24;
   font-size: 18px;
   font-weight: 700;
   font-family: 'Rye', Georgia, serif;
@@ -1033,8 +1031,7 @@ ul, li { list-style: none; }
   border-radius: 8px;
   background: transparent;
   border: none;
-  color: #3a2410;
-  text-shadow: 0 1px 0 rgba(255,245,210,.45);
+  color: #fbbf24;
   font-size: 10px;
   font-family: 'Rye', Georgia, serif;
   font-weight: 600;
@@ -1113,14 +1110,16 @@ ul, li { list-style: none; }
 .dbp-btn:disabled { cursor: not-allowed; }
 
 .dbp-btn--join {
-  /* dark engraved text on the ivory slot */
-  background: none;
-  -webkit-background-clip: border-box;
-  background-clip: border-box;
-  -webkit-text-fill-color: #36210d;
-  color: #36210d;
-  filter: none;
-  text-shadow: 0 1px 0 rgba(255,246,214,.6);
+  /* Ivory engraved gradient — no background, no glow box */
+  background: repeating-linear-gradient(
+    135deg,
+    #e8d5a8 0px, #f5edd5 3px, #c4a878 6px, #e0cca0 9px, #f2e4c0 12px, #cdb48a 15px
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  filter: drop-shadow(0 1.5px 3px rgba(0,0,0,0.9)) drop-shadow(0 -0.5px 0 rgba(255,240,190,0.3));
   font-size: 15px;
   padding-top: 4px;
   animation: dbp-ivory-breathe 2s ease-in-out infinite;
@@ -1164,13 +1163,15 @@ ul, li { list-style: none; }
   color: var(--red-light);
 }
 .dbp-btn--next-round {
-  background: none;
-  -webkit-background-clip: border-box;
-  background-clip: border-box;
-  -webkit-text-fill-color: #36210d;
-  color: #36210d;
-  filter: none;
-  text-shadow: 0 1px 0 rgba(255,246,214,.6);
+  background: repeating-linear-gradient(
+    135deg,
+    #e8d5a8 0px, #f5edd5 3px, #c4a878 6px, #e0cca0 9px, #f2e4c0 12px, #cdb48a 15px
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  filter: drop-shadow(0 1.5px 3px rgba(0,0,0,0.9)) drop-shadow(0 -0.5px 0 rgba(255,240,190,0.3));
   font-size: 15px;
   padding-top: 4px;
   animation: dbp-ivory-breathe 2s ease-in-out infinite;
@@ -1664,12 +1665,12 @@ ul, li { list-style: none; }
    Stats on the left, multiplier history on top, 16:9 game screen (video shown
    contain — no stretch, no crop, no quality loss), bet panel at the bottom. */
 @media (min-width: 1000px) {
-  body { background: #050303; }
+  body { background: #0a0603; }
 
   .app {
     max-width: 1180px;
     width: 100%;
-    margin: 0 auto;
+    margin: 8px auto;
     min-height: 100dvh;
     display: grid;
     grid-template-columns: 300px minmax(0, 1fr);
@@ -1683,7 +1684,11 @@ ul, li { list-style: none; }
     row-gap: 10px;
     padding: 14px;
     align-content: start;
-    box-shadow: none;
+    /* dark-brown background with small western symbols around the panels */
+    background: #19100a url('/assets/desk-bg-pattern.png') repeat;
+    background-size: 300px;
+    border: 1.5px solid rgba(214,158,46,.35);
+    border-radius: 12px;
   }
 
   .top-bar { grid-area: topbar; }
@@ -1693,7 +1698,7 @@ ul, li { list-style: none; }
   .app__footer  { display: contents; }
   .player-badge { display: none; }
 
-  /* stats — left column, full play-area height, own scroll */
+  /* stats — left column, full play-area height, own scroll, framed */
   .bv-root {
     grid-area: stats;
     align-self: stretch;
@@ -1702,8 +1707,8 @@ ul, li { list-style: none; }
     overflow-y: auto;
     border: 1.5px solid rgba(214,158,46,.5);
     border-radius: 8px;
-    background: rgba(16,9,3,.55);
-    box-shadow: inset 0 0 0 1px rgba(0,0,0,.5), 0 0 14px rgba(0,0,0,.5);
+    background: rgba(8,4,1,.6);
+    box-shadow: 0 0 12px rgba(0,0,0,.45);
   }
 
   /* game — exact 16:9 box (width-driven), nothing stretched or cropped */
@@ -1716,14 +1721,7 @@ ul, li { list-style: none; }
     align-self: start;
     border-radius: 10px;
     border: 1.5px solid rgba(214,158,46,.5);
-    box-shadow: 0 0 14px rgba(0,0,0,.5);
-  }
-  /* clear rectangular frame around the whole desktop window */
-  .app {
-    border: 1.5px solid rgba(214,158,46,.35);
-    border-radius: 12px;
-    margin-top: 8px;
-    margin-bottom: 8px;
+    box-shadow: 0 0 12px rgba(0,0,0,.5);
   }
   .game-area::after { display: none; }
   #running-bg-video,
