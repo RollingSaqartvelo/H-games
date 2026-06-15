@@ -1,5 +1,5 @@
 const MUSIC_SRC  = '/audio/Blues%20Saraceno%20%E2%80%93%20Dogs%20of%20War.mp3'
-const TARGET_VOL = 0.35
+const TARGET_VOL = 0.26
 const FADE_MS    = 800
 const TICK_MS    = 50
 const FADE_STEPS = FADE_MS / TICK_MS
