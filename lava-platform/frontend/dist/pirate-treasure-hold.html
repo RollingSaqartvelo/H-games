@@ -330,13 +330,19 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
   /* Two wooden plaques on the left (BUY BONUS / PAYTABLE), tucked behind the
      cabinet's left edge. Relocated into .game-wrap by JS on desktop. */
   /* Wooden post that the plaques hang from */
-  /* wooden post asset the plaques hang from (behind them) */
-  .pt-post{
-    position:absolute; left:-13px; top:5%; width:150px; height:90%; z-index:1;
-    background:url('assets/h-slots/pirate/post.png') center/contain no-repeat;
+  /* plain timber that fills the column down to the very bottom */
+  .pt-post-fill{
+    position:absolute; left:25px; width:74px; top:5%; bottom:0; z-index:1;
+    background:url('assets/h-slots/pirate/post-shaft.png') center/100% auto repeat-y;
     pointer-events:none;
   }
-  .pt-plaque{ position:absolute; left:-4px; width:132px; height:80px; z-index:2;
+  /* wooden post head (cap + bands + hooks) on top of the fill */
+  .pt-post{
+    position:absolute; left:-13px; top:5%; width:150px; height:90%; z-index:2;
+    background:url('assets/h-slots/pirate/post.png') top center / contain no-repeat;
+    pointer-events:none;
+  }
+  .pt-plaque{ position:absolute; left:-4px; width:132px; height:80px; z-index:3;
      background:url('assets/h-slots/pirate/board-bonus.png') center/contain no-repeat;
      display:flex; align-items:center; justify-content:center; border:none; padding:0; cursor:pointer;
      transform-origin:50% 6%; animation:plaqueSway 4.5s ease-in-out infinite; }
@@ -820,6 +826,9 @@ function buildReels() {
         wrap.appendChild(b);
       });
       // Wooden post the plaques hang from
+      var fill = document.createElement('div');
+      fill.className = 'pt-post-fill';
+      wrap.appendChild(fill);
       var post = document.createElement('div');
       post.className = 'pt-post';
       wrap.appendChild(post);
