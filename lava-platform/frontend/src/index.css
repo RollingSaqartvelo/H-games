@@ -1670,8 +1670,8 @@ ul, li { list-style: none; }
   .app {
     max-width: 1180px;
     width: 100%;
-    margin: 8px auto;
-    min-height: 100dvh;
+    margin: 24px auto;
+    min-height: calc(100dvh - 48px);
     display: grid;
     grid-template-columns: 300px minmax(0, 1fr);
     grid-template-rows: auto auto auto auto;
