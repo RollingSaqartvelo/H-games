@@ -321,20 +321,11 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
   /* Two wooden plaques on the left (BUY BONUS / PAYTABLE), tucked behind the
      cabinet's left edge. Relocated into .game-wrap by JS on desktop. */
   /* Wooden post that the plaques hang from */
+  /* wooden post asset the plaques hang from (behind them) */
   .pt-post{
-    position:absolute; left:120px; top:20%; bottom:18%; width:18px; z-index:1;
-    background:linear-gradient(to right,
-      #2b1208 0%, #6b3515 18%, #a05c2a 40%, #c47a3e 50%, #a05c2a 60%, #6b3515 82%, #2b1208 100%);
-    border-radius:5px;
-    box-shadow: inset 1px 0 3px rgba(255,255,255,.12), 3px 0 10px rgba(0,0,0,.7);
-  }
-  /* Rope connecting each plaque to the post */
-  .pt-plaque::after{
-    content:''; position:absolute; right:-18px; top:calc(50% - 3px);
-    width:18px; height:6px;
-    background:linear-gradient(to bottom, #7a5010 0%, #c8901a 50%, #7a5010 100%);
-    border-radius:3px;
-    box-shadow:0 1px 3px rgba(0,0,0,.5);
+    position:absolute; left:-13px; top:5%; width:150px; height:90%; z-index:1;
+    background:url('assets/h-slots/pirate/post.png') center/contain no-repeat;
+    pointer-events:none;
   }
   .pt-plaque{ position:absolute; left:-4px; width:132px; height:80px; z-index:2;
      background:url('assets/h-slots/pirate/board-bonus.png') center/contain no-repeat;
@@ -343,9 +334,9 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
   .pt-plaque .pt-plaque-txt{ display:block; font-size:12px; font-weight:900; letter-spacing:.05em;
      color:#f0c040; text-shadow:0 1px 2px #000, 0 0 6px rgba(0,0,0,.85); text-align:center;
      text-transform:uppercase; line-height:1.05; transform:translateY(-6%); }
-  #bonusBtn.pt-plaque{ top:26%; }
-  #paytableBtn.pt-plaque{ top:50%; }
-  #autoBtn.pt-plaque{ top:74%; }
+  #bonusBtn.pt-plaque{ top:13%; }
+  #paytableBtn.pt-plaque{ top:26%; }
+  #autoBtn.pt-plaque{ top:39%; }
   #autoBtn.pt-plaque.active .pt-plaque-txt{ color:#46e89a; }   /* active = green */
 
   /* sound/mute toggle — bottom-left corner of the frame */
@@ -448,7 +439,7 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
 <div id="hwOverlay" style="position:fixed;inset:0;z-index:150;background:rgba(0,0,0,0.92);display:none;flex-direction:column;align-items:center;justify-content:center;gap:10px;">
   <div style="font-size:24px;font-weight:900;color:#f0c040;letter-spacing:.15em;text-shadow:0 0 20px rgba(240,192,64,0.8);">HOLD &amp; WIN</div>
   <div style="position:relative;display:inline-block;">
-    <img src="assets/h-slots/pirate/ui/hold-win-frame.png" style="width:90vw;max-width:480px;display:block;pointer-events:none;">
+    <img src="assets/h-slots/pirate/ui/hold-win-frame.png" style="width:900px;max-width:92vw;display:block;pointer-events:none;">
     <div id="hwGrid" style="position:absolute;top:18%;left:9%;width:82%;height:68%;display:grid;grid-template-columns:repeat(5,1fr);grid-template-rows:repeat(3,1fr);gap:3px;"></div>
   </div>
   <div style="text-align:center;">
@@ -584,7 +575,7 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
     <!-- Right column: vertical jackpot scroll -->
     <div class="col-jackpot">
       <div class="jp-panel-wrap" id="jpPanel">
-        <img class="jp-panel-img" src="assets/h-slots/pirate/ui/jackpot-panel-new.png" alt="">
+        <img class="jp-panel-img" src="assets/h-slots/pirate/ui/new-jackpot.png" alt="">
         <div class="jp-values">
           <div class="jp-slot grand">
             <div class="jp-name">GRAND</div>
