@@ -1660,3 +1660,68 @@ ul, li { list-style: none; }
   .ywi--a    { left: calc(50vw - 240px); }
   .ywi--b    { left: 50vw; }
 }
+
+/* ─── Desktop Aviator-style layout (≥ 1000px) ─────────────────────────────────
+   Stats on the left, multiplier history on top, 16:9 game screen (video shown
+   contain — no stretch, no crop, no quality loss), bet panel at the bottom. */
+@media (min-width: 1000px) {
+  body { background: #050303; }
+
+  .app {
+    max-width: 1180px;
+    width: 100%;
+    margin: 0 auto;
+    min-height: 100dvh;
+    display: grid;
+    grid-template-columns: 300px minmax(0, 1fr);
+    grid-template-rows: auto auto auto auto;
+    grid-template-areas:
+      "topbar topbar"
+      "stats  history"
+      "stats  game"
+      "stats  panel";
+    column-gap: 14px;
+    row-gap: 10px;
+    padding: 14px;
+    align-content: start;
+    box-shadow: none;
+  }
+
+  .top-bar { grid-area: topbar; }
+  .mh-row  { grid-area: history; margin: 0; }
+
+  /* lift the footer's children (bet panel + stats) into the grid */
+  .app__footer  { display: contents; }
+  .player-badge { display: none; }
+
+  /* stats — left column, full play-area height, own scroll */
+  .bv-root {
+    grid-area: stats;
+    align-self: stretch;
+    height: 100%;
+    min-height: 0;
+    overflow-y: auto;
+  }
+
+  /* game — exact 16:9 box (width-driven), nothing stretched or cropped */
+  .game-area {
+    grid-area: game;
+    flex: none;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    align-self: start;
+    border-radius: 14px;
+  }
+  .game-area::after { display: none; }
+  #running-bg-video,
+  .bvb-wrap > video { object-fit: contain !important; }
+
+  /* bet panel — bottom, centered, constrained */
+  .dbp-root {
+    grid-area: panel;
+    width: 100%;
+    max-width: 460px;
+    margin: 8px auto 0;
+  }
+}
