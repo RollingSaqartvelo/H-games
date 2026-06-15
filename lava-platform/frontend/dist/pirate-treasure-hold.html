@@ -274,6 +274,22 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
   .col-jackpot .jp-panel-wrap{ width:auto; height:100%; }
   .col-jackpot .jp-panel-img{ width:auto; height:100%; object-fit:contain; }
   .bottom-panel{ grid-area:controls; z-index:1; padding:6px 10px 10px; }
+
+  /* wooden bet-input panel: − / + over the carved knobs, amount in the centre window */
+  .bottom-panel .bet-row{ position:relative; width:310px; aspect-ratio:1600/642;
+     margin:2px auto 6px; padding:0; display:block;
+     background:url('assets/h-slots/pirate/bet-input-panel.png') center/contain no-repeat; }
+  .bottom-panel .bet-row .bet-lbl{ display:none; }
+  .bottom-panel .bet-row .bet-stepper{ display:contents; }
+  .bottom-panel .bet-row .bet-btn{ position:absolute; top:47%; transform:translate(-50%,-50%);
+     width:58px; height:58px; background:transparent; border:none; box-shadow:none;
+     color:transparent; font-size:0; cursor:pointer; z-index:2; border-radius:50%; }
+  .bottom-panel .bet-row #betDown{ left:16.5%; }
+  .bottom-panel .bet-row #betUp{ left:83.5%; }
+  .bottom-panel .bet-row #betDisplay{ position:absolute; left:50%; top:47.7%;
+     transform:translate(-50%,-50%); width:37%; height:50%; min-width:0; margin:0;
+     background:#000; border-radius:4px; display:flex; align-items:center; justify-content:center;
+     color:#f0c040; font-family:monospace; font-weight:900; font-size:21px; z-index:1; }
   .col-character{ display:none; }   /* hidden on desktop v1 */
 
   /* reels frame becomes the reel WINDOW that sits inside the wooden panel hole.
