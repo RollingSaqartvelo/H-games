@@ -276,16 +276,18 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
 /* ═══ Desktop framed "screen" (≥1000px) — landscape 16:9 like Outlaw:
    reels in one rectangle, everything else in a second rectangle.
    Mobile layout below 1000px is untouched. ═══════════════════════════════ */
-@media (min-width:1000px){
-  html,body{ background:#060d18; overflow:auto; height:auto; }
+/* framed landscape layout — applied at ALL widths; JS scales it to fit the
+   viewport (desktop AND mobile show the same rectangular screen). */
+@media (min-width:1px){
+  html,body{ background:#060d18; overflow:hidden; height:100%; }
   /* neutral dark surround — pirate background lives INSIDE the frame only */
   .bg-layer, .bg-stars{ display:none !important; }
 
-  /* outer landscape frame */
+  /* outer landscape frame — FIXED design size, transform-scaled by JS */
   .game-wrap{
-    max-width:1340px; width:100%;
+    width:1340px; max-width:none;
     height:auto; min-height:0;
-    margin:24px auto;
+    margin:0;
     padding:16px;
     position:relative;
     display:grid;
@@ -698,7 +700,7 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
 const DEMO_START = 1000;
 const BET_STEPS = [0.25, 0.50, 1, 2, 5, 10, 25, 30];
 // px per symbol cell — compact on mobile, larger on desktop framed screen
-const CELL_H = (typeof window !== 'undefined' && window.innerWidth >= 1000) ? 76 : 40;
+const CELL_H = 76;   // single framed layout (scaled to fit on mobile)
 const NUM_ROWS = 3;
 const NUM_COLS = 5;
 const SYMBOL_NAMES = ['chest','coins','rum','anchor','wild','scatter','doubloon','boost','mystery','j','q','k','a'];
@@ -859,9 +861,9 @@ function buildReels() {
   frame.innerHTML = '';
   reelEls = []; stripEls = []; cellRows = [];
 
-  // Desktop: wooden cabinet panel behind the reels. Size the reel window to the
-  // panel's centre opening aspect (≈1.821) so the reels fill the hole exactly.
-  if (window.innerWidth >= 1000) {
+  // Wooden cabinet panel behind the reels (always — layout is scaled to fit).
+  // Size the reel window to the panel's centre opening aspect (≈1.821).
+  if (true) {
     const panel = document.createElement('img');
     panel.className = 'pirate-panel';
     panel.src = 'assets/h-slots/pirate/pirate%20baraban.png';
@@ -1222,18 +1224,35 @@ function syncJackpotHeight() {
   const rf = document.getElementById('reelsFrame');
   const cj = document.querySelector('.col-jackpot');
   if (!rf || !cj) return;
-  // Desktop: match the FULL wooden panel height (reels-outer), not the reel window.
-  // Mobile: match the reel window as before.
-  const target = (window.innerWidth >= 1000 && rf.parentElement)
-    ? rf.parentElement.offsetHeight
-    : rf.offsetHeight;
+  // match the FULL wooden panel height (reels-outer), not just the reel window
+  const target = rf.parentElement ? rf.parentElement.offsetHeight : rf.offsetHeight;
   cj.style.height = target + 'px';
+}
+
+// Scale the whole fixed-size game frame to fit the viewport (desktop & mobile),
+// centered — so the rectangular screen looks identical, just smaller on phones.
+function fitStage() {
+  const gw = document.querySelector('.game-wrap');
+  if (!gw) return;
+  gw.style.transform = 'none';
+  const w = gw.offsetWidth, h = gw.offsetHeight;
+  if (!w || !h) return;
+  const s = Math.min(window.innerWidth / w, window.innerHeight / h, 1);
+  gw.style.position = 'fixed';
+  gw.style.transformOrigin = 'top left';
+  gw.style.left = Math.round((window.innerWidth  - w * s) / 2) + 'px';
+  gw.style.top  = Math.round((window.innerHeight - h * s) / 2) + 'px';
+  gw.style.transform = 'scale(' + s + ')';
 }
 
 async function init() {
   buildReels();
-  requestAnimationFrame(syncJackpotHeight);
-  window.addEventListener('resize', syncJackpotHeight);
+  requestAnimationFrame(function(){ syncJackpotHeight(); fitStage(); });
+  window.addEventListener('resize', function(){ syncJackpotHeight(); fitStage(); });
+  window.addEventListener('orientationchange', function(){ setTimeout(function(){ syncJackpotHeight(); fitStage(); }, 200); });
+  window.addEventListener('load', function(){ syncJackpotHeight(); fitStage(); });
+  // re-fit after async assets (panel/jackpot/logo) change the frame height
+  [200, 600, 1200, 2500].forEach(function(t){ setTimeout(function(){ syncJackpotHeight(); fitStage(); }, t); });
   buildStars();
   initChar();
 
