@@ -63,7 +63,7 @@ export function RunningVideo() {
     <video
       ref={videoRef}
       id="running-bg-video"
-      src="/video/outlawbgnew.mp4"
+      src="/video/outlawbgnew.mp4?v=2"
       style={{
         position: 'absolute',
         inset: 0,
