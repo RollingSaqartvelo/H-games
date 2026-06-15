@@ -157,6 +157,13 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
   0%,82%,100%{ opacity:.85 } 84%{ opacity:.12 } 86%{ opacity:.75 }
   89%{ opacity:.05 } 92%{ opacity:.8 } 95%{ opacity:.5 }
 }
+/* rat scurries along the floor left→right every ~16s */
+@keyframes ratRun{
+  0%,78%{ left:-13%; opacity:0; }
+  80%{ opacity:1; } 99%{ opacity:1; }
+  100%{ left:109%; opacity:0; }
+}
+@keyframes ratBob{ 0%,100%{ transform:translateY(0) } 50%{ transform:translateY(-4px) } }
 .spin-btn.spinning img{ animation:pt-spin-wheel .7s linear infinite; }
 .spin-btn.spinning:disabled{ opacity:1; }
 
@@ -364,18 +371,29 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
      cabinet's left edge. Relocated into .game-wrap by JS on desktop. */
   /* Wooden post that the plaques hang from */
   /* plain timber column behind the plaques, down to the very bottom */
+  /* ORIGINAL post asset — the main pillar (cap + bands), top-anchored */
+  .pt-post{
+    position:absolute; left:32px; top:2%; width:80px; height:91%; z-index:2;
+    background:url('assets/h-slots/pirate/post.png') top center / 204% auto no-repeat;
+    pointer-events:none;
+  }
+  /* plain timber that only EXTENDS the post down to the very bottom (behind it) */
   .pt-post-fill{
-    position:absolute; left:36px; width:78px; top:11%; bottom:0; z-index:1;
+    position:absolute; left:32px; width:80px; top:80%; bottom:0; z-index:1;
     background:url('assets/h-slots/pirate/post-shaft.png') center/100% auto repeat-y;
     pointer-events:none;
   }
-  .pt-post{ display:none; }   /* no decorative cap head on top */
 
   /* lantern flicker — warm glow over the baked lamp in the background */
   .pt-lamp{ position:absolute; left:8%; top:11%; width:150px; height:180px; z-index:0;
      pointer-events:none; border-radius:50%;
      background:radial-gradient(circle, rgba(255,186,80,.6), rgba(255,150,40,.18) 48%, transparent 70%);
      mix-blend-mode:screen; animation:lampFlicker 5s infinite; }
+
+  /* rat scurries along the floor of the hold every ~16s */
+  .pt-rat{ position:absolute; bottom:2%; left:-13%; width:86px; height:auto; z-index:1;
+     opacity:0; pointer-events:none; filter:drop-shadow(0 4px 4px rgba(0,0,0,.55));
+     animation:ratRun 16s linear infinite; }
   .pt-plaque{ position:absolute; left:-6px; width:158px; height:96px; z-index:3;
      background:url('assets/h-slots/pirate/board-bonus.png') center/contain no-repeat;
      display:flex; align-items:center; justify-content:center; border:none; padding:0; cursor:pointer;
@@ -871,6 +889,11 @@ function buildReels() {
       var lamp = document.createElement('div');
       lamp.className = 'pt-lamp';
       wrap.appendChild(lamp);
+      var rat = document.createElement('img');
+      rat.className = 'pt-rat';
+      rat.src = 'assets/h-slots/pirate/rat.png';
+      rat.alt = '';
+      wrap.appendChild(rat);
       var post = document.createElement('div');
       post.className = 'pt-post';
       wrap.appendChild(post);
