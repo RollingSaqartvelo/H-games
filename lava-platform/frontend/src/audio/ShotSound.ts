@@ -10,9 +10,12 @@ audio.style.cssText = 'position:fixed;width:1px;height:1px;opacity:0;pointer-eve
 if (typeof document !== 'undefined') document.body.appendChild(audio)
 
 /** Fire the gunshot sound — retriggers from the start on every shot. */
+// File has ~256ms of leading silence; start 50ms in so the shot lands 50ms earlier.
+const LEAD_SKIP = 0.05
+
 export function playShotSound(): void {
   audio.pause()
-  audio.currentTime = 0
+  audio.currentTime = LEAD_SKIP
   audio.volume = 0.7
   const p = audio.play()
   if (p) p.catch(() => {})
