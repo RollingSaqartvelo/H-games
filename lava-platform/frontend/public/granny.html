@@ -902,30 +902,35 @@
     @media (min-width:1000px){
       .topbar{ position:static; }
       .gran-panel{ display:contents; }   /* lift np-history, game-area, panels into grid */
-      .bet-footer{ display:contents; }
 
       .app{
         max-width:1180px; width:100%; margin:24px auto;
         min-height:calc(100dvh - 48px);
         display:grid;
         grid-template-columns:300px minmax(0,1fr);
-        grid-template-rows:auto auto auto auto auto;
+        grid-template-rows:auto auto auto auto;
         grid-template-areas:
           "topbar topbar"
           "stats  history"
           "stats  game"
-          "stats  panelA"
-          "stats  panelB";
+          "stats  panels";
         column-gap:14px; row-gap:10px; padding:14px;
         align-content:start;
-        background:#16241c;
+        background:#16241c url('/assets/granny/med-bg-pattern.png?v=1') repeat;
+        background-size:300px;
         border:1.5px solid rgba(70,232,154,.30);
         border-radius:12px;
         box-shadow:none;
       }
       .topbar{ grid-area:topbar; }
       .np-history{ grid-area:history; position:relative!important; left:auto!important; top:auto!important; width:auto!important; height:auto!important; }
-      .lip{ grid-area:stats; position:relative!important; width:auto!important; max-width:none!important; margin:0!important; height:100%; min-height:0; overflow-y:auto; align-self:stretch; }
+      .lip{
+        grid-area:stats; position:relative!important;
+        width:auto!important; max-width:none!important; margin:0!important;
+        height:100%; min-height:0; overflow-y:auto; align-self:stretch;
+        background:#102019;            /* opaque — no icon bleed through stats */
+        border:1.5px solid rgba(70,232,154,.45); border-radius:8px;
+      }
       .game-area{
         grid-area:game;
         position:relative!important;
@@ -933,14 +938,22 @@
         width:100%!important; height:auto!important;
         aspect-ratio:16/9;
         align-self:start;
+        border:1.5px solid rgba(70,232,154,.45); border-radius:10px;
       }
       #bvbVideo{ object-fit:contain!important; }
-      #panel0.bet-panel{ grid-area:panelA; }
-      #panel1.bet-panel{ grid-area:panelB; }
+      /* both bet panels side-by-side in one row → fit without scrolling */
+      .bet-footer{
+        grid-area:panels;
+        display:flex!important; flex-direction:row; gap:14px;
+        align-items:flex-start; justify-content:center;
+        position:relative!important; left:auto!important; top:auto!important;
+        width:100%!important; height:auto!important; margin:4px 0 0!important;
+      }
       #panel0.bet-panel, #panel1.bet-panel{
         position:relative!important; left:auto!important; top:auto!important;
-        width:100%!important; height:auto!important;
-        aspect-ratio:2000/926; max-width:520px; margin:4px auto!important;
+        flex:1 1 0; min-width:0;
+        width:auto!important; height:auto!important;
+        aspect-ratio:2000/926; max-width:520px; margin:0!important;
       }
     }
   </style>
