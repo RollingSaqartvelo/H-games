@@ -10,6 +10,7 @@ import { BettingVideo }      from './components/BettingVideo'
 import { WastedOverlay }    from './components/WastedOverlay'
 import { GifCharacters }   from './components/GifCharacters'
 import { RunningVideo }    from './components/RunningVideo'
+import { RoundLoader }     from './components/RoundLoader'
 import { useSocket }         from './hooks/useSocket'
 import { usePixi }           from './hooks/usePixi'
 import { useTMAAuth }        from './hooks/useTMAAuth'
@@ -99,6 +100,9 @@ export function App() {
 
         {/* z:99 — Wasted cinematic slam on crash */}
         <WastedOverlay />
+
+        {/* z:90 — Inter-round logo loader (2s) after crash, before betting */}
+        <RoundLoader />
 
         {/* z:50 — Splash overlay on first load; sits above Pixi so the mount
             div stays in game-area and Pixi can initialise into the correct element */}

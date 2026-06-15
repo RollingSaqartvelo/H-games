@@ -186,6 +186,44 @@ ul, li { list-style: none; }
 }
 .splash__text { color: var(--text-muted); font-size: 12px; letter-spacing: 2px; }
 
+/* ─── Inter-round loader (logo + bar) inside the broadcast screen ───────────── */
+.round-loader {
+  position: absolute;
+  inset: 0;
+  z-index: 90;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  background: var(--bg);
+  animation: rl-in 0.2s ease;
+}
+@keyframes rl-in { from { opacity: 0 } to { opacity: 1 } }
+.round-loader__logo {
+  width: 62%;
+  max-width: 280px;
+  object-fit: contain;
+  border-radius: 14px;
+}
+.round-loader__bar {
+  width: 58%;
+  max-width: 260px;
+  height: 6px;
+  border-radius: 99px;
+  background: rgba(255, 255, 255, 0.12);
+  overflow: hidden;
+}
+.round-loader__fill {
+  display: block;
+  height: 100%;
+  width: 0;
+  border-radius: 99px;
+  background: linear-gradient(90deg, #b8860b, #ffd700, #fff0a0);
+  animation: rl-fill 2s linear forwards;
+}
+@keyframes rl-fill { from { width: 0 } to { width: 100% } }
+
 /* ─── TopBar ─────────────────────────────────────────────────────────────────── */
 .top-bar {
   flex: 0 0 auto;
