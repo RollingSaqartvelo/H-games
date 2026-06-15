@@ -143,6 +143,15 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
 @keyframes pt-spin-wheel{ to{ transform:rotate(360deg); } }
 /* bat opens eyes briefly once per 7s cycle (opacity only — keeps the centering transform) */
 @keyframes batBlink{ 0%,88%,100%{opacity:0} 91%,97%{opacity:1} }
+/* embossed 3D gold plaque text with a gentle glow pulse */
+@keyframes plaqueGlow{
+  0%,100%{ text-shadow:0 1px 0 #c8901a,0 2px 0 #9a6a14,0 3px 0 #7d540f,0 4px 5px rgba(0,0,0,.65),
+            0 0 6px rgba(255,200,90,.40),0 0 12px rgba(255,180,50,.25); }
+  50%{ text-shadow:0 1px 0 #c8901a,0 2px 0 #9a6a14,0 3px 0 #7d540f,0 4px 5px rgba(0,0,0,.65),
+        0 0 11px rgba(255,212,115,.85),0 0 22px rgba(255,190,70,.55); }
+}
+/* plaques sway gently as if hanging in a breeze */
+@keyframes plaqueSway{ 0%,100%{ transform:rotate(-1.1deg) } 50%{ transform:rotate(1.1deg) } }
 .spin-btn.spinning img{ animation:pt-spin-wheel .7s linear infinite; }
 .spin-btn.spinning:disabled{ opacity:1; }
 
@@ -329,14 +338,15 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
   }
   .pt-plaque{ position:absolute; left:-4px; width:132px; height:80px; z-index:2;
      background:url('assets/h-slots/pirate/board-bonus.png') center/contain no-repeat;
-     display:flex; align-items:center; justify-content:center; border:none; padding:0; cursor:pointer; }
+     display:flex; align-items:center; justify-content:center; border:none; padding:0; cursor:pointer;
+     transform-origin:50% 6%; animation:plaqueSway 4.5s ease-in-out infinite; }
   .pt-plaque img{ display:none; }
-  .pt-plaque .pt-plaque-txt{ display:block; font-size:12px; font-weight:900; letter-spacing:.05em;
-     color:#f0c040; text-shadow:0 1px 2px #000, 0 0 6px rgba(0,0,0,.85); text-align:center;
-     text-transform:uppercase; line-height:1.05; transform:translateY(-6%); }
-  #bonusBtn.pt-plaque{ top:13%; }
-  #paytableBtn.pt-plaque{ top:26%; }
-  #autoBtn.pt-plaque{ top:39%; }
+  .pt-plaque .pt-plaque-txt{ display:block; font-size:13px; font-weight:900; letter-spacing:.04em;
+     color:#ffe7a0; text-align:center; text-transform:uppercase; line-height:1.05;
+     transform:translateY(-6%); animation:plaqueGlow 2.6s ease-in-out infinite; }
+  #bonusBtn.pt-plaque{ top:13%; animation-delay:0s; }
+  #paytableBtn.pt-plaque{ top:26%; animation-delay:-1.7s; }
+  #autoBtn.pt-plaque{ top:39%; animation-delay:-3.2s; }
   #autoBtn.pt-plaque.active .pt-plaque-txt{ color:#46e89a; }   /* active = green */
 
   /* sound/mute toggle — bottom-left corner of the frame */
