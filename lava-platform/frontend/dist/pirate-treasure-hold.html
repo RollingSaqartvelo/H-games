@@ -152,6 +152,11 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
 }
 /* plaques sway gently as if hanging in a breeze */
 @keyframes plaqueSway{ 0%,100%{ transform:rotate(-1.1deg) } 50%{ transform:rotate(1.1deg) } }
+/* logo back-glow: warm halo along the contour, gently pulsing */
+@keyframes logoGlow{
+  0%,100%{ filter:drop-shadow(0 0 9px rgba(255,200,90,.5)) drop-shadow(0 0 20px rgba(255,165,45,.32)) drop-shadow(0 6px 10px rgba(0,0,0,.6)); }
+  50%{ filter:drop-shadow(0 0 17px rgba(255,216,120,.85)) drop-shadow(0 0 40px rgba(255,180,60,.6)) drop-shadow(0 6px 10px rgba(0,0,0,.6)); }
+}
 /* hanging lantern flickers (briefly dims) every 5s — extra glow over the baked lamp */
 @keyframes lampFlicker{
   0%,82%,100%{ opacity:.85 } 84%{ opacity:.12 } 86%{ opacity:.75 }
@@ -344,7 +349,7 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
   .col-character{ display:none; }   /* hidden on desktop v1 */
   .header-logo{ display:none; }     /* replaced by the 3D logo image */
   .pt-logo{ position:absolute; left:4px; top:2px; width:224px; height:auto; z-index:6;
-     pointer-events:none; filter:drop-shadow(0 6px 10px rgba(0,0,0,.6)); }
+     pointer-events:none; animation:logoGlow 3s ease-in-out infinite; }
 
   /* reels frame becomes the reel WINDOW that sits inside the wooden panel hole.
      No own border/bg/padding — the wood panel is the frame. */
