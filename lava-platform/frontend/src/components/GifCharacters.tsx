@@ -82,6 +82,13 @@ export function GifCharacters() {
     }
   }, [running])
 
+  // Gunshot sound on the sheriff-crash GIF (rising edge → plays once)
+  const prevSheriffCrashing = useRef(false)
+  useEffect(() => {
+    if (sheriffCrashing && !prevSheriffCrashing.current) playShotSound()
+    prevSheriffCrashing.current = sheriffCrashing
+  }, [sheriffCrashing])
+
   // Hero + crash sequence state machine
   useEffect(() => {
     window.clearTimeout(heroTimer.current)
