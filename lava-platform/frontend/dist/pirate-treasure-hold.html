@@ -321,6 +321,11 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
                 width:100%; padding:0;
                 display:flex; align-items:center; justify-content:center; overflow:visible; }
   .win-display{ grid-area:reels; z-index:2; align-self:end; height:22px; margin-bottom:6px; }
+  /* WIN readout on the cabinet's top wooden beam — bold white embossed letters */
+  .reels-frame > .win-display{ position:absolute; left:50%; top:-29%;
+     transform:translate(-50%,-50%); width:auto; height:auto; margin:0; z-index:8; }
+  .reels-frame > .win-display .win-text{ color:#fff; font-size:30px; font-weight:900; letter-spacing:.04em;
+     text-shadow:0 2px 0 #000, 0 -1px 0 #000, 2px 0 0 #000, -2px 0 0 #000, 0 3px 7px rgba(0,0,0,.95); }
   /* jackpot scroll — tall & narrow, no border box, right side */
   .col-jackpot{ grid-area:jackpot; z-index:1; width:100%; max-width:none;
                 height:100%; align-self:stretch; margin:0;
@@ -909,6 +914,9 @@ function buildReels() {
       logo.src = 'assets/h-slots/pirate/pirate%20logo.png';
       logo.alt = 'PIRATE TREASURE';
       wrap.appendChild(logo);
+      // move the WIN readout onto the cabinet's top wooden beam
+      var wd = document.querySelector('.win-display');
+      if (wd && frame) frame.appendChild(wd);
       var post = document.createElement('div');
       post.className = 'pt-post';
       wrap.appendChild(post);
@@ -1430,7 +1438,7 @@ async function doSpin(options={}) {
     await showBigWin(winAmt, bet);
   } else if (winAmt > 0) {
     soundWin(winAmt, bet);
-    showWinText('WIN $' + winAmt.toFixed(2));
+    showWinText('WIN ' + winAmt.toFixed(2) + '$');
   }
 
   } catch(e) {
@@ -1450,7 +1458,7 @@ async function doSpin(options={}) {
 
 async function showWins(result, bet) {
   // Quick flash of win amount
-  showWinText('WIN $' + (result.total_payout||0).toFixed(2));
+  showWinText('WIN ' + (result.total_payout||0).toFixed(2) + '$');
   await new Promise(r => setTimeout(r, 800));
 }
 
