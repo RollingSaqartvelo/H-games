@@ -1,4 +1,4 @@
-const SRC = '/audio/%D0%BD%D0%BE%D0%B2%D1%8B%D0%B9%20%D0%B7%D0%B2%D1%83%D0%BA%20%D0%B2%D1%8B%D1%81%D1%82%D1%80%D0%B5%D0%BB%D0%B0.mp3'
+const SRC = '/audio/%D0%BD%D0%BE%D0%B2%D1%8B%D0%B9%20%D0%B7%D0%B2%D1%83%D0%BA%20%D0%B2%D1%8B%D1%81%D1%82%D1%80%D0%B5%D0%BB%D0%B0.mp3?v=2'
 
 const audio = new Audio(SRC)
 audio.preload = 'auto'
@@ -9,13 +9,11 @@ audio.volume  = 0.7
 audio.style.cssText = 'position:fixed;width:1px;height:1px;opacity:0;pointer-events:none;top:-9999px;left:-9999px;'
 if (typeof document !== 'undefined') document.body.appendChild(audio)
 
-/** Fire the gunshot sound — retriggers from the start on every shot. */
-// File has ~256ms of leading silence; start 50ms in so the shot lands 50ms earlier.
-const LEAD_SKIP = 0.05
-
+/** Fire the gunshot sound — retriggers from the start on every shot.
+ *  (50ms of leading silence is already trimmed from the file itself.) */
 export function playShotSound(): void {
   audio.pause()
-  audio.currentTime = LEAD_SKIP
+  audio.currentTime = 0
   audio.volume = 0.7
   const p = audio.play()
   if (p) p.catch(() => {})
