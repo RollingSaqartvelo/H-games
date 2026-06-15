@@ -211,6 +211,7 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
 }
 
 .pt-box{ display:none; }   /* desktop-only backer rectangles */
+.pirate-panel{ display:none; }   /* wooden cabinet — desktop only */
 
 /* ═══ Desktop framed "screen" (≥1000px) — landscape 16:9 like Outlaw:
    reels in one rectangle, everything else in a second rectangle.
@@ -222,7 +223,7 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
 
   /* outer landscape frame */
   .game-wrap{
-    max-width:1060px; width:100%;
+    max-width:1280px; width:100%;
     height:auto; min-height:0;
     margin:24px auto;
     padding:16px;
@@ -257,15 +258,25 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
   /* place content on top of the backers */
   .header{ grid-area:header; z-index:1; padding:6px 12px; margin:0; }
   .reels-outer{ grid-area:reels; z-index:1; align-self:center;
-                width:100%; padding:14px; }
+                width:100%; padding:0;
+                display:flex; align-items:center; justify-content:center; overflow:visible; }
   .win-display{ grid-area:reels; z-index:2; align-self:end; height:22px; margin-bottom:6px; }
   .col-jackpot{ grid-area:jackpot; z-index:1; width:auto; max-width:150px;
                 margin:0 auto; align-self:center; overflow:visible; }
   .bottom-panel{ grid-area:controls; z-index:1; padding:6px 10px 10px; }
   .col-character{ display:none; }   /* hidden on desktop v1 */
 
-  /* reels frame: drop its own border (the rectangle backer provides it) */
-  .reels-frame{ background:rgba(0,0,0,.45); border:none; }
+  /* reels frame becomes the reel WINDOW that sits inside the wooden panel hole.
+     No own border/bg/padding — the wood panel is the frame. */
+  .pt-box-reels{ display:none; }                 /* gold backer replaced by wood panel */
+  .reels-frame{ position:relative; background:transparent; border:none; padding:0;
+                overflow:visible; }
+  .reels-frame::before{ top:0; left:0; right:0; bottom:0; }   /* grid lines = exact window */
+
+  /* the wooden cabinet panel, positioned so its centre opening == the reel window.
+     Opening fractions: L .2735 T .3011 R .7305 B .7509 (panel 2000×1116). */
+  .pirate-panel{ display:block; position:absolute; z-index:0; pointer-events:none;
+                 width:218.82%; left:-59.85%; top:-66.94%; height:auto; }
 }
 </style>
 </head>
@@ -535,7 +546,7 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
 const DEMO_START = 1000;
 const BET_STEPS = [0.25, 0.50, 1, 2, 5, 10, 25, 30];
 // px per symbol cell — compact on mobile, larger on desktop framed screen
-const CELL_H = (typeof window !== 'undefined' && window.innerWidth >= 1000) ? 128 : 40;
+const CELL_H = (typeof window !== 'undefined' && window.innerWidth >= 1000) ? 76 : 40;
 const NUM_ROWS = 3;
 const NUM_COLS = 5;
 const SYMBOL_NAMES = ['chest','coins','rum','anchor','wild','scatter','doubloon','boost','mystery','j','q','k','a'];
@@ -696,6 +707,20 @@ function buildReels() {
   const frame = document.getElementById('reelsFrame');
   frame.innerHTML = '';
   reelEls = []; stripEls = []; cellRows = [];
+
+  // Desktop: wooden cabinet panel behind the reels. Size the reel window to the
+  // panel's centre opening aspect (≈1.821) so the reels fill the hole exactly.
+  if (window.innerWidth >= 1000) {
+    const panel = document.createElement('img');
+    panel.className = 'pirate-panel';
+    panel.src = 'assets/h-slots/pirate/pirate%20baraban.png';
+    panel.alt = '';
+    frame.appendChild(panel);
+    frame.style.width = (CELL_H * 3 * 1.821) + 'px';
+    // reserve the panel's full height in the reels area so the wood frame
+    // (which overflows the reel window) isn't clipped or overlapping Box B
+    if (frame.parentElement) frame.parentElement.style.minHeight = (CELL_H * 3 / 0.4498) + 'px';
+  }
 
   const cellH = CELL_H;
 
