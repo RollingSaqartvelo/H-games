@@ -201,23 +201,62 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
   display:block;
 }
 
-/* ═══ Desktop framed "screen" (≥1000px) — same centered rounded panel as
-   Outlaw / Granny. Mobile layout below 1000px is untouched. ═══════════════ */
+.pt-box{ display:none; }   /* desktop-only backer rectangles */
+
+/* ═══ Desktop framed "screen" (≥1000px) — landscape 16:9 like Outlaw:
+   reels in one rectangle, everything else in a second rectangle.
+   Mobile layout below 1000px is untouched. ═══════════════════════════════ */
 @media (min-width:1000px){
-  html,body{ background:#060d18; overflow:auto; }
+  html,body{ background:#060d18; overflow:auto; height:auto; }
   /* neutral dark surround — pirate background lives INSIDE the frame only */
   .bg-layer, .bg-stars{ display:none !important; }
 
+  /* outer landscape frame */
   .game-wrap{
-    max-width:560px;
-    height:calc(100dvh - 48px);
+    max-width:1060px; width:100%;
+    height:auto; min-height:0;
     margin:24px auto;
+    padding:16px;
+    display:grid;
+    grid-template-columns:minmax(0,1fr) 320px;
+    grid-template-rows:auto 1fr auto;
+    grid-template-areas:
+      "reels  header"
+      "reels  jackpot"
+      "reels  controls";
+    column-gap:16px; row-gap:10px;
+    align-items:stretch;
     border:1.5px solid rgba(240,192,64,.38);
     border-radius:16px;
     box-shadow:0 0 0 1px rgba(0,0,0,.5), 0 12px 40px rgba(0,0,0,.6);
     overflow:hidden;
     background:#0a1628 url('assets/h-slots/pirate/bg/background.PNG') center/cover no-repeat;
   }
+
+  /* the two rectangles (visual backers behind the content) */
+  .pt-box{ display:block; z-index:0; border-radius:12px;
+           border:1.5px solid rgba(240,192,64,.45);
+           background:rgba(7,14,26,.62);
+           box-shadow:inset 0 0 24px rgba(0,0,0,.55); }
+  .pt-box-reels{ grid-area:reels; }
+  .pt-box-rest { grid-column:2; grid-row:1 / 4; }
+
+  /* lift nested children into the grid */
+  .game-layout{ display:contents; }
+  .col-reels{ display:contents; }
+
+  /* place content on top of the backers */
+  .header{ grid-area:header; z-index:1; padding:6px 12px; margin:0; }
+  .reels-outer{ grid-area:reels; z-index:1; align-self:center;
+                width:100%; padding:14px; }
+  .win-display{ grid-area:reels; z-index:2; align-self:end; height:22px; margin-bottom:6px; }
+  .col-jackpot{ grid-area:jackpot; z-index:1; width:auto; max-width:150px;
+                margin:0 auto; align-self:center; overflow:visible; }
+  .bottom-panel{ grid-area:controls; z-index:1; padding:6px 10px 10px; }
+  .col-character{ display:none; }   /* hidden on desktop v1 */
+
+  /* reels frame: drop its own border (the rectangle backer provides it) */
+  .reels-frame{ background:rgba(0,0,0,.45); border:none; }
 }
 </style>
 </head>
@@ -393,6 +432,10 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
 
 <div class="game-wrap">
 
+  <!-- desktop-only backer rectangles (display:none on mobile) -->
+  <div class="pt-box pt-box-reels" aria-hidden="true"></div>
+  <div class="pt-box pt-box-rest" aria-hidden="true"></div>
+
   <div class="header">
     <div class="header-logo">⚓ Pirate Treasure</div>
     <div class="header-bal">
@@ -482,7 +525,8 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
 // ═══════════════════════════════════════════════════════════
 const DEMO_START = 1000;
 const BET_STEPS = [0.25, 0.50, 1, 2, 5, 10, 25, 30];
-const CELL_H = 40; // px per symbol cell — compact for 100dvh fit
+// px per symbol cell — compact on mobile, larger on desktop framed screen
+const CELL_H = (typeof window !== 'undefined' && window.innerWidth >= 1000) ? 128 : 40;
 const NUM_ROWS = 3;
 const NUM_COLS = 5;
 const SYMBOL_NAMES = ['chest','coins','rum','anchor','wild','scatter','doubloon','boost','mystery','j','q','k','a'];
