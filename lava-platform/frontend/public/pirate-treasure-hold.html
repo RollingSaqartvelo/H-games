@@ -285,13 +285,13 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
 
   /* outer landscape frame — FIXED design size, transform-scaled by JS */
   .game-wrap{
-    width:1340px; max-width:none;
+    width:1560px; max-width:none;
     height:auto; min-height:0;
     margin:0;
     padding:16px;
     position:relative;
     display:grid;
-    grid-template-columns:104px minmax(0,1fr) 256px;
+    grid-template-columns:104px minmax(0,1fr) 300px;
     grid-template-rows:auto 1fr auto;
     grid-template-areas:
       "lpad  header   ."
@@ -700,7 +700,7 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
 const DEMO_START = 1000;
 const BET_STEPS = [0.25, 0.50, 1, 2, 5, 10, 25, 30];
 // px per symbol cell — compact on mobile, larger on desktop framed screen
-const CELL_H = 76;   // single framed layout (scaled to fit on mobile)
+const CELL_H = 90;   // bigger reel cabinet (wider + taller); whole frame scales to fit
 const NUM_ROWS = 3;
 const NUM_COLS = 5;
 const SYMBOL_NAMES = ['chest','coins','rum','anchor','wild','scatter','doubloon','boost','mystery','j','q','k','a'];
@@ -1237,23 +1237,11 @@ function fitStage() {
   gw.style.transform = 'none';
   const w = gw.offsetWidth, h = gw.offsetHeight;
   if (!w || !h) return;
-  let s = Math.min(window.innerWidth / w, window.innerHeight / h, 1);
-  var growDown = false;
-  if (window.innerWidth < 1000) {
-    // mobile: allow slight width overflow, capped by height
-    s = Math.min(s * 1.2, window.innerHeight / h);
-  } else {
-    // desktop: bigger, fit the WIDTH; extra height grows downward
-    s = Math.min(s * 1.38, window.innerWidth / w);
-    growDown = true;
-  }
+  const s = Math.min(window.innerWidth / w, window.innerHeight / h, 1);
   gw.style.position = 'fixed';
   gw.style.transformOrigin = 'top left';
   gw.style.left = Math.round((window.innerWidth  - w * s) / 2) + 'px';
-  // grow downward on desktop: anchor near the top when it's taller than the viewport
-  gw.style.top  = (growDown && h * s > window.innerHeight)
-    ? '6px'
-    : Math.round((window.innerHeight - h * s) / 2) + 'px';
+  gw.style.top  = Math.round((window.innerHeight - h * s) / 2) + 'px';
   gw.style.transform = 'scale(' + s + ')';
 }
 
