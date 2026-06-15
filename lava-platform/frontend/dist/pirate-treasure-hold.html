@@ -5,9 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#0a1628">
 <title>PIRATE TREASURE HOLD — H-GAMES</title>
-<link rel="preload" as="image" href="assets/h-slots/pirate/symbols/sym-boost.png">
-<link rel="preload" as="image" href="assets/h-slots/pirate/symbols/sym-scatter.png">
-<link rel="preload" as="image" href="assets/h-slots/pirate/symbols/sym-wild.png">
+<link rel="preload" as="image" href="assets/h-slots/pirate/symbols/sym-boost.png?v=2">
+<link rel="preload" as="image" href="assets/h-slots/pirate/symbols/sym-scatter.png?v=2">
+<link rel="preload" as="image" href="assets/h-slots/pirate/symbols/sym-wild.png?v=2">
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -1004,7 +1004,7 @@ function setCell(col, idx, symId, doubloonVal) {
     cell.style.background = 'rgba(192,57,43,0.3)'; // red tint on error
     img.style.display = 'none';
   };
-  img.src = src;
+  img.src = src + '?v=2';   // cache-bust new symbol art
   cell.appendChild(img);
 
   if (symId === 6 && doubloonVal !== undefined) {
