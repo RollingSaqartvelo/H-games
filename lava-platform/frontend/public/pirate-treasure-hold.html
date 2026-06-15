@@ -1238,18 +1238,22 @@ function fitStage() {
   const w = gw.offsetWidth, h = gw.offsetHeight;
   if (!w || !h) return;
   let s = Math.min(window.innerWidth / w, window.innerHeight / h, 1);
-  // scale the whole frame up 20% so the reel panel reads bigger.
+  var growDown = false;
   if (window.innerWidth < 1000) {
     // mobile: allow slight width overflow, capped by height
     s = Math.min(s * 1.2, window.innerHeight / h);
   } else {
-    // desktop: 20% bigger but still fit inside the viewport
-    s = Math.min(s * 1.2, window.innerWidth / w, window.innerHeight / h);
+    // desktop: bigger, fit the WIDTH; extra height grows downward
+    s = Math.min(s * 1.38, window.innerWidth / w);
+    growDown = true;
   }
   gw.style.position = 'fixed';
   gw.style.transformOrigin = 'top left';
   gw.style.left = Math.round((window.innerWidth  - w * s) / 2) + 'px';
-  gw.style.top  = Math.round((window.innerHeight - h * s) / 2) + 'px';
+  // grow downward on desktop: anchor near the top when it's taller than the viewport
+  gw.style.top  = (growDown && h * s > window.innerHeight)
+    ? '6px'
+    : Math.round((window.innerHeight - h * s) / 2) + 'px';
   gw.style.transform = 'scale(' + s + ')';
 }
 
