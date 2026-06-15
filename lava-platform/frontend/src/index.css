@@ -1707,7 +1707,7 @@ ul, li { list-style: none; }
     overflow-y: auto;
     border: 1.5px solid rgba(214,158,46,.5);
     border-radius: 8px;
-    background: rgba(8,4,1,.6);
+    background: #100a04;
     box-shadow: 0 0 12px rgba(0,0,0,.45);
   }
 
@@ -1734,4 +1734,15 @@ ul, li { list-style: none; }
     max-width: 460px;
     margin: 8px auto 0;
   }
+
+  /* WASTED — keep it roughly over the game screen, only slightly larger */
+  .wasted-ov {
+    top: 120px !important;
+    height: 42vh !important;
+    align-items: flex-start !important;
+  }
+  .wasted-ov-img { width: min(54vw, 760px) !important; }
 }
+
+/* WASTED slam image base width (mobile) */
+.wasted-ov-img { width: 115vw; }

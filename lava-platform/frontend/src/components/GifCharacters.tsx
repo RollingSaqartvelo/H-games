@@ -232,6 +232,7 @@ export function GifCharacters() {
       {/* Wasted — full-screen fixed overlay via portal; flexbox center is immune to ancestor transforms */}
       {showWasted && createPortal(
         <div
+          className="wasted-ov"
           aria-hidden="true"
           style={{
             position: 'fixed',
@@ -247,10 +248,10 @@ export function GifCharacters() {
           }}
         >
           <img
+            className="wasted-ov-img"
             src={WASTED_SRC}
             alt="WASTED"
             style={{
-              width: '115vw',
               height: 'auto',
               display: 'block',
               animation: 'wasted-slam 320ms cubic-bezier(0.15, 1.35, 0.4, 1) both',
