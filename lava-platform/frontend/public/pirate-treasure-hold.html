@@ -277,7 +277,7 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
 
   /* wooden bet-input panel: − / + over the carved knobs, amount in the centre window */
   .bottom-panel .bet-row{ position:relative; width:310px; aspect-ratio:1600/642;
-     margin:2px auto 6px; padding:0; display:block;
+     margin:79px auto 6px; padding:0; display:block;   /* sits just below the overhanging SPIN wheel */
      background:url('assets/h-slots/pirate/bet-input-panel.png') center/contain no-repeat; }
   .bottom-panel .bet-row .bet-lbl{ display:none; }
   .bottom-panel .bet-row .bet-stepper{ display:contents; }
@@ -314,7 +314,7 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
 
   /* SPIN wheel straddling the cabinet's bottom platform (50% on, 50% below).
      Relocated into .reels-outer (the cabinet) by JS on desktop. */
-  .reels-outer > .spin-btn{ position:absolute; left:50%; bottom:5px; margin:0;
+  .reels-outer > .spin-btn{ position:absolute; left:50%; bottom:15px; margin:0;
      transform:translate(-50%,50%); width:146px; height:146px; z-index:7; }
   .reels-outer > .spin-btn img{ width:146px; height:146px; }
 
