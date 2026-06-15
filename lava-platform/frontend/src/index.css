@@ -1729,9 +1729,8 @@ ul, li { list-style: none; }
   /* Betting video is portrait → contain (pillarbox), side gaps filled by the
      neutral backdrop on .bvb-wrap below. Only shows during WAITING/BETTING. */
   .bvb-wrap > video { object-fit: contain !important; }
-  .bvb-wrap {
-    background: #0a0503 url('/assets/desk-bet-bg.jpg') center center / cover no-repeat;
-  }
+  /* Side gaps filled with the same neutral colour as the stats block (no icons) */
+  .bvb-wrap { background: #100a04; }
 
   /* bet panel — bottom, centered, constrained */
   .dbp-root {
