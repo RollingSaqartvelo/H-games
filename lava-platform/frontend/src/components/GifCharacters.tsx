@@ -20,16 +20,19 @@ const HERO_CRASH_DELAY  = 100
 const SHOT_MS      = 5000
 const SHOT_SHOW_MS = 800
 
-function useCharLayout(): { size: string; sizeNum: number; isMobile: boolean } {
-  // App container is always ≤480px — always use compact mobile character layout
-  const [w, setW] = useState(() => Math.min(window.innerWidth, 480))
+function useCharLayout(): { size: string; sizeNum: number; isMobile: boolean; wide: boolean } {
+  // Mobile = centered ≤480 column; wide = desktop Aviator layout (≥1000px)
+  const [vw, setVw] = useState(() => window.innerWidth)
   useEffect(() => {
-    const update = () => setW(Math.min(window.innerWidth, 480))
+    const update = () => setVw(window.innerWidth)
     window.addEventListener('resize', update)
     return () => window.removeEventListener('resize', update)
   }, [])
-  const sizeNum = Math.round(w * 0.85)
-  return { size: sizeNum + 'px', sizeNum, isMobile: true }
+  const wide = vw >= 1000
+  const w = Math.min(vw, 480)
+  // a touch bigger on desktop so the riders read in the wide 16:9 screen
+  const sizeNum = Math.round(w * (wide ? 1.0 : 0.85))
+  return { size: sizeNum + 'px', sizeNum, isMobile: true, wide }
 }
 
 export function GifCharacters() {
@@ -53,7 +56,7 @@ export function GifCharacters() {
   const sheriffEndTimer = useRef<number | undefined>(undefined)
   const heroDelayTimer  = useRef<number | undefined>(undefined)
 
-  const { size, sizeNum, isMobile } = useCharLayout()
+  const { size, sizeNum, isMobile, wide } = useCharLayout()
 
   const running = roundState === 'RUNNING'
   const crashed = roundState === 'CRASHED'
@@ -203,7 +206,9 @@ export function GifCharacters() {
             alt=""
             style={{
               ...sheriffStyle,
-              left: sheriffCrashEnded ? (isMobile ? '-10%' : 0) : (isMobile ? '-35%' : 0),
+              left: sheriffCrashEnded
+                ? (wide ? '16%' : isMobile ? '-10%' : 0)
+                : (wide ? '12%' : isMobile ? '-35%' : 0),
               // crash end PNG (255×196) has less padding than GIF (500×500) — scale down to match silhouette
               ...(sheriffCrashEnded && {
                 width:  Math.round(sizeNum * 0.54) + 'px',
@@ -220,7 +225,7 @@ export function GifCharacters() {
           key={heroState}
           src={heroState === 'run' ? HERO_SRC : CRASH_SRC}
           alt=""
-          style={{ ...charStyle, left: isMobile ? '25%' : '55%' }}
+          style={{ ...charStyle, left: wide ? '52%' : isMobile ? '25%' : '55%' }}
         />
       </div>
 
