@@ -381,7 +381,7 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
   /* plain timber column behind the plaques, down to the very bottom */
   /* ORIGINAL post asset — the main pillar (cap + bands), top-anchored */
   .pt-post{
-    position:absolute; left:32px; top:2%; width:80px; height:91%; z-index:2;
+    position:absolute; left:32px; top:24%; width:80px; height:76%; z-index:2;
     background:url('assets/h-slots/pirate/post.png') top center / 204% auto no-repeat;
     pointer-events:none;
   }
@@ -400,8 +400,7 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
 
   /* animated skulls (with rat peeking from the socket) overlaid on the panel's
      static skulls — positioned so its skull content matches the baked skulls. */
-  .pt-skullvid{ position:absolute; left:-39%; top:-62%; width:51%; height:auto; z-index:2;
-     pointer-events:none; }
+  .pt-skullvid{ display:none; }   /* hidden — webm keying looks bad for now */
   .pt-plaque{ position:absolute; left:-6px; width:158px; height:96px; z-index:3;
      background:url('assets/h-slots/pirate/board-bonus.png') center/contain no-repeat;
      display:flex; align-items:center; justify-content:center; border:none; padding:0; cursor:pointer;
@@ -410,9 +409,9 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
   .pt-plaque .pt-plaque-txt{ display:block; font-size:13px; font-weight:900; letter-spacing:.04em;
      color:#ffe7a0; text-align:center; text-transform:uppercase; line-height:1.05;
      transform:translateY(-6%); animation:plaqueGlow 2.6s ease-in-out infinite; }
-  #bonusBtn.pt-plaque{ top:15%; animation-delay:0s; }
-  #paytableBtn.pt-plaque{ top:29%; animation-delay:-1.7s; }
-  #autoBtn.pt-plaque{ top:43%; animation-delay:-3.2s; }
+  #bonusBtn.pt-plaque{ top:28%; animation-delay:0s; }
+  #paytableBtn.pt-plaque{ top:42%; animation-delay:-1.7s; }
+  #autoBtn.pt-plaque{ top:56%; animation-delay:-3.2s; }
   #autoBtn.pt-plaque.active .pt-plaque-txt{ color:#46e89a; }   /* active = green */
 
   /* sound/mute toggle — bottom-left corner of the frame */
