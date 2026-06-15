@@ -200,6 +200,25 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
   background:transparent !important;mix-blend-mode:normal;
   display:block;
 }
+
+/* ═══ Desktop framed "screen" (≥1000px) — same centered rounded panel as
+   Outlaw / Granny. Mobile layout below 1000px is untouched. ═══════════════ */
+@media (min-width:1000px){
+  html,body{ background:#060d18; overflow:auto; }
+  /* neutral dark surround — pirate background lives INSIDE the frame only */
+  .bg-layer, .bg-stars{ display:none !important; }
+
+  .game-wrap{
+    max-width:560px;
+    height:calc(100dvh - 48px);
+    margin:24px auto;
+    border:1.5px solid rgba(240,192,64,.38);
+    border-radius:16px;
+    box-shadow:0 0 0 1px rgba(0,0,0,.5), 0 12px 40px rgba(0,0,0,.6);
+    overflow:hidden;
+    background:#0a1628 url('assets/h-slots/pirate/bg/background.PNG') center/cover no-repeat;
+  }
+}
 </style>
 </head>
 <body>
