@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useGame } from '../store/game'
 import { playWastedSound } from '../audio/WastedSound'
+import { playShotSound } from '../audio/ShotSound'
 
 const SHERIFF_IDLE  = '/assets/sheriff/%D1%88%D0%B5%D1%80%D0%B8%D1%84.gif'
 const SHERIFF_SHOT  = '/assets/sheriff/%D0%92%D1%8B%D1%81%D1%82%D1%80%D0%B5%D0%BB.gif'
@@ -67,6 +68,7 @@ export function GifCharacters() {
     const fire = () => {
       setShotKey((k) => k + 1)
       setFiring(true)
+      playShotSound()
       hideRef.current = window.setTimeout(() => setFiring(false), SHOT_SHOW_MS)
     }
     // First shot after 1500ms, then every SHOT_MS
