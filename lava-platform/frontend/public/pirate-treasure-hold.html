@@ -332,12 +332,12 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
   /* Wooden post that the plaques hang from */
   /* plain timber column behind the plaques, down to the very bottom */
   .pt-post-fill{
-    position:absolute; left:25px; width:74px; top:11%; bottom:0; z-index:1;
+    position:absolute; left:36px; width:78px; top:11%; bottom:0; z-index:1;
     background:url('assets/h-slots/pirate/post-shaft.png') center/100% auto repeat-y;
     pointer-events:none;
   }
   .pt-post{ display:none; }   /* no decorative cap head on top */
-  .pt-plaque{ position:absolute; left:-4px; width:132px; height:80px; z-index:3;
+  .pt-plaque{ position:absolute; left:-6px; width:158px; height:96px; z-index:3;
      background:url('assets/h-slots/pirate/board-bonus.png') center/contain no-repeat;
      display:flex; align-items:center; justify-content:center; border:none; padding:0; cursor:pointer;
      transform-origin:50% 6%; animation:plaqueSway 4.5s ease-in-out infinite; }
@@ -345,9 +345,9 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
   .pt-plaque .pt-plaque-txt{ display:block; font-size:13px; font-weight:900; letter-spacing:.04em;
      color:#ffe7a0; text-align:center; text-transform:uppercase; line-height:1.05;
      transform:translateY(-6%); animation:plaqueGlow 2.6s ease-in-out infinite; }
-  #bonusBtn.pt-plaque{ top:16%; animation-delay:0s; }
+  #bonusBtn.pt-plaque{ top:15%; animation-delay:0s; }
   #paytableBtn.pt-plaque{ top:29%; animation-delay:-1.7s; }
-  #autoBtn.pt-plaque{ top:42%; animation-delay:-3.2s; }
+  #autoBtn.pt-plaque{ top:43%; animation-delay:-3.2s; }
   #autoBtn.pt-plaque.active .pt-plaque-txt{ color:#46e89a; }   /* active = green */
 
   /* sound/mute toggle — bottom-left corner of the frame */
