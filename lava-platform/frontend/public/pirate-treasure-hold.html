@@ -1166,21 +1166,38 @@ function playSound(src, vol=0.7) {
   a.play().catch(() => {});
 }
 
+function sfxMuted(){ const mb=document.getElementById('muteBtn'); return !!(mb && mb.classList.contains('muted')); }
 function soundSpin()  { playSound('audio/strike.mp3', 0.6); }
-function soundClick() { playTone(440, 0.08, 0.08); } // reel-stop beep — keep as web audio
+function soundClick() { playSound('audio/reel-stop.mp3', 0.5); }   // wooden reel-stop thunk
 function soundWin(amount, bet) {
   const mult = amount / bet;
   if (mult >= 10) {
     playSound('audio/BIG WIN.mp3', 0.8);
   } else {
-    playSound('audio/TO_WIN.mp3', 0.7);
+    playSound('audio/win-small.mp3', 0.7);   // regular win jingle
   }
 }
 function soundHoldWin() { playSound('audio/Start bonus.mp3', 0.8); }
+// new pirate SFX
+function soundScatter()      { playSound('audio/scatter-land.mp3', 0.75); }
+function soundPayline()      { playSound('audio/payline.mp3', 0.5); }
+function soundMult(v)        { playSound(v>=50 ? 'audio/mult-big.mp3' : 'audio/mult-small.mp3', 0.78); }
+function soundChestWin()     { playSound('audio/chest-win.mp3', 0.85); }
+function soundChestEmpty()   { playSound('audio/chest-empty.mp3', 0.7); }
+function soundBonusSummary() { playSound('audio/bonus-summary.mp3', 0.85); }
+function soundRollupEnd()    { playSound('audio/rollup-end.mp3', 0.7); }
+// looping reels sound while spinning (respects mute)
+let _reelLoop = null;
+function reelLoopStart(){ try{ if(sfxMuted())return; if(!_reelLoop){ _reelLoop=new Audio('audio/reels-loop.mp3'); _reelLoop.loop=true; _reelLoop.volume=0.32; } _reelLoop.currentTime=0; _reelLoop.play().catch(()=>{}); }catch(e){} }
+function reelLoopStop(){ try{ if(_reelLoop){ _reelLoop.pause(); _reelLoop.currentTime=0; } }catch(e){} }
+// looping coin tally during a roll-up count
+let _rollLoop = null;
+function rollupStart(){ try{ if(sfxMuted())return; if(!_rollLoop){ _rollLoop=new Audio('audio/coin-rollup.mp3'); _rollLoop.loop=true; _rollLoop.volume=0.5; } _rollLoop.currentTime=0; _rollLoop.play().catch(()=>{}); }catch(e){} }
+function rollupStop(){ try{ if(_rollLoop){ _rollLoop.pause(); _rollLoop.currentTime=0; } }catch(e){} }
 
 // ── Background music ────────────────────────────────────────
 const bgMusic = document.getElementById('bgMusic');
-bgMusic.volume = 0.4;
+bgMusic.volume = 0.3;   // 25% quieter than before (was 0.4)
 
 let _musicStarted = false;
 function startMusic() {
@@ -1526,6 +1543,7 @@ function showMultiplier(m) {
   el.style.display = 'block';
   el.classList.toggle('mult-fire', m >= 100);   // big multipliers blaze
   el.classList.remove('mult-pop'); void el.offsetWidth; el.classList.add('mult-pop');
+  soundMult(m);
 }
 function hideMultiplier() {
   const el = document.getElementById('multBadge');
@@ -1600,16 +1618,17 @@ function showBonusSummary(amount) {
     ov.classList.add('show');
     spawnFireworks(ov); playPops(4);
     setTimeout(function(){ spawnFireworks(ov); playPops(3); }, 650);
-    try { playSound('audio/BIG WIN.mp3', 0.85); } catch(e){}
+    try { soundBonusSummary(); } catch(e){}
+    rollupStart();
     const dur = 1700, t0 = performance.now();
     (function frame(now){
       const p = Math.min(1, (now - t0) / dur);
       const v = amount * (1 - Math.pow(1 - p, 3));
       amtEl.textContent = '$' + v.toFixed(2);
-      if (p < 1) requestAnimationFrame(frame); else amtEl.textContent = '$' + amount.toFixed(2);
+      if (p < 1) requestAnimationFrame(frame); else { amtEl.textContent = '$' + amount.toFixed(2); rollupStop(); soundRollupEnd(); }
     })(t0);
     let done = false;
-    const finish = () => { if (done) return; done = true; clearTimeout(tt); ov.classList.remove('show'); ov.removeEventListener('click', finish); resolve(); };
+    const finish = () => { if (done) return; done = true; clearTimeout(tt); rollupStop(); ov.classList.remove('show'); ov.removeEventListener('click', finish); resolve(); };
     const tt = setTimeout(finish, dur + 2400);
     ov.addEventListener('click', finish);
   });
@@ -1647,6 +1666,7 @@ function showChestPick(buyValue) {
     function finish(res){ if(done) return; done=true; setTimeout(function(){ ov.classList.remove('show'); }, 100); resolve(res); }
     function reveal(idx){
       if (picked>=0) return; picked=idx;
+      if (idx===winIdx) soundChestWin(); else soundChestEmpty();
       chests.forEach(function(ch,i){
         ch.classList.add('revealed');
         if (i===winIdx){ ch.querySelector('.chest-img').src='assets/h-slots/pirate/symbols/chest-win.png'; const mi=ch.querySelector('.chest-mult'); mi.src='assets/h-slots/pirate/symbols/x'+prizeMult+'.png'; mi.style.display='block'; }
@@ -1895,6 +1915,7 @@ async function doSpin(options={}) {
   if (isDemo) saveDemo();
 
   soundSpin();
+  reelLoopStart();
 
   try {
 
@@ -1950,6 +1971,7 @@ async function doSpin(options={}) {
 
   await Promise.all(reelPromises);
   skipRequested = false;
+  reelLoopStop();
 
   // Update visible cells to final state (SPIN_END = 67,68,69)
   for (let col=0; col<NUM_COLS; col++) {
@@ -1972,6 +1994,7 @@ async function doSpin(options={}) {
 
   // Handle scatter flash
   if (result.scatter_count >= 3) {
+    soundScatter();
     flashScatters(grid);
   }
 
@@ -2042,6 +2065,7 @@ async function doSpin(options={}) {
   } finally {
     isSpinning = false;
     setSpinBtns(true);
+    reelLoopStop();
   }
 
   // Free spins always auto-run; otherwise honour autoplay
@@ -2411,7 +2435,8 @@ function highlightWins(result) {
     const c = cellRows[col] && cellRows[col][SPIN_END+row];
     if (c) c.classList.remove('win-cell');
   }
-  if (!result || !result.paylines) return;
+  if (!result || !result.paylines || !result.paylines.length) return;
+  soundPayline();
   result.paylines.forEach(function(pl){
     const line = PAYLINES[pl.line-1]; if (!line) return;
     for (let col=0; col<pl.count; col++) {
