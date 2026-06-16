@@ -478,6 +478,11 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
   #paytableBtn.pt-plaque{ top:42%; animation-delay:-1.7s; }
   #autoBtn.pt-plaque{ top:56%; animation-delay:-3.2s; }
   #autoBtn.pt-plaque.active .pt-plaque-txt{ color:#46e89a; }   /* active = green */
+  /* single free-spins counter plaque (during the feature) */
+  #fsPlaque.pt-fs-plaque{ top:40%; width:160px; height:100px; animation-delay:-1s; }
+  .fs-plaque-txt{ line-height:1.05; font-size:12px; }
+  .fs-plaque-txt b{ display:block; font-size:30px; color:#ffd860; margin-top:1px;
+     text-shadow:0 2px 0 #8a5a10, 0 4px 6px rgba(0,0,0,.7), 0 0 12px rgba(255,200,80,.8); }
 
   /* sound/mute toggle — bottom-left corner of the frame */
   .pt-mute-corner{ position:absolute; left:14px; bottom:14px; z-index:6;
@@ -1025,6 +1030,12 @@ function buildReels() {
         b.appendChild(s);
         wrap.appendChild(b);
       });
+      // Free-spins counter plaque (shown only during the feature, replaces the 3 buttons)
+      var fsp = document.createElement('div');
+      fsp.id = 'fsPlaque'; fsp.className = 'pt-plaque pt-fs-plaque';
+      fsp.innerHTML = '<span class="pt-plaque-txt fs-plaque-txt">Free Spins<br><b id="fsPlaqueNum">0</b></span>';
+      fsp.style.display = 'none';
+      wrap.appendChild(fsp);
       // Wooden post the plaques hang from
       var fill = document.createElement('div');
       fill.className = 'pt-post-fill';
@@ -1490,7 +1501,19 @@ async function init() {
   updateUI();
 }
 
+// During free spins: hide BUY BONUS/PAYTABLE/AUTOPLAY plaques, show one "Free Spins N" plaque
+function updateFsPlaque() {
+  const active = freeSpinsLeft > 0;
+  ['bonusBtn','paytableBtn','autoBtn'].forEach(function(id){ const b=document.getElementById(id); if(b) b.style.display = active ? 'none' : ''; });
+  const fsp = document.getElementById('fsPlaque');
+  if (fsp) {
+    fsp.style.display = active ? 'flex' : 'none';
+    const n = document.getElementById('fsPlaqueNum'); if (n) n.textContent = freeSpinsLeft;
+  }
+}
+
 function updateUI() {
+  updateFsPlaque();
   const balEl = document.getElementById('balVal');
   if (balEl) balEl.textContent = '$' + balance.toFixed(2);
   const betEl = document.getElementById('betDisplay');
