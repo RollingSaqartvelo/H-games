@@ -298,9 +298,9 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
 .chest-pick-sub{font-size:14px;letter-spacing:.12em;text-transform:uppercase;color:#f0c040;margin-top:-6px;}
 .chest-pick-row{display:flex;gap:40px;margin:10px 0;}
 /* wooden 3-bay stage panel the chests sit inside */
-.chest-stage{position:relative;width:min(900px,95vw);aspect-ratio:2000/830;}
+.chest-stage{position:relative;width:min(960px,98vw);aspect-ratio:2000/830;}
 .chest-stage-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 14px 34px rgba(0,0,0,.75));pointer-events:none;}
-.chest-stage .chest-pick-title{position:absolute;top:8.5%;left:50%;transform:translateX(-50%);font-size:clamp(15px,2.1vw,26px);color:#5a3414;text-shadow:0 1px 0 rgba(255,240,200,.5);}
+.chest-stage .chest-pick-title{position:absolute;top:8.5%;left:50%;transform:translateX(-50%) translateY(12px);font-size:clamp(15px,2.1vw,26px);color:#5a3414;text-shadow:0 1px 0 rgba(255,240,200,.5);}
 .chest-slot{position:absolute;top:53%;width:21%;transform:translate(-50%,-50%);}
 .chest{position:relative;width:100%;aspect-ratio:1;cursor:pointer;transition:transform .15s;animation:fsPop .45s cubic-bezier(.2,1.3,.4,1) both;}
 .chest:hover{transform:scale(1.07) translateY(-4px);}
@@ -968,9 +968,9 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
   <div class="chest-stage">
     <img class="chest-stage-bg" src="assets/h-slots/pirate/chest-stage.png?v=1" alt="">
     <div class="chest-pick-title">Pick a Chest!</div>
-    <div class="chest-slot" style="left:18.6%"><div class="chest"><img class="chest-img" src=""><img class="chest-mult" src=""></div></div>
+    <div class="chest-slot" style="left:calc(18.6% + 28px)"><div class="chest"><img class="chest-img" src=""><img class="chest-mult" src=""></div></div>
     <div class="chest-slot" style="left:50%"><div class="chest"><img class="chest-img" src=""><img class="chest-mult" src=""></div></div>
-    <div class="chest-slot" style="left:81.4%"><div class="chest"><img class="chest-img" src=""><img class="chest-mult" src=""></div></div>
+    <div class="chest-slot" style="left:calc(81.4% - 25px)"><div class="chest"><img class="chest-img" src=""><img class="chest-mult" src=""></div></div>
   </div>
   <div class="chest-pick-sub">One holds a multiplier ×50–×500</div>
   <button id="chestCollectBtn" class="chest-collect">COLLECT <span id="chestCollectVal">$0.00</span></button>
@@ -1338,11 +1338,10 @@ function buildReels() {
       // sound/mute toggle into the bottom-left corner
       const mute = document.getElementById('muteBtn');
       if (mute && wrap) { mute.classList.add('pt-mute-corner'); wrap.appendChild(mute); }
-      // Move feature overlays INSIDE the scaled game-wrap so their fixed/inset:0
-      // centring is relative to the game (game-wrap has a transform), not the
-      // viewport — keeps BONUS WIN / chest pick centred on the cabinet.
+      // Move BONUS WIN inside the scaled game-wrap so its fixed/inset:0 centring
+      // is relative to the game. Chest-pick stays a BODY child (full viewport
+      // size) so it's large on mobile, not shrunk with the cabinet.
       var bsum = document.getElementById('bonusSummary'); if (bsum && wrap) wrap.appendChild(bsum);
-      var cpick = document.getElementById('chestPick');   if (cpick && wrap) wrap.appendChild(cpick);
     }
   }
 
