@@ -311,13 +311,27 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
 /* bonus result screen */
 .bonus-summary{position:fixed;inset:0;z-index:340;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.88);}
 .bonus-summary.show{display:flex;animation:fsFade .3s ease;}
-.bonus-summary-panel{position:relative;width:min(720px,94vw);aspect-ratio:2000/1116;text-align:center;
+.bonus-summary-panel{position:relative;z-index:2;width:min(720px,94vw);aspect-ratio:2000/1116;text-align:center;
   display:flex;flex-direction:column;align-items:center;justify-content:center;padding-bottom:5%;
   background:url('assets/h-slots/pirate/bonus-win.png') center/contain no-repeat;
-  filter:drop-shadow(0 0 55px rgba(255,200,90,.5));
-  animation:mult-pop .5s cubic-bezier(.2,1.3,.4,1) both;}
-.bonus-summary-title{font-size:clamp(18px,3.4vw,34px);font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:#5a3414;text-shadow:0 1px 0 rgba(255,245,210,.6);}
-.bonus-summary-amt{font-size:clamp(30px,6vw,64px);font-weight:900;color:#2a1606;text-shadow:0 2px 0 #ffe8a8,0 0 22px rgba(255,210,90,.7);margin-top:4px;}
+  filter:drop-shadow(0 0 55px rgba(255,200,90,.55));}
+.bonus-summary.show .bonus-summary-panel{animation:bwFlyIn .72s cubic-bezier(.18,1.3,.4,1) both;}
+@keyframes bwFlyIn{0%{transform:scale(.12) translateY(60px);opacity:0;filter:blur(6px) drop-shadow(0 0 55px rgba(255,200,90,.55))}
+  55%{opacity:1;filter:blur(0) drop-shadow(0 0 55px rgba(255,200,90,.55))}72%{transform:scale(1.13)}88%{transform:scale(.96)}100%{transform:scale(1)}}
+.bonus-summary-title{position:relative;top:7px;font-size:clamp(18px,3.4vw,34px);font-weight:900;letter-spacing:.14em;text-transform:uppercase;
+  color:#fff;text-shadow:0 2px 5px rgba(0,0,0,.75),0 0 12px rgba(150,80,15,.7),0 0 2px rgba(90,45,10,.9);}
+.bonus-summary-amt{font-size:clamp(30px,6vw,64px);font-weight:900;color:#fff;margin-top:6px;
+  text-shadow:0 3px 7px rgba(0,0,0,.85),0 0 20px rgba(255,200,90,.85),0 0 2px rgba(80,40,8,.9);}
+/* pulsing radial glow behind the scroll */
+.bonus-summary-glow{position:absolute;left:50%;top:50%;z-index:1;width:min(940px,98vw);aspect-ratio:1;transform:translate(-50%,-50%);
+  background:radial-gradient(circle,rgba(255,216,100,.6),rgba(255,150,40,.2) 42%,transparent 66%);
+  pointer-events:none;animation:bwGlow 1.8s ease-in-out infinite;}
+@keyframes bwGlow{0%,100%{opacity:.55;transform:translate(-50%,-50%) scale(.9)}50%{opacity:1;transform:translate(-50%,-50%) scale(1.07)}}
+/* fireworks / confetti burst */
+.bw-fx{position:absolute;inset:0;z-index:3;pointer-events:none;overflow:visible;}
+.bw-particle{position:absolute;left:50%;top:46%;width:11px;height:11px;border-radius:2px;opacity:0;will-change:transform,opacity;}
+@keyframes bwBurst{0%{transform:translate(-50%,-50%) scale(.35) rotate(0);opacity:1}
+  12%{opacity:1}100%{transform:translate(calc(-50% + var(--tx)),calc(-50% + var(--ty))) scale(1) rotate(var(--rot));opacity:0}}
 
 /* paginated info screen */
 .pt-info{position:relative;min-height:404px;padding-bottom:60px;}
@@ -856,6 +870,8 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
 
 <!-- Bonus result screen: BONUS WIN $X with roll-up -->
 <div class="bonus-summary" id="bonusSummary">
+  <div class="bonus-summary-glow"></div>
+  <div class="bw-fx" id="bwFx"></div>
   <div class="bonus-summary-panel">
     <div class="bonus-summary-title">Bonus Win</div>
     <div class="bonus-summary-amt" id="bonusSummaryAmt">$0.00</div>
@@ -1197,6 +1213,11 @@ function buildReels() {
       // sound/mute toggle into the bottom-left corner
       const mute = document.getElementById('muteBtn');
       if (mute && wrap) { mute.classList.add('pt-mute-corner'); wrap.appendChild(mute); }
+      // Move feature overlays INSIDE the scaled game-wrap so their fixed/inset:0
+      // centring is relative to the game (game-wrap has a transform), not the
+      // viewport — keeps BONUS WIN / chest pick centred on the cabinet.
+      var bsum = document.getElementById('bonusSummary'); if (bsum && wrap) wrap.appendChild(bsum);
+      var cpick = document.getElementById('chestPick');   if (cpick && wrap) wrap.appendChild(cpick);
     }
   }
 
@@ -1435,6 +1456,47 @@ let globalBonusMult = 0;   // persistent multiplier from the chest pick (0 = non
 let inBonus = false;       // true while a free-spins feature is running
 let bonusTotalWin = 0;     // accumulated winnings across the whole feature
 
+// Celebration: confetti / firework burst out of the scroll
+function spawnFireworks(ov) {
+  const fx = ov.querySelector('.bw-fx'); if (!fx) return;
+  fx.innerHTML = '';
+  const colors = ['#ffd860','#ff5a45','#46e89a','#54b0ff','#bc52ff','#ffffff','#ff9a3c'];
+  const N = 54;
+  for (let i=0;i<N;i++) {
+    const p = document.createElement('i'); p.className = 'bw-particle';
+    const ang = (i/N)*Math.PI*2 + (Math.random()-0.5)*0.5;
+    const dist = 170 + Math.random()*230;
+    const tx = Math.cos(ang)*dist, ty = Math.sin(ang)*dist - 40;   // bias upward
+    p.style.setProperty('--tx', tx.toFixed(0)+'px');
+    p.style.setProperty('--ty', ty.toFixed(0)+'px');
+    p.style.setProperty('--rot', (Math.random()*720-360).toFixed(0)+'deg');
+    p.style.background = colors[i % colors.length];
+    if (i % 4 === 0) { p.style.width='7px'; p.style.height='15px'; p.style.borderRadius='3px'; }
+    const dur = 0.9 + Math.random()*0.7, delay = Math.random()*0.18;
+    p.style.animation = 'bwBurst ' + dur.toFixed(2) + 's cubic-bezier(.15,.7,.4,1) ' + delay.toFixed(2) + 's forwards';
+    fx.appendChild(p);
+  }
+}
+// Firework "pop / clap" sounds (respects mute toggle)
+function playPops(n) {
+  try {
+    const mb = document.getElementById('muteBtn');
+    if (mb && mb.classList.contains('muted')) return;
+    const ctx = getAudioCtx(); if (!ctx) return;
+    for (let k=0;k<n;k++) {
+      const t = ctx.currentTime + k*0.16 + Math.random()*0.05;
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = 'triangle';
+      o.frequency.setValueAtTime(170 + Math.random()*130, t);
+      o.frequency.exponentialRampToValueAtTime(45, t + 0.18);
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(0.22, t + 0.012);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.2);
+      o.connect(g); g.connect(ctx.destination); o.start(t); o.stop(t + 0.22);
+    }
+  } catch(e){}
+}
+
 // Bonus result screen: "BONUS WIN $X" with a roll-up count
 function showBonusSummary(amount) {
   return new Promise(resolve => {
@@ -1442,6 +1504,9 @@ function showBonusSummary(amount) {
     if (!ov || amount <= 0) { resolve(); return; }
     const amtEl = document.getElementById('bonusSummaryAmt');
     ov.classList.add('show');
+    spawnFireworks(ov); playPops(4);
+    setTimeout(function(){ spawnFireworks(ov); playPops(3); }, 650);
+    try { playSound('audio/BIG WIN.mp3', 0.85); } catch(e){}
     const dur = 1700, t0 = performance.now();
     (function frame(now){
       const p = Math.min(1, (now - t0) / dur);
@@ -2234,20 +2299,16 @@ function clearWinDisplay() {
   document.getElementById('freeCounter').style.display = 'none';
 }
 
+// The free-spins count now lives on the wooden #fsPlaque, so the small top
+// "FREE SPINS / N remaining" badge is no longer shown.
 function showFreeBadge() {
-  document.getElementById('freeBadge').style.display = 'block';
+  document.getElementById('freeBadge').style.display = 'none';
   updateFreeCounter();
 }
 
 function updateFreeCounter() {
-  const el = document.getElementById('freeCounter');
-  if (freeSpinsLeft > 0) {
-    el.style.display = 'block';
-    el.textContent = freeSpinsLeft + ' remaining';
-  } else {
-    el.style.display = 'none';
-    document.getElementById('freeBadge').style.display = 'none';
-  }
+  document.getElementById('freeCounter').style.display = 'none';
+  document.getElementById('freeBadge').style.display = 'none';
 }
 
 function showMessage(msg) {
