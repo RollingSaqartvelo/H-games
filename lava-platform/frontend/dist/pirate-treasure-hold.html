@@ -432,7 +432,7 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
 @keyframes bwTapPulse{0%,100%{opacity:.72;transform:scale(1)}50%{opacity:1;transform:scale(1.06)}}
 
 /* Bonus-buy confirm — wooden board asset with content laid over the planks */
-.bc-board{position:relative;width:min(380px,88vw);aspect-ratio:2000/3583;
+.bc-board{position:relative;height:min(600px,80vh);width:auto;aspect-ratio:2000/3583;
   background:url('assets/h-slots/pirate/confirm-board.png') center/contain no-repeat;
   filter:drop-shadow(0 0 42px rgba(255,190,60,.5)) drop-shadow(0 18px 40px rgba(0,0,0,.7));
   animation:bcPop .42s cubic-bezier(.2,1.3,.4,1) both;}
@@ -1338,10 +1338,10 @@ function buildReels() {
       // sound/mute toggle into the bottom-left corner
       const mute = document.getElementById('muteBtn');
       if (mute && wrap) { mute.classList.add('pt-mute-corner'); wrap.appendChild(mute); }
-      // Move BONUS WIN inside the scaled game-wrap so its fixed/inset:0 centring
-      // is relative to the game. Chest-pick stays a BODY child (full viewport
-      // size) so it's large on mobile, not shrunk with the cabinet.
-      var bsum = document.getElementById('bonusSummary'); if (bsum && wrap) wrap.appendChild(bsum);
+      // BONUS WIN and chest-pick stay BODY children (full viewport size) so they
+      // render large on mobile instead of shrinking with the scaled cabinet.
+      // They're fixed/inset:0 → centred on the viewport, which fitStage keeps
+      // aligned with the game.
     }
   }
 
