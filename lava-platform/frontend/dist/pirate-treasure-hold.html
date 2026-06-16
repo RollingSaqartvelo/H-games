@@ -604,8 +604,8 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
      No own border/bg/padding — the wood panel is the frame. */
   .pt-box-reels{ display:none; }                 /* gold backer replaced by wood panel */
   .reels-frame{ position:relative; border:none; padding:0; overflow:visible;
-                /* warm sandy backdrop behind the symbols (so spinning looks like falling sand) */
-                background:linear-gradient(180deg,#f3e3b8 0%,#e6cf92 50%,#d3b56e 100%); }
+                /* warm sandy backdrop behind the symbols (slightly darker) */
+                background:linear-gradient(180deg,#e6d29c 0%,#d6bd78 50%,#c0a256 100%); }
   .reels-frame::before{ top:0; left:0; right:0; bottom:0; }   /* grid lines = exact window */
   .reel{ min-width:0; }   /* let 5 reels share the fixed window width (no overflow) */
 
@@ -2018,7 +2018,6 @@ async function doSpin(options={}) {
 
   soundSpin();
   reelLoopStart();
-  { var _rf = document.getElementById('reelsFrame'); if (_rf) _rf.classList.add('sanding'); }
 
   try {
 
