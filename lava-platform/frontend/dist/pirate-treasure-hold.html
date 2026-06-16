@@ -920,8 +920,8 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
         The theoretical RTP of this game is <b>96.00%</b>.<br>
         The RTP of the game when using "BUY FREE SPINS" is <b>95.00%</b>.<br>
         The RTP of the game when using "BUY SUPER FREE SPINS" is <b>95.00%</b>.<br>
-        <b>MINIMUM BET: $0.25</b><br>
-        <b>MAXIMUM BET: $30.00</b>
+        <b>MINIMUM BET: $0.10</b><br>
+        <b>MAXIMUM BET: $100.00</b>
       </p>
       <p class="rules-txt">
         SPACE and ENTER buttons on the keyboard can be used to start and stop the spin.<br>
@@ -1086,7 +1086,7 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
 //  CONFIG & STATE
 // ═══════════════════════════════════════════════════════════
 const DEMO_START = 1000;
-const BET_STEPS = [0.25, 0.50, 1, 2, 5, 10, 25, 30];
+const BET_STEPS = [0.10, 0.20, 0.50, 1, 2, 3, 5, 8, 10, 15, 20, 25, 30, 50, 75, 100];
 // px per symbol cell — compact on mobile, larger on desktop framed screen
 const CELL_H = 104;  // bigger reel cabinet (wider + taller); whole frame scales to fit
 const NUM_ROWS = 3;
@@ -1147,7 +1147,7 @@ setTimeout(() => {
 // _preloaded[symId] = actual Image object so setCell() can check .complete
 const _preloaded = SYMBOL_IMGS.map(src => _assetImgs[src + SYM_V]);
 
-let betIdx = 2; // default $1.00
+let betIdx = 3; // default $1.00 (index in BET_STEPS)
 let balance = DEMO_START;
 let isDemo = true;
 let isSpinning = false;
