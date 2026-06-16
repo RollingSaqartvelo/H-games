@@ -96,6 +96,16 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
 .reel{flex:1;overflow:hidden;position:relative;border-radius:0;}
 .reel-strip{display:flex;flex-direction:column;will-change:transform;}
 .reel-strip.spinning{filter:none;}
+/* falling-sand overlay over the reels while spinning */
+.sand-layer{position:absolute;inset:0;z-index:7;pointer-events:none;opacity:0;transition:opacity .18s;mix-blend-mode:multiply;
+  background-image:
+    radial-gradient(circle, rgba(150,110,50,.30) 0.8px, transparent 1.4px),
+    radial-gradient(circle, rgba(120,85,35,.22) 0.7px, transparent 1.3px),
+    repeating-linear-gradient(180deg, rgba(170,130,60,0) 0, rgba(170,130,60,0) 10px, rgba(150,110,50,.16) 12px, rgba(170,130,60,0) 15px);
+  background-size:13px 17px, 21px 26px, 100% 64px;
+  background-position:0 0, 7px 0, 0 0;}
+.reels-frame.sanding .sand-layer{opacity:1;animation:sandFall .45s linear infinite;}
+@keyframes sandFall{to{background-position:0 17px, 7px 26px, 0 64px;}}
 .sym-cell{display:flex;align-items:center;justify-content:center;
   position:relative;background:transparent!important;border:none!important;box-shadow:none!important;}
 .sym-cell img{width:100%;height:100%;object-fit:contain;display:block;background:transparent;}
@@ -594,8 +604,8 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
      No own border/bg/padding — the wood panel is the frame. */
   .pt-box-reels{ display:none; }                 /* gold backer replaced by wood panel */
   .reels-frame{ position:relative; border:none; padding:0; overflow:visible;
-                /* light icy blue-white backdrop behind the symbols (~20% darker) */
-                background:linear-gradient(180deg,#cfe5f2 0%,#b2d3e6 52%,#96bfd5 100%); }
+                /* warm sandy backdrop behind the symbols (so spinning looks like falling sand) */
+                background:linear-gradient(180deg,#f3e3b8 0%,#e6cf92 50%,#d3b56e 100%); }
   .reels-frame::before{ top:0; left:0; right:0; bottom:0; }   /* grid lines = exact window */
   .reel{ min-width:0; }   /* let 5 reels share the fixed window width (no overflow) */
 
@@ -672,16 +682,18 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
   .fs-plaque-txt b{ display:block; font-size:30px; color:#ffd860; margin-top:1px;
      text-shadow:0 2px 0 #8a5a10, 0 4px 6px rgba(0,0,0,.7), 0 0 12px rgba(255,200,80,.8); }
 
-  /* MENU + sound toggle — two round buttons side by side, bottom-left */
-  .pt-menu-corner{ position:absolute; left:14px;  bottom:14px; z-index:6; }
-  .pt-mute-corner{ position:absolute; left:70px;  bottom:14px; z-index:6; }
-  .pt-menu-corner, .pt-mute-corner{
-     width:48px; height:48px; font-size:24px; cursor:pointer;
+  /* MENU + INFO + MUTE — round-button cluster left of the SPIN wheel */
+  .reels-outer > .pt-ctrl{ position:absolute; left:50%; bottom:20px;
+     transform:translate(-50%,50%) translateX(-230px); display:flex; gap:14px; z-index:8; }
+  .pt-ctrl-btn{
+     width:52px; height:52px; font-size:25px; line-height:1; cursor:pointer;
      display:flex; align-items:center; justify-content:center; color:#ffe7a0;
-     background:rgba(20,12,4,.55); border:2px solid rgba(240,192,64,.55); border-radius:50%;
-     box-shadow:0 2px 8px rgba(0,0,0,.5); transition:transform .12s,background .15s; }
-  .pt-menu-corner:hover, .pt-mute-corner:hover{ background:rgba(240,192,64,.25); }
-  .pt-menu-corner:active, .pt-mute-corner:active{ transform:scale(.92); }
+     font-family:'Pirata One',system-ui,serif; font-weight:900;
+     background:rgba(20,12,4,.6); border:2px solid rgba(240,192,64,.6); border-radius:50%;
+     box-shadow:0 3px 9px rgba(0,0,0,.55), inset 0 0 10px rgba(0,0,0,.4); transition:transform .12s,background .15s; }
+  .pt-ctrl-btn:hover{ background:rgba(240,192,64,.28); }
+  .pt-ctrl-btn:active{ transform:scale(.9); }
+  #infoBtn.pt-ctrl-btn{ font-style:italic; font-size:28px; }
 }
 </style>
 </head>
@@ -1005,10 +1017,6 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
       <div class="set-txt"><b>Turbo Spin</b><span>Faster reel spins</span></div>
       <div class="set-toggle" id="setTurbo"><i></i></div>
     </div>
-    <div class="set-row" onclick="openInfo();closeSettings();">
-      <div class="set-txt"><b>Game Rules</b><span>Paytable &amp; how to play</span></div>
-      <div class="set-arrow">›</div>
-    </div>
   </div>
 </div>
 
@@ -1097,6 +1105,7 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
           </button>
           <button class="auto-btn" id="autoBtn" onclick="toggleAuto()"><img src="assets/h-slots/pirate/ui/btn-autoplay.png" alt="AUTO"></button>
           <button id="menuBtn" class="menu-btn" aria-label="menu" onclick="openSettings()">☰</button>
+          <button id="infoBtn" class="info-corner" aria-label="info" onclick="openInfo()">i</button>
           <button id="muteBtn" class="mute-btn" aria-label="mute">🔊</button>
         </div>
       </div>
@@ -1412,11 +1421,11 @@ function buildReels() {
       var post = document.createElement('div');
       post.className = 'pt-post';
       wrap.appendChild(post);
-      // sound/mute toggle into the bottom-left corner
-      const menu = document.getElementById('menuBtn');
-      if (menu && wrap) { menu.classList.add('pt-menu-corner'); wrap.appendChild(menu); }
-      const mute = document.getElementById('muteBtn');
-      if (mute && wrap) { mute.classList.add('pt-mute-corner'); wrap.appendChild(mute); }
+      // MENU + INFO + MUTE as a round-button cluster, left of the SPIN wheel
+      var ctrl = document.createElement('div');
+      ctrl.className = 'pt-ctrl';
+      ['menuBtn','infoBtn','muteBtn'].forEach(function(id){ var b=document.getElementById(id); if(b){ b.classList.add('pt-ctrl-btn'); ctrl.appendChild(b); } });
+      if (ro) ro.appendChild(ctrl);
       // BONUS WIN and chest-pick stay BODY children (full viewport size) so they
       // render large on mobile instead of shrinking with the scaled cabinet.
       // They're fixed/inset:0 → centred on the viewport, which fitStage keeps
@@ -1455,6 +1464,13 @@ function buildReels() {
       setCell(col, i, Math.floor(Math.random() * 9));
     }
     setStripY(col, SPIN_REST_Y);
+  }
+
+  // falling-sand overlay (shown only while reels spin)
+  if (frame && !frame.querySelector('.sand-layer')) {
+    var sand = document.createElement('div');
+    sand.className = 'sand-layer';
+    frame.appendChild(sand);
   }
 }
 
@@ -2002,6 +2018,7 @@ async function doSpin(options={}) {
 
   soundSpin();
   reelLoopStart();
+  { var _rf = document.getElementById('reelsFrame'); if (_rf) _rf.classList.add('sanding'); }
 
   try {
 
@@ -2058,6 +2075,7 @@ async function doSpin(options={}) {
   await Promise.all(reelPromises);
   skipRequested = false;
   reelLoopStop();
+  { var _rf2 = document.getElementById('reelsFrame'); if (_rf2) _rf2.classList.remove('sanding'); }
 
   // Update visible cells to final state (result cells = RESULT_BASE+0,1,2)
   for (let col=0; col<NUM_COLS; col++) {
@@ -2152,6 +2170,7 @@ async function doSpin(options={}) {
     isSpinning = false;
     setSpinBtns(true);
     reelLoopStop();
+    { var _rf3 = document.getElementById('reelsFrame'); if (_rf3) _rf3.classList.remove('sanding'); }
   }
 
   // Free spins always auto-run; otherwise honour autoplay
