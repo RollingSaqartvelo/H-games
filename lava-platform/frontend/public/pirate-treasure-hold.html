@@ -535,11 +535,15 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
     pointer-events:none;
   }
 
-  /* lantern flicker — warm glow over the baked lamp in the background */
-  .pt-lamp{ position:absolute; left:8%; top:11%; width:150px; height:180px; z-index:0;
+  /* lantern flicker — warm glow over the two baked hanging lanterns in the bg.
+     left/top mark the lantern CENTRE (translate centres the glow on it). */
+  .pt-lamp{ position:absolute; width:150px; height:175px; z-index:1;
+     transform:translate(-50%,-50%);
      pointer-events:none; border-radius:50%;
      background:radial-gradient(circle, rgba(255,186,80,.6), rgba(255,150,40,.18) 48%, transparent 70%);
      mix-blend-mode:screen; animation:lampFlicker 5s infinite; }
+  .pt-lamp-l{ left:15%;  top:21%; }
+  .pt-lamp-r{ left:88%;  top:27%; animation-delay:-2.5s; }
 
   /* animated skulls (with rat peeking from the socket) overlaid on the panel's
      static skulls — positioned so its skull content matches the baked skulls. */
@@ -1203,9 +1207,12 @@ function buildReels() {
       var fill = document.createElement('div');
       fill.className = 'pt-post-fill';
       wrap.appendChild(fill);
-      var lamp = document.createElement('div');
-      lamp.className = 'pt-lamp';
-      wrap.appendChild(lamp);
+      var lampL = document.createElement('div');
+      lampL.className = 'pt-lamp pt-lamp-l';
+      wrap.appendChild(lampL);
+      var lampR = document.createElement('div');
+      lampR.className = 'pt-lamp pt-lamp-r';
+      wrap.appendChild(lampR);
       var logo = document.createElement('img');
       logo.className = 'pt-logo';
       logo.src = 'assets/h-slots/pirate/pirate%20logo.png';
