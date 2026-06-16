@@ -2400,18 +2400,19 @@ async function showBigWin(amount, bet, label) {
   const muted = !!(mb && mb.classList.contains('muted'));
   const bgWasPlaying = bgMusic && !bgMusic.paused;
   if (bgWasPlaying) bgMusic.pause();
+  // extracted soundtrack via a plain Audio (same path the working reel SFX use).
+  // Plays ALWAYS (like the other SFX) — NOT gated by the bg-music mute toggle.
+  try { if (_bwAudio) { _bwAudio.pause(); _bwAudio = null; } } catch(e){}
+  _bwAudio = new Audio(cfg.audio);
+  _bwAudio.volume = 0.95;
+  _bwAudio.play().catch(function(err){ console.warn('[PIRATE] bw audio blocked:', err && err.name); });
   let videoEnded = false;
   if (vid) {
     try {
-      vid.muted = true; vid.loop = false; vid.src = cfg.src; vid.currentTime = 0;
+      vid.muted = true; vid.loop = false; vid.src = cfg.src; vid.currentTime = 0;  // video silent; MP3 carries sound
       vid.onended = function(){ videoEnded = true; };
       vid.play().catch(()=>{});
     } catch(e){}
-  }
-  // the soundtrack as a separate MP3 (same reliable pattern as the other SFX)
-  try { if (_bwAudio) { _bwAudio.pause(); _bwAudio = null; } } catch(e){}
-  if (!muted) {
-    try { _bwAudio = new Audio(cfg.audio); _bwAudio.volume = 0.95; _bwAudio.play().catch(()=>{}); } catch(e){}
   }
   _bwSkip = false;
   overlay.classList.remove('fade');
