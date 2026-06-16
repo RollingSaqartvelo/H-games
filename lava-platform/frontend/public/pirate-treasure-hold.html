@@ -431,6 +431,31 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
   animation:bwTapPulse 1.2s ease-in-out infinite;}
 @keyframes bwTapPulse{0%,100%{opacity:.72;transform:scale(1)}50%{opacity:1;transform:scale(1.06)}}
 
+/* Bonus-buy confirm board — glowing, animated */
+#bonusConfirm .modal-box{border:2px solid rgba(240,192,64,.75);
+  box-shadow:0 0 0 2px rgba(0,0,0,.6),0 0 42px rgba(255,190,60,.5),0 18px 50px rgba(0,0,0,.7),inset 0 0 40px rgba(0,0,0,.5);
+  animation:bcPop .42s cubic-bezier(.2,1.3,.4,1) both;}
+@keyframes bcPop{0%{transform:scale(.72);opacity:0}60%{transform:scale(1.05)}100%{transform:scale(1);opacity:1}}
+#bonusConfirm #bonusCostVal{animation:bcCost 1.2s ease-in-out infinite;}
+@keyframes bcCost{0%,100%{transform:scale(1);text-shadow:0 0 8px rgba(255,190,60,.6)}50%{transform:scale(1.08);text-shadow:0 0 18px rgba(255,210,90,1)}}
+.bc-actions{display:flex;gap:34px;justify-content:center;align-items:flex-start;margin-top:4px;}
+.bc-opt{display:flex;flex-direction:column;align-items:center;gap:6px;}
+.bc-btn{width:72px;height:72px;border-radius:50%;border:none;cursor:pointer;
+  font-size:38px;font-weight:900;line-height:1;color:#fff;display:flex;align-items:center;justify-content:center;
+  text-shadow:0 2px 4px rgba(0,0,0,.55);transition:transform .12s;}
+.bc-btn:hover{transform:scale(1.08);}
+.bc-btn:active{transform:scale(.9);}
+.bc-yes{background:radial-gradient(circle at 36% 30%,#7bf0a4,#1f9c4d 72%);
+  animation:bcYes 1.1s ease-in-out infinite;}
+.bc-no{background:radial-gradient(circle at 36% 30%,#ff8273,#c22a1c 72%);
+  animation:bcNo 1.4s ease-in-out infinite;}
+@keyframes bcYes{0%,100%{box-shadow:0 0 0 3px rgba(70,232,154,.3),0 0 16px rgba(60,220,120,.65),0 6px 14px rgba(0,0,0,.5);transform:scale(1)}
+  50%{box-shadow:0 0 0 6px rgba(70,232,154,.5),0 0 32px rgba(60,235,135,1),0 6px 14px rgba(0,0,0,.5);transform:scale(1.08)}}
+@keyframes bcNo{0%,100%{box-shadow:0 0 0 3px rgba(255,90,70,.28),0 0 14px rgba(255,70,50,.6),0 6px 14px rgba(0,0,0,.5);transform:scale(1)}
+  50%{box-shadow:0 0 0 5px rgba(255,90,70,.45),0 0 24px rgba(255,80,60,.9),0 6px 14px rgba(0,0,0,.5);transform:scale(1.04)}}
+.bc-lbl{font-size:11px;font-weight:900;letter-spacing:.16em;text-transform:uppercase;}
+.bc-lbl-yes{color:#5be08a;} .bc-lbl-no{color:#ff7a6a;}
+
 /* ── Scatter animation ── */
 @keyframes scatter-flash{0%,100%{opacity:1}50%{opacity:.3}}
 .scatter-anim{animation:scatter-flash .3s ease 5;}
@@ -896,9 +921,15 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
     <p style="color:#e8d5a3;font-size:13px;line-height:1.5;margin:2px 0 16px;">Land 4 scatters and start <b>12 free spins</b> — each spin has a multiplier up to ×500. Collect <b>3 golden keys</b> for a chest pick with a persistent ×50–×500!</p>
     <div style="font-size:11px;color:var(--muted);letter-spacing:.2em;text-transform:uppercase;">Price (100× bet)</div>
     <div id="bonusCostVal" style="font-size:32px;font-weight:900;color:#f0c040;font-family:monospace;margin:4px 0 20px;text-shadow:var(--blood-glow);">$0.00</div>
-    <div style="display:flex;gap:12px;justify-content:center;">
-      <button onclick="closeBonusConfirm()" style="flex:1;background:rgba(0,0,0,.3);border:1.5px solid var(--muted);color:#c8b89a;padding:12px 0;font-size:14px;font-weight:900;letter-spacing:.1em;border-radius:8px;cursor:pointer;">CANCEL</button>
-      <button onclick="confirmBonusBuy()" style="flex:1;background:linear-gradient(135deg,#f0c040,#c8962a);border:none;color:#1a0e02;padding:12px 0;font-size:14px;font-weight:900;letter-spacing:.1em;border-radius:8px;cursor:pointer;">BUY</button>
+    <div class="bc-actions">
+      <div class="bc-opt">
+        <button class="bc-btn bc-no" onclick="closeBonusConfirm()" aria-label="Cancel">✕</button>
+        <span class="bc-lbl bc-lbl-no">Cancel</span>
+      </div>
+      <div class="bc-opt">
+        <button class="bc-btn bc-yes" onclick="confirmBonusBuy()" aria-label="Buy">✓</button>
+        <span class="bc-lbl bc-lbl-yes">Buy</span>
+      </div>
     </div>
   </div>
 </div>
