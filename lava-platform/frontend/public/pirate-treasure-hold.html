@@ -146,6 +146,15 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
 .spin-btn img{width:90px;height:90px;object-fit:contain;display:block;}
 /* wheel spins while the round is spinning */
 @keyframes pt-spin-wheel{ to{ transform:rotate(360deg); } }
+/* multiplier badge pop-in */
+@keyframes mult-pop{ 0%{transform:translate(-50%,-50%) scale(.3);opacity:0} 60%{transform:translate(-50%,-50%) scale(1.18);opacity:1} 100%{transform:translate(-50%,-50%) scale(1);opacity:1} }
+.pt-mult.mult-pop{ animation:mult-pop .45s cubic-bezier(.2,1.3,.4,1) both; }
+/* big multipliers (x100/x250/x500) blaze with a pulsing fiery glow */
+@keyframes mult-fire{
+  0%,100%{ filter:drop-shadow(0 0 8px rgba(255,95,30,.9)) drop-shadow(0 0 20px rgba(255,50,10,.6)) drop-shadow(0 4px 9px rgba(0,0,0,.7)); }
+  50%{ filter:drop-shadow(0 0 17px rgba(255,150,50,1)) drop-shadow(0 0 40px rgba(255,70,15,.9)) drop-shadow(0 4px 9px rgba(0,0,0,.7)); }
+}
+.pt-mult.mult-fire.mult-pop{ animation:mult-pop .45s cubic-bezier(.2,1.3,.4,1) both, mult-fire .7s ease-in-out infinite; }
 /* bat opens eyes briefly once per 7s cycle (opacity only — keeps the centering transform) */
 @keyframes batBlink{ 0%,88%,100%{opacity:0} 91%,97%{opacity:1} }
 /* embossed 3D gold plaque text with a gentle glow pulse */
@@ -414,6 +423,11 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
   /* animated skulls (with rat peeking from the socket) overlaid on the panel's
      static skulls — positioned so its skull content matches the baked skulls. */
   .pt-skullvid{ display:none; }   /* hidden — webm keying looks bad for now */
+
+  /* free-spins multiplier badge — shown above the reels each free spin */
+  .pt-mult{ position:absolute; left:50%; top:-15%; transform:translate(-50%,-50%);
+     width:30%; height:auto; z-index:9; pointer-events:none;
+     filter:drop-shadow(0 4px 9px rgba(0,0,0,.7)); }
   .pt-plaque{ position:absolute; left:-6px; width:158px; height:96px; z-index:3;
      background:url('assets/h-slots/pirate/board-bonus.png') center/contain no-repeat;
      display:flex; align-items:center; justify-content:center; border:none; padding:0; cursor:pointer;
@@ -451,6 +465,7 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
 (function(){
   const SYMS=['a','k','q','j','anchor','boost','chest','coins','doubloon','mystery','rum','scatter','wild']
     .map(n=>'/assets/h-slots/pirate/symbols/sym-'+n+'.png?v=2');
+  const MULTS=[2,3,5,10,20,50,100,250,500].map(v=>'/assets/h-slots/pirate/symbols/x'+v+'.png');
   const VIDS=[
     '/assets/h-slots/pirate/character/INTRO.mp4',
     '/assets/h-slots/pirate/character/IDLE.mp4',
@@ -458,8 +473,9 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
     '/assets/h-slots/pirate/character/big%20win.mp4',
     '/assets/h-slots/pirate/character/lose.mp4',
     '/video/win%20video.mp4',
-    // all reel symbols
+    // all reel symbols + multipliers
     ...SYMS,
+    ...MULTS,
     // frame / UI / background art
     '/assets/h-slots/pirate/background.jpeg',
     '/assets/h-slots/pirate/pirate%20baraban.png',
@@ -919,6 +935,9 @@ function buildReels() {
     skv.setAttribute('playsinline', ''); skv.setAttribute('muted', '');
     frame.appendChild(skv);
     skv.play().catch(function(){});
+    const mb = document.createElement('img');
+    mb.id = 'multBadge'; mb.className = 'pt-mult'; mb.alt = ''; mb.style.display = 'none';
+    frame.appendChild(mb);
     frame.style.width = (CELL_H * 3 * 1.821) + 'px';
     // reserve the panel's full height in the reels area so the wood frame
     // (which overflows the reel window) isn't clipped or overlapping Box B
@@ -1161,22 +1180,34 @@ const PAYLINES = [
   [1,1,2,1,1],[0,0,1,1,2],[2,2,1,1,0],[0,1,1,0,0],[2,1,1,2,2]
 ];
 
+// ── Free-spins multipliers (bonus / scatter feature) — tuned to ~96% bonus RTP ──
+const MULT_VALUES  = [2,3,5,10,20,50,100,250,500];
+const MULT_WEIGHTS = [7600,2000,700,280,120,45,14,3,1];
+const _multTot = MULT_WEIGHTS.reduce((a,b)=>a+b,0);
+function pickMultiplier() {
+  let r = demoRand() * _multTot;
+  for (let i=0;i<MULT_VALUES.length;i++){ if ((r -= MULT_WEIGHTS[i]) < 0) return MULT_VALUES[i]; }
+  return MULT_VALUES[0];
+}
+function showMultiplier(m) {
+  const el = document.getElementById('multBadge');
+  if (!el) return;
+  el.src = 'assets/h-slots/pirate/symbols/x' + m + '.png';
+  el.style.display = 'block';
+  el.classList.toggle('mult-fire', m >= 100);   // big multipliers blaze
+  el.classList.remove('mult-pop'); void el.offsetWidth; el.classList.add('mult-pop');
+}
+function hideMultiplier() {
+  const el = document.getElementById('multBadge');
+  if (el) el.style.display = 'none';
+}
+
 function demoSpin(bet, isFreeSpin, bonusBuy) {
   const weights = isFreeSpin ? DEMO_FREE_WEIGHTS : DEMO_WEIGHTS;
   let grid = [];
   for (let r=0;r<3;r++) {
     grid.push([]);
     for (let c=0;c<5;c++) { grid[r].push(demoWeightedPick(weights)); }
-  }
-
-  if (bonusBuy) {
-    // Force 3 doubloons
-    let count = 0;
-    for (let r=0;r<3;r++) for (let c=0;c<5;c++) if (grid[r][c]===6) count++;
-    while (count < 3) {
-      const r = Math.floor(demoRand()*3), c = Math.floor(demoRand()*5);
-      if (grid[r][c]!==6) { grid[r][c]=6; count++; }
-    }
   }
 
   // Paylines
@@ -1209,20 +1240,8 @@ function demoSpin(bet, isFreeSpin, bonusBuy) {
   for (let r=0;r<3;r++) for (let c=0;c<5;c++) if(grid[r][c]===5) scatterCount++;
   const freeSpinsAwarded = scatterCount>=5?20:scatterCount>=4?12:scatterCount>=3?8:0;
 
-  // Doubloon / Hold&Win
-  let doubloonCount=0;
-  for (let r=0;r<3;r++) for (let c=0;c<5;c++) if(grid[r][c]===6||grid[r][c]===7||grid[r][c]===8) doubloonCount++;
-  let holdWinTriggered = false, holdWinResult = null;
-  const threshold = doubloonCount>=6?100:doubloonCount>=5?75:doubloonCount>=4?50:doubloonCount>=3?30:0;
-  if ((bonusBuy||demoRand()*100<threshold) && doubloonCount>=3) {
-    holdWinTriggered = true;
-    holdWinResult = buildDemoHoldWin(grid, bet);
-    // HW winnings tracked separately via runHoldWinRound, not pre-added here
-  }
-
   return { grid, paylines, total_payout: totalPayout, scatter_count: scatterCount,
-    free_spins_awarded: freeSpinsAwarded, hold_win_triggered: holdWinTriggered,
-    hold_win_result: holdWinResult, bet };
+    free_spins_awarded: freeSpinsAwarded, bet };
 }
 
 const DOUBLOON_MULTS = [0.75,1.50,2.25,3.00,3.75,4.50,5.25,6.00,6.75,7.50,8.25,9.00,9.75,10.50,11.25];
@@ -1477,28 +1496,29 @@ async function doSpin(options={}) {
     updateFreeCounter();
   }
 
-  // Show payline wins
-  if (result.paylines && result.paylines.length > 0) {
-    await showWins(result, bet);
-  }
+  // Free-spins multiplier — shown above the reels on every free spin
+  let mult = 1;
+  if (isFree) { mult = pickMultiplier(); showMultiplier(mult); }
+  else hideMultiplier();
 
-  // Handle Hold&Win
-  let hwWinnings = 0;
-  if (result.hold_win_triggered && result.hold_win_result) {
-    hwWinnings = await showHoldWin(result.hold_win_result, bet, result);
+  const winAmt = (result.total_payout || 0) * mult;
+
+  // Show win (base × multiplier)
+  if (winAmt > 0) {
+    showWinText('WIN ' + winAmt.toFixed(2) + '$');
+    await new Promise(r => setTimeout(r, 800));
   }
 
   // Update balance
   if (!isDemo) {
     balance = result.balance || balance;
   } else {
-    balance += (result.total_payout||0) + hwWinnings;
+    balance += winAmt;
     saveDemo();
   }
   updateUI();
 
   // Big win check
-  const winAmt = (result.total_payout||0) + hwWinnings;
   charReact(winAmt, bet);
   if (winAmt > bet * 10) {
     soundWin(winAmt, bet);
@@ -1515,11 +1535,12 @@ async function doSpin(options={}) {
     setSpinBtns(true);
   }
 
-  // Auto-play
-  if (isAuto && freeSpinsLeft <= 0) {
-    autoTimer = setTimeout(doSpin, 1500);
-  } else if (isAuto && freeSpinsLeft > 0) {
-    autoTimer = setTimeout(() => doSpin(), 1000);
+  // Free spins always auto-run; otherwise honour autoplay
+  if (freeSpinsLeft > 0) {
+    autoTimer = setTimeout(() => doSpin(), 1100);
+  } else {
+    setTimeout(hideMultiplier, 1400);   // clear the badge when the feature ends
+    if (isAuto) autoTimer = setTimeout(doSpin, 1500);
   }
 }
 
@@ -1903,7 +1924,13 @@ async function confirmBonusBuy() {
   if (isSpinning) return;
   const cost = BET_STEPS[betIdx] * 65;
   if (balance < cost) { showMessage('Need $' + cost.toFixed(2)); return; }
-  await doSpin({bonusBuy:true});
+  balance -= cost;
+  if (isDemo) saveDemo();
+  freeSpinsLeft = 10;          // bonus = 10 free spins (each with a multiplier)
+  showFreeBadge();
+  updateFreeCounter();
+  updateUI();
+  doSpin();                    // free spins auto-run (freeSpinsLeft>0 → isFree)
 }
 
 function openInfo() { document.getElementById('infoModal').classList.add('open'); }
