@@ -449,13 +449,32 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
 <style>@keyframes ls-p{0%,100%{opacity:.15}50%{opacity:.6}}</style>
 <script>
 (function(){
+  const SYMS=['a','k','q','j','anchor','boost','chest','coins','doubloon','mystery','rum','scatter','wild']
+    .map(n=>'/assets/h-slots/pirate/symbols/sym-'+n+'.png?v=2');
   const VIDS=[
     '/assets/h-slots/pirate/character/INTRO.mp4',
     '/assets/h-slots/pirate/character/IDLE.mp4',
     '/assets/h-slots/pirate/character/win.mp4',
     '/assets/h-slots/pirate/character/big%20win.mp4',
     '/assets/h-slots/pirate/character/lose.mp4',
-    '/video/win%20video.mp4'
+    '/video/win%20video.mp4',
+    // all reel symbols
+    ...SYMS,
+    // frame / UI / background art
+    '/assets/h-slots/pirate/background.jpeg',
+    '/assets/h-slots/pirate/pirate%20baraban.png',
+    '/assets/h-slots/pirate/pirate%20logo.png',
+    '/assets/h-slots/pirate/board-bonus.png',
+    '/assets/h-slots/pirate/post.png',
+    '/assets/h-slots/pirate/post-shaft.png',
+    '/assets/h-slots/pirate/eyes.png',
+    '/assets/h-slots/pirate/bet-input-panel.png',
+    '/assets/h-slots/pirate/ui/new-jackpot.png',
+    '/assets/h-slots/pirate/ui/hold-win-frame.png',
+    '/assets/h-slots/pirate/ui/btn-spin-idle.png',
+    '/assets/h-slots/pirate/ui/btn-buy-bonus.png',
+    '/assets/h-slots/pirate/ui/btn-paytable.png',
+    '/assets/h-slots/pirate/ui/btn-autoplay.png'
   ];
   const scr=document.getElementById('ls');
   const bar=document.getElementById('ls-bar');
@@ -496,7 +515,7 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
       if(!cl){prog[i][0]=prog[i][1]=1;upd();}
     }catch(e){prog[i][0]=prog[i][1]=1;upd();}
   }
-  const guard=setTimeout(finish,15000);
+  const guard=setTimeout(finish,25000);
   Promise.all(VIDS.map((u,i)=>load(u,i))).then(()=>{clearTimeout(guard);finish();});
 })();
 </script>
