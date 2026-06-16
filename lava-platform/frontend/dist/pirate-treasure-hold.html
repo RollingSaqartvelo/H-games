@@ -634,12 +634,10 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
         <div class="modal-rule">25 fixed paylines — wins pay left to right on adjacent reels.</div>
         <div class="modal-rule">🃏 Wild substitutes for all paying symbols.</div>
         <div class="modal-rule">🗺️ Scatter ×3 = 8 free spins | ×4 = 12 | ×5 = 20.</div>
-        <div class="modal-rule">🥇 Doubloon ×3+ may trigger the Hold &amp; Win feature.</div>
-        <div class="modal-rule">During Hold &amp; Win: 3 respins, reset on each new doubloon.</div>
-        <div class="modal-rule">🧭 Boost multiplies all doubloon values 2.5–5×.</div>
-        <div class="modal-rule">💀 Mystery transforms to a random jackpot type.</div>
-        <div class="modal-rule">Full grid (15 doubloons) = GRAND jackpot bonus!</div>
-        <div class="modal-rule">Bonus Buy: 65× bet for guaranteed Hold &amp; Win.</div>
+        <div class="modal-rule">✖️ During free spins every spin shows a multiplier (×2 up to ×500) that multiplies that spin's win.</div>
+        <div class="modal-rule">🔥 The big multipliers (×100 / ×250 / ×500) blaze with fire.</div>
+        <div class="modal-rule">More scatters during free spins re-trigger extra spins.</div>
+        <div class="modal-rule">Bonus Buy: 65× bet → lands 4 scatters = 12 free spins with multipliers.</div>
       </div>
     </div>
   </div>
@@ -648,8 +646,8 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
 <!-- Buy Bonus confirmation -->
 <div class="modal" id="bonusConfirm">
   <div class="modal-box" style="max-width:340px;text-align:center;">
-    <div class="modal-title">Buy Hold &amp; Win</div>
-    <p style="color:#e8d5a3;font-size:13px;line-height:1.5;margin:2px 0 16px;">Instantly trigger the Hold &amp; Win feature with a guaranteed 3 doubloons.</p>
+    <div class="modal-title">Buy Free Spins</div>
+    <p style="color:#e8d5a3;font-size:13px;line-height:1.5;margin:2px 0 16px;">Land 4 scatters and start <b>12 free spins</b> — each spin has a multiplier up to ×500.</p>
     <div style="font-size:11px;color:var(--muted);letter-spacing:.2em;text-transform:uppercase;">Price (65× bet)</div>
     <div id="bonusCostVal" style="font-size:32px;font-weight:900;color:#f0c040;font-family:monospace;margin:4px 0 20px;text-shadow:var(--blood-glow);">$0.00</div>
     <div style="display:flex;gap:12px;justify-content:center;">
@@ -1183,7 +1181,7 @@ const PAYLINES = [
 
 // ── Free-spins multipliers (bonus / scatter feature) — tuned to ~96% bonus RTP ──
 const MULT_VALUES  = [2,3,5,10,20,50,100,250,500];
-const MULT_WEIGHTS = [7600,2000,700,280,120,45,14,3,1];
+const MULT_WEIGHTS = [10300,1950,520,185,72,23,6,2,1];  // tuned: 12 free spins, ~95% bonus RTP
 const _multTot = MULT_WEIGHTS.reduce((a,b)=>a+b,0);
 function pickMultiplier() {
   let r = demoRand() * _multTot;
@@ -1209,6 +1207,16 @@ function demoSpin(bet, isFreeSpin, bonusBuy) {
   for (let r=0;r<3;r++) {
     grid.push([]);
     for (let c=0;c<5;c++) { grid[r].push(demoWeightedPick(weights)); }
+  }
+
+  // Bonus buy: force exactly 4 scatters so the trigger spin awards the feature
+  if (bonusBuy) {
+    for (let r=0;r<3;r++) for (let c=0;c<5;c++) if (grid[r][c]===5) grid[r][c]=0;
+    let placed = 0;
+    while (placed < 4) {
+      const r = Math.floor(demoRand()*3), c = Math.floor(demoRand()*5);
+      if (grid[r][c]!==5) { grid[r][c]=5; placed++; }
+    }
   }
 
   // Paylines
@@ -1920,13 +1928,8 @@ async function confirmBonusBuy() {
   if (isSpinning) return;
   const cost = BET_STEPS[betIdx] * 65;
   if (balance < cost) { showMessage('Need $' + cost.toFixed(2)); return; }
-  balance -= cost;
-  if (isDemo) saveDemo();
-  freeSpinsLeft = 10;          // bonus = 10 free spins (each with a multiplier)
-  showFreeBadge();
-  updateFreeCounter();
-  updateUI();
-  doSpin();                    // free spins auto-run (freeSpinsLeft>0 → isFree)
+  // trigger spin lands 4 scatters → awards 12 free spins, then they auto-run
+  doSpin({bonusBuy:true});
 }
 
 function openInfo() { document.getElementById('infoModal').classList.add('open'); }
