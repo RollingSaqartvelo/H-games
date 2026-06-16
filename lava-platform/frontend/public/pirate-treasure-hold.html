@@ -1448,54 +1448,49 @@ async function animateReel(col, finalSymbols, stopDelay) {
         const cellH = CELL_H;
         const strip = stripEls[col];
         if (!strip) { resolve(); return; }
-
         soundClick();
-        strip.style.transition = 'none';
-        setStripY(col, -SPIN_START * cellH);
 
+        // Fill the strip: a random run, with the final 3 symbols in the result window
+        strip.style.transition = 'none';
         for (let i = 0; i < SPIN_END; i++) setCell(col, i, Math.floor(Math.random()*9));
         for (let r = 0; r < NUM_ROWS; r++) setCell(col, SPIN_END+r, finalSymbols[r] ?? 0);
 
+        const startY  = -SPIN_START * cellH;
+        const targetY = -SPIN_END   * cellH;
+        setStripY(col, startY);
+        void strip.offsetHeight;            // commit the start position before transitioning
         strip.classList.add('spinning');
-        const startY = -SPIN_START * cellH;
-        const targetY = -SPIN_END * cellH;
-        const spinDur = turbo ? 220 : 300;
-        const startTime = performance.now();
 
-        await new Promise(r2 => {
-          let done = false;
-          function finish() {
-            if (done) return; done = true;
+        if (skipRequested) {
+          strip.style.transition = 'none';
+          setStripY(col, targetY);
+        } else {
+          const fast = turbo ? 230 : 400;   // constant-speed streaming phase (GPU transition)
+          const land = turbo ? 240 : 420;   // deceleration / landing phase
+          const preY = targetY + cellH * 3; // start decelerating 3 cells before the stop
+
+          // Phase A — fast linear stream (reads as a spinning reel, no JS jank)
+          strip.style.transition = 'transform ' + fast + 'ms linear';
+          setStripY(col, preY);
+          await new Promise(r2 => setTimeout(r2, fast));
+
+          // Phase B — ease-out onto the final symbols with a tiny overshoot bounce
+          if (!skipRequested) {
+            strip.style.transition = 'transform ' + land + 'ms cubic-bezier(.16,.72,.28,1)';
+            setStripY(col, targetY - 9);    // overshoot a hair past the stop
+            await new Promise(r2 => setTimeout(r2, land));
+            strip.style.transition = 'transform .09s ease-out';
+            setStripY(col, targetY);        // settle back
+            await new Promise(r2 => setTimeout(r2, 90));
+          } else {
             strip.style.transition = 'none';
             setStripY(col, targetY);
-            strip.classList.remove('spinning');
-            for (let r=0;r<NUM_ROWS;r++) setCell(col, SPIN_END+r, finalSymbols[r] ?? 0);
-            r2();
           }
-          // fallback: гарантированное завершение если rAF подвис
-          setTimeout(finish, spinDur + 300);
-          function frame(now) {
-            if (skipRequested) { finish(); return; }
-            const t = Math.min((now - startTime) / spinDur, 1);
-            setStripY(col, startY + (targetY - startY) * easeInOutQuart(t));
-            if (t < 1) requestAnimationFrame(frame); else finish();
-          }
-          requestAnimationFrame(frame);
-        });
-
-        if (!skipRequested) {
-          strip.style.transition = 'transform 0.08s ease-out';
-          setStripY(col, targetY + 8);
-          await new Promise(r2 => setTimeout(r2, 80));
-          strip.style.transition = 'transform 0.06s ease-in';
-          setStripY(col, targetY);
-          await new Promise(r2 => setTimeout(r2, 60));
         }
 
         strip.style.transition = 'none';
-        setStripY(col, -SPIN_END * CELL_H);
+        setStripY(col, targetY);
         for (let r=0;r<NUM_ROWS;r++) setCell(col, SPIN_END+r, finalSymbols[r] ?? 0);
-        strip.style.transition = '';
         strip.classList.remove('spinning');
 
       } catch(e) {
