@@ -161,7 +161,7 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
 .spin-btn:disabled{opacity:.4;cursor:default;}
 .spin-btn img{width:90px;height:90px;object-fit:contain;display:block;}
 /* wheel spins while the round is spinning */
-@keyframes pt-spin-wheel{ to{ transform:rotate(360deg); } }
+@keyframes pt-spin-wheel{ to{ transform:rotate(-360deg); } }
 /* multiplier badge pop-in */
 @keyframes mult-pop{ 0%{transform:translate(-50%,-50%) scale(.3);opacity:0} 60%{transform:translate(-50%,-50%) scale(1.18);opacity:1} 100%{transform:translate(-50%,-50%) scale(1);opacity:1} }
 .pt-mult.mult-pop{ animation:mult-pop .45s cubic-bezier(.2,1.3,.4,1) both; }
@@ -1241,10 +1241,12 @@ muteBtn.onclick = (e) => {
 // ── Spin strip layout ──────────────────────────────────────
 // Strip: SHORT (18 cells) on purpose — 70 cells × 5 reels created 350 <img>
 // elements per spin (~220 MB decoded) which iOS Safari evicts → blank cells.
-// 18 × 5 = 90 imgs (~58 MB) fits. Travel = 15 cells, plenty for the spin look.
+// 18 × 5 = 90 imgs (~58 MB) fits.
+// Reels spin TOP→DOWN: the final result lives in the TOP cells (0,1,2); the
+// strip starts pushed up (showing the bottom random cells) and scrolls DOWN to 0.
 const SPIN_TOTAL  = 18;
-const SPIN_START  = 0;  // cells shown before spin (window 0,1,2)
-const SPIN_END    = 15; // cells shown after spin (15,16,17 = final result)
+const RESULT_BASE = 0;                       // final symbols occupy cells 0,1,2 (top)
+const SPIN_REST_Y = -RESULT_BASE * 104;      // strip Y at rest (window shows the result)
 
 let reelEls = [];
 let stripEls = [];
@@ -1374,7 +1376,7 @@ function buildReels() {
     for (let i = 0; i < SPIN_TOTAL; i++) {
       setCell(col, i, Math.floor(Math.random() * 9));
     }
-    setStripY(col, -SPIN_START * cellH);
+    setStripY(col, SPIN_REST_Y);
   }
 }
 
@@ -1452,11 +1454,13 @@ async function animateReel(col, finalSymbols, stopDelay) {
       // Fill the strip: a random run, with the final 3 symbols in the result window.
       // Done up-front so NOTHING of the previous result lingers — all reels start now.
       strip.style.transition = 'none';
-      for (let i = 0; i < SPIN_END; i++) setCell(col, i, Math.floor(Math.random()*9));
-      for (let r = 0; r < NUM_ROWS; r++) setCell(col, SPIN_END+r, finalSymbols[r] ?? 0);
+      // final result in the TOP cells (0,1,2); random run fills the rest below
+      for (let r = 0; r < NUM_ROWS; r++) setCell(col, RESULT_BASE+r, finalSymbols[r] ?? 0);
+      for (let i = NUM_ROWS; i < SPIN_TOTAL; i++) setCell(col, i, Math.floor(Math.random()*9));
 
-      const startY  = -SPIN_START * cellH;
-      const targetY = -SPIN_END   * cellH;
+      // Spin DOWN: start pushed up (showing bottom random cells) → scroll to 0 (result on top)
+      const startY  = -(SPIN_TOTAL - NUM_ROWS) * cellH;
+      const targetY = -RESULT_BASE * cellH;            // 0 → window shows the result
       setStripY(col, startY);
       void strip.offsetHeight;            // commit the start position before transitioning
       strip.classList.add('spinning');
@@ -1469,7 +1473,7 @@ async function animateReel(col, finalSymbols, stopDelay) {
         // left→right in sequence (no frozen old result on later reels).
         const fast = (turbo ? 360 : 620) + stopDelay;  // streaming phase (+ stagger)
         const land = turbo ? 320 : 560;                // deceleration / landing phase
-        const preY = targetY + cellH * 4;              // decelerate 4 cells before the stop
+        const preY = targetY - cellH * 4;              // decelerate 4 cells before the stop
 
         // Phase A — steady linear stream (reads as a spinning reel, no JS jank)
         strip.style.transition = 'transform ' + fast + 'ms linear';
@@ -1489,15 +1493,15 @@ async function animateReel(col, finalSymbols, stopDelay) {
 
       strip.style.transition = 'none';
       setStripY(col, targetY);
-      for (let r=0;r<NUM_ROWS;r++) setCell(col, SPIN_END+r, finalSymbols[r] ?? 0);
+      for (let r=0;r<NUM_ROWS;r++) setCell(col, RESULT_BASE+r, finalSymbols[r] ?? 0);
       strip.classList.remove('spinning');
 
     } catch(e) {
       console.error('[PIRATE] animateReel error col='+col, e);
       try {
         stripEls[col]?.classList.remove('spinning');
-        setStripY(col, -SPIN_END * CELL_H);
-        for (let r=0;r<NUM_ROWS;r++) setCell(col, SPIN_END+r, finalSymbols[r] ?? 0);
+        setStripY(col, SPIN_REST_Y);
+        for (let r=0;r<NUM_ROWS;r++) setCell(col, RESULT_BASE+r, finalSymbols[r] ?? 0);
       } catch(e2) {}
     } finally {
       resolve();
@@ -1977,10 +1981,10 @@ async function doSpin(options={}) {
   skipRequested = false;
   reelLoopStop();
 
-  // Update visible cells to final state (SPIN_END = 67,68,69)
+  // Update visible cells to final state (result cells = RESULT_BASE+0,1,2)
   for (let col=0; col<NUM_COLS; col++) {
     for (let row=0; row<NUM_ROWS; row++) {
-      setCell(col, SPIN_END+row, grid[row][col]);
+      setCell(col, RESULT_BASE+row, grid[row][col]);
     }
   }
 
@@ -1991,7 +1995,7 @@ async function doSpin(options={}) {
   let popDelay = 0;
   for (let col=0; col<NUM_COLS; col++) for (let row=0; row<NUM_ROWS; row++) {
     if (grid[row][col] === 5) {
-      const cell = cellRows[col] && cellRows[col][SPIN_END+row];
+      const cell = cellRows[col] && cellRows[col][RESULT_BASE+row];
       if (cell) { (function(c,d){ setTimeout(function(){ c.classList.remove('sym-pop'); void c.offsetWidth; c.classList.add('sym-pop'); }, d); })(cell, popDelay); popDelay += 90; }
     }
   }
@@ -2445,7 +2449,7 @@ async function showBigWin(amount, bet, label) {
 // Square-frame the symbols that form each winning payline (clears old frames first)
 function highlightWins(result) {
   for (let col=0; col<NUM_COLS; col++) for (let row=0; row<NUM_ROWS; row++) {
-    const c = cellRows[col] && cellRows[col][SPIN_END+row];
+    const c = cellRows[col] && cellRows[col][RESULT_BASE+row];
     if (c) c.classList.remove('win-cell');
   }
   if (!result || !result.paylines || !result.paylines.length) return;
@@ -2453,7 +2457,7 @@ function highlightWins(result) {
   result.paylines.forEach(function(pl){
     const line = PAYLINES[pl.line-1]; if (!line) return;
     for (let col=0; col<pl.count; col++) {
-      const c = cellRows[col] && cellRows[col][SPIN_END+line[col]];
+      const c = cellRows[col] && cellRows[col][RESULT_BASE+line[col]];
       if (c) c.classList.add('win-cell');
     }
   });
@@ -2463,7 +2467,7 @@ function flashScatters(grid) {
   for (let col=0; col<NUM_COLS; col++) {
     for (let row=0; row<NUM_ROWS; row++) {
       if (grid[row][col]===5) {
-        const cell = cellRows[col][SPIN_END+row];
+        const cell = cellRows[col][RESULT_BASE+row];
         if (cell) {
           cell.classList.add('scatter-anim');
           cell.addEventListener('animationend', ()=>cell.classList.remove('scatter-anim'), {once:true});
