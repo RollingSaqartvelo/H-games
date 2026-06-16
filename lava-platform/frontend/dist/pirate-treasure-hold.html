@@ -514,6 +514,11 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
     background:#0b1422 url('assets/h-slots/pirate/background.jpeg') center/cover no-repeat;
   }
 
+  /* pirate mascot standing to the LEFT of the cabinet, rooted at the very
+     bottom (boots clipped by game-wrap overflow), head/monkey up by the reels */
+  .pt-mascot{ position:absolute; left:0; bottom:-3%; height:80%; width:auto; z-index:4;
+     pointer-events:none; filter:drop-shadow(0 8px 16px rgba(0,0,0,.55)); }
+
   /* the two rectangles (visual backers behind the content) */
   .pt-box{ display:block; z-index:0; border-radius:12px;
            border:1.5px solid rgba(240,192,64,.45);
@@ -697,6 +702,7 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
     '/assets/h-slots/pirate/background.jpeg',
     '/assets/h-slots/pirate/pirate%20baraban.png',
     '/assets/h-slots/pirate/pirate%20logo.png',
+    '/assets/h-slots/pirate/pirate-mascot.png',
     '/assets/h-slots/pirate/board-bonus.png',
     '/assets/h-slots/pirate/chest-stage.png?v=1',
     '/assets/h-slots/pirate/bonus-win.png',
@@ -1329,6 +1335,12 @@ function buildReels() {
       logo.src = 'assets/h-slots/pirate/pirate%20logo.png';
       logo.alt = 'PIRATE TREASURE';
       wrap.appendChild(logo);
+      // pirate mascot on the left, standing from the bottom up to the cabinet
+      var mascot = document.createElement('img');
+      mascot.className = 'pt-mascot';
+      mascot.src = 'assets/h-slots/pirate/pirate-mascot.png';
+      mascot.alt = '';
+      wrap.appendChild(mascot);
       // move the WIN readout onto the cabinet's top wooden beam
       var wd = document.querySelector('.win-display');
       if (wd && frame) frame.appendChild(wd);
