@@ -299,19 +299,19 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
 
   /* outer landscape frame — FIXED design size, transform-scaled by JS */
   .game-wrap{
-    width:1560px; max-width:none;
+    width:1565px; max-width:none;
     height:auto; min-height:0;
     margin:0;
-    padding:16px;
+    padding:12px;
     position:relative;
     display:grid;
-    grid-template-columns:104px minmax(0,1fr) 300px;
+    grid-template-columns:70px minmax(0,1fr) 210px;
     grid-template-rows:auto 1fr auto;
     grid-template-areas:
       "lpad  header   ."
       "lpad  reels    jackpot"
       "lpad  controls .";
-    column-gap:14px; row-gap:8px;
+    column-gap:8px; row-gap:8px;
     align-items:stretch;
     border:1.5px solid rgba(240,192,64,.38);
     border-radius:16px;
@@ -343,11 +343,12 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
   .reels-frame > .win-display .win-text{ color:#fff; font-size:30px; font-weight:900; letter-spacing:.04em;
      text-shadow:0 2px 0 #000, 0 -1px 0 #000, 2px 0 0 #000, -2px 0 0 #000, 0 3px 7px rgba(0,0,0,.95); }
   /* jackpot scroll — tall & narrow, no border box, right side */
+  /* jackpot fixed to its column width (decoupled from the bigger cabinet height) */
   .col-jackpot{ grid-area:jackpot; z-index:1; width:100%; max-width:none;
-                height:100%; align-self:stretch; margin:0;
+                height:auto; align-self:center; margin:0;
                 display:flex; align-items:center; justify-content:center; overflow:visible; }
-  .col-jackpot .jp-panel-wrap{ width:auto; height:100%; }
-  .col-jackpot .jp-panel-img{ width:auto; height:100%; object-fit:contain; }
+  .col-jackpot .jp-panel-wrap{ width:100%; height:auto; }
+  .col-jackpot .jp-panel-img{ width:100%; height:auto; object-fit:contain; }
   .bottom-panel{ grid-area:controls; z-index:1; padding:6px 10px 10px; }
 
   /* wooden bet-input panel: − / + over the carved knobs, amount in the centre window */
@@ -754,7 +755,7 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
 const DEMO_START = 1000;
 const BET_STEPS = [0.25, 0.50, 1, 2, 5, 10, 25, 30];
 // px per symbol cell — compact on mobile, larger on desktop framed screen
-const CELL_H = 90;   // bigger reel cabinet (wider + taller); whole frame scales to fit
+const CELL_H = 104;  // bigger reel cabinet (wider + taller); whole frame scales to fit
 const NUM_ROWS = 3;
 const NUM_COLS = 5;
 const SYMBOL_NAMES = ['chest','coins','rum','anchor','wild','scatter','doubloon','boost','mystery','j','q','k','a'];
@@ -1288,12 +1289,7 @@ const tg = window.Telegram?.WebApp;
 if (tg) { tg.ready(); tg.expand(); tg.disableVerticalSwipes?.(); }
 
 function syncJackpotHeight() {
-  const rf = document.getElementById('reelsFrame');
-  const cj = document.querySelector('.col-jackpot');
-  if (!rf || !cj) return;
-  // match the FULL wooden panel height (reels-outer), not just the reel window
-  const target = rf.parentElement ? rf.parentElement.offsetHeight : rf.offsetHeight;
-  cj.style.height = target + 'px';
+  // jackpot is now sized by its column width (CSS) — no JS height matching
 }
 
 // Scale the whole fixed-size game frame to fit the viewport (desktop & mobile),
