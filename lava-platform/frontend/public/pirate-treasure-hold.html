@@ -422,6 +422,14 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
   filter:drop-shadow(0 4px 7px rgba(0,0,0,.85)) drop-shadow(0 0 22px rgba(255,200,80,.8));
   animation:bwBounce 1.1s ease-in-out infinite;}
 .bw-sub{font-size:11px;color:var(--text-muted);margin-top:8px;letter-spacing:.3em;}
+/* "TAP TO CONTINUE" — yellow 3D pirate letters at the bottom of the win video */
+.bw-tap{position:absolute;left:0;right:0;bottom:6vh;z-index:3;text-align:center;pointer-events:none;
+  font-family:'Luckiest Guy','Pirata One',system-ui,cursive;
+  font-size:clamp(20px,3.6vw,42px);letter-spacing:.06em;text-transform:uppercase;
+  color:#ffe23a;-webkit-text-stroke:1.6px #5a3408;
+  text-shadow:0 1px 0 #c98a10,0 2px 0 #b8780c,0 3px 0 #9c6408,0 4px 0 #7a4d06,0 5px 0 #5e3b05,0 7px 9px rgba(0,0,0,.75);
+  animation:bwTapPulse 1.2s ease-in-out infinite;}
+@keyframes bwTapPulse{0%,100%{opacity:.72;transform:scale(1)}50%{opacity:1;transform:scale(1.06)}}
 
 /* ── Scatter animation ── */
 @keyframes scatter-flash{0%,100%{opacity:1}50%{opacity:.3}}
@@ -767,6 +775,7 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
     <div class="bw-type" id="bwType">BIG WIN</div>
     <div class="bw-amount" id="bwAmount">$0.00</div>
   </div>
+  <div class="bw-tap">Tap to Continue</div>
 </div>
 
 <div class="modal" id="infoModal">
