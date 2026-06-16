@@ -99,6 +99,13 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
 /* scatter pops out of its cell when the reels settle */
 @keyframes sym-pop{ 0%{transform:scale(1)} 34%{transform:scale(1.3) translateY(-9%)} 62%{transform:scale(.94)} 100%{transform:scale(1)} }
 .sym-cell.sym-pop{ animation:sym-pop .55s ease-out; position:relative; z-index:6; }
+/* winning symbols — square glowing frame so the player sees how they won */
+.sym-cell.win-cell{ position:relative; z-index:5; }
+.sym-cell.win-cell::after{ content:''; position:absolute; inset:5%; border:3px solid #ffcf3a; border-radius:7px;
+  box-shadow:0 0 13px rgba(255,210,90,.9), inset 0 0 10px rgba(255,210,90,.55); pointer-events:none;
+  animation:winPulse .85s ease-in-out infinite; }
+@keyframes winPulse{0%,100%{opacity:.6;border-color:#ffcf3a;box-shadow:0 0 9px rgba(255,200,70,.7), inset 0 0 8px rgba(255,205,80,.4)}
+  50%{opacity:1;border-color:#fff0b0;box-shadow:0 0 18px rgba(255,225,120,1), inset 0 0 12px rgba(255,225,120,.7)}}
 /* free-spins counter number pop */
 @keyframes num-pop{ 0%{transform:scale(1)} 40%{transform:scale(1.45);color:#fff} 100%{transform:scale(1)} }
 .fs-plaque-txt b.num-pop{ animation:num-pop .35s ease-out; }
@@ -1864,6 +1871,9 @@ async function doSpin(options={}) {
     }
   }
 
+  // Frame the winning-line symbols so the player sees how they won
+  highlightWins(result);
+
   // Scatters pop out of their cells once the reels settle
   let popDelay = 0;
   for (let col=0; col<NUM_COLS; col++) for (let row=0; row<NUM_ROWS; row++) {
@@ -2254,6 +2264,22 @@ async function showBigWin(amount, bet, label) {
   overlay.classList.add('show');
   await new Promise(r => setTimeout(r, skipRequested ? 800 : 3000));
   overlay.classList.remove('show');
+}
+
+// Square-frame the symbols that form each winning payline (clears old frames first)
+function highlightWins(result) {
+  for (let col=0; col<NUM_COLS; col++) for (let row=0; row<NUM_ROWS; row++) {
+    const c = cellRows[col] && cellRows[col][SPIN_END+row];
+    if (c) c.classList.remove('win-cell');
+  }
+  if (!result || !result.paylines) return;
+  result.paylines.forEach(function(pl){
+    const line = PAYLINES[pl.line-1]; if (!line) return;
+    for (let col=0; col<pl.count; col++) {
+      const c = cellRows[col] && cellRows[col][SPIN_END+line[col]];
+      if (c) c.classList.add('win-cell');
+    }
+  });
 }
 
 function flashScatters(grid) {
