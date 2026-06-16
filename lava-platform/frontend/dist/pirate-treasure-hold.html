@@ -337,6 +337,22 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
 .pt-multrow{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:14px 0;}
 .pt-multrow img{height:58px;width:auto;filter:drop-shadow(0 3px 5px rgba(0,0,0,.5));}
 
+/* GAME RULES page (Pragmatic-style) */
+.vol-badge{display:flex;align-items:center;justify-content:center;gap:8px;margin:0 auto 14px;width:max-content;
+  padding:5px 16px;border:1.5px solid rgba(240,192,64,.55);border-radius:20px;background:rgba(0,0,0,.3);
+  font-size:11px;font-weight:900;letter-spacing:.22em;text-transform:uppercase;color:#ffe7a0;}
+.vol-fire{display:inline-flex;gap:1px;color:#ffcf3a;font-size:14px;text-shadow:0 0 8px rgba(255,180,40,.9);filter:drop-shadow(0 0 4px rgba(255,150,20,.8));}
+.rules-txt{font-size:11.5px;line-height:1.6;color:rgba(255,255,255,.82);text-align:center;margin:0 auto 14px;max-width:680px;}
+.rules-txt.lead{color:rgba(255,255,255,.7);font-style:italic;}
+.rules-txt b{color:#f0c040;}
+/* payline diagram grid */
+.pl-grid{display:flex;flex-wrap:wrap;gap:10px 14px;justify-content:center;margin:16px auto 18px;max-width:720px;}
+.pl-item{display:flex;align-items:center;gap:6px;}
+.pl-num{font-size:11px;font-weight:900;color:#f0c040;font-family:monospace;min-width:16px;text-align:right;}
+.pl-cells{display:grid;grid-template-columns:repeat(5,7px);grid-template-rows:repeat(3,7px);gap:1.5px;}
+.pl-cells i{width:7px;height:7px;border-radius:1px;background:rgba(255,255,255,.14);}
+.pl-cells i.on{background:linear-gradient(180deg,#ffd860,#e0a020);box-shadow:0 0 4px rgba(255,200,80,.9);}
+
 /* persistent chest multiplier indicator (during free spins) */
 .pt-globalmult{position:absolute;left:16%;top:-13%;transform:translate(-50%,-50%);z-index:9;pointer-events:none;
   font-size:34px;font-weight:900;font-family:'Courier New',monospace;color:#ff5a2a;
@@ -762,12 +778,31 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
     <!-- Page 6 — Game rules -->
     <div class="pt-page" data-page="6">
       <div class="pt-page-title">Game Rules</div>
-      <div class="modal-rule">5×3 reels, <b>25 fixed paylines</b>. All symbols pay from <b>left to right</b> on adjacent reels from the leftmost reel.</div>
-      <div class="modal-rule">All wins are multiplied by bet per line. Only the highest win is paid per line; wins on different lines are added together.</div>
-      <div class="modal-rule">🃏 Wild substitutes for all paying symbols (not Scatter / Key).</div>
-      <div class="modal-rule"><b>Max win: 5,000× bet.</b> If a round reaches the cap it ends and the win is awarded.</div>
-      <div class="modal-rule">Theoretical <b>RTP ≈ 96%</b>. Bonus-buy RTP ≈ 95%. <b>High volatility.</b></div>
-      <div class="modal-rule">Use − / + to change the bet. Press the wheel to spin. Malfunction voids all pays and plays.</div>
+      <div class="vol-badge">Volatility <span class="vol-fire">⚡⚡⚡⚡⚡</span></div>
+      <p class="rules-txt lead">High volatility games pay out less often on average but the chance to hit big wins in a short time span is higher.</p>
+      <p class="rules-txt">
+        All symbols pay from left to right on selected paylines.<br>
+        All wins are multiplied by bet per line.<br>
+        All values are expressed as actual wins in coins.<br>
+        When winning on multiple paylines, all wins are added to the total win.<br>
+        Only the highest win is paid per line.
+      </p>
+      <p class="rules-txt">
+        Free Spins win is awarded to the player after the round completes.<br>
+        Free Spins total win in the history contains the whole win of the cycle.
+      </p>
+      <div class="pl-grid" id="plGrid"></div>
+      <p class="rules-txt">
+        The theoretical RTP of this game is <b>96.00%</b>.<br>
+        The RTP of the game when using "BUY FREE SPINS" is <b>95.00%</b>.<br>
+        The RTP of the game when using "BUY SUPER FREE SPINS" is <b>95.00%</b>.<br>
+        <b>MINIMUM BET: $0.25</b><br>
+        <b>MAXIMUM BET: $30.00</b>
+      </p>
+      <p class="rules-txt">
+        SPACE and ENTER buttons on the keyboard can be used to start and stop the spin.<br>
+        Malfunction voids all pays and plays.
+      </p>
     </div>
 
     <div class="pt-nav">
@@ -2245,8 +2280,25 @@ async function confirmBonusBuy() {
 }
 
 let infoPageN = 1; const INFO_PAGES = 6;
+// Draw the 25 paylines as tiny 5×3 grid diagrams on the Game Rules page
+function renderPaylineDiagrams() {
+  const host = document.getElementById('plGrid');
+  if (!host || host.dataset.built) return;
+  let html = '';
+  for (let i=0;i<PAYLINES.length;i++) {
+    const line = PAYLINES[i];
+    let cells = '';
+    for (let row=0;row<NUM_ROWS;row++) for (let col=0;col<NUM_COLS;col++) {
+      cells += '<i class="'+(line[col]===row?'on':'')+'"></i>';
+    }
+    html += '<div class="pl-item"><span class="pl-num">'+(i+1)+'</span><div class="pl-cells">'+cells+'</div></div>';
+  }
+  host.innerHTML = html;
+  host.dataset.built = '1';
+}
 function renderInfoPage() {
   document.querySelectorAll('#infoModal .pt-page').forEach(function(p){ p.classList.toggle('active', (+p.dataset.page)===infoPageN); });
+  if (infoPageN===6) renderPaylineDiagrams();
   const ind = document.getElementById('ptPageInd'); if (ind) ind.textContent = infoPageN + ' / ' + INFO_PAGES;
   const pv = document.getElementById('ptPrev'), nx = document.getElementById('ptNext');
   if (pv) pv.disabled = infoPageN<=1;
