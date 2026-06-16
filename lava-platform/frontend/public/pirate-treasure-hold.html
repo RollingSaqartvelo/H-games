@@ -316,18 +316,18 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
 
   /* outer landscape frame — FIXED design size, transform-scaled by JS */
   .game-wrap{
-    width:1565px; max-width:none;
+    width:1400px; max-width:none;
     height:auto; min-height:0;
     margin:0;
     padding:12px;
     position:relative;
     display:grid;
-    grid-template-columns:70px minmax(0,1fr) 210px;
+    grid-template-columns:70px minmax(0,1fr);
     grid-template-rows:auto 1fr auto;
     grid-template-areas:
-      "lpad  header   ."
-      "lpad  reels    jackpot"
-      "lpad  controls .";
+      "lpad  header"
+      "lpad  reels"
+      "lpad  controls";
     column-gap:8px; row-gap:8px;
     align-items:stretch;
     border:1.5px solid rgba(240,192,64,.38);
@@ -360,10 +360,8 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
   .reels-frame > .win-display .win-text{ color:#fff; font-size:30px; font-weight:900; letter-spacing:.04em;
      text-shadow:0 2px 0 #000, 0 -1px 0 #000, 2px 0 0 #000, -2px 0 0 #000, 0 3px 7px rgba(0,0,0,.95); }
   /* jackpot scroll — tall & narrow, no border box, right side */
-  /* jackpot fixed to its column width (decoupled from the bigger cabinet height) */
-  .col-jackpot{ grid-area:jackpot; z-index:1; width:100%; max-width:none;
-                height:auto; align-self:center; margin:0;
-                display:flex; align-items:center; justify-content:center; overflow:visible; }
+  /* jackpot panel removed (Hold & Win feature replaced by free spins) */
+  .col-jackpot{ display:none; }
   .col-jackpot .jp-panel-wrap{ width:100%; height:auto; }
   .col-jackpot .jp-panel-img{ width:100%; height:auto; object-fit:contain; }
   .bottom-panel{ grid-area:controls; z-index:1; padding:6px 10px 10px; }
@@ -503,7 +501,6 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
     '/assets/h-slots/pirate/post-shaft.png',
     '/assets/h-slots/pirate/eyes.png',
     '/assets/h-slots/pirate/bet-input-panel.png',
-    '/assets/h-slots/pirate/ui/new-jackpot.png',
     '/assets/h-slots/pirate/ui/hold-win-frame.png',
     '/assets/h-slots/pirate/ui/btn-spin-idle.png',
     '/assets/h-slots/pirate/ui/btn-buy-bonus.png',
