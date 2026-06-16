@@ -1442,60 +1442,66 @@ function easeInOutQuart(t) {
 }
 
 async function animateReel(col, finalSymbols, stopDelay) {
-  return new Promise(resolve => {
-    setTimeout(async () => {
-      try {
-        const cellH = CELL_H;
-        const strip = stripEls[col];
-        if (!strip) { resolve(); return; }
-        soundClick();
+  return new Promise(async resolve => {
+    try {
+      const cellH = CELL_H;
+      const strip = stripEls[col];
+      if (!strip) { resolve(); return; }
+      soundClick();
 
-        // Fill the strip: a random run, with the final 3 symbols in the result window
+      // Fill the strip: a random run, with the final 3 symbols in the result window.
+      // Done up-front so NOTHING of the previous result lingers — all reels start now.
+      strip.style.transition = 'none';
+      for (let i = 0; i < SPIN_END; i++) setCell(col, i, Math.floor(Math.random()*9));
+      for (let r = 0; r < NUM_ROWS; r++) setCell(col, SPIN_END+r, finalSymbols[r] ?? 0);
+
+      const startY  = -SPIN_START * cellH;
+      const targetY = -SPIN_END   * cellH;
+      setStripY(col, startY);
+      void strip.offsetHeight;            // commit the start position before transitioning
+      strip.classList.add('spinning');
+
+      if (skipRequested) {
         strip.style.transition = 'none';
-        for (let i = 0; i < SPIN_END; i++) setCell(col, i, Math.floor(Math.random()*9));
-        for (let r = 0; r < NUM_ROWS; r++) setCell(col, SPIN_END+r, finalSymbols[r] ?? 0);
+        setStripY(col, targetY);
+      } else {
+        // All reels START together; stopDelay EXTENDS the stream so they STOP
+        // left→right in sequence (no frozen old result on later reels).
+        const fast = (turbo ? 360 : 620) + stopDelay;  // streaming phase (+ stagger)
+        const land = turbo ? 320 : 560;                // deceleration / landing phase
+        const preY = targetY + cellH * 4;              // decelerate 4 cells before the stop
 
-        const startY  = -SPIN_START * cellH;
-        const targetY = -SPIN_END   * cellH;
-        setStripY(col, startY);
-        void strip.offsetHeight;            // commit the start position before transitioning
-        strip.classList.add('spinning');
+        // Phase A — steady linear stream (reads as a spinning reel, no JS jank)
+        strip.style.transition = 'transform ' + fast + 'ms linear';
+        setStripY(col, preY);
+        await new Promise(r2 => setTimeout(r2, fast));
 
-        if (skipRequested) {
-          strip.style.transition = 'none';
-          setStripY(col, targetY);
-        } else {
-          const fast = turbo ? 380 : 680;   // constant-speed streaming phase (symbols readable)
-          const land = turbo ? 320 : 560;   // deceleration / landing phase
-          const preY = targetY + cellH * 4; // start decelerating 4 cells before the stop
-
-          // Phase A — steady linear stream (reads as a spinning reel, no JS jank)
-          strip.style.transition = 'transform ' + fast + 'ms linear';
-          setStripY(col, preY);
-          await new Promise(r2 => setTimeout(r2, fast));
-
-          // Phase B — ease-out straight onto the final symbols (no overshoot/bounce)
+        // Phase B — ease-out straight onto the final symbols (no overshoot/bounce)
+        if (!skipRequested) {
           strip.style.transition = 'transform ' + land + 'ms cubic-bezier(.18,.66,.3,1)';
           setStripY(col, targetY);
           await new Promise(r2 => setTimeout(r2, land));
+        } else {
+          strip.style.transition = 'none';
+          setStripY(col, targetY);
         }
-
-        strip.style.transition = 'none';
-        setStripY(col, targetY);
-        for (let r=0;r<NUM_ROWS;r++) setCell(col, SPIN_END+r, finalSymbols[r] ?? 0);
-        strip.classList.remove('spinning');
-
-      } catch(e) {
-        console.error('[PIRATE] animateReel error col='+col, e);
-        try {
-          stripEls[col]?.classList.remove('spinning');
-          setStripY(col, -SPIN_END * CELL_H);
-          for (let r=0;r<NUM_ROWS;r++) setCell(col, SPIN_END+r, finalSymbols[r] ?? 0);
-        } catch(e2) {}
-      } finally {
-        resolve();
       }
-    }, stopDelay);
+
+      strip.style.transition = 'none';
+      setStripY(col, targetY);
+      for (let r=0;r<NUM_ROWS;r++) setCell(col, SPIN_END+r, finalSymbols[r] ?? 0);
+      strip.classList.remove('spinning');
+
+    } catch(e) {
+      console.error('[PIRATE] animateReel error col='+col, e);
+      try {
+        stripEls[col]?.classList.remove('spinning');
+        setStripY(col, -SPIN_END * CELL_H);
+        for (let r=0;r<NUM_ROWS;r++) setCell(col, SPIN_END+r, finalSymbols[r] ?? 0);
+      } catch(e2) {}
+    } finally {
+      resolve();
+    }
   });
 }
 
@@ -1960,7 +1966,7 @@ async function doSpin(options={}) {
   }
 
   // Animate reels stopping
-  const stopDelays = turbo ? [0,45,90,135,180] : [0, 130, 260, 390, 520];
+  const stopDelays = turbo ? [0,35,70,105,140] : [0, 100, 200, 300, 400];
   const reelPromises = [];
   for (let col=0; col<NUM_COLS; col++) {
     const finalSyms = [grid[0][col], grid[1][col], grid[2][col]];
