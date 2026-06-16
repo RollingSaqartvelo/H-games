@@ -676,7 +676,7 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
   const AUDIOS=[
     'reel-stop','reels-loop','win-small','payline','coin-rollup','rollup-end',
     'scatter-land','mult-big','mult-small','bonus-summary','chest-empty','chest-win',
-    'bigwin-audio','megawin-audio','superwin-audio','strike'
+    'bigwin-audio','megawin-audio','superwin-audio','spin-wheel'
   ].map(n=>'/audio/'+n+'.mp3');
   const VIDS=[
     '/assets/h-slots/pirate/character/INTRO.mp4',
@@ -1178,7 +1178,7 @@ function playSound(src, vol=0.7) {
 }
 
 function sfxMuted(){ const mb=document.getElementById('muteBtn'); return !!(mb && mb.classList.contains('muted')); }
-function soundSpin()  { playSound('audio/strike.mp3', 0.6); }
+function soundSpin()  { playSound('audio/spin-wheel.mp3', 0.7); }   // spinning ship's wheel
 function soundClick() { playSound('audio/reel-stop.mp3', 0.5); }   // wooden reel-stop thunk
 function soundWin(amount, bet) {
   const mult = amount / bet;
@@ -1239,11 +1239,12 @@ muteBtn.onclick = (e) => {
 // ═══════════════════════════════════════════════════════════
 //  REEL BUILD
 // ── Spin strip layout ──────────────────────────────────────
-// Strip: 70 cells. Spin from showing cell SPIN_START_IDX to SPIN_END_IDX.
-// Travel = 67-14 = 53 cells (≈4× more than original 13). Reset before each spin.
-const SPIN_TOTAL  = 70;
-const SPIN_START  = 14; // cells shown before spin
-const SPIN_END    = 67; // cells shown after spin (67,68,69 = final result)
+// Strip: SHORT (18 cells) on purpose — 70 cells × 5 reels created 350 <img>
+// elements per spin (~220 MB decoded) which iOS Safari evicts → blank cells.
+// 18 × 5 = 90 imgs (~58 MB) fits. Travel = 15 cells, plenty for the spin look.
+const SPIN_TOTAL  = 18;
+const SPIN_START  = 0;  // cells shown before spin (window 0,1,2)
+const SPIN_END    = 15; // cells shown after spin (15,16,17 = final result)
 
 let reelEls = [];
 let stripEls = [];
@@ -1400,7 +1401,6 @@ function setCell(col, idx, symId, doubloonVal) {
   const src = (SYMBOL_IMGS[symId] ?? SYMBOL_IMGS[0]) + SYM_V;
   const img = document.createElement('img');
   img.alt = SYMBOL_NAMES[symId] || '';
-  img.decoding = 'sync';
   img.style.cssText = 'width:100%;height:100%;object-fit:contain;display:block;background:transparent;';
   // gold placeholder only if this symbol isn't decoded yet (preloaded URL matches src)
   const pre = _preloaded[symId];
