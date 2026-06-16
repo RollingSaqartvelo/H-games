@@ -257,6 +257,23 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
 .pt-jp-row.grand .n,.pt-jp-row.grand .v{color:#ff3030;}
 .pt-jp-row.mega .n{color:#ff8a3c;}
 .modal-rule{font-size:11px;color:rgba(255,255,255,.72);line-height:1.55;margin-bottom:5px;}
+
+/* free-spins award board */
+.fs-award{position:fixed;inset:0;z-index:300;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.82);cursor:pointer;}
+.fs-award.show{display:flex;animation:fsFade .3s ease;}
+@keyframes fsFade{from{opacity:0}to{opacity:1}}
+.fs-award-board{text-align:center;padding:30px 56px;
+  background:radial-gradient(120% 90% at 50% 0%,rgba(85,55,20,.6),transparent 60%),linear-gradient(180deg,#1d1407 0%,#0e0a04 100%);
+  border:3px solid rgba(240,192,64,.6);border-radius:18px;
+  box-shadow:0 0 0 2px rgba(0,0,0,.6),0 0 55px rgba(240,160,40,.45),inset 0 0 40px rgba(0,0,0,.6);
+  animation:fsPop .45s cubic-bezier(.2,1.3,.4,1) both;}
+@keyframes fsPop{0%{transform:scale(.5);opacity:0}60%{transform:scale(1.08)}100%{transform:scale(1);opacity:1}}
+.fs-award-title{font-size:18px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:#ffe7a0;text-shadow:0 2px 4px #000;margin-bottom:8px;}
+.fs-award-num{font-size:96px;font-weight:900;line-height:1;font-family:'Courier New',monospace;color:#ffd860;
+  text-shadow:0 3px 0 #8a5a10,0 6px 12px rgba(0,0,0,.85),0 0 26px rgba(255,190,60,.7);animation:fsGlow 1.2s ease-in-out infinite;}
+@keyframes fsGlow{0%,100%{filter:drop-shadow(0 0 6px rgba(255,190,60,.5))}50%{filter:drop-shadow(0 0 18px rgba(255,210,90,.95))}}
+.fs-award-sub{font-size:30px;font-weight:900;letter-spacing:.18em;text-transform:uppercase;color:#f0c040;text-shadow:0 2px 4px #000;margin-top:2px;}
+.fs-award-hint{font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-top:18px;animation:ls-p 1.4s ease-in-out infinite;}
 @media (max-width:640px){ .pt-cols{grid-template-columns:1fr;} }
 
 /* ── Big Win animation ── */
@@ -654,6 +671,16 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
       <button onclick="closeBonusConfirm()" style="flex:1;background:rgba(0,0,0,.3);border:1.5px solid var(--muted);color:#c8b89a;padding:12px 0;font-size:14px;font-weight:900;letter-spacing:.1em;border-radius:8px;cursor:pointer;">CANCEL</button>
       <button onclick="confirmBonusBuy()" style="flex:1;background:linear-gradient(135deg,#f0c040,#c8962a);border:none;color:#1a0e02;padding:12px 0;font-size:14px;font-weight:900;letter-spacing:.1em;border-radius:8px;cursor:pointer;">BUY</button>
     </div>
+  </div>
+</div>
+
+<!-- Free-spins award board (pirate style) -->
+<div class="fs-award" id="fsAward">
+  <div class="fs-award-board">
+    <div class="fs-award-title">⚔ Congratulations ⚔</div>
+    <div class="fs-award-num" id="fsAwardNum">12</div>
+    <div class="fs-award-sub">Free Spins</div>
+    <div class="fs-award-hint">Press anywhere to continue</div>
   </div>
 </div>
 
@@ -1200,6 +1227,19 @@ function hideMultiplier() {
   const el = document.getElementById('multBadge');
   if (el) el.style.display = 'none';
 }
+// "N FREE SPINS" award board — waits for a tap (or 4.5s) before resolving
+function showFsAward(n) {
+  return new Promise(resolve => {
+    const el = document.getElementById('fsAward');
+    if (!el) { resolve(); return; }
+    document.getElementById('fsAwardNum').textContent = n;
+    el.classList.add('show');
+    let done = false;
+    const finish = () => { if (done) return; done = true; clearTimeout(t); el.classList.remove('show'); el.removeEventListener('click', finish); resolve(); };
+    const t = setTimeout(finish, 4500);
+    el.addEventListener('click', finish);
+  });
+}
 
 function demoSpin(bet, isFreeSpin, bonusBuy) {
   const weights = isFreeSpin ? DEMO_FREE_WEIGHTS : DEMO_WEIGHTS;
@@ -1492,7 +1532,8 @@ async function doSpin(options={}) {
   if (result.free_spins_awarded > 0) {
     freeSpinsLeft += result.free_spins_awarded;
     showFreeBadge();
-    await new Promise(r => setTimeout(r, 600));
+    await new Promise(r => setTimeout(r, 500));
+    await showFsAward(result.free_spins_awarded);   // "N FREE SPINS" board
   }
 
   if (isFree) {
