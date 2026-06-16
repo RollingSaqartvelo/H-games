@@ -290,6 +290,30 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
 .chest-collect{background:linear-gradient(135deg,#f0c040,#c8962a);border:none;color:#1a0e02;padding:14px 36px;
   font-size:16px;font-weight:900;letter-spacing:.1em;border-radius:10px;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.5);}
 .chest-collect:active{transform:scale(.96);}
+/* locked chests tremble + glow (something inside!) */
+@keyframes chestShake{0%,100%{transform:rotate(-1.6deg)}25%{transform:rotate(1.6deg)}50%{transform:rotate(-1deg)}75%{transform:rotate(1.2deg)}}
+@keyframes chestGlow{0%,100%{filter:drop-shadow(0 8px 12px rgba(0,0,0,.65)) drop-shadow(0 0 8px rgba(255,200,80,.35))}50%{filter:drop-shadow(0 8px 12px rgba(0,0,0,.65)) drop-shadow(0 0 22px rgba(255,210,90,.95))}}
+.chest:not(.revealed) .chest-img{animation:chestShake .5s ease-in-out infinite, chestGlow 1.2s ease-in-out infinite;}
+.chest:nth-child(2):not(.revealed) .chest-img{animation-delay:-.16s,-.4s;}
+.chest:nth-child(3):not(.revealed) .chest-img{animation-delay:-.32s,-.8s;}
+
+/* paginated info screen */
+.pt-info{position:relative;min-height:404px;padding-bottom:60px;}
+.pt-page{display:none;}
+.pt-page.active{display:block;animation:fsFade .25s ease;}
+.pt-page-title{font-size:18px;font-weight:900;letter-spacing:.22em;text-transform:uppercase;text-align:center;color:var(--text-bright);text-shadow:var(--blood-glow);margin-bottom:14px;}
+.pt-nav{position:absolute;left:0;right:0;bottom:16px;display:flex;align-items:center;justify-content:center;gap:26px;}
+.pt-nav button{width:44px;height:44px;border-radius:50%;border:1.5px solid rgba(240,192,64,.5);background:rgba(0,0,0,.3);color:#f0c040;font-size:16px;cursor:pointer;transition:all .15s;}
+.pt-nav button:hover{background:rgba(240,192,64,.15);}
+.pt-nav button:disabled{opacity:.3;cursor:default;}
+.pt-nav .ind{font-size:13px;letter-spacing:.2em;color:var(--muted);min-width:64px;text-align:center;font-family:monospace;}
+.pt-bigcard{display:flex;gap:18px;align-items:center;background:linear-gradient(180deg,rgba(26,88,108,.3),rgba(7,33,46,.45));border:1px solid rgba(240,192,64,.28);border-radius:10px;padding:14px;margin-bottom:14px;box-shadow:inset 0 0 14px rgba(0,0,0,.4);}
+.pt-bigcard img{width:100px;height:100px;object-fit:contain;flex-shrink:0;filter:drop-shadow(0 3px 5px rgba(0,0,0,.6));}
+.pt-bigcard .t{font-size:16px;font-weight:900;color:#ffe7a0;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;}
+.pt-bigcard .d{font-size:12.5px;color:rgba(255,255,255,.78);line-height:1.55;}
+.pt-bigcard .d b{color:#f0c040;}
+.pt-multrow{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:14px 0;}
+.pt-multrow img{height:58px;width:auto;filter:drop-shadow(0 3px 5px rgba(0,0,0,.5));}
 
 /* persistent chest multiplier indicator (during free spins) */
 .pt-globalmult{position:absolute;left:16%;top:-13%;transform:translate(-50%,-50%);z-index:9;pointer-events:none;
@@ -642,47 +666,89 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
 </div>
 
 <div class="modal" id="infoModal">
-  <div class="modal-box">
+  <div class="modal-box pt-info">
     <button class="modal-close" onclick="closeInfo()">✕</button>
-    <div class="modal-title">PAYTABLE & RULES</div>
 
-    <div class="modal-section">Symbol Payouts &nbsp;(× bet per line — 3 / 4 / 5 in a row)</div>
-    <div class="pt-symgrid">
-      <div class="pt-symcard"><img src="assets/h-slots/pirate/symbols/sym-wild.png?v=2" alt=""><div class="pt-sc-r"><div class="pt-sc-name">Wild</div><div class="pt-sc-pays"><span>3× <b>0.60</b></span><span>4× <b>1.80</b></span><span class="x5">5× <b>9.00</b></span></div></div></div>
-      <div class="pt-symcard"><img src="assets/h-slots/pirate/symbols/sym-chest.png?v=2" alt=""><div class="pt-sc-r"><div class="pt-sc-name">Chest</div><div class="pt-sc-pays"><span>3× <b>0.45</b></span><span>4× <b>1.50</b></span><span class="x5">5× <b>7.50</b></span></div></div></div>
-      <div class="pt-symcard"><img src="assets/h-slots/pirate/symbols/sym-coins.png?v=2" alt=""><div class="pt-sc-r"><div class="pt-sc-name">Coins</div><div class="pt-sc-pays"><span>3× <b>0.15</b></span><span>4× <b>1.20</b></span><span class="x5">5× <b>6.00</b></span></div></div></div>
-      <div class="pt-symcard"><img src="assets/h-slots/pirate/symbols/sym-rum.png?v=2" alt=""><div class="pt-sc-r"><div class="pt-sc-name">Rum</div><div class="pt-sc-pays"><span>3× <b>0.15</b></span><span>4× <b>0.90</b></span><span class="x5">5× <b>4.50</b></span></div></div></div>
-      <div class="pt-symcard"><img src="assets/h-slots/pirate/symbols/sym-anchor.png?v=2" alt=""><div class="pt-sc-r"><div class="pt-sc-name">Anchor</div><div class="pt-sc-pays"><span>3× <b>0.15</b></span><span>4× <b>0.75</b></span><span class="x5">5× <b>3.00</b></span></div></div></div>
-      <div class="pt-symcard"><img src="assets/h-slots/pirate/symbols/sym-a.png?v=2" alt=""><div class="pt-sc-r"><div class="pt-sc-name">A</div><div class="pt-sc-pays"><span>3× <b>0.10</b></span><span>4× <b>0.30</b></span><span class="x5">5× <b>0.75</b></span></div></div></div>
-      <div class="pt-symcard"><img src="assets/h-slots/pirate/symbols/sym-k.png?v=2" alt=""><div class="pt-sc-r"><div class="pt-sc-name">K</div><div class="pt-sc-pays"><span>3× <b>0.10</b></span><span>4× <b>0.25</b></span><span class="x5">5× <b>0.60</b></span></div></div></div>
-      <div class="pt-symcard"><img src="assets/h-slots/pirate/symbols/sym-q.png?v=2" alt=""><div class="pt-sc-r"><div class="pt-sc-name">Q</div><div class="pt-sc-pays"><span>3× <b>0.05</b></span><span>4× <b>0.20</b></span><span class="x5">5× <b>0.50</b></span></div></div></div>
-      <div class="pt-symcard"><img src="assets/h-slots/pirate/symbols/sym-j.png?v=2" alt=""><div class="pt-sc-r"><div class="pt-sc-name">J</div><div class="pt-sc-pays"><span>3× <b>0.05</b></span><span>4× <b>0.15</b></span><span class="x5">5× <b>0.40</b></span></div></div></div>
-      <div class="pt-symcard"><img src="assets/h-slots/pirate/symbols/sym-scatter.png?v=2" alt=""><div class="pt-sc-r"><div class="pt-sc-name">Scatter</div><div class="pt-sc-pays"><span>×3 = 8 FS</span><span>×4 = 12</span><span class="x5">×5 = 20</span></div></div></div>
-      <div class="pt-symcard"><img src="assets/h-slots/pirate/symbols/sym-doubloon.png?v=2" alt=""><div class="pt-sc-r"><div class="pt-sc-name">Doubloon</div><div class="pt-sc-pays"><span>×3+ → Hold &amp; Win</span></div></div></div>
+    <!-- Page 1 — Symbol payouts -->
+    <div class="pt-page" data-page="1">
+      <div class="pt-page-title">Symbol Payouts</div>
+      <div style="text-align:center;font-size:11px;color:var(--muted);letter-spacing:.15em;margin:-6px 0 12px;">× BET PER LINE — 3 / 4 / 5 IN A ROW, LEFT TO RIGHT</div>
+      <div class="pt-symgrid">
+        <div class="pt-symcard"><img src="assets/h-slots/pirate/symbols/sym-wild.png?v=2" alt=""><div class="pt-sc-r"><div class="pt-sc-name">Wild</div><div class="pt-sc-pays"><span>3× <b>0.60</b></span><span>4× <b>1.80</b></span><span class="x5">5× <b>9.00</b></span></div></div></div>
+        <div class="pt-symcard"><img src="assets/h-slots/pirate/symbols/sym-chest.png?v=2" alt=""><div class="pt-sc-r"><div class="pt-sc-name">Chest</div><div class="pt-sc-pays"><span>3× <b>0.45</b></span><span>4× <b>1.50</b></span><span class="x5">5× <b>7.50</b></span></div></div></div>
+        <div class="pt-symcard"><img src="assets/h-slots/pirate/symbols/sym-coins.png?v=2" alt=""><div class="pt-sc-r"><div class="pt-sc-name">Coins</div><div class="pt-sc-pays"><span>3× <b>0.15</b></span><span>4× <b>1.20</b></span><span class="x5">5× <b>6.00</b></span></div></div></div>
+        <div class="pt-symcard"><img src="assets/h-slots/pirate/symbols/sym-rum.png?v=2" alt=""><div class="pt-sc-r"><div class="pt-sc-name">Rum</div><div class="pt-sc-pays"><span>3× <b>0.15</b></span><span>4× <b>0.90</b></span><span class="x5">5× <b>4.50</b></span></div></div></div>
+        <div class="pt-symcard"><img src="assets/h-slots/pirate/symbols/sym-anchor.png?v=2" alt=""><div class="pt-sc-r"><div class="pt-sc-name">Anchor</div><div class="pt-sc-pays"><span>3× <b>0.15</b></span><span>4× <b>0.75</b></span><span class="x5">5× <b>3.00</b></span></div></div></div>
+        <div class="pt-symcard"><img src="assets/h-slots/pirate/symbols/sym-a.png?v=2" alt=""><div class="pt-sc-r"><div class="pt-sc-name">A</div><div class="pt-sc-pays"><span>3× <b>0.10</b></span><span>4× <b>0.30</b></span><span class="x5">5× <b>0.75</b></span></div></div></div>
+        <div class="pt-symcard"><img src="assets/h-slots/pirate/symbols/sym-k.png?v=2" alt=""><div class="pt-sc-r"><div class="pt-sc-name">K</div><div class="pt-sc-pays"><span>3× <b>0.10</b></span><span>4× <b>0.25</b></span><span class="x5">5× <b>0.60</b></span></div></div></div>
+        <div class="pt-symcard"><img src="assets/h-slots/pirate/symbols/sym-q.png?v=2" alt=""><div class="pt-sc-r"><div class="pt-sc-name">Q</div><div class="pt-sc-pays"><span>3× <b>0.05</b></span><span>4× <b>0.20</b></span><span class="x5">5× <b>0.50</b></span></div></div></div>
+        <div class="pt-symcard"><img src="assets/h-slots/pirate/symbols/sym-j.png?v=2" alt=""><div class="pt-sc-r"><div class="pt-sc-name">J</div><div class="pt-sc-pays"><span>3× <b>0.05</b></span><span>4× <b>0.15</b></span><span class="x5">5× <b>0.40</b></span></div></div></div>
+      </div>
+      <div class="modal-rule" style="text-align:center;margin-top:10px;">🃏 Wild substitutes for all paying symbols.</div>
     </div>
 
-    <div class="pt-cols">
-      <div>
-        <div class="modal-section">Hold &amp; Win Jackpots</div>
-        <div class="pt-jp">
-          <div class="pt-jp-row grand"><span class="n">Grand</span><span class="v">10,000× bet</span></div>
-          <div class="pt-jp-row mega"><span class="n">Mega</span><span class="v">2,000× bet</span></div>
-          <div class="pt-jp-row"><span class="n">Major</span><span class="v">150× bet</span></div>
-          <div class="pt-jp-row"><span class="n">Minor</span><span class="v">50× bet</span></div>
-          <div class="pt-jp-row"><span class="n">Mini</span><span class="v">20× bet</span></div>
-        </div>
+    <!-- Page 2 — Special symbols -->
+    <div class="pt-page" data-page="2">
+      <div class="pt-page-title">Special Symbols</div>
+      <div class="pt-bigcard"><img src="assets/h-slots/pirate/symbols/sym-scatter.png?v=2" alt="">
+        <div><div class="t">Scatter</div><div class="d">Appears on any reel. Land <b>3 / 4 / 5</b> scatters anywhere to trigger the <b>Free Spins</b> feature with <b>8 / 12 / 20</b> free spins. More scatters during the feature re-trigger extra spins.</div></div>
       </div>
-      <div>
-        <div class="modal-section">Rules</div>
-        <div class="modal-rule">25 fixed paylines — wins pay left to right on adjacent reels.</div>
-        <div class="modal-rule">🃏 Wild substitutes for all paying symbols.</div>
-        <div class="modal-rule">🗺️ Scatter ×3 = 8 free spins | ×4 = 12 | ×5 = 20.</div>
-        <div class="modal-rule">✖️ During free spins every spin shows a multiplier (×2 up to ×500) that multiplies that spin's win.</div>
-        <div class="modal-rule">🔥 The big multipliers (×100 / ×250 / ×500) blaze with fire.</div>
-        <div class="modal-rule">More scatters during free spins re-trigger extra spins.</div>
-        <div class="modal-rule">🗝️ 3 golden keys in a free spin → pick a chest: collect the buy value, or gamble for a persistent ×50–×500 added to every following win.</div>
-        <div class="modal-rule">Bonus Buy: 100× bet → lands 4 scatters = 12 free spins with multipliers.</div>
+      <div class="pt-bigcard"><img src="assets/h-slots/pirate/symbols/sym-key.png?v=2" alt="">
+        <div><div class="t">Golden Key</div><div class="d">Appears only during free spins. Collect <b>3 keys on one spin</b> to open the <b>Chest Pick</b> bonus — a chance at a persistent multiplier of <b>×50 to ×500</b>.</div></div>
       </div>
+    </div>
+
+    <!-- Page 3 — Free spins & multipliers -->
+    <div class="pt-page" data-page="3">
+      <div class="pt-page-title">Free Spins &amp; Multipliers</div>
+      <div class="modal-rule" style="text-align:center;">On <b>every free spin</b> a multiplier lights up above the reels and multiplies that spin's win.</div>
+      <div class="pt-multrow">
+        <img src="assets/h-slots/pirate/symbols/x2.png" alt=""><img src="assets/h-slots/pirate/symbols/x3.png" alt=""><img src="assets/h-slots/pirate/symbols/x5.png" alt=""><img src="assets/h-slots/pirate/symbols/x10.png" alt=""><img src="assets/h-slots/pirate/symbols/x20.png" alt="">
+      </div>
+      <div class="pt-multrow">
+        <img src="assets/h-slots/pirate/symbols/x50.png" alt=""><img src="assets/h-slots/pirate/symbols/x100.png" alt=""><img src="assets/h-slots/pirate/symbols/x250.png" alt=""><img src="assets/h-slots/pirate/symbols/x500.png" alt="">
+      </div>
+      <div class="modal-rule" style="text-align:center;">🔥 The big multipliers <b>×100 / ×250 / ×500</b> blaze with fire. Small multipliers are common; the big ones are rare.</div>
+    </div>
+
+    <!-- Page 4 — Chest pick -->
+    <div class="pt-page" data-page="4">
+      <div class="pt-page-title">Chest Pick Bonus</div>
+      <div style="display:flex;gap:18px;justify-content:center;margin:6px 0 12px;">
+        <img src="assets/h-slots/pirate/symbols/chest-locked.png" style="width:110px;height:110px;object-fit:contain;">
+        <img src="assets/h-slots/pirate/symbols/chest-win.png" style="width:110px;height:110px;object-fit:contain;">
+        <img src="assets/h-slots/pirate/symbols/chest-empty.png" style="width:110px;height:110px;object-fit:contain;">
+      </div>
+      <div class="modal-rule">🗝️ Collect <b>3 golden keys on one free spin</b> to open the Chest Pick.</div>
+      <div class="modal-rule">You may <b>COLLECT</b> the bonus-buy value instantly, or pick one of 3 chests to gamble.</div>
+      <div class="modal-rule">One chest hides a <b>persistent multiplier ×50–×500</b> (50× common, 500× rare); the other two are empty.</div>
+      <div class="modal-rule">If you find it, that multiplier is <b>added to every following winning spin</b> (chest ×250 + spin ×5 = ×255) until the feature ends.</div>
+    </div>
+
+    <!-- Page 5 — Bonus buy -->
+    <div class="pt-page" data-page="5">
+      <div class="pt-page-title">Bonus Buy</div>
+      <div style="display:flex;justify-content:center;margin:6px 0 14px;"><img src="assets/h-slots/pirate/ui/btn-buy-bonus.png" style="width:90px;height:auto;"></div>
+      <div class="modal-rule" style="text-align:center;">Pay <b>100× total bet</b> to instantly trigger the feature: a spin lands <b>4 scatters</b> and awards <b>12 free spins</b>.</div>
+      <div class="modal-rule" style="text-align:center;">All free-spin multipliers and the Golden Key chest pick are active during a bought feature.</div>
+      <div class="modal-rule" style="text-align:center;color:#f0c040;">A confirmation window always shows the exact price before your balance is charged.</div>
+    </div>
+
+    <!-- Page 6 — Game rules -->
+    <div class="pt-page" data-page="6">
+      <div class="pt-page-title">Game Rules</div>
+      <div class="modal-rule">5×3 reels, <b>25 fixed paylines</b>. All symbols pay from <b>left to right</b> on adjacent reels from the leftmost reel.</div>
+      <div class="modal-rule">All wins are multiplied by bet per line. Only the highest win is paid per line; wins on different lines are added together.</div>
+      <div class="modal-rule">🃏 Wild substitutes for all paying symbols (not Scatter / Key).</div>
+      <div class="modal-rule"><b>Max win: 5,000× bet.</b> If a round reaches the cap it ends and the win is awarded.</div>
+      <div class="modal-rule">Theoretical <b>RTP ≈ 96%</b>. Bonus-buy RTP ≈ 95%. <b>High volatility.</b></div>
+      <div class="modal-rule">Use − / + to change the bet. Press the wheel to spin. Malfunction voids all pays and plays.</div>
+    </div>
+
+    <div class="pt-nav">
+      <button id="ptPrev" onclick="infoPage(-1)">◀</button>
+      <span class="ind" id="ptPageInd">1 / 6</span>
+      <button id="ptNext" onclick="infoPage(1)">▶</button>
     </div>
   </div>
 </div>
@@ -2103,7 +2169,16 @@ async function confirmBonusBuy() {
   doSpin({bonusBuy:true});
 }
 
-function openInfo() { document.getElementById('infoModal').classList.add('open'); }
+let infoPageN = 1; const INFO_PAGES = 6;
+function renderInfoPage() {
+  document.querySelectorAll('#infoModal .pt-page').forEach(function(p){ p.classList.toggle('active', (+p.dataset.page)===infoPageN); });
+  const ind = document.getElementById('ptPageInd'); if (ind) ind.textContent = infoPageN + ' / ' + INFO_PAGES;
+  const pv = document.getElementById('ptPrev'), nx = document.getElementById('ptNext');
+  if (pv) pv.disabled = infoPageN<=1;
+  if (nx) nx.disabled = infoPageN>=INFO_PAGES;
+}
+function infoPage(d) { infoPageN = Math.max(1, Math.min(INFO_PAGES, infoPageN+d)); renderInfoPage(); }
+function openInfo() { infoPageN = 1; renderInfoPage(); document.getElementById('infoModal').classList.add('open'); }
 function closeInfo() { document.getElementById('infoModal').classList.remove('open'); }
 
 // ═══════════════════════════════════════════════════════════
