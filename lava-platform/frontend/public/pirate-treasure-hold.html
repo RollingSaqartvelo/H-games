@@ -471,6 +471,21 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
 .bc-lbl{font-size:11px;font-weight:900;letter-spacing:.16em;text-transform:uppercase;}
 .bc-lbl-yes{color:#5be08a;} .bc-lbl-no{color:#ff7a6a;}
 
+/* Settings rows + toggles */
+.set-row{display:flex;align-items:center;justify-content:space-between;gap:14px;cursor:pointer;
+  padding:14px 6px;border-bottom:1px solid rgba(240,192,64,.18);}
+.set-row:last-child{border-bottom:none;}
+.set-txt{display:flex;flex-direction:column;}
+.set-txt b{font-size:14px;color:#ffe7a0;letter-spacing:.04em;text-transform:uppercase;}
+.set-txt span{font-size:11px;color:var(--muted);margin-top:2px;}
+.set-toggle{flex-shrink:0;width:50px;height:28px;border-radius:14px;background:rgba(0,0,0,.5);
+  border:1.5px solid rgba(255,255,255,.25);position:relative;transition:background .18s,border-color .18s;}
+.set-toggle i{position:absolute;top:2px;left:2px;width:22px;height:22px;border-radius:50%;
+  background:#c8b89a;transition:left .18s,background .18s;box-shadow:0 1px 3px rgba(0,0,0,.5);}
+.set-toggle.on{background:rgba(70,232,154,.35);border-color:#46e89a;}
+.set-toggle.on i{left:24px;background:#46e89a;}
+.set-arrow{flex-shrink:0;font-size:26px;color:#f0c040;font-weight:900;padding-right:6px;}
+
 /* ── Scatter animation ── */
 @keyframes scatter-flash{0%,100%{opacity:1}50%{opacity:.3}}
 .scatter-anim{animation:scatter-flash .3s ease 5;}
@@ -657,10 +672,16 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
   .fs-plaque-txt b{ display:block; font-size:30px; color:#ffd860; margin-top:1px;
      text-shadow:0 2px 0 #8a5a10, 0 4px 6px rgba(0,0,0,.7), 0 0 12px rgba(255,200,80,.8); }
 
-  /* sound/mute toggle — bottom-left corner of the frame */
-  .pt-mute-corner{ position:absolute; left:14px; bottom:14px; z-index:6;
-     width:46px; height:46px; font-size:24px; background:transparent; border:none;
-     display:flex; align-items:center; justify-content:center; cursor:pointer; }
+  /* MENU + sound toggle — two round buttons side by side, bottom-left */
+  .pt-menu-corner{ position:absolute; left:14px;  bottom:14px; z-index:6; }
+  .pt-mute-corner{ position:absolute; left:70px;  bottom:14px; z-index:6; }
+  .pt-menu-corner, .pt-mute-corner{
+     width:48px; height:48px; font-size:24px; cursor:pointer;
+     display:flex; align-items:center; justify-content:center; color:#ffe7a0;
+     background:rgba(20,12,4,.55); border:2px solid rgba(240,192,64,.55); border-radius:50%;
+     box-shadow:0 2px 8px rgba(0,0,0,.5); transition:transform .12s,background .15s; }
+  .pt-menu-corner:hover, .pt-mute-corner:hover{ background:rgba(240,192,64,.25); }
+  .pt-menu-corner:active, .pt-mute-corner:active{ transform:scale(.92); }
 }
 </style>
 </head>
@@ -967,6 +988,30 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
   </div>
 </div>
 
+<!-- Settings menu (Bounty-Hunter style) -->
+<div class="modal" id="settingsModal">
+  <div class="modal-box" style="max-width:380px;">
+    <button class="modal-close" onclick="closeSettings()">✕</button>
+    <div class="modal-title">Settings</div>
+    <div class="set-row" onclick="toggleSetMusic()">
+      <div class="set-txt"><b>Ambient Music</b><span>Background music on / off</span></div>
+      <div class="set-toggle" id="setMusic"><i></i></div>
+    </div>
+    <div class="set-row" onclick="toggleSetSfx()">
+      <div class="set-txt"><b>Sound FX</b><span>Game sounds on / off</span></div>
+      <div class="set-toggle" id="setSfx"><i></i></div>
+    </div>
+    <div class="set-row" onclick="toggleSetTurbo()">
+      <div class="set-txt"><b>Turbo Spin</b><span>Faster reel spins</span></div>
+      <div class="set-toggle" id="setTurbo"><i></i></div>
+    </div>
+    <div class="set-row" onclick="openInfo();closeSettings();">
+      <div class="set-txt"><b>Game Rules</b><span>Paytable &amp; how to play</span></div>
+      <div class="set-arrow">›</div>
+    </div>
+  </div>
+</div>
+
 <!-- Free-spins award board (pirate style) -->
 <div class="fs-award" id="fsAward">
   <div class="fs-award-board">
@@ -1051,6 +1096,7 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
             <img id="spinBtnImg" src="assets/h-slots/pirate/ui/btn-spin-idle.png" alt="SPIN">
           </button>
           <button class="auto-btn" id="autoBtn" onclick="toggleAuto()"><img src="assets/h-slots/pirate/ui/btn-autoplay.png" alt="AUTO"></button>
+          <button id="menuBtn" class="menu-btn" aria-label="menu" onclick="openSettings()">☰</button>
           <button id="muteBtn" class="mute-btn" aria-label="mute">🔊</button>
         </div>
       </div>
@@ -1174,7 +1220,10 @@ function getAudioCtx() {
   if (!audioCtx) { try { audioCtx = new (window.AudioContext||window.webkitAudioContext)() } catch(e){} }
   return audioCtx;
 }
+let sfxEnabled = true;     // Sound FX toggle (Menu)
+let musicEnabled = true;   // Ambient Music toggle (Menu + mute button)
 function playTone(freq, dur, vol=0.3, type='sine') {
+  if (!sfxEnabled) return;
   const ctx = getAudioCtx(); if (!ctx) return;
   const osc = ctx.createOscillator();
   const gain = ctx.createGain();
@@ -1186,12 +1235,13 @@ function playTone(freq, dur, vol=0.3, type='sine') {
 }
 // ── MP3 sound effects ──────────────────────────────────────
 function playSound(src, vol=0.7) {
+  if (!sfxEnabled) return;
   const a = new Audio(src);
   a.volume = vol;
   a.play().catch(() => {});
 }
 
-function sfxMuted(){ const mb=document.getElementById('muteBtn'); return !!(mb && mb.classList.contains('muted')); }
+function sfxMuted(){ return !sfxEnabled; }
 function soundSpin()  { playSound('audio/spin-wheel.mp3', 0.7); }   // spinning ship's wheel
 function soundClick() { playSound('audio/reel-stop.mp3', 0.5); }   // wooden reel-stop thunk
 function soundWin(amount, bet) {
@@ -1237,18 +1287,25 @@ document.addEventListener('touchstart', startMusic);
 document.addEventListener('click',      startMusic);
 
 const muteBtn = document.getElementById('muteBtn');
+function applyMusicState() {
+  if (musicEnabled) { if (_musicStarted) bgMusic.play().catch(()=>{}); muteBtn.textContent = '🔊'; muteBtn.classList.remove('muted'); }
+  else { bgMusic.pause(); muteBtn.textContent = '🔇'; muteBtn.classList.add('muted'); }
+  var t = document.getElementById('setMusic'); if (t) t.classList.toggle('on', musicEnabled);
+}
+function applySfxState() {
+  var t = document.getElementById('setSfx'); if (t) t.classList.toggle('on', sfxEnabled);
+}
 muteBtn.onclick = (e) => {
   e.stopPropagation(); // don't re-trigger startMusic
-  if (bgMusic.paused) {
-    bgMusic.play().catch(() => {});
-    muteBtn.textContent = '🔊';
-    muteBtn.classList.remove('muted');
-  } else {
-    bgMusic.pause();
-    muteBtn.textContent = '🔇';
-    muteBtn.classList.add('muted');
-  }
+  musicEnabled = !musicEnabled;
+  applyMusicState();
 };
+// ── Settings menu (Bounty-Hunter style) ──
+function openSettings(){ applyMusicState(); applySfxState(); var t=document.getElementById('setTurbo'); if(t) t.classList.toggle('on',turbo); document.getElementById('settingsModal').classList.add('open'); }
+function closeSettings(){ document.getElementById('settingsModal').classList.remove('open'); }
+function toggleSetMusic(){ musicEnabled = !musicEnabled; applyMusicState(); }
+function toggleSetSfx(){ sfxEnabled = !sfxEnabled; applySfxState(); }
+function toggleSetTurbo(){ turbo = !turbo; var t=document.getElementById('setTurbo'); if(t) t.classList.toggle('on',turbo); }
 
 // ═══════════════════════════════════════════════════════════
 //  REEL BUILD
@@ -1356,6 +1413,8 @@ function buildReels() {
       post.className = 'pt-post';
       wrap.appendChild(post);
       // sound/mute toggle into the bottom-left corner
+      const menu = document.getElementById('menuBtn');
+      if (menu && wrap) { menu.classList.add('pt-menu-corner'); wrap.appendChild(menu); }
       const mute = document.getElementById('muteBtn');
       if (mute && wrap) { mute.classList.add('pt-mute-corner'); wrap.appendChild(mute); }
       // BONUS WIN and chest-pick stay BODY children (full viewport size) so they
@@ -2415,16 +2474,16 @@ async function showBigWin(amount, bet, label) {
   amtEl.textContent = '$0.00';
 
   // start the cinematic (video MUTED) and duck the background music while it plays
-  const mb = document.getElementById('muteBtn');
-  const muted = !!(mb && mb.classList.contains('muted'));
+  const muted = !sfxEnabled;
   const bgWasPlaying = bgMusic && !bgMusic.paused;
   if (bgWasPlaying) bgMusic.pause();
-  // extracted soundtrack via a plain Audio (same path the working reel SFX use).
-  // Plays ALWAYS (like the other SFX) — NOT gated by the bg-music mute toggle.
+  // extracted soundtrack via a plain Audio — gated by the Sound FX toggle
   try { if (_bwAudio) { _bwAudio.pause(); _bwAudio = null; } } catch(e){}
-  _bwAudio = new Audio(cfg.audio);
-  _bwAudio.volume = 0.95;
-  _bwAudio.play().catch(function(err){ console.warn('[PIRATE] bw audio blocked:', err && err.name); });
+  if (sfxEnabled) {
+    _bwAudio = new Audio(cfg.audio);
+    _bwAudio.volume = 0.95;
+    _bwAudio.play().catch(function(err){ console.warn('[PIRATE] bw audio blocked:', err && err.name); });
+  }
   let videoEnded = false;
   if (vid) {
     try {
@@ -2462,7 +2521,7 @@ async function showBigWin(amount, bet, label) {
   overlay.classList.remove('show','fade');
   if (vid) { try { vid.pause(); vid.removeAttribute('src'); vid.load(); } catch(e){} }
   try { if (_bwAudio) { _bwAudio.pause(); _bwAudio.currentTime = 0; } } catch(e){}
-  if (bgWasPlaying && !muted) bgMusic.play().catch(()=>{});
+  if (bgWasPlaying && musicEnabled) bgMusic.play().catch(()=>{});
 }
 
 // Square-frame the symbols that form each winning payline (clears old frames first)
