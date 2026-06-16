@@ -274,6 +274,28 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
 @keyframes fsGlow{0%,100%{filter:drop-shadow(0 0 6px rgba(255,190,60,.5))}50%{filter:drop-shadow(0 0 18px rgba(255,210,90,.95))}}
 .fs-award-sub{font-size:30px;font-weight:900;letter-spacing:.18em;text-transform:uppercase;color:#f0c040;text-shadow:0 2px 4px #000;margin-top:2px;}
 .fs-award-hint{font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-top:18px;animation:ls-p 1.4s ease-in-out infinite;}
+
+/* chest-pick mini-game */
+.chest-pick{position:fixed;inset:0;z-index:320;display:none;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:rgba(0,0,0,.86);}
+.chest-pick.show{display:flex;animation:fsFade .3s ease;}
+.chest-pick-title{font-size:32px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:#ffe7a0;text-shadow:0 2px 6px #000;}
+.chest-pick-sub{font-size:14px;letter-spacing:.12em;text-transform:uppercase;color:#f0c040;margin-top:-6px;}
+.chest-pick-row{display:flex;gap:40px;margin:10px 0;}
+.chest{position:relative;width:190px;height:190px;cursor:pointer;transition:transform .15s;animation:fsPop .45s cubic-bezier(.2,1.3,.4,1) both;}
+.chest:hover{transform:scale(1.07) translateY(-4px);}
+.chest.revealed{cursor:default;}
+.chest-img{width:100%;height:100%;object-fit:contain;display:block;filter:drop-shadow(0 8px 12px rgba(0,0,0,.65));}
+.chest-mult{position:absolute;left:50%;top:34%;transform:translate(-50%,-50%);width:74%;height:auto;display:none;
+  filter:drop-shadow(0 0 16px rgba(255,205,80,1));animation:mult-pop .5s cubic-bezier(.2,1.3,.4,1) both;}
+.chest-collect{background:linear-gradient(135deg,#f0c040,#c8962a);border:none;color:#1a0e02;padding:14px 36px;
+  font-size:16px;font-weight:900;letter-spacing:.1em;border-radius:10px;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.5);}
+.chest-collect:active{transform:scale(.96);}
+
+/* persistent chest multiplier indicator (during free spins) */
+.pt-globalmult{position:absolute;left:16%;top:-13%;transform:translate(-50%,-50%);z-index:9;pointer-events:none;
+  font-size:34px;font-weight:900;font-family:'Courier New',monospace;color:#ff5a2a;
+  text-shadow:0 2px 0 #7a1500,0 0 12px rgba(255,90,30,.9),0 0 24px rgba(255,60,10,.7);
+  animation:fsGlow 1s ease-in-out infinite;}
 @media (max-width:640px){ .pt-cols{grid-template-columns:1fr;} }
 
 /* ── Big Win animation ── */
@@ -479,9 +501,10 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
 <style>@keyframes ls-p{0%,100%{opacity:.15}50%{opacity:.6}}</style>
 <script>
 (function(){
-  const SYMS=['a','k','q','j','anchor','boost','chest','coins','doubloon','mystery','rum','scatter','wild']
+  const SYMS=['a','k','q','j','anchor','boost','chest','coins','doubloon','mystery','rum','scatter','wild','key']
     .map(n=>'/assets/h-slots/pirate/symbols/sym-'+n+'.png?v=2');
   const MULTS=[2,3,5,10,20,50,100,250,500].map(v=>'/assets/h-slots/pirate/symbols/x'+v+'.png');
+  const CHESTS=['chest-locked','chest-empty','chest-win'].map(n=>'/assets/h-slots/pirate/symbols/'+n+'.png');
   const VIDS=[
     '/assets/h-slots/pirate/character/INTRO.mp4',
     '/assets/h-slots/pirate/character/IDLE.mp4',
@@ -489,9 +512,10 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
     '/assets/h-slots/pirate/character/big%20win.mp4',
     '/assets/h-slots/pirate/character/lose.mp4',
     '/video/win%20video.mp4',
-    // all reel symbols + multipliers
+    // all reel symbols + multipliers + chests
     ...SYMS,
     ...MULTS,
+    ...CHESTS,
     // frame / UI / background art
     '/assets/h-slots/pirate/background.jpeg',
     '/assets/h-slots/pirate/pirate%20baraban.png',
@@ -651,7 +675,8 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
         <div class="modal-rule">✖️ During free spins every spin shows a multiplier (×2 up to ×500) that multiplies that spin's win.</div>
         <div class="modal-rule">🔥 The big multipliers (×100 / ×250 / ×500) blaze with fire.</div>
         <div class="modal-rule">More scatters during free spins re-trigger extra spins.</div>
-        <div class="modal-rule">Bonus Buy: 65× bet → lands 4 scatters = 12 free spins with multipliers.</div>
+        <div class="modal-rule">🗝️ 3 golden keys in a free spin → pick a chest: collect the buy value, or gamble for a persistent ×50–×500 added to every following win.</div>
+        <div class="modal-rule">Bonus Buy: 100× bet → lands 4 scatters = 12 free spins with multipliers.</div>
       </div>
     </div>
   </div>
@@ -661,8 +686,8 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
 <div class="modal" id="bonusConfirm">
   <div class="modal-box" style="max-width:340px;text-align:center;">
     <div class="modal-title">Buy Free Spins</div>
-    <p style="color:#e8d5a3;font-size:13px;line-height:1.5;margin:2px 0 16px;">Land 4 scatters and start <b>12 free spins</b> — each spin has a multiplier up to ×500.</p>
-    <div style="font-size:11px;color:var(--muted);letter-spacing:.2em;text-transform:uppercase;">Price (65× bet)</div>
+    <p style="color:#e8d5a3;font-size:13px;line-height:1.5;margin:2px 0 16px;">Land 4 scatters and start <b>12 free spins</b> — each spin has a multiplier up to ×500. Collect <b>3 golden keys</b> for a chest pick with a persistent ×50–×500!</p>
+    <div style="font-size:11px;color:var(--muted);letter-spacing:.2em;text-transform:uppercase;">Price (100× bet)</div>
     <div id="bonusCostVal" style="font-size:32px;font-weight:900;color:#f0c040;font-family:monospace;margin:4px 0 20px;text-shadow:var(--blood-glow);">$0.00</div>
     <div style="display:flex;gap:12px;justify-content:center;">
       <button onclick="closeBonusConfirm()" style="flex:1;background:rgba(0,0,0,.3);border:1.5px solid var(--muted);color:#c8b89a;padding:12px 0;font-size:14px;font-weight:900;letter-spacing:.1em;border-radius:8px;cursor:pointer;">CANCEL</button>
@@ -679,6 +704,18 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
     <div class="fs-award-sub">Free Spins</div>
     <div class="fs-award-hint">Press anywhere to continue</div>
   </div>
+</div>
+
+<!-- Chest pick mini-game -->
+<div class="chest-pick" id="chestPick">
+  <div class="chest-pick-title">🗝️ Pick a Chest! 🗝️</div>
+  <div class="chest-pick-sub">One holds a multiplier ×50–×500</div>
+  <div class="chest-pick-row">
+    <div class="chest"><img class="chest-img" src=""><img class="chest-mult" src=""></div>
+    <div class="chest"><img class="chest-img" src=""><img class="chest-mult" src=""></div>
+    <div class="chest"><img class="chest-img" src=""><img class="chest-mult" src=""></div>
+  </div>
+  <button id="chestCollectBtn" class="chest-collect">COLLECT <span id="chestCollectVal">$0.00</span></button>
 </div>
 
 <div class="game-wrap">
@@ -780,11 +817,11 @@ const BET_STEPS = [0.25, 0.50, 1, 2, 5, 10, 25, 30];
 const CELL_H = 104;  // bigger reel cabinet (wider + taller); whole frame scales to fit
 const NUM_ROWS = 3;
 const NUM_COLS = 5;
-const SYMBOL_NAMES = ['chest','coins','rum','anchor','wild','scatter','doubloon','boost','mystery','j','q','k','a'];
+const SYMBOL_NAMES = ['chest','coins','rum','anchor','wild','scatter','doubloon','boost','mystery','j','q','k','a','key'];
 const SYMBOL_EMOJIS = {
   chest:'🏴‍☠️', coins:'💰', rum:'🍾', anchor:'⚓',
   wild:'🃏', scatter:'🗺️', doubloon:'🥇', boost:'🧭', mystery:'💀',
-  j:'J', q:'Q', k:'K', a:'A'
+  j:'J', q:'Q', k:'K', a:'A', key:'🗝️'
 };
 const SYMBOL_IMGS = [
   'assets/h-slots/pirate/symbols/sym-chest.png',
@@ -800,6 +837,7 @@ const SYMBOL_IMGS = [
   'assets/h-slots/pirate/symbols/sym-q.png',
   'assets/h-slots/pirate/symbols/sym-k.png',
   'assets/h-slots/pirate/symbols/sym-a.png',
+  'assets/h-slots/pirate/symbols/sym-key.png',
 ];
 
 // ── Asset diagnostics + preload ───────────────────────────────
@@ -961,6 +999,9 @@ function buildReels() {
     const mb = document.createElement('img');
     mb.id = 'multBadge'; mb.className = 'pt-mult'; mb.alt = ''; mb.style.display = 'none';
     frame.appendChild(mb);
+    const gm = document.createElement('div');
+    gm.id = 'globalMult'; gm.className = 'pt-globalmult'; gm.style.display = 'none';
+    frame.appendChild(gm);
     frame.style.width = (CELL_H * 3 * 1.821) + 'px';
     // reserve the panel's full height in the reels area so the wood frame
     // (which overflows the reel window) isn't clipped or overlapping Box B
@@ -1188,8 +1229,8 @@ function demoWeightedPick(weights) {
   return weights.length-1;
 }
 
-const DEMO_WEIGHTS = [180,200,220,220,90,35,55,15,40,180,170,160,150];
-const DEMO_FREE_WEIGHTS = [280,300,320,320,140,50,80,20,60,0,0,0,0];
+const DEMO_WEIGHTS = [180,200,220,220,90,35,55,15,40,180,170,160,150,0];
+const DEMO_FREE_WEIGHTS = [280,300,320,320,140,50,80,20,60,0,0,0,0,50];
 const PAYOUTS = {
   0:[0.45,1.50,7.50], 1:[0.15,1.20,6.00], 2:[0.15,0.90,4.50],
   3:[0.15,0.75,3.00], 4:[0.60,1.80,9.00], 5:[1.50,0,0],
@@ -1238,6 +1279,53 @@ function showFsAward(n) {
   });
 }
 
+// ── Chest-pick mini-game (3 golden keys → persistent multiplier) ──
+let globalBonusMult = 0;   // persistent multiplier from the chest pick (0 = none)
+const CHEST_VALUES  = [50,100,250,500];
+const CHEST_WEIGHTS = [60,25,12,3];   // 50× common … 500× rare
+function pickChestMult() {
+  const t = CHEST_WEIGHTS.reduce((a,b)=>a+b,0);
+  let r = demoRand()*t;
+  for (let i=0;i<CHEST_VALUES.length;i++){ if ((r-=CHEST_WEIGHTS[i])<0) return CHEST_VALUES[i]; }
+  return CHEST_VALUES[0];
+}
+function showGlobalMult(m) {
+  const el = document.getElementById('globalMult');
+  if (!el) return;
+  el.textContent = '×' + m;
+  el.style.display = m>0 ? 'block' : 'none';
+}
+// Returns Promise<{collected:bool, mult:number}>
+function showChestPick(buyValue) {
+  return new Promise(resolve => {
+    const ov = document.getElementById('chestPick');
+    if (!ov) { resolve({collected:false,mult:0}); return; }
+    const chests = Array.prototype.slice.call(ov.querySelectorAll('.chest'));
+    const prizeMult = pickChestMult();
+    const winIdx = Math.floor(demoRand()*3);
+    let done = false, picked = -1;
+    chests.forEach(function(ch){
+      ch.classList.remove('revealed');
+      ch.querySelector('.chest-img').src='assets/h-slots/pirate/symbols/chest-locked.png';
+      const mi=ch.querySelector('.chest-mult'); mi.style.display='none';
+    });
+    document.getElementById('chestCollectVal').textContent = '$' + buyValue.toFixed(2);
+    ov.classList.add('show');
+    function finish(res){ if(done) return; done=true; setTimeout(function(){ ov.classList.remove('show'); }, 100); resolve(res); }
+    function reveal(idx){
+      if (picked>=0) return; picked=idx;
+      chests.forEach(function(ch,i){
+        ch.classList.add('revealed');
+        if (i===winIdx){ ch.querySelector('.chest-img').src='assets/h-slots/pirate/symbols/chest-win.png'; const mi=ch.querySelector('.chest-mult'); mi.src='assets/h-slots/pirate/symbols/x'+prizeMult+'.png'; mi.style.display='block'; }
+        else ch.querySelector('.chest-img').src='assets/h-slots/pirate/symbols/chest-empty.png';
+      });
+      setTimeout(function(){ finish({collected:false, mult: idx===winIdx?prizeMult:0}); }, 2400);
+    }
+    chests.forEach(function(ch,i){ ch.onclick=function(){ reveal(i); }; });
+    document.getElementById('chestCollectBtn').onclick=function(){ if(picked>=0) return; finish({collected:true, mult:0}); };
+  });
+}
+
 function demoSpin(bet, isFreeSpin, bonusBuy) {
   const weights = isFreeSpin ? DEMO_FREE_WEIGHTS : DEMO_WEIGHTS;
   let grid = [];
@@ -1263,7 +1351,7 @@ function demoSpin(bet, isFreeSpin, bonusBuy) {
     let firstSym = -1;
     for (let c=0;c<5;c++) {
       const s = grid[line[c]][c];
-      if (s!==4 && s!==5 && s!==6 && s!==7 && s!==8) { firstSym=s; break; }
+      if (s!==4 && s!==5 && s!==6 && s!==7 && s!==8 && s!==13) { firstSym=s; break; }
     }
     if (firstSym===-1) firstSym=4;
     let count=0;
@@ -1286,8 +1374,13 @@ function demoSpin(bet, isFreeSpin, bonusBuy) {
   for (let r=0;r<3;r++) for (let c=0;c<5;c++) if(grid[r][c]===5) scatterCount++;
   const freeSpinsAwarded = scatterCount>=5?20:scatterCount>=4?12:scatterCount>=3?8:0;
 
+  // Golden keys (free spins only): 3+ in one spin → chest pick mini-game
+  let keyCount=0;
+  for (let r=0;r<3;r++) for (let c=0;c<5;c++) if(grid[r][c]===13) keyCount++;
+  const chestPick = isFreeSpin && keyCount>=3;
+
   return { grid, paylines, total_payout: totalPayout, scatter_count: scatterCount,
-    free_spins_awarded: freeSpinsAwarded, bet };
+    free_spins_awarded: freeSpinsAwarded, key_count: keyCount, chest_pick: chestPick, bet };
 }
 
 const DOUBLOON_MULTS = [0.75,1.50,2.25,3.00,3.75,4.50,5.25,6.00,6.75,7.50,8.25,9.00,9.75,10.50,11.25];
@@ -1440,7 +1533,7 @@ async function doSpin(options={}) {
   const bet = BET_STEPS[betIdx];
 
   const isFree = freeSpinsLeft > 0 && !options.bonusBuy;
-  const effectiveCost = options.bonusBuy ? bet * 65 : (isFree ? 0 : bet);
+  const effectiveCost = options.bonusBuy ? bet * 100 : (isFree ? 0 : bet);
 
   if (!isFree && balance < effectiveCost) {
     showMessage('NO FUNDS — $' + balance.toFixed(2));
@@ -1538,9 +1631,9 @@ async function doSpin(options={}) {
     updateFreeCounter();
   }
 
-  // Free-spins multiplier — shown above the reels on every free spin
+  // Free-spins multiplier — per-spin badge + persistent chest multiplier
   let mult = 1;
-  if (isFree) { mult = pickMultiplier(); showMultiplier(mult); }
+  if (isFree) { const spinM = pickMultiplier(); showMultiplier(spinM); mult = spinM + globalBonusMult; }
   else hideMultiplier();
 
   const winAmt = (result.total_payout || 0) * mult;
@@ -1570,6 +1663,21 @@ async function doSpin(options={}) {
     showWinText('WIN ' + winAmt.toFixed(2) + '$');
   }
 
+  // 3 golden keys → chest pick (collect the buy value, or gamble for a persistent ×50–×500)
+  if (result.chest_pick && globalBonusMult === 0) {
+    const buyVal = BET_STEPS[betIdx] * 100;
+    const res = await showChestPick(buyVal);
+    if (res.collected) {
+      balance += buyVal;
+      if (isDemo) saveDemo();
+      updateUI();
+      showWinText('WIN ' + buyVal.toFixed(2) + '$');
+    } else if (res.mult > 0) {
+      globalBonusMult = res.mult;
+      showGlobalMult(res.mult);
+    }
+  }
+
   } catch(e) {
     console.error('[PIRATE] doSpin error:', e);
   } finally {
@@ -1581,7 +1689,8 @@ async function doSpin(options={}) {
   if (freeSpinsLeft > 0) {
     autoTimer = setTimeout(() => doSpin(), 1100);
   } else {
-    setTimeout(hideMultiplier, 1400);   // clear the badge when the feature ends
+    globalBonusMult = 0;                // reset persistent multiplier when the feature ends
+    setTimeout(() => { hideMultiplier(); showGlobalMult(0); }, 1400);
     if (isAuto) autoTimer = setTimeout(doSpin, 1500);
   }
 }
@@ -1954,7 +2063,7 @@ function toggleAuto() {
 // Show the confirmation window with the price before charging the account
 function doBonusBuy() {
   if (isSpinning) return;
-  const cost = BET_STEPS[betIdx] * 65;
+  const cost = BET_STEPS[betIdx] * 100;
   document.getElementById('bonusCostVal').textContent = '$' + cost.toFixed(2);
   document.getElementById('bonusConfirm').classList.add('open');
 }
@@ -1964,8 +2073,9 @@ function closeBonusConfirm() {
 async function confirmBonusBuy() {
   closeBonusConfirm();
   if (isSpinning) return;
-  const cost = BET_STEPS[betIdx] * 65;
+  const cost = BET_STEPS[betIdx] * 100;
   if (balance < cost) { showMessage('Need $' + cost.toFixed(2)); return; }
+  globalBonusMult = 0; showGlobalMult(0);
   // trigger spin lands 4 scatters → awards 12 free spins, then they auto-run
   doSpin({bonusBuy:true});
 }
