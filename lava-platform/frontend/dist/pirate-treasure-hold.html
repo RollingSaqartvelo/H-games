@@ -2408,12 +2408,11 @@ async function showBigWin(amount, bet, label) {
       vid.play().catch(()=>{});
     } catch(e){}
   }
-  // the soundtrack as a separate MP3 (plays reliably after the spin tap)
-  try {
-    if (!_bwAudio) _bwAudio = new Audio();
-    _bwAudio.pause();
-    if (!muted) { _bwAudio.src = cfg.audio; _bwAudio.volume = 0.95; _bwAudio.currentTime = 0; _bwAudio.play().catch(()=>{}); }
-  } catch(e){}
+  // the soundtrack as a separate MP3 (same reliable pattern as the other SFX)
+  try { if (_bwAudio) { _bwAudio.pause(); _bwAudio = null; } } catch(e){}
+  if (!muted) {
+    try { _bwAudio = new Audio(cfg.audio); _bwAudio.volume = 0.95; _bwAudio.play().catch(()=>{}); } catch(e){}
+  }
   _bwSkip = false;
   overlay.classList.remove('fade');
   overlay.classList.add('show');
