@@ -559,8 +559,8 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
      No own border/bg/padding — the wood panel is the frame. */
   .pt-box-reels{ display:none; }                 /* gold backer replaced by wood panel */
   .reels-frame{ position:relative; border:none; padding:0; overflow:visible;
-                /* sea-coloured backdrop behind the symbols */
-                background:linear-gradient(180deg,#1a586c 0%,#0c3140 55%,#07212c 100%); }
+                /* light icy blue-white backdrop behind the symbols */
+                background:linear-gradient(180deg,#f4fbff 0%,#dceffa 52%,#c2e2f3 100%); }
   .reels-frame::before{ top:0; left:0; right:0; bottom:0; }   /* grid lines = exact window */
   .reel{ min-width:0; }   /* let 5 reels share the fixed window width (no overflow) */
 
@@ -1090,20 +1090,12 @@ const SYMBOL_IMGS = [
 ];
 
 // ── Asset diagnostics + preload ───────────────────────────────
+// IMPORTANT: setCell() loads symbols with the "?v=2" cache-buster, so we MUST
+// preload the EXACT same URLs (every reel symbol incl. key) — otherwise the
+// browser re-fetches/decodes them mid-spin and the last reel lands blank.
+const SYM_V = '?v=2';
 const ALL_ASSETS = [
-  'assets/h-slots/pirate/symbols/sym-chest.png',
-  'assets/h-slots/pirate/symbols/sym-coins.png',
-  'assets/h-slots/pirate/symbols/sym-rum.png',
-  'assets/h-slots/pirate/symbols/sym-anchor.png',
-  'assets/h-slots/pirate/symbols/sym-wild.png',
-  'assets/h-slots/pirate/symbols/sym-scatter.png',
-  'assets/h-slots/pirate/symbols/sym-doubloon.png',
-  'assets/h-slots/pirate/symbols/sym-boost.png',
-  'assets/h-slots/pirate/symbols/sym-mystery.png',
-  'assets/h-slots/pirate/symbols/sym-j.png',
-  'assets/h-slots/pirate/symbols/sym-q.png',
-  'assets/h-slots/pirate/symbols/sym-k.png',
-  'assets/h-slots/pirate/symbols/sym-a.png',
+  ...SYMBOL_IMGS.map(s => s + SYM_V),
   'assets/h-slots/pirate/ui/btn-spin-idle.png',
   'assets/h-slots/pirate/ui/btn-autoplay.png',
   'assets/h-slots/pirate/ui/btn-buy-bonus.png',
@@ -1128,7 +1120,7 @@ setTimeout(() => {
 }, 6000);
 
 // _preloaded[symId] = actual Image object so setCell() can check .complete
-const _preloaded = SYMBOL_IMGS.map(src => _assetImgs[src]);
+const _preloaded = SYMBOL_IMGS.map(src => _assetImgs[src + SYM_V]);
 
 let betIdx = 2; // default $1.00
 let balance = DEMO_START;
@@ -1387,21 +1379,25 @@ function setCell(col, idx, symId, doubloonVal) {
   else if (symId === 4) cell.classList.add('glow-wild');
 
   const src = SYMBOL_IMGS[symId] ?? SYMBOL_IMGS[0];
-  const img = document.createElement('img');
-  img.alt = SYMBOL_NAMES[symId] || '';
-  img.style.cssText = 'width:100%;height:100%;object-fit:contain;display:block;background:transparent;';
-
-  // Gold placeholder while loading (especially for large sym-boost.png)
-  if (!_preloaded[symId] || !_preloaded[symId].complete || _preloaded[symId].naturalWidth === 0) {
-    cell.style.background = 'rgba(240,192,64,0.15)';
+  const pre = _preloaded[symId];
+  let img;
+  if (pre && pre.complete && pre.naturalWidth > 0) {
+    // reuse the already-decoded preloaded bitmap → paints instantly, no mid-spin decode
+    img = pre.cloneNode(false);
+    img.style.cssText = 'width:100%;height:100%;object-fit:contain;display:block;background:transparent;';
+  } else {
+    img = document.createElement('img');
+    img.style.cssText = 'width:100%;height:100%;object-fit:contain;display:block;background:transparent;';
+    cell.style.background = 'rgba(240,192,64,0.15)';   // gold placeholder while loading
     img.onload = () => { cell.style.background = ''; };
+    img.onerror = () => {
+      console.warn('[PIRATE] setCell error, symId=' + symId + ' url=' + new URL(src, location.href).href);
+      cell.style.background = 'rgba(192,57,43,0.3)';
+      img.style.display = 'none';
+    };
+    img.src = src + SYM_V;   // cache-bust new symbol art
   }
-  img.onerror = () => {
-    console.warn('[PIRATE] setCell error, symId=' + symId + ' url=' + new URL(src, location.href).href);
-    cell.style.background = 'rgba(192,57,43,0.3)'; // red tint on error
-    img.style.display = 'none';
-  };
-  img.src = src + '?v=2';   // cache-bust new symbol art
+  img.alt = SYMBOL_NAMES[symId] || '';
   cell.appendChild(img);
 
   if (symId === 6 && doubloonVal !== undefined) {
@@ -1448,7 +1444,7 @@ async function animateReel(col, finalSymbols, stopDelay) {
         strip.classList.add('spinning');
         const startY = -SPIN_START * cellH;
         const targetY = -SPIN_END * cellH;
-        const spinDur = 360;
+        const spinDur = turbo ? 220 : 300;
         const startTime = performance.now();
 
         await new Promise(r2 => {
@@ -1962,7 +1958,7 @@ async function doSpin(options={}) {
   }
 
   // Animate reels stopping
-  const stopDelays = turbo ? [0,60,120,180,240] : [0, 200, 400, 600, 800];
+  const stopDelays = turbo ? [0,45,90,135,180] : [0, 130, 260, 390, 520];
   const reelPromises = [];
   for (let col=0; col<NUM_COLS; col++) {
     const finalSyms = [grid[0][col], grid[1][col], grid[2][col]];
