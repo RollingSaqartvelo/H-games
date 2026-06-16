@@ -5,9 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#0a1628">
 <title>PIRATE TREASURE HOLD — H-GAMES</title>
-<link rel="preload" as="image" href="assets/h-slots/pirate/symbols/sym-boost.png?v=2">
-<link rel="preload" as="image" href="assets/h-slots/pirate/symbols/sym-scatter.png?v=2">
-<link rel="preload" as="image" href="assets/h-slots/pirate/symbols/sym-wild.png?v=2">
+<link rel="preload" as="image" href="assets/h-slots/pirate/symbols/sym-boost.png?v=3">
+<link rel="preload" as="image" href="assets/h-slots/pirate/symbols/sym-scatter.png?v=3">
+<link rel="preload" as="image" href="assets/h-slots/pirate/symbols/sym-wild.png?v=3">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Pirata+One&display=swap" rel="stylesheet">
@@ -559,8 +559,8 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
      No own border/bg/padding — the wood panel is the frame. */
   .pt-box-reels{ display:none; }                 /* gold backer replaced by wood panel */
   .reels-frame{ position:relative; border:none; padding:0; overflow:visible;
-                /* light icy blue-white backdrop behind the symbols */
-                background:linear-gradient(180deg,#f4fbff 0%,#dceffa 52%,#c2e2f3 100%); }
+                /* light icy blue-white backdrop behind the symbols (~20% darker) */
+                background:linear-gradient(180deg,#cfe5f2 0%,#b2d3e6 52%,#96bfd5 100%); }
   .reels-frame::before{ top:0; left:0; right:0; bottom:0; }   /* grid lines = exact window */
   .reel{ min-width:0; }   /* let 5 reels share the fixed window width (no overflow) */
 
@@ -660,9 +660,15 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
 <script>
 (function(){
   const SYMS=['a','k','q','j','anchor','boost','chest','coins','doubloon','mystery','rum','scatter','wild','key']
-    .map(n=>'/assets/h-slots/pirate/symbols/sym-'+n+'.png?v=2');
-  const MULTS=[2,3,5,10,20,50,100,250,500].map(v=>'/assets/h-slots/pirate/symbols/x'+v+'.png');
-  const CHESTS=['chest-locked','chest-empty','chest-win'].map(n=>'/assets/h-slots/pirate/symbols/'+n+'.png');
+    .map(n=>'/assets/h-slots/pirate/symbols/sym-'+n+'.png?v=3');
+  const MULTS=[2,3,5,10,20,50,100,250,500].map(v=>'/assets/h-slots/pirate/symbols/x'+v+'.png?v=3');
+  const CHESTS=['chest-locked','chest-empty','chest-win'].map(n=>'/assets/h-slots/pirate/symbols/'+n+'.png?v=3');
+  // every SFX + win-video soundtrack, so audio is ready right after the loader
+  const AUDIOS=[
+    'reel-stop','reels-loop','win-small','payline','coin-rollup','rollup-end',
+    'scatter-land','mult-big','mult-small','bonus-summary','chest-empty','chest-win',
+    'bigwin-audio','megawin-audio','superwin-audio','strike'
+  ].map(n=>'/audio/'+n+'.mp3');
   const VIDS=[
     '/assets/h-slots/pirate/character/INTRO.mp4',
     '/assets/h-slots/pirate/character/IDLE.mp4',
@@ -677,6 +683,7 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
     ...SYMS,
     ...MULTS,
     ...CHESTS,
+    ...AUDIOS,
     // frame / UI / background art
     '/assets/h-slots/pirate/background.jpeg',
     '/assets/h-slots/pirate/pirate%20baraban.png',
@@ -753,9 +760,9 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
   <div style="font-size:46px;font-weight:900;color:#f0c040;text-shadow:0 0 30px rgba(240,192,64,1),0 4px 8px rgba(0,0,0,1);letter-spacing:.15em;">HOLD &amp; WIN</div>
   <div style="color:#e8d5a3;font-size:12px;letter-spacing:.4em;">COLLECT ALL TREASURE</div>
   <div style="display:flex;gap:20px;margin:8px 0;">
-    <div style="text-align:center"><img src="assets/h-slots/pirate/symbols/sym-doubloon.png?v=2" style="width:64px;height:64px;object-fit:contain;"><div style="color:#f0c040;font-size:10px;margin-top:4px;">CASH</div></div>
-    <div style="text-align:center"><img src="assets/h-slots/pirate/symbols/sym-boost.png?v=2" style="width:64px;height:64px;object-fit:contain;"><div style="color:#f0c040;font-size:10px;margin-top:4px;">BOOST</div></div>
-    <div style="text-align:center"><img src="assets/h-slots/pirate/symbols/sym-mystery.png?v=2" style="width:64px;height:64px;object-fit:contain;"><div style="color:#f0c040;font-size:10px;margin-top:4px;">MYSTERY</div></div>
+    <div style="text-align:center"><img src="assets/h-slots/pirate/symbols/sym-doubloon.png?v=3" style="width:64px;height:64px;object-fit:contain;"><div style="color:#f0c040;font-size:10px;margin-top:4px;">CASH</div></div>
+    <div style="text-align:center"><img src="assets/h-slots/pirate/symbols/sym-boost.png?v=3" style="width:64px;height:64px;object-fit:contain;"><div style="color:#f0c040;font-size:10px;margin-top:4px;">BOOST</div></div>
+    <div style="text-align:center"><img src="assets/h-slots/pirate/symbols/sym-mystery.png?v=3" style="width:64px;height:64px;object-fit:contain;"><div style="color:#f0c040;font-size:10px;margin-top:4px;">MYSTERY</div></div>
   </div>
   <div style="color:#fff;font-size:15px;font-weight:700;letter-spacing:.1em;">15 ячеек = 🏴‍☠️ GRAND PRIZE</div>
   <button id="hwIntroBtn" style="background:linear-gradient(135deg,#f0c040,#c8962a);border:none;padding:14px 48px;font-size:16px;font-weight:900;color:#000;letter-spacing:.2em;cursor:pointer;margin-top:8px;">PRESS TO CONTINUE</button>
@@ -812,15 +819,15 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
       <div class="pt-page-title">Symbol Payouts</div>
       <div style="text-align:center;font-size:11px;color:var(--muted);letter-spacing:.15em;margin:-6px 0 12px;">× BET PER LINE — 3 / 4 / 5 IN A ROW, LEFT TO RIGHT</div>
       <div class="pt-symgrid">
-        <div class="pt-symcard"><img src="assets/h-slots/pirate/symbols/sym-wild.png?v=2" alt=""><div class="pt-sc-r"><div class="pt-sc-name">Wild</div><div class="pt-sc-pays"><span>3× <b>0.60</b></span><span>4× <b>1.80</b></span><span class="x5">5× <b>9.00</b></span></div></div></div>
-        <div class="pt-symcard"><img src="assets/h-slots/pirate/symbols/sym-chest.png?v=2" alt=""><div class="pt-sc-r"><div class="pt-sc-name">Chest</div><div class="pt-sc-pays"><span>3× <b>0.45</b></span><span>4× <b>1.50</b></span><span class="x5">5× <b>7.50</b></span></div></div></div>
-        <div class="pt-symcard"><img src="assets/h-slots/pirate/symbols/sym-coins.png?v=2" alt=""><div class="pt-sc-r"><div class="pt-sc-name">Coins</div><div class="pt-sc-pays"><span>3× <b>0.15</b></span><span>4× <b>1.20</b></span><span class="x5">5× <b>6.00</b></span></div></div></div>
-        <div class="pt-symcard"><img src="assets/h-slots/pirate/symbols/sym-rum.png?v=2" alt=""><div class="pt-sc-r"><div class="pt-sc-name">Rum</div><div class="pt-sc-pays"><span>3× <b>0.15</b></span><span>4× <b>0.90</b></span><span class="x5">5× <b>4.50</b></span></div></div></div>
-        <div class="pt-symcard"><img src="assets/h-slots/pirate/symbols/sym-anchor.png?v=2" alt=""><div class="pt-sc-r"><div class="pt-sc-name">Anchor</div><div class="pt-sc-pays"><span>3× <b>0.15</b></span><span>4× <b>0.75</b></span><span class="x5">5× <b>3.00</b></span></div></div></div>
-        <div class="pt-symcard"><img src="assets/h-slots/pirate/symbols/sym-a.png?v=2" alt=""><div class="pt-sc-r"><div class="pt-sc-name">A</div><div class="pt-sc-pays"><span>3× <b>0.10</b></span><span>4× <b>0.30</b></span><span class="x5">5× <b>0.75</b></span></div></div></div>
-        <div class="pt-symcard"><img src="assets/h-slots/pirate/symbols/sym-k.png?v=2" alt=""><div class="pt-sc-r"><div class="pt-sc-name">K</div><div class="pt-sc-pays"><span>3× <b>0.10</b></span><span>4× <b>0.25</b></span><span class="x5">5× <b>0.60</b></span></div></div></div>
-        <div class="pt-symcard"><img src="assets/h-slots/pirate/symbols/sym-q.png?v=2" alt=""><div class="pt-sc-r"><div class="pt-sc-name">Q</div><div class="pt-sc-pays"><span>3× <b>0.05</b></span><span>4× <b>0.20</b></span><span class="x5">5× <b>0.50</b></span></div></div></div>
-        <div class="pt-symcard"><img src="assets/h-slots/pirate/symbols/sym-j.png?v=2" alt=""><div class="pt-sc-r"><div class="pt-sc-name">J</div><div class="pt-sc-pays"><span>3× <b>0.05</b></span><span>4× <b>0.15</b></span><span class="x5">5× <b>0.40</b></span></div></div></div>
+        <div class="pt-symcard"><img src="assets/h-slots/pirate/symbols/sym-wild.png?v=3" alt=""><div class="pt-sc-r"><div class="pt-sc-name">Wild</div><div class="pt-sc-pays"><span>3× <b>0.60</b></span><span>4× <b>1.80</b></span><span class="x5">5× <b>9.00</b></span></div></div></div>
+        <div class="pt-symcard"><img src="assets/h-slots/pirate/symbols/sym-chest.png?v=3" alt=""><div class="pt-sc-r"><div class="pt-sc-name">Chest</div><div class="pt-sc-pays"><span>3× <b>0.45</b></span><span>4× <b>1.50</b></span><span class="x5">5× <b>7.50</b></span></div></div></div>
+        <div class="pt-symcard"><img src="assets/h-slots/pirate/symbols/sym-coins.png?v=3" alt=""><div class="pt-sc-r"><div class="pt-sc-name">Coins</div><div class="pt-sc-pays"><span>3× <b>0.15</b></span><span>4× <b>1.20</b></span><span class="x5">5× <b>6.00</b></span></div></div></div>
+        <div class="pt-symcard"><img src="assets/h-slots/pirate/symbols/sym-rum.png?v=3" alt=""><div class="pt-sc-r"><div class="pt-sc-name">Rum</div><div class="pt-sc-pays"><span>3× <b>0.15</b></span><span>4× <b>0.90</b></span><span class="x5">5× <b>4.50</b></span></div></div></div>
+        <div class="pt-symcard"><img src="assets/h-slots/pirate/symbols/sym-anchor.png?v=3" alt=""><div class="pt-sc-r"><div class="pt-sc-name">Anchor</div><div class="pt-sc-pays"><span>3× <b>0.15</b></span><span>4× <b>0.75</b></span><span class="x5">5× <b>3.00</b></span></div></div></div>
+        <div class="pt-symcard"><img src="assets/h-slots/pirate/symbols/sym-a.png?v=3" alt=""><div class="pt-sc-r"><div class="pt-sc-name">A</div><div class="pt-sc-pays"><span>3× <b>0.10</b></span><span>4× <b>0.30</b></span><span class="x5">5× <b>0.75</b></span></div></div></div>
+        <div class="pt-symcard"><img src="assets/h-slots/pirate/symbols/sym-k.png?v=3" alt=""><div class="pt-sc-r"><div class="pt-sc-name">K</div><div class="pt-sc-pays"><span>3× <b>0.10</b></span><span>4× <b>0.25</b></span><span class="x5">5× <b>0.60</b></span></div></div></div>
+        <div class="pt-symcard"><img src="assets/h-slots/pirate/symbols/sym-q.png?v=3" alt=""><div class="pt-sc-r"><div class="pt-sc-name">Q</div><div class="pt-sc-pays"><span>3× <b>0.05</b></span><span>4× <b>0.20</b></span><span class="x5">5× <b>0.50</b></span></div></div></div>
+        <div class="pt-symcard"><img src="assets/h-slots/pirate/symbols/sym-j.png?v=3" alt=""><div class="pt-sc-r"><div class="pt-sc-name">J</div><div class="pt-sc-pays"><span>3× <b>0.05</b></span><span>4× <b>0.15</b></span><span class="x5">5× <b>0.40</b></span></div></div></div>
       </div>
       <div class="modal-rule" style="text-align:center;margin-top:10px;">🃏 Wild substitutes for all paying symbols.</div>
     </div>
@@ -828,10 +835,10 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
     <!-- Page 2 — Special symbols -->
     <div class="pt-page" data-page="2">
       <div class="pt-page-title">Special Symbols</div>
-      <div class="pt-bigcard"><img src="assets/h-slots/pirate/symbols/sym-scatter.png?v=2" alt="">
+      <div class="pt-bigcard"><img src="assets/h-slots/pirate/symbols/sym-scatter.png?v=3" alt="">
         <div><div class="t">Scatter</div><div class="d">Appears on any reel. Land <b>3 / 4 / 5</b> scatters anywhere to trigger the <b>Free Spins</b> feature with <b>8 / 12 / 20</b> free spins. More scatters during the feature re-trigger extra spins.</div></div>
       </div>
-      <div class="pt-bigcard"><img src="assets/h-slots/pirate/symbols/sym-key.png?v=2" alt="">
+      <div class="pt-bigcard"><img src="assets/h-slots/pirate/symbols/sym-key.png?v=3" alt="">
         <div><div class="t">Golden Key</div><div class="d">Appears only during free spins. Collect <b>3 keys on one spin</b> to open the <b>Chest Pick</b> bonus — a chance at a persistent multiplier of <b>×50 to ×500</b>.</div></div>
       </div>
     </div>
@@ -841,10 +848,10 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
       <div class="pt-page-title">Free Spins &amp; Multipliers</div>
       <div class="modal-rule" style="text-align:center;">On <b>every free spin</b> a multiplier lights up above the reels and multiplies that spin's win.</div>
       <div class="pt-multrow">
-        <img src="assets/h-slots/pirate/symbols/x2.png" alt=""><img src="assets/h-slots/pirate/symbols/x3.png" alt=""><img src="assets/h-slots/pirate/symbols/x5.png" alt=""><img src="assets/h-slots/pirate/symbols/x10.png" alt=""><img src="assets/h-slots/pirate/symbols/x20.png" alt="">
+        <img src="assets/h-slots/pirate/symbols/x2.png?v=3" alt=""><img src="assets/h-slots/pirate/symbols/x3.png?v=3" alt=""><img src="assets/h-slots/pirate/symbols/x5.png?v=3" alt=""><img src="assets/h-slots/pirate/symbols/x10.png?v=3" alt=""><img src="assets/h-slots/pirate/symbols/x20.png?v=3" alt="">
       </div>
       <div class="pt-multrow">
-        <img src="assets/h-slots/pirate/symbols/x50.png" alt=""><img src="assets/h-slots/pirate/symbols/x100.png" alt=""><img src="assets/h-slots/pirate/symbols/x250.png" alt=""><img src="assets/h-slots/pirate/symbols/x500.png" alt="">
+        <img src="assets/h-slots/pirate/symbols/x50.png?v=3" alt=""><img src="assets/h-slots/pirate/symbols/x100.png?v=3" alt=""><img src="assets/h-slots/pirate/symbols/x250.png?v=3" alt=""><img src="assets/h-slots/pirate/symbols/x500.png?v=3" alt="">
       </div>
       <div class="modal-rule" style="text-align:center;">🔥 The big multipliers <b>×100 / ×250 / ×500</b> blaze with fire. Small multipliers are common; the big ones are rare.</div>
     </div>
@@ -853,9 +860,9 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
     <div class="pt-page" data-page="4">
       <div class="pt-page-title">Chest Pick Bonus</div>
       <div style="display:flex;gap:18px;justify-content:center;margin:6px 0 12px;">
-        <img src="assets/h-slots/pirate/symbols/chest-locked.png" style="width:110px;height:110px;object-fit:contain;">
-        <img src="assets/h-slots/pirate/symbols/chest-win.png" style="width:110px;height:110px;object-fit:contain;">
-        <img src="assets/h-slots/pirate/symbols/chest-empty.png" style="width:110px;height:110px;object-fit:contain;">
+        <img src="assets/h-slots/pirate/symbols/chest-locked.png?v=3" style="width:110px;height:110px;object-fit:contain;">
+        <img src="assets/h-slots/pirate/symbols/chest-win.png?v=3" style="width:110px;height:110px;object-fit:contain;">
+        <img src="assets/h-slots/pirate/symbols/chest-empty.png?v=3" style="width:110px;height:110px;object-fit:contain;">
       </div>
       <div class="modal-rule">🗝️ Collect <b>3 golden keys on one free spin</b> to open the Chest Pick.</div>
       <div class="modal-rule">You may <b>COLLECT</b> the bonus-buy value instantly, or pick one of 3 chests to gamble.</div>
@@ -1090,10 +1097,10 @@ const SYMBOL_IMGS = [
 ];
 
 // ── Asset diagnostics + preload ───────────────────────────────
-// IMPORTANT: setCell() loads symbols with the "?v=2" cache-buster, so we MUST
+// IMPORTANT: setCell() loads symbols with the "?v=3" cache-buster, so we MUST
 // preload the EXACT same URLs (every reel symbol incl. key) — otherwise the
 // browser re-fetches/decodes them mid-spin and the last reel lands blank.
-const SYM_V = '?v=2';
+const SYM_V = '?v=3';
 const ALL_ASSETS = [
   ...SYMBOL_IMGS.map(s => s + SYM_V),
   'assets/h-slots/pirate/ui/btn-spin-idle.png',
@@ -1378,26 +1385,22 @@ function setCell(col, idx, symId, doubloonVal) {
   else if (symId === 8) cell.classList.add('glow-mystery');
   else if (symId === 4) cell.classList.add('glow-wild');
 
-  const src = SYMBOL_IMGS[symId] ?? SYMBOL_IMGS[0];
-  const pre = _preloaded[symId];
-  let img;
-  if (pre && pre.complete && pre.naturalWidth > 0) {
-    // reuse the already-decoded preloaded bitmap → paints instantly, no mid-spin decode
-    img = pre.cloneNode(false);
-    img.style.cssText = 'width:100%;height:100%;object-fit:contain;display:block;background:transparent;';
-  } else {
-    img = document.createElement('img');
-    img.style.cssText = 'width:100%;height:100%;object-fit:contain;display:block;background:transparent;';
-    cell.style.background = 'rgba(240,192,64,0.15)';   // gold placeholder while loading
-    img.onload = () => { cell.style.background = ''; };
-    img.onerror = () => {
-      console.warn('[PIRATE] setCell error, symId=' + symId + ' url=' + new URL(src, location.href).href);
-      cell.style.background = 'rgba(192,57,43,0.3)';
-      img.style.display = 'none';
-    };
-    img.src = src + SYM_V;   // cache-bust new symbol art
-  }
+  const src = (SYMBOL_IMGS[symId] ?? SYMBOL_IMGS[0]) + SYM_V;
+  const img = document.createElement('img');
   img.alt = SYMBOL_NAMES[symId] || '';
+  img.decoding = 'sync';
+  img.style.cssText = 'width:100%;height:100%;object-fit:contain;display:block;background:transparent;';
+  // gold placeholder only if this symbol isn't decoded yet (preloaded URL matches src)
+  const pre = _preloaded[symId];
+  if (!pre || !pre.complete || pre.naturalWidth === 0) {
+    cell.style.background = 'rgba(240,192,64,0.15)';
+    img.onload = () => { cell.style.background = ''; };
+  }
+  img.onerror = () => {
+    cell.style.background = 'rgba(192,57,43,0.3)';
+    img.style.display = 'none';
+  };
+  img.src = src;   // same URL as preload → served from cache, no mid-spin fetch
   cell.appendChild(img);
 
   if (symId === 6 && doubloonVal !== undefined) {
@@ -1535,7 +1538,7 @@ function pickMultiplier() {
 function showMultiplier(m) {
   const el = document.getElementById('multBadge');
   if (!el) return;
-  el.src = 'assets/h-slots/pirate/symbols/x' + m + '.png';
+  el.src = 'assets/h-slots/pirate/symbols/x' + m + '.png?v=3';
   el.style.display = 'block';
   el.classList.toggle('mult-fire', m >= 100);   // big multipliers blaze
   el.classList.remove('mult-pop'); void el.offsetWidth; el.classList.add('mult-pop');
@@ -1654,7 +1657,7 @@ function showChestPick(buyValue) {
     let done = false, picked = -1;
     chests.forEach(function(ch){
       ch.classList.remove('revealed');
-      ch.querySelector('.chest-img').src='assets/h-slots/pirate/symbols/chest-locked.png';
+      ch.querySelector('.chest-img').src='assets/h-slots/pirate/symbols/chest-locked.png?v=3';
       const mi=ch.querySelector('.chest-mult'); mi.style.display='none';
     });
     document.getElementById('chestCollectVal').textContent = '$' + buyValue.toFixed(2);
@@ -1665,8 +1668,8 @@ function showChestPick(buyValue) {
       if (idx===winIdx) soundChestWin(); else soundChestEmpty();
       chests.forEach(function(ch,i){
         ch.classList.add('revealed');
-        if (i===winIdx){ ch.querySelector('.chest-img').src='assets/h-slots/pirate/symbols/chest-win.png'; const mi=ch.querySelector('.chest-mult'); mi.src='assets/h-slots/pirate/symbols/x'+prizeMult+'.png'; mi.style.display='block'; }
-        else ch.querySelector('.chest-img').src='assets/h-slots/pirate/symbols/chest-empty.png';
+        if (i===winIdx){ ch.querySelector('.chest-img').src='assets/h-slots/pirate/symbols/chest-win.png?v=3'; const mi=ch.querySelector('.chest-mult'); mi.src='assets/h-slots/pirate/symbols/x'+prizeMult+'.png?v=3'; mi.style.display='block'; }
+        else ch.querySelector('.chest-img').src='assets/h-slots/pirate/symbols/chest-empty.png?v=3';
       });
       setTimeout(function(){ finish({collected:false, mult: idx===winIdx?prizeMult:0}); }, 2400);
     }
@@ -2361,13 +2364,16 @@ function doBoostFlash() {
   setTimeout(() => flash.classList.remove('active'), 300);
 }
 
-// Win tiers → full-screen cinematic video takeover (chest / cannons / kraken)
+// Win tiers → full-screen cinematic video takeover (chest / cannons / kraken).
+// Video plays MUTED; its soundtrack is the extracted MP3 (reliable on iOS, where
+// programmatic unmuted video autoplay is blocked).
 const BW_TIERS = {
-  big:   { label:'BIG WIN',   src:'video/BIG%20WIN.mp4',   hold:4200 },
-  mega:  { label:'MEGA WIN',  src:'video/MEGA%20WIN.mp4',  hold:4800 },
-  super: { label:'SUPER WIN', src:'video/SUPER%20WIN.mp4', hold:6000 },
+  big:   { label:'BIG WIN',   src:'video/BIG%20WIN.mp4',   audio:'audio/bigwin-audio.mp3' },
+  mega:  { label:'MEGA WIN',  src:'video/MEGA%20WIN.mp4',  audio:'audio/megawin-audio.mp3' },
+  super: { label:'SUPER WIN', src:'video/SUPER%20WIN.mp4', audio:'audio/superwin-audio.mp3' },
 };
 let _bwSkip = false;
+let _bwAudio = null;
 function bwSkip(){ _bwSkip = true; }
 
 async function showBigWin(amount, bet, label) {
@@ -2380,8 +2386,7 @@ async function showBigWin(amount, bet, label) {
   const amtEl = document.getElementById('bwAmount');
   amtEl.textContent = '$0.00';
 
-  // start the cinematic (video carries its own audio; honour the mute toggle
-  // and duck the background music while it plays)
+  // start the cinematic (video MUTED) and duck the background music while it plays
   const mb = document.getElementById('muteBtn');
   const muted = !!(mb && mb.classList.contains('muted'));
   const bgWasPlaying = bgMusic && !bgMusic.paused;
@@ -2389,11 +2394,17 @@ async function showBigWin(amount, bet, label) {
   let videoEnded = false;
   if (vid) {
     try {
-      vid.muted = muted; vid.volume = 0.9; vid.loop = false; vid.src = cfg.src; vid.currentTime = 0;
+      vid.muted = true; vid.loop = false; vid.src = cfg.src; vid.currentTime = 0;
       vid.onended = function(){ videoEnded = true; };
       vid.play().catch(()=>{});
     } catch(e){}
   }
+  // the soundtrack as a separate MP3 (plays reliably after the spin tap)
+  try {
+    if (!_bwAudio) _bwAudio = new Audio();
+    _bwAudio.pause();
+    if (!muted) { _bwAudio.src = cfg.audio; _bwAudio.volume = 0.95; _bwAudio.currentTime = 0; _bwAudio.play().catch(()=>{}); }
+  } catch(e){}
   _bwSkip = false;
   overlay.classList.remove('fade');
   overlay.classList.add('show');
@@ -2422,6 +2433,7 @@ async function showBigWin(amount, bet, label) {
   await new Promise(r => setTimeout(r, 500));
   overlay.classList.remove('show','fade');
   if (vid) { try { vid.pause(); vid.removeAttribute('src'); vid.load(); } catch(e){} }
+  try { if (_bwAudio) { _bwAudio.pause(); _bwAudio.currentTime = 0; } } catch(e){}
   if (bgWasPlaying && !muted) bgMusic.play().catch(()=>{});
 }
 
