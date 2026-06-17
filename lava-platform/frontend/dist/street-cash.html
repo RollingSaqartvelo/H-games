@@ -361,6 +361,16 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:url('/assets
   padding:5px 16px;border:1.5px solid rgba(124,58,237,.45);border-radius:20px;background:rgba(124,58,237,.08);
   font-family:'Orbitron',sans-serif;font-size:11px;font-weight:900;letter-spacing:2px;color:#7c3aed;}
 .vol-fire{font-size:13px;}
+/* visual paytable panel inside the INFO modal */
+.xp2{position:relative;width:100%;aspect-ratio:2000/1068;margin:4px 0 12px;
+  background:url('/assets/street-cash/x-panel-new.png') center/contain no-repeat;}
+.xp2-slot{position:absolute;transform:translate(-50%,-50%);width:13%;height:24%;
+  display:flex;align-items:center;justify-content:center;}
+.xp2-slot img{width:84%;height:84%;object-fit:contain;}
+.xp2-mult{position:absolute;left:50%;bottom:-9px;transform:translateX(-50%);
+  font-family:'Orbitron',sans-serif;font-size:9px;font-weight:900;color:#ffd24d;
+  text-shadow:0 1px 2px #000;white-space:nowrap;}
+.xp2-mult.loss{color:#ff6a8a;}
 </style>
 </head>
 <body>
@@ -538,13 +548,15 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:url('/assets
     <p class="rules-p">Press <b>PLAY</b>: the 3 center reels spin and a <b>cursor</b> runs clockwise around the frame, then stops on one symbol. If that symbol <b>matches any of the 3 reels</b>, you win <b>bet × that symbol's multiplier</b>. Stop on the <b>Boombox</b> (blocker) = no win.</p>
 
     <div class="rules-h">SYMBOL PAYOUTS</div>
-    <div class="pt-row"><img src="/assets/street-cash/sym-6.png?v=2"><span class="pt-name">2Pac</span><span class="pt-mult">×100</span></div>
-    <div class="pt-row"><img src="/assets/street-cash/sym-4.png?v=2"><span class="pt-name">Golden Glock</span><span class="pt-mult">×75</span></div>
-    <div class="pt-row"><img src="/assets/street-cash/sym-3.png?v=2"><span class="pt-name">Gold Grillz</span><span class="pt-mult">×20</span></div>
-    <div class="pt-row"><img src="/assets/street-cash/sym-2.png?v=2"><span class="pt-name">Sneaker</span><span class="pt-mult">×8</span></div>
-    <div class="pt-row"><img src="/assets/street-cash/sym-1.png?v=2"><span class="pt-name">Graffiti Hoodie</span><span class="pt-mult">×3</span></div>
-    <div class="pt-row"><img src="/assets/street-cash/sym-0.png?v=2"><span class="pt-name">Skateboard</span><span class="pt-mult">×2</span></div>
-    <div class="pt-row pt-loss"><img src="/assets/street-cash/tnt.png?v=2" style="width:34px;height:34px"><span class="pt-name">Boombox — BLOCKER</span><span class="pt-mult">LOSS</span></div>
+    <div class="xp2">
+      <div class="xp2-slot" style="left:26.8%;top:35.4%"><img src="/assets/street-cash/sym-6.png?v=2"><span class="xp2-mult">×100</span></div>
+      <div class="xp2-slot" style="left:42.2%;top:35.4%"><img src="/assets/street-cash/sym-4.png?v=2"><span class="xp2-mult">×75</span></div>
+      <div class="xp2-slot" style="left:57.6%;top:35.4%"><img src="/assets/street-cash/sym-3.png?v=2"><span class="xp2-mult">×20</span></div>
+      <div class="xp2-slot" style="left:73.0%;top:35.4%"><img src="/assets/street-cash/sym-2.png?v=2"><span class="xp2-mult">×8</span></div>
+      <div class="xp2-slot" style="left:34.2%;top:65.0%"><img src="/assets/street-cash/sym-1.png?v=2"><span class="xp2-mult">×3</span></div>
+      <div class="xp2-slot" style="left:50.0%;top:65.0%"><img src="/assets/street-cash/sym-0.png?v=2"><span class="xp2-mult">×2</span></div>
+      <div class="xp2-slot" style="left:65.5%;top:65.0%"><img src="/assets/street-cash/tnt.png?v=2"><span class="xp2-mult loss">LOSS</span></div>
+    </div>
 
     <div class="rules-h">BUTTONS</div>
     <p class="rules-p" style="text-align:left">
