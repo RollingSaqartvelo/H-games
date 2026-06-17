@@ -295,10 +295,10 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:url('/assets
   #app::after{ content:''; position:absolute; inset:0; pointer-events:none;
      background:linear-gradient(180deg,rgba(8,4,22,.35),rgba(8,4,22,.62)); z-index:0; }
   #machine{ position:static; width:100%; height:100%; max-width:none; padding:0; }
-  /* board (panel + drum) = 70% of the cabinet (980px), centred.
-     street-panel-new.png is 2000×1204 → 980×590. */
+  /* board (panel + drum) +30% → 1274px, centred.
+     street-panel-new.png is 2000×1204 → 1274×767. */
   #board{ position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); z-index:3;
-     width:980px; height:590px; }
+     width:1274px; height:767px; }
 
   /* other panels hidden for now — focusing on the board size */
   #msg-bar, #xpanel, #bet-section, #action-section, #demo-badge{ display:none; }
@@ -434,32 +434,32 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:url('/assets
     <div id="xpanel">
       <!-- Row 1: 4 slots (x=141-1858, y=189-540) -->
       <div class="xp-slot" data-sym="6" style="left:7.05%;top:17.34%;width:21.45%;height:32.20%">
-        <img src="/assets/street-cash/sym-6.png" class="xp-img">
+        <img src="/assets/street-cash/sym-6.png?v=2" class="xp-img">
         <div class="xp-mult">×100</div>
       </div>
       <div class="xp-slot" data-sym="5" style="left:28.50%;top:17.34%;width:21.45%;height:32.20%">
-        <img src="/assets/street-cash/sym-4.png" class="xp-img">
+        <img src="/assets/street-cash/sym-4.png?v=2" class="xp-img">
         <div class="xp-mult">×75</div>
       </div>
       <div class="xp-slot" data-sym="4" style="left:49.95%;top:17.34%;width:21.45%;height:32.20%">
-        <img src="/assets/street-cash/sym-3.png" class="xp-img">
+        <img src="/assets/street-cash/sym-3.png?v=2" class="xp-img">
         <div class="xp-mult">×20</div>
       </div>
       <div class="xp-slot" data-sym="3" style="left:71.40%;top:17.34%;width:21.45%;height:32.20%">
-        <img src="/assets/street-cash/sym-2.png" class="xp-img">
+        <img src="/assets/street-cash/sym-2.png?v=2" class="xp-img">
         <div class="xp-mult">×8</div>
       </div>
       <!-- Row 2: 3 slots (x=345-1656, y=560-923) -->
       <div class="xp-slot" data-sym="2" style="left:17.25%;top:51.38%;width:21.85%;height:33.30%">
-        <img src="/assets/street-cash/sym-1.png" class="xp-img">
+        <img src="/assets/street-cash/sym-1.png?v=2" class="xp-img">
         <div class="xp-mult">×3</div>
       </div>
       <div class="xp-slot" data-sym="1" style="left:39.10%;top:51.38%;width:21.85%;height:33.30%">
-        <img src="/assets/street-cash/sym-0.png" class="xp-img">
+        <img src="/assets/street-cash/sym-0.png?v=2" class="xp-img">
         <div class="xp-mult">×2</div>
       </div>
       <div class="xp-slot" data-sym="0" style="left:60.95%;top:51.38%;width:21.85%;height:33.30%">
-        <img src="/assets/street-cash/tnt.png" class="xp-img">
+        <img src="/assets/street-cash/tnt.png?v=2" class="xp-img">
         <div class="xp-mult xp-loss">LOSS</div>
       </div>
     </div>
@@ -499,13 +499,13 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:url('/assets
     <p class="rules-p">Press <b>PLAY</b>: the 3 center reels spin and a <b>cursor</b> runs clockwise around the frame, then stops on one symbol. If that symbol <b>matches any of the 3 reels</b>, you win <b>bet × that symbol's multiplier</b>. Stop on the <b>Boombox</b> (blocker) = no win.</p>
 
     <div class="rules-h">SYMBOL PAYOUTS</div>
-    <div class="pt-row"><img src="/assets/street-cash/sym-6.png"><span class="pt-name">2Pac</span><span class="pt-mult">×100</span></div>
-    <div class="pt-row"><img src="/assets/street-cash/sym-4.png"><span class="pt-name">Golden Glock</span><span class="pt-mult">×75</span></div>
-    <div class="pt-row"><img src="/assets/street-cash/sym-3.png"><span class="pt-name">Gold Grillz</span><span class="pt-mult">×20</span></div>
-    <div class="pt-row"><img src="/assets/street-cash/sym-2.png"><span class="pt-name">Sneaker</span><span class="pt-mult">×8</span></div>
-    <div class="pt-row"><img src="/assets/street-cash/sym-1.png"><span class="pt-name">Graffiti Hoodie</span><span class="pt-mult">×3</span></div>
-    <div class="pt-row"><img src="/assets/street-cash/sym-0.png"><span class="pt-name">Skateboard</span><span class="pt-mult">×2</span></div>
-    <div class="pt-row pt-loss"><img src="/assets/street-cash/tnt.png" style="width:34px;height:34px"><span class="pt-name">Boombox — BLOCKER</span><span class="pt-mult">LOSS</span></div>
+    <div class="pt-row"><img src="/assets/street-cash/sym-6.png?v=2"><span class="pt-name">2Pac</span><span class="pt-mult">×100</span></div>
+    <div class="pt-row"><img src="/assets/street-cash/sym-4.png?v=2"><span class="pt-name">Golden Glock</span><span class="pt-mult">×75</span></div>
+    <div class="pt-row"><img src="/assets/street-cash/sym-3.png?v=2"><span class="pt-name">Gold Grillz</span><span class="pt-mult">×20</span></div>
+    <div class="pt-row"><img src="/assets/street-cash/sym-2.png?v=2"><span class="pt-name">Sneaker</span><span class="pt-mult">×8</span></div>
+    <div class="pt-row"><img src="/assets/street-cash/sym-1.png?v=2"><span class="pt-name">Graffiti Hoodie</span><span class="pt-mult">×3</span></div>
+    <div class="pt-row"><img src="/assets/street-cash/sym-0.png?v=2"><span class="pt-name">Skateboard</span><span class="pt-mult">×2</span></div>
+    <div class="pt-row pt-loss"><img src="/assets/street-cash/tnt.png?v=2" style="width:34px;height:34px"><span class="pt-name">Boombox — BLOCKER</span><span class="pt-mult">LOSS</span></div>
 
     <div class="rules-h">BUTTONS</div>
     <p class="rules-p" style="text-align:left">
@@ -558,13 +558,13 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:url('/assets
 // ── Symbols ───────────────────────────────────────────────────────────────────
 // sym-0 = TNT (LOSS), sym-1 = Dice ×2, sym-2..6 = win symbols
 const SYMS = [
-  { mult:0,   src:'/assets/street-cash/tnt.png',   bg:'sym-bg-0', name:'TNT',     isLoss:true  },
-  { mult:2,   src:'/assets/street-cash/sym-0.png', bg:'sym-bg-1', name:'Dice',    isLoss:false },
-  { mult:3,   src:'/assets/street-cash/sym-1.png', bg:'sym-bg-2', name:'Shades',  isLoss:false },
-  { mult:8,   src:'/assets/street-cash/sym-2.png', bg:'sym-bg-3', name:'Sneaker', isLoss:false },
-  { mult:20,  src:'/assets/street-cash/sym-3.png', bg:'sym-bg-4', name:'Chain',   isLoss:false },
-  { mult:75,  src:'/assets/street-cash/sym-4.png', bg:'sym-bg-5', name:'Watch',   isLoss:false },
-  { mult:100, src:'/assets/street-cash/sym-6.png', bg:'sym-bg-6', name:'Card',    isLoss:false },
+  { mult:0,   src:'/assets/street-cash/tnt.png?v=2',   bg:'sym-bg-0', name:'Boombox',  isLoss:true  },
+  { mult:2,   src:'/assets/street-cash/sym-0.png?v=2', bg:'sym-bg-1', name:'Skateboard',isLoss:false },
+  { mult:3,   src:'/assets/street-cash/sym-1.png?v=2', bg:'sym-bg-2', name:'Hoodie',   isLoss:false },
+  { mult:8,   src:'/assets/street-cash/sym-2.png?v=2', bg:'sym-bg-3', name:'Sneaker',  isLoss:false },
+  { mult:20,  src:'/assets/street-cash/sym-3.png?v=2', bg:'sym-bg-4', name:'Grillz',   isLoss:false },
+  { mult:75,  src:'/assets/street-cash/sym-4.png?v=2', bg:'sym-bg-5', name:'Glock',    isLoss:false },
+  { mult:100, src:'/assets/street-cash/sym-6.png?v=2', bg:'sym-bg-6', name:'2Pac',     isLoss:false },
 ]
 
 // Demo weights matching backend (out of 100000)
@@ -612,7 +612,7 @@ let cursorCell = null  // fc-element currently showing cursor-stop
 
 // ── Build DOM ─────────────────────────────────────────────────────────────────
 function setup() {
-  const W = 980   // fixed DESIGN width = 70% of the 1400px cabinet
+  const W = 1274   // fixed DESIGN width (~91% of cabinet; +30% bigger)
   // street-panel-new.png is 2000×1204. Center reel window: x608 y392 w784 h428.
   const imgH = Math.round(W * 1204 / 2000)
 
@@ -1124,6 +1124,8 @@ const bgMusic = document.getElementById('bg-music')
 if (bgMusic) bgMusic.volume = 0.45
 function startMusic() {
   if (_musicStarted || !bgMusic) return
+  // wait until the loading screen is gone — don't play over it
+  if (window._lsActive || document.getElementById('ls')) return
   _musicStarted = true
   document.removeEventListener('pointerdown', startMusic)
   if (musicOn && !scMuted) bgMusic.play().catch(()=>{})
