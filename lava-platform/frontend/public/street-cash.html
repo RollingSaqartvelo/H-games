@@ -295,10 +295,10 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:url('/assets
   #app::after{ content:''; position:absolute; inset:0; pointer-events:none;
      background:linear-gradient(180deg,rgba(8,4,22,.35),rgba(8,4,22,.62)); z-index:0; }
   #machine{ position:static; width:100%; height:100%; max-width:none; padding:0; }
-  /* board (perimeter frame + reels) = 60% of the cabinet (840px), centred.
-     street panel.png is 1600×872 → 840×458. */
+  /* board (perimeter frame + reels) = 72% of the cabinet (1008px), centred.
+     street panel.png is 1600×872 → 1008×549. */
   #board{ position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); z-index:3;
-     width:840px; height:458px; }
+     width:1008px; height:549px; }
 
   /* other panels hidden for now — focusing on the board size */
   #msg-bar, #xpanel, #bet-section, #action-section, #demo-badge{ display:none; }
@@ -541,7 +541,7 @@ let cursorCell = null  // fc-element currently showing cursor-stop
 
 // ── Build DOM ─────────────────────────────────────────────────────────────────
 function setup() {
-  const W = 840   // fixed DESIGN width = 60% of the 1400px cabinet
+  const W = 1008   // fixed DESIGN width = 72% of the 1400px cabinet
   // street panel.png is 1600×872. Transparent hole: x=454-1145, y=257-612.
   const imgH = Math.round(W * 872 / 1600)
 
