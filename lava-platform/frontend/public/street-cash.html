@@ -300,7 +300,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:url('/assets
   /* board (panel + drum) +30% → 1274px, centred.
      street-panel-new.png is 2000×1204 → 1274×767. */
   #board{ position:absolute; left:15px; top:50%; transform:translateY(-50%); z-index:3;
-     width:1300px; height:783px; }
+     width:960px; height:578px; }
 
   /* other panels hidden for now — focusing on the board size */
   #msg-bar, #xpanel, #bet-section, #action-section, #demo-badge{ display:none; }
@@ -680,7 +680,7 @@ let cursorCell = null  // fc-element currently showing cursor-stop
 
 // ── Build DOM ─────────────────────────────────────────────────────────────────
 function setup() {
-  const W = 1300   // fixed DESIGN width — fills cabinet (1400) with ~50px margins
+  const W = 960   // fixed DESIGN width — board pinned left, right column free for controls
   // street-panel-new.png is 2000×1204. Center reel window: x608 y392 w784 h428.
   const imgH = Math.round(W * 1204 / 2000)
 
