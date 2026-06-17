@@ -103,8 +103,8 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:url('/assets
   border:none;
   position:relative;overflow:hidden;
 }
-#reel-0{ transform:translateX(15px); }    /* nudge leftmost reel symbol right */
-#reel-2{ transform:translateX(-15px); }   /* nudge rightmost reel symbol left */
+#reel-0{ transform:translateX(25px); }    /* nudge leftmost reel symbol right */
+#reel-2{ transform:translateX(-25px); }   /* nudge rightmost reel symbol left */
 
 /* ── Reel cells ── */
 .rc{
@@ -305,8 +305,8 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:url('/assets
   /* other panels hidden for now — focusing on the board size */
   #msg-bar, #xpanel, #bet-section, #action-section, #demo-badge{ display:none; }
 
-  /* SETTINGS / INFO / MUTE — row of round buttons directly UNDER the PLAY button */
-  .sc-ctrl{ position:absolute; right:92px; bottom:74px; z-index:10; display:flex; gap:12px; }
+  /* SETTINGS / INFO / MUTE — row of round buttons under AUTOPLAY */
+  .sc-ctrl{ position:absolute; right:86px; top:636px; z-index:10; display:flex; gap:12px; }
   .sc-cbtn{ width:54px; height:54px; border-radius:50%; cursor:pointer; font-size:24px; line-height:1;
      display:flex; align-items:center; justify-content:center; color:#e9d5ff;
      background:rgba(20,8,40,.62); border:2px solid rgba(168,85,247,.6);
@@ -330,10 +330,23 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:url('/assets
   #sc-bal{ position:absolute; left:71.2%; top:50%; transform:translate(-50%,-50%); width:34%; text-align:center;
      font-family:'Orbitron',sans-serif; font-weight:900; font-size:21px; color:#ffd24d; text-shadow:0 1px 3px #000; }
 
-  /* PLAY housing — overlay on the board's bottom-right; buttons sit under it */
-  #sc-play{ position:absolute; right:24px; bottom:150px; width:268px;
+  /* on-screen paytable (combinations) — right free area, under player panel */
+  #sc-paytable{ position:absolute; right:24px; top:150px; width:384px; margin:0;
+     aspect-ratio:2000/1068; z-index:8; }
+
+  /* PLAY housing — right column, below the paytable */
+  #sc-play{ position:absolute; right:46px; top:372px; width:244px;
      aspect-ratio:2000/1493; z-index:10; background:url('/assets/street-cash/play-panel.png') center/contain no-repeat;
      filter:drop-shadow(0 6px 16px rgba(0,0,0,.7)); }
+  /* AUTOPLAY pill under PLAY */
+  #auto2-btn{ position:absolute; right:78px; top:566px; width:180px; height:52px; z-index:10; cursor:pointer;
+     border:2px solid rgba(168,85,247,.7); border-radius:14px; color:#e9d5ff;
+     background:linear-gradient(180deg, rgba(60,20,110,.85), rgba(30,8,60,.9));
+     font-family:'Orbitron',sans-serif; font-weight:900; letter-spacing:2px; font-size:15px;
+     box-shadow:0 3px 10px rgba(0,0,0,.5), 0 0 16px rgba(140,70,210,.35); transition:transform .12s, background .15s; }
+  #auto2-btn:hover{ background:linear-gradient(180deg, rgba(90,40,160,.9), rgba(50,16,100,.95)); }
+  #auto2-btn:active{ transform:scale(.95); }
+  #auto2-btn.auto-on{ border-color:#46e89a; color:#9bffce; box-shadow:0 0 16px rgba(70,232,154,.6); }
   #play2-btn{ position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
      width:30%; aspect-ratio:1; border-radius:50%; cursor:pointer; border:none;
      background:radial-gradient(circle at 38% 32%, #d9b3ff, #a855f7 55%, #6d28d9 100%);
@@ -510,10 +523,23 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:url('/assets
       <div id="sc-bal">$0.00</div>
     </div>
 
+    <!-- on-screen paytable (combinations), right free area -->
+    <div id="sc-paytable" class="xp2">
+      <div class="xp2-slot" style="left:26.8%;top:35.4%"><img src="/assets/street-cash/sym-6.png?v=2"><span class="xp2-mult">×100</span></div>
+      <div class="xp2-slot" style="left:42.2%;top:35.4%"><img src="/assets/street-cash/sym-4.png?v=2"><span class="xp2-mult">×75</span></div>
+      <div class="xp2-slot" style="left:57.6%;top:35.4%"><img src="/assets/street-cash/sym-3.png?v=2"><span class="xp2-mult">×20</span></div>
+      <div class="xp2-slot" style="left:73.0%;top:35.4%"><img src="/assets/street-cash/sym-2.png?v=2"><span class="xp2-mult">×8</span></div>
+      <div class="xp2-slot" style="left:34.2%;top:65.0%"><img src="/assets/street-cash/sym-1.png?v=2"><span class="xp2-mult">×3</span></div>
+      <div class="xp2-slot" style="left:50.0%;top:65.0%"><img src="/assets/street-cash/sym-0.png?v=2"><span class="xp2-mult">×2</span></div>
+      <div class="xp2-slot" style="left:65.5%;top:65.0%"><img src="/assets/street-cash/tnt.png?v=2"><span class="xp2-mult loss">LOSS</span></div>
+    </div>
+
     <!-- PLAY housing: round button sits in the center socket -->
     <div id="sc-play">
       <button id="play2-btn" onclick="onPlay()" aria-label="PLAY"><span>▶</span></button>
     </div>
+    <!-- AUTOPLAY under PLAY -->
+    <button id="auto2-btn" onclick="toggleAuto()" aria-label="autoplay">AUTO</button>
 
     <div class="sc-ctrl">
       <button class="sc-cbtn" id="sc-set-btn" onclick="openSettings()" aria-label="settings">☰</button>
@@ -548,17 +574,6 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:url('/assets
 
     <div class="rules-h">HOW TO WIN</div>
     <p class="rules-p">Press <b>PLAY</b>: the 3 center reels spin and a <b>cursor</b> runs clockwise around the frame, then stops on one symbol. If that symbol <b>matches any of the 3 reels</b>, you win <b>bet × that symbol's multiplier</b>. Stop on the <b>Boombox</b> (blocker) = no win.</p>
-
-    <div class="rules-h">SYMBOL PAYOUTS</div>
-    <div class="xp2">
-      <div class="xp2-slot" style="left:26.8%;top:35.4%"><img src="/assets/street-cash/sym-6.png?v=2"><span class="xp2-mult">×100</span></div>
-      <div class="xp2-slot" style="left:42.2%;top:35.4%"><img src="/assets/street-cash/sym-4.png?v=2"><span class="xp2-mult">×75</span></div>
-      <div class="xp2-slot" style="left:57.6%;top:35.4%"><img src="/assets/street-cash/sym-3.png?v=2"><span class="xp2-mult">×20</span></div>
-      <div class="xp2-slot" style="left:73.0%;top:35.4%"><img src="/assets/street-cash/sym-2.png?v=2"><span class="xp2-mult">×8</span></div>
-      <div class="xp2-slot" style="left:34.2%;top:65.0%"><img src="/assets/street-cash/sym-1.png?v=2"><span class="xp2-mult">×3</span></div>
-      <div class="xp2-slot" style="left:50.0%;top:65.0%"><img src="/assets/street-cash/sym-0.png?v=2"><span class="xp2-mult">×2</span></div>
-      <div class="xp2-slot" style="left:65.5%;top:65.0%"><img src="/assets/street-cash/tnt.png?v=2"><span class="xp2-mult loss">LOSS</span></div>
-    </div>
 
     <div class="rules-h">BUTTONS</div>
     <p class="rules-p" style="text-align:left">
@@ -1203,7 +1218,7 @@ function closeSettings(){ document.getElementById('set-modal').classList.remove(
 // ── Auto ──────────────────────────────────────────────────────────────────────
 function toggleAuto() {
   autoMode = !autoMode
-  document.getElementById('auto-btn').classList.toggle('auto-on', autoMode)
+  const ab = document.getElementById('auto2-btn'); if (ab) ab.classList.toggle('auto-on', autoMode)
   if (!autoMode) { clearTimeout(autoTimer); autoTimer = null }
   else if (!spinning) onPlay()
 }
