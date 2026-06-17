@@ -297,14 +297,14 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:url('/assets
   #machine{ position:static; width:100%; height:100%; max-width:none; padding:0; }
   /* board (panel + drum) +30% → 1274px, centred.
      street-panel-new.png is 2000×1204 → 1274×767. */
-  #board{ position:absolute; left:30%; top:50%; transform:translate(-50%,-50%); z-index:3;
-     width:1274px; height:767px; }
+  #board{ position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); z-index:3;
+     width:1300px; height:783px; }
 
   /* other panels hidden for now — focusing on the board size */
   #msg-bar, #xpanel, #bet-section, #action-section, #demo-badge{ display:none; }
 
-  /* SETTINGS / INFO / MUTE — round neon buttons, bottom-left of the cabinet */
-  .sc-ctrl{ position:absolute; left:28px; bottom:28px; z-index:9; display:flex; gap:14px; }
+  /* SETTINGS / INFO / MUTE — row of round buttons directly UNDER the PLAY button */
+  .sc-ctrl{ position:absolute; right:92px; bottom:74px; z-index:10; display:flex; gap:12px; }
   .sc-cbtn{ width:54px; height:54px; border-radius:50%; cursor:pointer; font-size:24px; line-height:1;
      display:flex; align-items:center; justify-content:center; color:#e9d5ff;
      background:rgba(20,8,40,.62); border:2px solid rgba(168,85,247,.6);
@@ -328,10 +328,10 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:url('/assets
   #sc-bal{ position:absolute; left:71.2%; top:50%; transform:translate(-50%,-50%); width:34%; text-align:center;
      font-family:'Orbitron',sans-serif; font-weight:900; font-size:21px; color:#ffd24d; text-shadow:0 1px 3px #000; }
 
-  /* PLAY housing — right side (board is shifted left) */
-  #sc-play{ position:absolute; right:40px; top:50%; transform:translateY(-50%); width:320px;
-     aspect-ratio:2000/1493; z-index:8; background:url('/assets/street-cash/play-panel.png') center/contain no-repeat;
-     filter:drop-shadow(0 6px 16px rgba(0,0,0,.6)); }
+  /* PLAY housing — overlay on the board's bottom-right; buttons sit under it */
+  #sc-play{ position:absolute; right:24px; bottom:150px; width:268px;
+     aspect-ratio:2000/1493; z-index:10; background:url('/assets/street-cash/play-panel.png') center/contain no-repeat;
+     filter:drop-shadow(0 6px 16px rgba(0,0,0,.7)); }
   #play2-btn{ position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
      width:30%; aspect-ratio:1; border-radius:50%; cursor:pointer; border:none;
      background:radial-gradient(circle at 38% 32%, #d9b3ff, #a855f7 55%, #6d28d9 100%);
@@ -651,7 +651,7 @@ let cursorCell = null  // fc-element currently showing cursor-stop
 
 // ── Build DOM ─────────────────────────────────────────────────────────────────
 function setup() {
-  const W = 1274   // fixed DESIGN width (~91% of cabinet; +30% bigger)
+  const W = 1300   // fixed DESIGN width — fills cabinet (1400) with ~50px margins
   // street-panel-new.png is 2000×1204. Center reel window: x608 y392 w784 h428.
   const imgH = Math.round(W * 1204 / 2000)
 
