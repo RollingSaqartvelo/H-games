@@ -103,6 +103,8 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:url('/assets
   border:none;
   position:relative;overflow:hidden;
 }
+#reel-0{ transform:translateX(15px); }    /* nudge leftmost reel symbol right */
+#reel-2{ transform:translateX(-15px); }   /* nudge rightmost reel symbol left */
 
 /* ── Reel cells ── */
 .rc{
@@ -686,7 +688,7 @@ function setup() {
   const drumH = iH
 
   REEL_H = drumH
-  IMG_SZ = Math.round(Math.floor(drumW / 3) * 0.80)
+  IMG_SZ = Math.round(Math.floor(drumW / 3) * 0.68)   // drum symbols 15% smaller
 
   const drum = document.getElementById('slot-drum')
   drum.style.position   = 'absolute'
