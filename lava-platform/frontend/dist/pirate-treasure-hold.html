@@ -45,6 +45,22 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
 .header-bal{display:flex;flex-direction:column;align-items:flex-end;}
 .bal-lbl{font-size:8px;letter-spacing:.3em;color:var(--text-muted);text-transform:uppercase;}
 .bal-val{font-size:16px;font-weight:900;color:var(--text-bright);font-family:monospace;text-shadow:var(--blood-drip);}
+/* player panel (wooden skull plaque): ID + balance windows + glowing skull eyes */
+.pt-player{ position:absolute; top:8px; right:16px; width:300px; aspect-ratio:2000/523; z-index:7;
+  background:url('assets/h-slots/pirate/player-panel.png') center/contain no-repeat;
+  pointer-events:none; filter:drop-shadow(0 4px 10px rgba(0,0,0,.55)); --eye-c:#5be0ff; }
+.pt-player-id{ position:absolute; left:30%; top:48%; transform:translate(-50%,-50%); width:22%; text-align:center;
+  font-size:clamp(9px,1.0vw,13px); font-weight:900; letter-spacing:.04em; color:#ffe7a0;
+  text-shadow:0 1px 2px #000; white-space:nowrap; overflow:hidden; }
+.pt-player-bal{ position:absolute; left:71.5%; top:48%; transform:translate(-50%,-50%); width:38%; text-align:center;
+  font-size:clamp(12px,1.3vw,18px); font-weight:900; font-family:monospace; color:#ffe7a0; text-shadow:0 1px 2px #000; }
+.pt-eye{ position:absolute; top:49%; width:2.6%; aspect-ratio:1; border-radius:50%;
+  transform:translate(-50%,-50%);
+  background:radial-gradient(circle, #fff 12%, var(--eye-c) 42%, transparent 72%);
+  box-shadow:0 0 5px 1px var(--eye-c), 0 0 12px var(--eye-c);
+  animation:ptEye 1.1s ease-in-out infinite; transition:background .8s, box-shadow .8s; }
+.pt-eye-l{ left:9.6%; } .pt-eye-r{ left:12.8%; }
+@keyframes ptEye{0%,100%{opacity:.7;transform:translate(-50%,-50%) scale(.82)}50%{opacity:1;transform:translate(-50%,-50%) scale(1.18)}}
 
 /* ── 3-column game layout ── */
 .game-layout{display:flex;flex-direction:row;align-items:flex-start;
@@ -1061,10 +1077,14 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
 
   <div class="header">
     <div class="header-logo">⚓ Pirate Treasure</div>
-    <div class="header-bal">
-      <div class="bal-lbl">Balance</div>
-      <div class="bal-val" id="balVal">$0.00</div>
-    </div>
+  </div>
+
+  <!-- player panel: ID (left window) + balance (right window) + glowing skull eyes -->
+  <div class="pt-player" id="ptPlayer">
+    <div class="pt-eye pt-eye-l"></div>
+    <div class="pt-eye pt-eye-r"></div>
+    <div class="pt-player-id" id="ptPlayerId">DEMO</div>
+    <div class="pt-player-bal" id="balVal">$0.00</div>
   </div>
 
   <div class="game-layout">
@@ -2776,6 +2796,14 @@ function buildStars() {
 //  START
 // ═══════════════════════════════════════════════════════════
 init();
+
+// Skull eyes: constant glow, colour swaps every 30s
+(function(){
+  const eyeColors = ['#5be0ff','#ff4ddb','#5bff8e','#ffd24d','#ff5a45','#bc52ff','#ff9a3c'];
+  let ei = 0;
+  function swap(){ const pl = document.getElementById('ptPlayer'); if (pl) pl.style.setProperty('--eye-c', eyeColors[ei % eyeColors.length]); ei++; }
+  swap(); setInterval(swap, 30000);
+})();
 </script>
 </body>
 </html>
