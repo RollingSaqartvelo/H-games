@@ -184,8 +184,8 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:url('/assets
 .xp-slot.active .xp-mult{color:#ffe97a;text-shadow:0 0 10px rgba(255,215,0,.7)}
 
 /* ── Paytable modal ── */
-#pt-modal{display:none;position:fixed;inset:0;z-index:300;background:rgba(30,0,60,.6);backdrop-filter:blur(4px);align-items:flex-end;justify-content:center}
-#pt-modal.open{display:flex;animation:ov-in .2s ease}
+#pt-modal,#set-modal{display:none;position:fixed;inset:0;z-index:300;background:rgba(30,0,60,.6);backdrop-filter:blur(4px);align-items:flex-end;justify-content:center}
+#pt-modal.open,#set-modal.open{display:flex;animation:ov-in .2s ease}
 @keyframes ov-in{from{opacity:0}to{opacity:1}}
 #pt-sheet{width:100%;max-width:440px;background:linear-gradient(180deg,#f5f0ff,#ede0ff,#f5f0ff);border:1.5px solid rgba(192,132,252,.4);border-bottom:none;border-radius:20px 20px 0 0;padding:16px 14px max(env(safe-area-inset-bottom,16px),16px);max-height:82vh;overflow-y:auto}
 #pt-sheet h3{font-family:'Orbitron',sans-serif;font-size:11px;font-weight:900;letter-spacing:3px;color:#7c3aed;text-align:center;margin-bottom:12px}
@@ -302,7 +302,37 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:url('/assets
 
   /* other panels hidden for now — focusing on the board size */
   #msg-bar, #xpanel, #bet-section, #action-section, #demo-badge{ display:none; }
+
+  /* SETTINGS / INFO / MUTE — round neon buttons, bottom-left of the cabinet */
+  .sc-ctrl{ position:absolute; left:28px; bottom:28px; z-index:9; display:flex; gap:14px; }
+  .sc-cbtn{ width:54px; height:54px; border-radius:50%; cursor:pointer; font-size:24px; line-height:1;
+     display:flex; align-items:center; justify-content:center; color:#e9d5ff;
+     background:rgba(20,8,40,.62); border:2px solid rgba(168,85,247,.6);
+     box-shadow:0 3px 10px rgba(0,0,0,.55), 0 0 16px rgba(140,70,210,.35), inset 0 0 10px rgba(0,0,0,.4);
+     transition:transform .12s, background .15s; font-family:'Orbitron',sans-serif; font-weight:900; }
+  .sc-cbtn:hover{ background:rgba(168,85,247,.3); }
+  .sc-cbtn:active{ transform:scale(.9); }
+  #sc-info-btn{ font-style:italic; font-size:27px; }
 }
+/* settings/rules toggles + modal rows (work at all sizes) */
+.set-row{display:flex;align-items:center;justify-content:space-between;gap:14px;cursor:pointer;
+  padding:13px 4px;border-bottom:1px solid rgba(124,58,237,.18);}
+.set-row:last-child{border-bottom:none;}
+.set-txt b{display:block;font-family:'Orbitron',sans-serif;font-size:12px;letter-spacing:1px;color:#5b2a8c;}
+.set-txt span{font-size:10px;color:rgba(90,42,140,.6);}
+.set-tog{flex-shrink:0;width:50px;height:28px;border-radius:14px;background:rgba(0,0,0,.5);
+  border:1.5px solid rgba(255,255,255,.22);position:relative;transition:background .18s,border-color .18s;}
+.set-tog i{position:absolute;top:2px;left:2px;width:22px;height:22px;border-radius:50%;
+  background:#c8b89a;transition:left .18s,background .18s;}
+.set-tog.on{background:rgba(168,85,247,.4);border-color:#a855f7;}
+.set-tog.on i{left:24px;background:#c084fc;}
+.rules-h{font-family:'Orbitron',sans-serif;font-size:12px;letter-spacing:2px;color:#7c3aed;margin:14px 0 6px;text-align:center;}
+.rules-p{font-size:11px;line-height:1.55;color:rgba(60,30,90,.85);text-align:center;margin-bottom:4px;}
+.rules-p b{color:#7c3aed;}
+.vol-badge{display:flex;align-items:center;justify-content:center;gap:8px;margin:6px auto 12px;width:max-content;
+  padding:5px 16px;border:1.5px solid rgba(124,58,237,.45);border-radius:20px;background:rgba(124,58,237,.08);
+  font-family:'Orbitron',sans-serif;font-size:11px;font-weight:900;letter-spacing:2px;color:#7c3aed;}
+.vol-fire{font-size:13px;}
 </style>
 </head>
 <body>
@@ -434,6 +464,12 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:url('/assets
       </div>
     </div>
 
+    <div class="sc-ctrl">
+      <button class="sc-cbtn" id="sc-set-btn" onclick="openSettings()" aria-label="settings">☰</button>
+      <button class="sc-cbtn" id="sc-info-btn" onclick="openPaytable()" aria-label="info">i</button>
+      <button class="sc-cbtn" id="sc-mute" onclick="toggleMute()" aria-label="mute">🔊</button>
+    </div>
+
     <div id="bet-section">
       <div id="bet-display"><em>BET</em><span id="bet-val">$1.00</span></div>
       <div id="bet-btns">
@@ -452,22 +488,59 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:url('/assets
   </div>
 </div>
 
-<!-- Paytable modal -->
+<!-- Rules / Info modal -->
 <div id="pt-modal" onclick="if(event.target===this)closePT()">
   <div id="pt-sheet">
-    <h3>HOW TO WIN</h3>
-    <p style="text-align:center;font-size:9px;color:rgba(139,94,0,.5);letter-spacing:1px;margin-bottom:10px">CURSOR STOPS ON A SYMBOL · MATCH ON ANY REEL = WIN</p>
-    <div class="pt-row"><img src="/assets/street-cash/sym-6.png"><span class="pt-name">Platinum Card</span><span class="pt-mult">×100</span></div>
-    <div class="pt-row"><img src="/assets/street-cash/sym-4.png"><span class="pt-name">Watch</span><span class="pt-mult">×75</span></div>
-    <div class="pt-row"><img src="/assets/street-cash/sym-3.png"><span class="pt-name">Gold Chain</span><span class="pt-mult">×20</span></div>
+    <h3>GAME RULES</h3>
+    <div class="vol-badge">VOLATILITY <span class="vol-fire">🔥🔥🔥🔥🔥</span></div>
+    <p class="rules-p">High volatility — wins land less often, but the chance to hit big multipliers in a short run is higher.</p>
+
+    <div class="rules-h">HOW TO WIN</div>
+    <p class="rules-p">Press <b>PLAY</b>: the 3 center reels spin and a <b>cursor</b> runs clockwise around the frame, then stops on one symbol. If that symbol <b>matches any of the 3 reels</b>, you win <b>bet × that symbol's multiplier</b>. Stop on the <b>Boombox</b> (blocker) = no win.</p>
+
+    <div class="rules-h">SYMBOL PAYOUTS</div>
+    <div class="pt-row"><img src="/assets/street-cash/sym-6.png"><span class="pt-name">2Pac</span><span class="pt-mult">×100</span></div>
+    <div class="pt-row"><img src="/assets/street-cash/sym-4.png"><span class="pt-name">Golden Glock</span><span class="pt-mult">×75</span></div>
+    <div class="pt-row"><img src="/assets/street-cash/sym-3.png"><span class="pt-name">Gold Grillz</span><span class="pt-mult">×20</span></div>
     <div class="pt-row"><img src="/assets/street-cash/sym-2.png"><span class="pt-name">Sneaker</span><span class="pt-mult">×8</span></div>
-    <div class="pt-row"><img src="/assets/street-cash/sym-1.png"><span class="pt-name">Sunglasses</span><span class="pt-mult">×3</span></div>
-    <div class="pt-row"><img src="/assets/street-cash/sym-0.png"><span class="pt-name">Dice</span><span class="pt-mult">×2</span></div>
-    <div class="pt-row pt-loss"><img src="/assets/street-cash/tnt.png" style="width:34px;height:34px"><span class="pt-name">TNT — BLOCKER</span><span class="pt-mult">LOSS</span></div>
-    <p style="text-align:center;font-size:9px;color:rgba(139,94,0,.3);margin-top:10px;letter-spacing:1px">RTP 94%</p>
+    <div class="pt-row"><img src="/assets/street-cash/sym-1.png"><span class="pt-name">Graffiti Hoodie</span><span class="pt-mult">×3</span></div>
+    <div class="pt-row"><img src="/assets/street-cash/sym-0.png"><span class="pt-name">Skateboard</span><span class="pt-mult">×2</span></div>
+    <div class="pt-row pt-loss"><img src="/assets/street-cash/tnt.png" style="width:34px;height:34px"><span class="pt-name">Boombox — BLOCKER</span><span class="pt-mult">LOSS</span></div>
+
+    <div class="rules-h">BUTTONS</div>
+    <p class="rules-p" style="text-align:left">
+      ▶ <b>PLAY</b> — start the spin.<br>
+      <b>MIN</b> — set the lowest bet.<br>
+      <b>×2</b> — double the bet · <b>×½</b> — halve the bet.<br>
+      <b>MAX</b> — set the highest bet.<br>
+      ☰ <b>Settings</b> — music & sound toggles.<br>
+      ⓘ <b>Info</b> — these rules.<br>
+      🔊 <b>Mute</b> — turn the sound on / off.
+    </p>
+
+    <p class="rules-p"><b>MIN BET $0.10 · MAX BET $100.00 · RTP 94%</b></p>
     <button id="pt-close" onclick="closePT()">CLOSE</button>
   </div>
 </div>
+
+<!-- Settings modal -->
+<div id="set-modal" onclick="if(event.target===this)closeSettings()">
+  <div id="pt-sheet">
+    <h3>SETTINGS</h3>
+    <div class="set-row" onclick="toggleMusic()">
+      <div class="set-txt"><b>Ambient Music</b><span>Background track on / off</span></div>
+      <div class="set-tog" id="tog-music"><i></i></div>
+    </div>
+    <div class="set-row" onclick="toggleSfx()">
+      <div class="set-txt"><b>Sound FX</b><span>Game sounds on / off</span></div>
+      <div class="set-tog" id="tog-sfx"><i></i></div>
+    </div>
+    <button id="pt-close" onclick="closeSettings()">CLOSE</button>
+  </div>
+</div>
+
+<!-- background music (Notorious B.I.G. — Juicy instrumental) -->
+<audio id="bg-music" loop preload="auto" src="/audio/juicy.mp3"></audio>
 
 <!-- Big win overlay -->
 <div id="win-overlay">
@@ -1045,6 +1118,30 @@ function closeOverlay() {
 function openPaytable() { document.getElementById('pt-modal').classList.add('open') }
 function closePT()       { document.getElementById('pt-modal').classList.remove('open') }
 
+// ── Settings / audio ──────────────────────────────────────────────────────────
+let musicOn = true, sfxOn = true, scMuted = false, _musicStarted = false
+const bgMusic = document.getElementById('bg-music')
+if (bgMusic) bgMusic.volume = 0.45
+function startMusic() {
+  if (_musicStarted || !bgMusic) return
+  _musicStarted = true
+  document.removeEventListener('pointerdown', startMusic)
+  if (musicOn && !scMuted) bgMusic.play().catch(()=>{})
+}
+document.addEventListener('pointerdown', startMusic)
+function applyAudio() {
+  const mb = document.getElementById('sc-mute')
+  if (bgMusic) { if (musicOn && !scMuted) { if (_musicStarted) bgMusic.play().catch(()=>{}) } else bgMusic.pause() }
+  if (mb) { mb.textContent = scMuted ? '🔇' : '🔊'; mb.style.opacity = scMuted ? '.5' : '1' }
+  const tm=document.getElementById('tog-music'); if(tm) tm.classList.toggle('on', musicOn && !scMuted)
+  const ts=document.getElementById('tog-sfx');   if(ts) ts.classList.toggle('on', sfxOn && !scMuted)
+}
+function toggleMute()  { scMuted = !scMuted; applyAudio() }
+function toggleMusic() { musicOn = !musicOn; if(musicOn) scMuted=false; applyAudio() }
+function toggleSfx()   { sfxOn = !sfxOn; applyAudio() }
+function openSettings(){ applyAudio(); document.getElementById('set-modal').classList.add('open') }
+function closeSettings(){ document.getElementById('set-modal').classList.remove('open') }
+
 // ── Auto ──────────────────────────────────────────────────────────────────────
 function toggleAuto() {
   autoMode = !autoMode
@@ -1149,6 +1246,7 @@ async function boot() {
   }
   setup()
   updateBal()
+  applyAudio()
   fitStage();
   [100,400,1000].forEach(t => setTimeout(fitStage, t));
 }
