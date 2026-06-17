@@ -276,6 +276,39 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:url('/assets
 #ov-amount{font-family:'Orbitron',sans-serif;font-size:34px;font-weight:900;color:#7c3aed;letter-spacing:2px;animation:win-pop .4s ease}
 #ov-close{margin-top:18px;padding:10px 32px;background:linear-gradient(90deg,#a855f7,#7c3aed,#a855f7);background-size:200%;border:none;border-radius:20px;font-family:'Orbitron',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;color:#fff;cursor:pointer;animation:grad-flow 2s linear infinite;position:relative;z-index:3}
 #ov-close:active{transform:scale(.96)}
+
+/* ═══ Landscape framed cabinet (desktop AND mobile) — JS scales it to fit ═══ */
+@media (min-width:1px){
+  html,body{ overflow:hidden; height:100%; background:#05060f; }
+  body::before{ display:none; }            /* neon bg lives INSIDE the cabinet */
+  #topbar{ position:absolute; left:34px; right:34px; top:14px; width:auto; max-width:none;
+     background:transparent; border:none; padding:0; z-index:8; }
+  #game-title{ font-size:22px; letter-spacing:5px; }
+  #balance-display{ font-size:18px; color:#d8b4ff; }
+
+  /* the cabinet — FIXED design size, transform-scaled by JS to fit the viewport */
+  #app{ position:fixed; left:0; top:0; width:1200px; height:720px; max-width:none; min-height:0;
+     margin:0; padding:0; display:block; overflow:hidden;
+     border-radius:22px; border:3px solid rgba(168,85,247,.5);
+     box-shadow:0 0 0 2px rgba(0,0,0,.6), 0 0 60px rgba(140,70,210,.45), 0 24px 60px rgba(0,0,0,.75);
+     background:#0a0a18 url('/assets/street-cash/BG.jpeg') center 22%/cover no-repeat; }
+  #app::after{ content:''; position:absolute; inset:0; pointer-events:none;
+     background:linear-gradient(180deg,rgba(8,4,22,.35),rgba(8,4,22,.62)); z-index:0; }
+  #machine{ position:static; width:100%; height:100%; max-width:none; padding:0; }
+  #msg-bar{ position:absolute; left:700px; width:470px; top:96px; z-index:6;
+     background-color:transparent; border:none; min-height:0; font-size:14px; }
+
+  /* board (perimeter frame + reels) on the left, vertically centred.
+     W=620 design → panel 620×338 (street panel.png is 1600×872). */
+  #board{ position:absolute; left:40px; top:50%; transform:translateY(-50%); z-index:3;
+     width:620px; height:338px; }
+
+  /* right column — mini paytable, bet panel, play */
+  #xpanel{ position:absolute; left:706px; top:120px; width:466px; height:auto; margin:0; z-index:4; }
+  #bet-section{ position:absolute; left:716px; top:404px; width:442px; max-width:none; margin:0; z-index:5; }
+  #action-section{ position:absolute; left:740px; top:556px; width:394px; max-width:none; margin:0; z-index:5; }
+  #demo-badge{ position:absolute; left:706px; right:34px; top:702px; text-align:center; z-index:5; }
+}
 </style>
 </head>
 <body>
@@ -514,7 +547,7 @@ let cursorCell = null  // fc-element currently showing cursor-stop
 
 // ── Build DOM ─────────────────────────────────────────────────────────────────
 function setup() {
-  const W = Math.min(window.innerWidth, 440)
+  const W = 620   // fixed DESIGN width — the whole stage is transform-scaled to fit by fitStage()
   // street panel.png is 1600×872. Transparent hole: x=454-1145, y=257-612.
   const imgH = Math.round(W * 872 / 1600)
 
@@ -1090,6 +1123,23 @@ async function preprocessAssets() {
   })
 }
 
+// ── Fit the fixed-design cabinet into the viewport (desktop + mobile) ──
+function fitStage() {
+  const app = document.getElementById('app');
+  if (!app) return;
+  app.style.transform = 'none';
+  const w = app.offsetWidth, h = app.offsetHeight;
+  if (!w || !h) return;
+  const s = Math.min(window.innerWidth / w, window.innerHeight / h, 1);
+  app.style.position = 'fixed';
+  app.style.transformOrigin = 'top left';
+  app.style.left = Math.round((window.innerWidth  - w * s) / 2) + 'px';
+  app.style.top  = Math.round((window.innerHeight - h * s) / 2) + 'px';
+  app.style.transform = 'scale(' + s + ')';
+}
+window.addEventListener('resize', fitStage);
+window.addEventListener('orientationchange', () => setTimeout(fitStage, 200));
+
 // ── Boot ──────────────────────────────────────────────────────────────────────
 async function boot() {
   const tg = window.Telegram?.WebApp
@@ -1116,6 +1166,8 @@ async function boot() {
   }
   setup()
   updateBal()
+  fitStage();
+  [100,400,1000].forEach(t => setTimeout(fitStage, t));
 }
 
 boot()
