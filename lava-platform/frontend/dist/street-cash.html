@@ -29,7 +29,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:url('/assets
 /* ── Board ── */
 #board{
   display:block;position:relative;
-  background:url('/assets/street-cash/street%20panel.png') left top/100% auto no-repeat;
+  background:url('/assets/street-cash/street-panel-new.png') left top/100% 100% no-repeat;
 }
 #vokryg-img{display:none}
 
@@ -291,14 +291,14 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:url('/assets
      margin:0; padding:0; display:block; overflow:hidden;
      border-radius:22px; border:3px solid rgba(168,85,247,.5);
      box-shadow:0 0 0 2px rgba(0,0,0,.6), 0 0 60px rgba(140,70,210,.45), 0 24px 60px rgba(0,0,0,.75);
-     background:#0a0a18 url('/assets/street-cash/BG.jpeg') center 22%/cover no-repeat; }
+     background:#0a0a18 url('/assets/street-cash/bg-street.jpeg') center/cover no-repeat; }
   #app::after{ content:''; position:absolute; inset:0; pointer-events:none;
      background:linear-gradient(180deg,rgba(8,4,22,.35),rgba(8,4,22,.62)); z-index:0; }
   #machine{ position:static; width:100%; height:100%; max-width:none; padding:0; }
-  /* board (perimeter frame + reels) = 72% of the cabinet (1008px), centred.
-     street panel.png is 1600×872 → 1008×549. */
+  /* board (panel + drum) = 70% of the cabinet (980px), centred.
+     street-panel-new.png is 2000×1204 → 980×590. */
   #board{ position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); z-index:3;
-     width:1008px; height:549px; }
+     width:980px; height:590px; }
 
   /* other panels hidden for now — focusing on the board size */
   #msg-bar, #xpanel, #bet-section, #action-section, #demo-badge{ display:none; }
@@ -497,25 +497,23 @@ const SYMS = [
 // Demo weights matching backend (out of 100000)
 const DEMO_W = [73200, 21500, 3000, 1500, 700, 80, 20]
 
-// 35 cells: 12 top + 5 right + 13 bottom + 5 left (corners fc0,fc11,fc17,fc29)
+// NEW panel: 18 slots — 6 top + 3 right + 6 bottom + 3 left (no corner slots).
+// ART_CELLS below are listed in CLOCKWISE order, so fc0..fc17 already go clockwise.
+// Symbol per slot (0=boombox/LOSS, 1=skate ×2, 2=hoodie ×3, 3=sneaker ×8,
+//   4=grill ×20, 5=glock ×75, 6=2pac ×100). Loss frequent, top mults rare.
 const FRAME_LAYOUT = [
-  // Top row L→R (fc0=TL … fc11=TR): 12
-  0,1,2,0,3,4,2,1,3,0,6,2,
-  // Right col T→B interior (fc12-fc16): 5
-  0,2,1,3,4,
-  // Bottom row R→L (fc17=BR … fc29=BL): 13
-  0,4,1,2,3,5,1,3,0,2,6,4,0,
-  // Left col B→T interior (fc30-fc34): 5
-  2,0,3,1,4
+  // top L→R (fc0-5)
+  0,1,0,2,1,3,
+  // right T→B (fc6-8)
+  0,4,1,
+  // bottom R→L (fc9-14)
+  0,2,5,1,0,3,
+  // left B→T (fc15-17)
+  2,6,0
 ]
 
-// Clockwise traversal: 35 cells
-const CW_ORDER = [
-  0,1,2,3,4,5,6,7,8,9,10,11,   // top L→R
-  12,13,14,15,16,               // right T→B
-  17,18,19,20,21,22,23,24,25,26,27,28,29, // bottom R→L
-  30,31,32,33,34                // left B→T
-]
+// Clockwise traversal = identity (ART_CELLS are already clockwise)
+const CW_ORDER = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17]
 
 // For each symbol, which CW positions contain it
 const SYM_CW = (() => {
@@ -541,22 +539,17 @@ let cursorCell = null  // fc-element currently showing cursor-stop
 
 // ── Build DOM ─────────────────────────────────────────────────────────────────
 function setup() {
-  const W = 1008   // fixed DESIGN width = 72% of the 1400px cabinet
-  // street panel.png is 1600×872. Transparent hole: x=454-1145, y=257-612.
-  const imgH = Math.round(W * 872 / 1600)
+  const W = 980   // fixed DESIGN width = 70% of the 1400px cabinet
+  // street-panel-new.png is 2000×1204. Center reel window: x608 y392 w784 h428.
+  const imgH = Math.round(W * 1204 / 2000)
 
-  // Outer frame = full panel edges
-  const fL = 0
-  const fR = W
-  const fT = 0
-  const fB = imgH
-  // Inner transparent hole (drum goes here)
-  const iL = Math.round(W    * 454  / 1600)
-  const iR = Math.round(W    * 1145 / 1600)
-  const iT = Math.round(imgH * 257  / 872)
-  const iB = Math.round(imgH * 612  / 872)
-  const iW = iR - iL
-  const iH = iB - iT
+  // Inner reel window (drum goes here) — measured from the new panel art
+  const iL = Math.round(W    * 608 / 2000)
+  const iT = Math.round(imgH * 392 / 1204)
+  const iW = Math.round(W    * 784 / 2000)
+  const iH = Math.round(imgH * 428 / 1204)
+  const iR = iL + iW
+  const iB = iT + iH
 
   // Board height matches new panel aspect ratio
   const board = document.getElementById('board')
@@ -577,7 +570,7 @@ function setup() {
   drum.style.top        = drumT + 'px'
   drum.style.width      = drumW + 'px'
   drum.style.height     = drumH + 'px'
-  drum.style.background = "url('/assets/street-cash/baraban.jpeg') center/100% 100% no-repeat"
+  drum.style.background = "url('/assets/street-cash/baraban-new.png') center/100% 100% no-repeat"
   drum.style.zIndex     = '20'
   drum.style.overflow   = 'hidden'
   document.querySelectorAll('.rc').forEach(el => el.style.height = REEL_H + 'px')
@@ -592,20 +585,20 @@ function setup() {
   scBot.style.top   = (drumT + drumH + 4) + 'px'
   scBot.style.width = drumW + 'px'
 
-  // ── 35 frame cells — artwork-exact positions from street panel.png (1600×872) ──
-  const scaleX = W / 1600
-  const scaleY = imgH / 872
-  CELL = Math.round(90 * scaleX)
+  // ── 18 frame cells — artwork-exact positions from street-panel-new.png (2000×1204) ──
+  const scaleX = W / 2000
+  const scaleY = imgH / 1204
+  CELL = Math.round(140 * scaleX)
 
   // Per-symbol icon dims [width%, height%] relative to each cell's own W×H
   const ICON_DIMS = [
-    [1.04, 1.28],  // 0 TNT
-    [1.16, 1.08],  // 1 Dice
-    [1.40, 0.80],  // 2 Shades
-    [1.32, 0.96],  // 3 Sneaker
-    [1.16, 1.04],  // 4 Chain
-    [1.12, 1.12],  // 5 Watch
-    [1.32, 0.88],  // 6 Card
+    [1.12, 1.02],  // 0 boombox (LOSS)
+    [1.30, 0.86],  // 1 skateboard ×2
+    [1.04, 1.06],  // 2 hoodie ×3
+    [1.20, 0.96],  // 3 sneaker ×8
+    [1.26, 0.86],  // 4 grill ×20
+    [1.18, 1.00],  // 5 glock ×75
+    [0.96, 1.16],  // 6 2pac ×100
   ]
 
   function makeAbsFC(id, symIdx, x, y, w, h) {
@@ -632,22 +625,18 @@ function setup() {
     return d
   }
 
-  // Artwork cell bounding boxes in original 1600×872 coordinates
+  // Artwork cell bounding boxes in 2000×1204 coords — CLOCKWISE (top→right→bottom→left)
   const ART_CELLS = [
-    // Top row L→R  (fc0=TL corner … fc11=TR corner)
-    [68,59,160,146],[192,59,286,146],[317,59,410,146],[442,60,535,146],
-    [567,60,659,146],[691,60,784,142],[815,60,909,142],[940,60,1033,145],
-    [1064,60,1158,146],[1189,60,1282,146],[1313,59,1407,146],[1439,59,1531,146],
-    // Right col T→B interior (fc12-fc16)
-    [1439,174,1531,259],[1439,286,1531,370],[1439,396,1531,481],
-    [1439,507,1531,592],[1439,620,1531,703],
-    // Bottom row R→L  (fc17=BR corner … fc29=BL corner)
-    [1441,729,1531,820],[1327,731,1414,820],[1212,730,1300,820],
-    [1098,731,1186,819],[985,731,1071,819],[870,731,957,819],[756,731,843,819],
-    [642,731,729,819],[528,731,615,819],[414,731,501,820],[300,731,387,820],
-    [185,729,273,820],[69,728,158,820],
-    // Left col B→T interior (fc30-fc34)
-    [68,620,160,703],[68,505,160,592],[68,396,160,481],[68,286,160,370],[68,174,160,259]
+    // top L→R (fc0-5)
+    [464,192,608,324],[652,192,792,324],[836,192,980,324],
+    [1020,192,1164,324],[1208,192,1348,324],[1396,192,1536,324],
+    // right T→B (fc6-8)
+    [1440,364,1576,492],[1440,532,1576,660],[1440,700,1576,828],
+    // bottom R→L (fc9-14)
+    [1396,864,1536,992],[1208,864,1348,992],[1020,864,1164,992],
+    [836,864,980,992],[652,864,792,992],[464,864,608,992],
+    // left B→T (fc15-17)
+    [424,700,560,828],[424,532,560,660],[424,364,560,492]
   ]
 
   ART_CELLS.forEach(([ox1,oy1,ox2,oy2], id) => {
