@@ -313,6 +313,34 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:url('/assets
   .sc-cbtn:hover{ background:rgba(168,85,247,.3); }
   .sc-cbtn:active{ transform:scale(.9); }
   #sc-info-btn{ font-style:italic; font-size:27px; }
+
+  /* topbar text replaced by the player panel */
+  #game-title, #balance-display{ display:none; }
+  #back-btn{ position:absolute; left:20px; top:16px; z-index:9; }
+
+  /* player panel (ID left window + balance right window) — top centre */
+  #sc-player{ position:absolute; left:50%; top:10px; transform:translateX(-50%); width:540px;
+     aspect-ratio:2000/523; z-index:8; background:url('/assets/street-cash/player-panel.png') center/contain no-repeat;
+     filter:drop-shadow(0 4px 12px rgba(0,0,0,.55)); }
+  #sc-id{ position:absolute; left:30.5%; top:50%; transform:translate(-50%,-50%); width:23%; text-align:center;
+     font-family:'Orbitron',sans-serif; font-weight:900; font-size:15px; letter-spacing:1px; color:#e9d5ff;
+     text-shadow:0 1px 3px #000; white-space:nowrap; overflow:hidden; }
+  #sc-bal{ position:absolute; left:71.2%; top:50%; transform:translate(-50%,-50%); width:34%; text-align:center;
+     font-family:'Orbitron',sans-serif; font-weight:900; font-size:21px; color:#ffd24d; text-shadow:0 1px 3px #000; }
+
+  /* PLAY housing — right side (board is shifted left) */
+  #sc-play{ position:absolute; right:40px; top:50%; transform:translateY(-50%); width:320px;
+     aspect-ratio:2000/1493; z-index:8; background:url('/assets/street-cash/play-panel.png') center/contain no-repeat;
+     filter:drop-shadow(0 6px 16px rgba(0,0,0,.6)); }
+  #play2-btn{ position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+     width:30%; aspect-ratio:1; border-radius:50%; cursor:pointer; border:none;
+     background:radial-gradient(circle at 38% 32%, #d9b3ff, #a855f7 55%, #6d28d9 100%);
+     box-shadow:0 0 18px rgba(168,85,247,.9), inset 0 -6px 12px rgba(0,0,0,.4), inset 0 4px 8px rgba(255,255,255,.4);
+     display:flex; align-items:center; justify-content:center; transition:transform .12s; }
+  #play2-btn span{ color:#fff; font-size:34px; line-height:1; margin-left:5px; text-shadow:0 2px 4px rgba(0,0,0,.5); }
+  #play2-btn:hover{ transform:translate(-50%,-50%) scale(1.05); }
+  #play2-btn:active{ transform:translate(-50%,-50%) scale(.92); }
+  #play2-btn:disabled{ opacity:.5; cursor:default; }
 }
 /* settings/rules toggles + modal rows (work at all sizes) */
 .set-row{display:flex;align-items:center;justify-content:space-between;gap:14px;cursor:pointer;
@@ -462,6 +490,17 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:url('/assets
         <img src="/assets/street-cash/tnt.png?v=2" class="xp-img">
         <div class="xp-mult xp-loss">LOSS</div>
       </div>
+    </div>
+
+    <!-- player panel: ID (left window) + balance (right window) -->
+    <div id="sc-player">
+      <div id="sc-id">DEMO</div>
+      <div id="sc-bal">$0.00</div>
+    </div>
+
+    <!-- PLAY housing: round button sits in the center socket -->
+    <div id="sc-play">
+      <button id="play2-btn" onclick="onPlay()" aria-label="PLAY"><span>▶</span></button>
     </div>
 
     <div class="sc-ctrl">
@@ -1021,7 +1060,9 @@ async function onPlay() {
 
   spinning = true
   const btn = document.getElementById('play-btn')
-  btn.disabled = true
+  const btn2 = document.getElementById('play2-btn')
+  if (btn) btn.disabled = true
+  if (btn2) btn2.disabled = true
   document.getElementById('bet-section').style.opacity = '0.35'
   document.getElementById('bet-section').style.pointerEvents = 'none'
   clearWin()
@@ -1047,7 +1088,7 @@ async function onPlay() {
         payout    = d.payout
       } else if (resp.status === 402) {
         setMsg('Insufficient balance')
-        spinning = false; btn.disabled = false; stopLights(); return
+        spinning = false; if(btn)btn.disabled = false; if(btn2)btn2.disabled = false; stopLights(); return
       }
     } catch {}
   }
@@ -1085,7 +1126,8 @@ async function onPlay() {
   }
 
   spinning = false
-  btn.disabled = false
+  if (btn) btn.disabled = false
+  if (btn2) btn2.disabled = false
   document.getElementById('bet-section').style.opacity = ''
   document.getElementById('bet-section').style.pointerEvents = ''
 
@@ -1166,6 +1208,7 @@ function adjBet(a) {
 // ── Balance ───────────────────────────────────────────────────────────────────
 function updateBal() {
   document.getElementById('balance-display').textContent = '$' + balance.toFixed(2)
+  const sb = document.getElementById('sc-bal'); if (sb) sb.textContent = '$' + balance.toFixed(2)
   if (demoMode) localStorage.setItem('crash_bal', balance.toFixed(2))
 }
 
