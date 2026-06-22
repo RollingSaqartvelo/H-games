@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { TopBar }            from './components/TopBar'
 import { MultiplierHistory } from './components/MultiplierHistory'
 import { Multiplier }        from './components/Multiplier'
@@ -96,7 +96,36 @@ export function App() {
   usePixi(pixiMount)
 
   const { token, playerId, firstName, loading } = useTMAAuth()
-  useBgMusic(!loading)
+
+  // Keep the splash up until the heavy media (background videos + character GIFs)
+  // are actually loaded — otherwise the game shows before they're ready.
+  const [mediaReady, setMediaReady] = useState(false)
+  useEffect(() => {
+    let done = false
+    const finish = () => { if (!done) { done = true; setMediaReady(true) } }
+    const imgs = [
+      '/assets/sheriff/%D1%88%D0%B5%D1%80%D0%B8%D1%84.gif',
+      '/assets/sheriff/%D0%92%D1%8B%D1%81%D1%82%D1%80%D0%B5%D0%BB.gif',
+      '/assets/sheriff/sherif%20crash.gif',
+      '/assets/sheriff/crash%20end.png',
+      '/assets/hero/%D0%B3%D0%B5%D1%80%D0%BE%D0%B9.gif',
+      '/assets/hero/Newcrash.gif',
+      '/assets/ui/Wasted/wasted1.png',
+      '/assets/ui/wins/you_win_combo_full.png',
+    ].map(src => new Promise<void>(res => {
+      const im = new Image(); im.onload = () => res(); im.onerror = () => res(); im.src = src
+    }))
+    const vids = [
+      '/video/betting-loop2.mp4',
+      '/video/outlawbgnew.mp4?v=2',
+    ].map(src => fetch(src).then(r => r.blob()).then(() => {}).catch(() => {}))
+    Promise.all([...imgs, ...vids]).then(finish)
+    const cap = window.setTimeout(finish, 14000)   // never block forever
+    return () => window.clearTimeout(cap)
+  }, [])
+
+  const ready = !loading && mediaReady
+  useBgMusic(ready)
   useSocket(playerId)
 
   return (
@@ -139,7 +168,7 @@ export function App() {
 
         {/* z:50 — Splash overlay on first load; sits above Pixi so the mount
             div stays in game-area and Pixi can initialise into the correct element */}
-        {loading && (
+        {!ready && (
           <div className="splash">
             <div className="splash__logo">OUTLAW</div>
             <div className="splash__spinner" />
