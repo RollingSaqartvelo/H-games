@@ -690,7 +690,9 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
   .pt-logo{ display:none; }   /* title is now part of the left panel */
   .pt-leftpanel{ position:absolute; left:-64px; top:6px; width:410px; aspect-ratio:1313/1198; z-index:5;
      background:url('assets/h-slots/pirate/left-panel.png') top center/contain no-repeat; pointer-events:none;
-     filter:drop-shadow(0 4px 12px rgba(0,0,0,.5)); }
+     filter:drop-shadow(0 4px 12px rgba(0,0,0,.5));
+     transform-origin:50% 5%; animation:lpSway 4.2s ease-in-out infinite; }
+  @keyframes lpSway{ 0%,100%{ transform:rotate(-0.9deg); } 50%{ transform:rotate(0.9deg); } }
   .pt-lpbtn{ position:absolute; left:18%; width:58%; height:14%; padding:0; border:none; background:transparent;
      cursor:pointer; pointer-events:auto; transition:transform .1s, filter .15s; }
   .pt-lpbtn:hover{ filter:brightness(1.12) drop-shadow(0 0 10px rgba(255,200,80,.6)); }
