@@ -600,22 +600,26 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
   .col-jackpot .jp-panel-img{ width:100%; height:auto; object-fit:contain; }
   .bottom-panel{ grid-area:controls; z-index:1; padding:6px 10px 10px; }
 
-  /* wooden bet-input panel: − / + over the carved knobs, amount in the centre window */
-  .bottom-panel .bet-row{ position:relative; width:310px; aspect-ratio:1600/642;
-     margin:79px auto 6px; padding:0; display:block;   /* sits just below the overhanging SPIN wheel */
-     background:url('assets/h-slots/pirate/bet-input-panel.png') center/contain no-repeat; }
+  /* full-width wooden beam (palka): SPIN centred on it, − / amount / + on the right */
+  .bottom-panel .bet-row{ position:relative; width:980px; aspect-ratio:2000/666;
+     margin:6px auto; padding:0; display:block;
+     background:url('assets/h-slots/pirate/palka.png') center/contain no-repeat; }
   .bottom-panel .bet-row .bet-lbl{ display:none; }
   .bottom-panel .bet-row .bet-stepper{ display:contents; }
-  .bottom-panel .bet-row .bet-btn{ position:absolute; top:47%; transform:translate(-50%,-50%);
-     width:58px; height:58px; background:transparent; border:none; box-shadow:none;
-     color:transparent; font-size:0; cursor:pointer; z-index:2; border-radius:50%; }
-  .bottom-panel .bet-row #betDown{ left:16.5%; }
-  .bottom-panel .bet-row #betUp{ left:83.5%; }
-  .bottom-panel .bet-row #betDisplay{ position:absolute; left:50%; top:47.7%;
-     transform:translate(-50%,-50%); width:37%; height:50%; min-width:0; margin:0;
-     background:#000; border-radius:4px; display:flex; align-items:center; justify-content:center;
-     color:#f0c040; font-family:monospace; font-weight:900; font-size:21px; z-index:2;
+  .bottom-panel .bet-row .bet-btn{ position:absolute; top:51%; transform:translate(-50%,-50%);
+     width:42px; height:42px; background:transparent; border:none; box-shadow:none;
+     color:transparent; font-size:0; cursor:pointer; z-index:3; border-radius:50%; }
+  .bottom-panel .bet-row #betDown{ left:64%; }
+  .bottom-panel .bet-row #betUp{ left:88%; }
+  .bottom-panel .bet-row #betDisplay{ position:absolute; left:73.2%; top:51.6%;
+     transform:translate(-50%,-50%); width:20%; height:13%; min-width:0; margin:0;
+     background:transparent; display:flex; align-items:center; justify-content:center;
+     color:#f0c040; font-family:monospace; font-weight:900; font-size:20px; z-index:3;
      cursor:pointer; pointer-events:auto; }
+  /* SPIN wheel centred on the palka */
+  .bet-row > .spin-btn{ position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+     margin:0; width:172px; height:172px; z-index:7; }
+  .bet-row > .spin-btn img{ width:172px; height:172px; }
   .col-character{ display:none; }   /* hidden on desktop v1 */
   .header-logo{ display:none; }     /* replaced by the 3D logo image */
   .pt-logo{ position:absolute; left:4px; top:2px; width:224px; height:auto; z-index:6;
@@ -784,7 +788,7 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
     '/assets/h-slots/pirate/post.png',
     '/assets/h-slots/pirate/post-shaft.png',
     '/assets/h-slots/pirate/eyes.png',
-    '/assets/h-slots/pirate/bet-input-panel.png',
+    '/assets/h-slots/pirate/palka.png',
     '/assets/h-slots/pirate/ui/hold-win-frame.png',
     '/assets/h-slots/pirate/ui/new-spin.png',
     '/assets/h-slots/pirate/ui/btn-buy-bonus.png',
@@ -1413,7 +1417,8 @@ function buildReels() {
       const wrap = document.querySelector('.game-wrap');
       const ro   = frame.parentElement;            // .reels-outer (the cabinet)
       const spin = document.getElementById('spinBtn');
-      if (ro && spin) ro.appendChild(spin);
+      const betRow = document.querySelector('.bet-row');
+      if (betRow && spin) betRow.appendChild(spin);   // SPIN sits centred on the palka beam
       // Single left-panel asset (title + 3 plaques baked in); buttons = transparent click zones
       var lp = document.createElement('div');
       lp.className = 'pt-leftpanel';
