@@ -677,6 +677,19 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
   .pt-lamp-l{ left:18%; top:28%; }
   .pt-lamp-r{ left:84%; top:29%; animation-delay:-2.5s; }
 
+  /* left panel (title + BUY BONUS / PAYTABLE / AUTOPLAY baked into one asset) */
+  .pt-logo{ display:none; }   /* title is now part of the left panel */
+  .pt-leftpanel{ position:absolute; left:6px; top:6px; width:410px; aspect-ratio:1313/1198; z-index:5;
+     background:url('assets/h-slots/pirate/left-panel.png') top center/contain no-repeat; pointer-events:none;
+     filter:drop-shadow(0 4px 12px rgba(0,0,0,.5)); }
+  .pt-lpbtn{ position:absolute; left:18%; width:58%; height:14%; padding:0; border:none; background:transparent;
+     cursor:pointer; pointer-events:auto; transition:transform .1s, filter .15s; }
+  .pt-lpbtn:hover{ filter:brightness(1.12) drop-shadow(0 0 10px rgba(255,200,80,.6)); }
+  .pt-lpbtn:active{ transform:scale(.96); }
+  .pt-lpbtn-b{ top:50.0%; }   /* BUY BONUS */
+  .pt-lpbtn-p{ top:68.0%; }   /* PAYTABLE  */
+  .pt-lpbtn-a{ top:85.7%; }   /* AUTOPLAY  */
+
   /* animated skulls (with rat peeking from the socket) overlaid on the panel's
      static skulls — positioned so its skull content matches the baked skulls. */
   .pt-skullvid{ display:none; }   /* hidden — webm keying looks bad for now */
@@ -761,7 +774,7 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
     // frame / UI / background art
     '/assets/h-slots/pirate/new-bg.png',
     '/assets/h-slots/pirate/pirate%20baraban.png',
-    '/assets/h-slots/pirate/pirate%20logo.png',
+    '/assets/h-slots/pirate/left-panel.png',
     '/assets/h-slots/pirate/pirate-mascot.png',
     '/assets/h-slots/pirate/board-bonus.png',
     '/assets/h-slots/pirate/chest-stage.png?v=1',
@@ -1401,26 +1414,23 @@ function buildReels() {
       const ro   = frame.parentElement;            // .reels-outer (the cabinet)
       const spin = document.getElementById('spinBtn');
       if (ro && spin) ro.appendChild(spin);
-      [['bonusBtn', 'BUY BONUS'], ['paytableBtn', 'PAYTABLE'], ['autoBtn', 'AUTOPLAY']].forEach(function (pair) {
+      // Single left-panel asset (title + 3 plaques baked in); buttons = transparent click zones
+      var lp = document.createElement('div');
+      lp.className = 'pt-leftpanel';
+      [['bonusBtn','b'], ['paytableBtn','p'], ['autoBtn','a']].forEach(function (pair) {
         const b = document.getElementById(pair[0]);
-        if (!b || !wrap) return;
-        b.classList.add('pt-plaque');
-        const s = document.createElement('span');
-        s.className = 'pt-plaque-txt';
-        s.textContent = pair[1];
-        b.appendChild(s);
-        wrap.appendChild(b);
+        if (!b) return;
+        b.classList.add('pt-lpbtn', 'pt-lpbtn-'+pair[1]);
+        b.innerHTML = '';   // icon + label are part of the panel art
+        lp.appendChild(b);
       });
+      if (wrap) wrap.appendChild(lp);
       // Free-spins counter plaque (shown only during the feature, replaces the 3 buttons)
       var fsp = document.createElement('div');
       fsp.id = 'fsPlaque'; fsp.className = 'pt-plaque pt-fs-plaque';
       fsp.innerHTML = '<span class="pt-plaque-txt fs-plaque-txt">Free Spins<br><b id="fsPlaqueNum">0</b></span>';
       fsp.style.display = 'none';
       wrap.appendChild(fsp);
-      // Wooden post the plaques hang from
-      var fill = document.createElement('div');
-      fill.className = 'pt-post-fill';
-      wrap.appendChild(fill);
       var lampLayer = document.createElement('div');
       lampLayer.className = 'pt-lamp-layer';
       var lampL = document.createElement('div');
@@ -1429,11 +1439,6 @@ function buildReels() {
       lampR.className = 'pt-lamp pt-lamp-r';
       lampLayer.appendChild(lampL); lampLayer.appendChild(lampR);
       wrap.appendChild(lampLayer);
-      var logo = document.createElement('img');
-      logo.className = 'pt-logo';
-      logo.src = 'assets/h-slots/pirate/pirate%20logo.png';
-      logo.alt = 'PIRATE TREASURE';
-      wrap.appendChild(logo);
       // pirate mascot on the left, standing from the bottom up to the cabinet
       var mascot = document.createElement('img');
       mascot.className = 'pt-mascot';
@@ -1443,9 +1448,6 @@ function buildReels() {
       // move the WIN readout onto the cabinet's top wooden beam
       var wd = document.querySelector('.win-display');
       if (wd && frame) frame.appendChild(wd);
-      var post = document.createElement('div');
-      post.className = 'pt-post';
-      wrap.appendChild(post);
       // MENU + INFO + MUTE as a round-button cluster, left of the SPIN wheel
       var ctrl = document.createElement('div');
       ctrl.className = 'pt-ctrl';
