@@ -97,12 +97,12 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
    float in front like Bounty Hunter. Lines at column (1/5..4/5) & row (1/3,2/3) edges. */
 .reels-frame::before{content:'';position:absolute;top:4px;left:4px;right:4px;bottom:4px;
   pointer-events:none;
-  --gl:rgba(240,192,64,.55);
+  --gl:rgba(120,72,28,.85);
   background-image:
-    linear-gradient(to right,transparent calc(20% - 1px),var(--gl) calc(20% - 1px),var(--gl) calc(20% + 1px),transparent calc(20% + 1px)),
-    linear-gradient(to right,transparent calc(40% - 1px),var(--gl) calc(40% - 1px),var(--gl) calc(40% + 1px),transparent calc(40% + 1px)),
-    linear-gradient(to right,transparent calc(60% - 1px),var(--gl) calc(60% - 1px),var(--gl) calc(60% + 1px),transparent calc(60% + 1px)),
-    linear-gradient(to right,transparent calc(80% - 1px),var(--gl) calc(80% - 1px),var(--gl) calc(80% + 1px),transparent calc(80% + 1px));}
+    linear-gradient(to right,transparent calc(20% - 2px),var(--gl) calc(20% - 2px),var(--gl) calc(20% + 2px),transparent calc(20% + 2px)),
+    linear-gradient(to right,transparent calc(40% - 2px),var(--gl) calc(40% - 2px),var(--gl) calc(40% + 2px),transparent calc(40% + 2px)),
+    linear-gradient(to right,transparent calc(60% - 2px),var(--gl) calc(60% - 2px),var(--gl) calc(60% + 2px),transparent calc(60% + 2px)),
+    linear-gradient(to right,transparent calc(80% - 2px),var(--gl) calc(80% - 2px),var(--gl) calc(80% + 2px),transparent calc(80% + 2px));}
 
 /* Win lines overlay */
 .win-line{position:absolute;left:0;right:0;height:2px;background:var(--text-bright);
@@ -1193,7 +1193,7 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
 const DEMO_START = 1000;
 const BET_STEPS = [0.10, 0.20, 0.50, 1, 2, 3, 5, 8, 10, 15, 20, 25, 30, 50, 75, 100];
 // px per symbol cell — compact on mobile, larger on desktop framed screen
-const CELL_H = 106;  // reel cabinet size (whole frame scales to fit)
+const CELL_H = 161;  // reel cabinet size — cabinet outer width ≈ palka length (whole frame scales to fit)
 const NUM_ROWS = 3;
 const NUM_COLS = 5;
 const SYMBOL_NAMES = ['chest','coins','rum','anchor','wild','scatter','doubloon','boost','mystery','j','q','k','a','key'];
@@ -1408,7 +1408,7 @@ function buildReels() {
     frame.style.width = (CELL_H * 3 * 1.821) + 'px';
     // reserve the panel's full height in the reels area so the wood frame
     // (which overflows the reel window) isn't clipped or overlapping Box B
-    if (frame.parentElement) frame.parentElement.style.minHeight = (CELL_H * 3 / 0.4498) + 'px';
+    if (frame.parentElement) frame.parentElement.style.minHeight = (CELL_H * 3 / 0.701) + 'px';
 
     // Relocate controls (desktop, once): SPIN onto the cabinet bottom platform,
     // BUY BONUS / PAYTABLE onto two wooden plaques on the left.
