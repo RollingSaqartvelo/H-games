@@ -564,7 +564,12 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
   /* pirate mascot standing to the LEFT of the cabinet, rooted at the very
      bottom (boots clipped by game-wrap overflow), head/monkey up by the reels */
   .pt-mascot{ position:absolute; left:40px; bottom:-3%; height:53%; width:auto; z-index:4;
-     pointer-events:none; filter:drop-shadow(0 8px 16px rgba(0,0,0,.55)); }
+     pointer-events:none; filter:drop-shadow(0 8px 16px rgba(0,0,0,.55));
+     transform-origin:50% 100%; animation:mascotIdle 5.5s ease-in-out infinite; }
+  @keyframes mascotIdle{
+    0%,100%{ transform:rotate(-0.6deg) skewX(0.35deg) translateY(0); }
+    50%    { transform:rotate(0.6deg)  skewX(-0.35deg) translateY(-3px); }
+  }
 
   /* the two rectangles (visual backers behind the content) */
   .pt-box{ display:block; z-index:0; border-radius:12px;
