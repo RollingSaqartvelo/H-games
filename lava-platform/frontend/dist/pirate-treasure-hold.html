@@ -558,7 +558,7 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
     border-radius:16px;
     box-shadow:0 0 0 1px rgba(0,0,0,.5), 0 12px 40px rgba(0,0,0,.6);
     overflow:hidden;
-    background:#0b1422 url('assets/h-slots/pirate/background.jpeg') center/cover no-repeat;
+    background:#0b1422 url('assets/h-slots/pirate/new-bg.png') center/cover no-repeat;
   }
 
   /* pirate mascot standing to the LEFT of the cabinet, rooted at the very
@@ -667,15 +667,15 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
   /* The bg image is center/cover; this layer reproduces the *rendered* image
      box (full height, image aspect, centred — overflowing sides are clipped by
      game-wrap). Lamp glows live inside it so their % == image coordinates. */
-  .pt-lamp-layer{ position:absolute; top:0; left:50%; height:100%; aspect-ratio:800/438;
+  .pt-lamp-layer{ position:absolute; top:0; left:50%; height:100%; aspect-ratio:1672/941;
      transform:translateX(-50%); z-index:1; pointer-events:none; }
   /* warm glow over the two baked hanging lanterns; left/top = lantern centre */
   .pt-lamp{ position:absolute; width:10%; aspect-ratio:1; transform:translate(-50%,-50%);
      pointer-events:none; border-radius:50%;
      background:radial-gradient(circle, rgba(255,198,100,.55), rgba(255,150,40,.16) 50%, transparent 72%);
      animation:lampFlicker 5s infinite; }
-  .pt-lamp-l{ left:14.8%; top:21%; }
-  .pt-lamp-r{ left:88%;   top:27%; animation-delay:-2.5s; }
+  .pt-lamp-l{ left:18%; top:28%; }
+  .pt-lamp-r{ left:84%; top:29%; animation-delay:-2.5s; }
 
   /* animated skulls (with rat peeking from the socket) overlaid on the panel's
      static skulls — positioned so its skull content matches the baked skulls. */
@@ -759,7 +759,7 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
     ...CHESTS,
     ...AUDIOS,
     // frame / UI / background art
-    '/assets/h-slots/pirate/background.jpeg',
+    '/assets/h-slots/pirate/new-bg.png',
     '/assets/h-slots/pirate/pirate%20baraban.png',
     '/assets/h-slots/pirate/pirate%20logo.png',
     '/assets/h-slots/pirate/pirate-mascot.png',
@@ -773,7 +773,7 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
     '/assets/h-slots/pirate/eyes.png',
     '/assets/h-slots/pirate/bet-input-panel.png',
     '/assets/h-slots/pirate/ui/hold-win-frame.png',
-    '/assets/h-slots/pirate/ui/btn-spin-idle.png',
+    '/assets/h-slots/pirate/ui/new-spin.png',
     '/assets/h-slots/pirate/ui/btn-buy-bonus.png',
     '/assets/h-slots/pirate/ui/btn-paytable.png',
     '/assets/h-slots/pirate/ui/btn-autoplay.png'
@@ -1126,7 +1126,7 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
           <button class="bonus-btn" id="bonusBtn" onclick="doBonusBuy()"><img src="assets/h-slots/pirate/ui/btn-buy-bonus.png" alt="BUY BONUS"></button>
           <button class="info-btn" id="paytableBtn" onclick="openInfo()"><img src="assets/h-slots/pirate/ui/btn-paytable.png" alt="PAYTABLE"></button>
           <button class="spin-btn" id="spinBtn" onclick="doSpin()">
-            <img id="spinBtnImg" src="assets/h-slots/pirate/ui/btn-spin-idle.png" alt="SPIN">
+            <img id="spinBtnImg" src="assets/h-slots/pirate/ui/new-spin.png" alt="SPIN">
           </button>
           <button class="auto-btn" id="autoBtn" onclick="toggleAuto()"><img src="assets/h-slots/pirate/ui/btn-autoplay.png" alt="AUTO"></button>
           <button id="menuBtn" class="menu-btn" aria-label="menu" onclick="openSettings()">☰</button>
@@ -1209,7 +1209,7 @@ const SYMBOL_IMGS = [
 const SYM_V = '?v=3';
 const ALL_ASSETS = [
   ...SYMBOL_IMGS.map(s => s + SYM_V),
-  'assets/h-slots/pirate/ui/btn-spin-idle.png',
+  'assets/h-slots/pirate/ui/new-spin.png',
   'assets/h-slots/pirate/ui/btn-autoplay.png',
   'assets/h-slots/pirate/ui/btn-buy-bonus.png',
   'assets/h-slots/pirate/ui/btn-paytable.png',
@@ -2607,7 +2607,7 @@ function setSpinBtns(enabled) {
   document.getElementById('betDown').disabled = !enabled;
   document.getElementById('betUp').disabled = !enabled;
   const spinImg = document.getElementById('spinBtnImg');
-  if (spinImg) spinImg.src = 'assets/h-slots/pirate/ui/btn-spin-idle.png';  // single spin asset
+  if (spinImg) spinImg.src = 'assets/h-slots/pirate/ui/new-spin.png';  // single spin asset
   if (enabled) {
     document.getElementById('spinBtn').classList.remove('spinning');
   } else {
