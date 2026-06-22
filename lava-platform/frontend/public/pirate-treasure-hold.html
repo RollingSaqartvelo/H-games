@@ -635,9 +635,9 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
   .reel{ min-width:0; }   /* let 5 reels share the fixed window width (no overflow) */
 
   /* the wooden cabinet panel, positioned so its centre opening == the reel window.
-     Opening fractions: L .2735 T .3011 R .7305 B .7509 (panel 2000×1116). */
+     New baraban (1536×1024): opening L7.88% R92.38% T13.77% B83.89% (aspect 1.808). */
   .pirate-panel{ display:block; position:absolute; z-index:0; pointer-events:none;
-                 width:218.82%; left:-59.85%; top:-66.94%; height:auto; }
+                 width:118.3%; left:-9.32%; top:-19.8%; height:auto; }
 
   /* glowing eyes overlaid on the sleeping bat; blink open every 3.5s */
   .bat-eyes{ display:block; position:absolute; z-index:2; pointer-events:none;
@@ -777,7 +777,7 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
     ...AUDIOS,
     // frame / UI / background art
     '/assets/h-slots/pirate/new-bg.png',
-    '/assets/h-slots/pirate/pirate%20baraban.png',
+    '/assets/h-slots/pirate/pir-baraban-new.png',
     '/assets/h-slots/pirate/left-panel.png',
     '/assets/h-slots/pirate/pirate-mascot.png',
     '/assets/h-slots/pirate/board-bonus.png',
@@ -1384,7 +1384,7 @@ function buildReels() {
   if (true) {
     const panel = document.createElement('img');
     panel.className = 'pirate-panel';
-    panel.src = 'assets/h-slots/pirate/pirate%20baraban.png';
+    panel.src = 'assets/h-slots/pirate/pir-baraban-new.png';
     panel.alt = '';
     frame.appendChild(panel);
     const eyes = document.createElement('img');
