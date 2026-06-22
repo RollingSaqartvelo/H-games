@@ -585,7 +585,7 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
   /* place content on top of the backers */
   .header{ grid-area:header; z-index:1; padding:6px 12px; margin:0; }
   .reels-outer{ grid-area:reels; z-index:1; align-self:end;
-                width:100%; padding:0;
+                width:100%; padding:0; transform:translateY(-130px);
                 display:flex; align-items:flex-end; justify-content:center; overflow:visible; }
   .win-display{ grid-area:reels; z-index:2; align-self:end; height:22px; margin-bottom:6px; }
   /* WIN readout on the cabinet's top wooden beam — bold white embossed letters */
@@ -598,7 +598,7 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
   .col-jackpot{ display:none; }
   .col-jackpot .jp-panel-wrap{ width:100%; height:auto; }
   .col-jackpot .jp-panel-img{ width:100%; height:auto; object-fit:contain; }
-  .bottom-panel{ grid-area:controls; z-index:1; padding:5px 10px 10px; }
+  .bottom-panel{ grid-area:controls; z-index:1; padding:5px 10px 10px; transform:translateY(-130px); }
 
   /* full-width wooden beam (palka, cropped to the beam): SPIN centred, − / amount / + on the right */
   .bottom-panel .bet-row{ position:relative; width:1040px; aspect-ratio:1968/214;
