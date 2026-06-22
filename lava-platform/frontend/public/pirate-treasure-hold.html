@@ -187,7 +187,7 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
 .spin-btn:disabled{opacity:.4;cursor:default;}
 .spin-btn img{width:90px;height:90px;object-fit:contain;display:block;}
 /* wheel spins while the round is spinning */
-@keyframes pt-spin-wheel{ to{ transform:rotate(-360deg); } }
+@keyframes pt-spin-wheel{ to{ transform:rotate(360deg); } }
 /* multiplier badge pop-in */
 @keyframes mult-pop{ 0%{transform:translate(-50%,-50%) scale(.3);opacity:0} 60%{transform:translate(-50%,-50%) scale(1.18);opacity:1} 100%{transform:translate(-50%,-50%) scale(1);opacity:1} }
 .pt-mult.mult-pop{ animation:mult-pop .45s cubic-bezier(.2,1.3,.4,1) both; }
@@ -598,21 +598,21 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
   .col-jackpot{ display:none; }
   .col-jackpot .jp-panel-wrap{ width:100%; height:auto; }
   .col-jackpot .jp-panel-img{ width:100%; height:auto; object-fit:contain; }
-  .bottom-panel{ grid-area:controls; z-index:1; padding:6px 10px 10px; }
+  .bottom-panel{ grid-area:controls; z-index:1; padding:5px 10px 10px; }
 
-  /* full-width wooden beam (palka): SPIN centred on it, − / amount / + on the right */
-  .bottom-panel .bet-row{ position:relative; width:980px; aspect-ratio:2000/666;
-     margin:6px auto; padding:0; display:block;
+  /* full-width wooden beam (palka, cropped to the beam): SPIN centred, − / amount / + on the right */
+  .bottom-panel .bet-row{ position:relative; width:1040px; aspect-ratio:1968/214;
+     margin:5px auto 0; padding:0; display:block;
      background:url('assets/h-slots/pirate/palka.png') center/contain no-repeat; }
   .bottom-panel .bet-row .bet-lbl{ display:none; }
   .bottom-panel .bet-row .bet-stepper{ display:contents; }
-  .bottom-panel .bet-row .bet-btn{ position:absolute; top:51%; transform:translate(-50%,-50%);
-     width:42px; height:42px; background:transparent; border:none; box-shadow:none;
+  .bottom-panel .bet-row .bet-btn{ position:absolute; top:55%; transform:translate(-50%,-50%);
+     width:46px; height:46px; background:transparent; border:none; box-shadow:none;
      color:transparent; font-size:0; cursor:pointer; z-index:3; border-radius:50%; }
-  .bottom-panel .bet-row #betDown{ left:64%; }
-  .bottom-panel .bet-row #betUp{ left:88%; }
-  .bottom-panel .bet-row #betDisplay{ position:absolute; left:73.2%; top:51.6%;
-     transform:translate(-50%,-50%); width:20%; height:13%; min-width:0; margin:0;
+  .bottom-panel .bet-row #betDown{ left:64.4%; }
+  .bottom-panel .bet-row #betUp{ left:88.8%; }
+  .bottom-panel .bet-row #betDisplay{ position:absolute; left:73.8%; top:55%;
+     transform:translate(-50%,-50%); width:19%; height:42%; min-width:0; margin:0;
      background:transparent; display:flex; align-items:center; justify-content:center;
      color:#f0c040; font-family:monospace; font-weight:900; font-size:20px; z-index:3;
      cursor:pointer; pointer-events:auto; }
@@ -683,7 +683,7 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
 
   /* left panel (title + BUY BONUS / PAYTABLE / AUTOPLAY baked into one asset) */
   .pt-logo{ display:none; }   /* title is now part of the left panel */
-  .pt-leftpanel{ position:absolute; left:-34px; top:6px; width:410px; aspect-ratio:1313/1198; z-index:5;
+  .pt-leftpanel{ position:absolute; left:-64px; top:6px; width:410px; aspect-ratio:1313/1198; z-index:5;
      background:url('assets/h-slots/pirate/left-panel.png') top center/contain no-repeat; pointer-events:none;
      filter:drop-shadow(0 4px 12px rgba(0,0,0,.5)); }
   .pt-lpbtn{ position:absolute; left:18%; width:58%; height:14%; padding:0; border:none; background:transparent;
@@ -720,11 +720,11 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
   .fs-plaque-txt b{ display:block; font-size:30px; color:#ffd860; margin-top:1px;
      text-shadow:0 2px 0 #8a5a10, 0 4px 6px rgba(0,0,0,.7), 0 0 12px rgba(255,200,80,.8); }
 
-  /* MENU + INFO + MUTE — round-button cluster left of the SPIN wheel */
-  .reels-outer > .pt-ctrl{ position:absolute; left:50%; bottom:20px;
-     transform:translate(-50%,50%) translateX(-230px); display:flex; gap:14px; z-index:8; }
+  /* MENU + INFO + MUTE — round-button cluster on the palka beam, left side */
+  .bet-row > .pt-ctrl{ position:absolute; left:13%; top:50%;
+     transform:translateY(-50%); display:flex; gap:12px; z-index:8; }
   .pt-ctrl-btn{
-     width:52px; height:52px; font-size:25px; line-height:1; cursor:pointer;
+     width:48px; height:48px; font-size:23px; line-height:1; cursor:pointer;
      display:flex; align-items:center; justify-content:center; color:#ffe7a0;
      font-family:'Pirata One',system-ui,serif; font-weight:900;
      background:rgba(20,12,4,.6); border:2px solid rgba(240,192,64,.6); border-radius:50%;
@@ -1193,7 +1193,7 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
 const DEMO_START = 1000;
 const BET_STEPS = [0.10, 0.20, 0.50, 1, 2, 3, 5, 8, 10, 15, 20, 25, 30, 50, 75, 100];
 // px per symbol cell — compact on mobile, larger on desktop framed screen
-const CELL_H = 104;  // bigger reel cabinet (wider + taller); whole frame scales to fit
+const CELL_H = 118;  // bigger reel cabinet (wider + taller); whole frame scales to fit
 const NUM_ROWS = 3;
 const NUM_COLS = 5;
 const SYMBOL_NAMES = ['chest','coins','rum','anchor','wild','scatter','doubloon','boost','mystery','j','q','k','a','key'];
@@ -1453,11 +1453,12 @@ function buildReels() {
       // move the WIN readout onto the cabinet's top wooden beam
       var wd = document.querySelector('.win-display');
       if (wd && frame) frame.appendChild(wd);
-      // MENU + INFO + MUTE as a round-button cluster, left of the SPIN wheel
+      // MENU + INFO + MUTE round-button cluster — on the palka beam, left side
       var ctrl = document.createElement('div');
       ctrl.className = 'pt-ctrl';
       ['menuBtn','infoBtn','muteBtn'].forEach(function(id){ var b=document.getElementById(id); if(b){ b.classList.add('pt-ctrl-btn'); ctrl.appendChild(b); } });
-      if (ro) ro.appendChild(ctrl);
+      var betRow2 = document.querySelector('.bet-row');
+      if (betRow2) betRow2.appendChild(ctrl); else if (ro) ro.appendChild(ctrl);
       // BONUS WIN and chest-pick stay BODY children (full viewport size) so they
       // render large on mobile instead of shrinking with the scaled cabinet.
       // They're fixed/inset:0 → centred on the viewport, which fitStage keeps
