@@ -1705,8 +1705,19 @@ ul, li { list-style: none; }
   }
   .game-area::after { display: none; }
   #running-bg-video { object-fit: cover !important; }
-  .bvb-wrap > video { object-fit: contain !important; }
-  .bvb-wrap { background: transparent; }
+  /* betting-stage video background removed on the cabinet (countdown stays) */
+  .bvb-wrap { display: none !important; }
+
+  /* tabs & stat labels are already DRAWN on the cabinet — keep only transparent
+     click targets + live values, don't re-draw them on top */
+  .bv-tab, .bv-tab--active {
+    background: none !important; border: none !important; color: transparent !important;
+    box-shadow: none !important;
+  }
+  .bv-pill { background: none !important; border: none !important; color: transparent !important; }
+  .bv-stats { border: none !important; }
+  .bv-stat + .bv-stat { border-left: none !important; }
+  .bv-stat-lbl { color: transparent !important; }   /* BETS / PLAYERS / TOP WIN drawn on cabinet */
 
   /* bet panel — bottom bet-control area */
   .dbp-root {
