@@ -1719,11 +1719,24 @@ ul, li { list-style: none; }
   .bv-stat + .bv-stat { border-left: none !important; }
   .bv-stat-lbl { color: transparent !important; }   /* BETS / PLAYERS / TOP WIN drawn on cabinet */
 
-  /* bet panel — bottom bet-control area */
+  /* bet panel — controls are DRAWN on the cabinet; hide our chrome, keep
+     transparent click targets + dynamic values (amount, action label) only */
   .dbp-root {
-    position: absolute !important; left: 46%; top: 63%; width: 42%; height: 34%;
+    position: absolute !important; left: 50%; top: 62%; width: 38%; height: 34%;
     margin: 0 !important; max-width: none;
   }
+  .dbp-block, .dbp-content { background: none !important; border: none !important; box-shadow: none !important; }
+  .dbp-block__header { display: none !important; }
+  .dbp-step-btn { background: none !important; border: none !important; box-shadow: none !important; color: transparent !important; }
+  .dbp-amount-display { background: none !important; border: none !important; box-shadow: none !important; }
+  .dbp-amount-currency { color: transparent !important; }           /* $ already drawn */
+  .dbp-amount-input { color: #f3d488 !important; opacity: 1 !important; }  /* dynamic value stays */
+  .dbp-chip, .dbp-chip--active { background: none !important; border: none !important; box-shadow: none !important; color: transparent !important; }
+  .dbp-toggle, .dbp-toggle__track, .dbp-toggle--on .dbp-toggle__track { background: none !important; border: none !important; box-shadow: none !important; }
+  .dbp-toggle__label { color: transparent !important; }             /* AUTO BET drawn */
+  .dbp-btn, .dbp-btn--img { background: none !important; border: none !important; box-shadow: none !important; }
+  .dbp-btn--img img { display: none !important; }                   /* hide Button.png sprite */
+  .dbp-btn__label { color: #f3d488 !important; }                    /* keep action text (BET/CASH OUT) */
 
   /* WASTED — centered exactly on the game broadcast (game-area), not the viewport.
      --ga-* vars are written by App.tsx from .game-area's live rect (desktop only). */
