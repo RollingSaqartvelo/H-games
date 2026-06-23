@@ -2589,8 +2589,8 @@ function _unlockGrannyMedia() {
   document.querySelectorAll('video, audio').forEach(el => {
     if (el.paused) {
       el.play().then(() => {
-        // Don't keep countdown audio running after unlock
-        if (el === _cdAudio) { el.pause(); el.currentTime = 0 }
+        // Unlock only — don't let one-shot SFX (countdown / win) actually sound on the tap
+        if (el === _cdAudio || el === _winAudio) { el.pause(); el.currentTime = 0 }
       }).catch(() => {})
     }
   })
