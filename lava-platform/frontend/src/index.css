@@ -1723,24 +1723,56 @@ ul, li { list-style: none; }
   .bv-stat + .bv-stat { border-left: none !important; }
   .bv-stat-lbl { color: transparent !important; }   /* BETS / PLAYERS / TOP WIN drawn on cabinet */
 
-  /* bet panel — controls are DRAWN on the cabinet; hide our chrome, keep
-     transparent click targets + dynamic values (amount, action label) only */
-  .dbp-root {
-    position: absolute !important; left: 50%; top: 62%; width: 38%; height: 34%;
-    margin: 0 !important; max-width: none;
-  }
-  .dbp-block, .dbp-content { background: none !important; border: none !important; box-shadow: none !important; }
+  /* ── Bet panel: chrome is DRAWN on cabinet; place transparent controls over it,
+     a black clickable amount input, and an animated AUTO BET knob ── */
+  .dbp-root { position: absolute !important; left: 39%; top: 59%; width: 48%; height: 33%;
+    margin: 0 !important; max-width: none; z-index: 6; }
+  .dbp-block { position: absolute !important; inset: 0; padding: 0 !important;
+    background: none !important; border: none !important; box-shadow: none !important; }
   .dbp-block__header { display: none !important; }
-  .dbp-step-btn { background: none !important; border: none !important; box-shadow: none !important; color: transparent !important; }
-  .dbp-amount-display { background: none !important; border: none !important; box-shadow: none !important; }
-  .dbp-amount-currency { color: transparent !important; }           /* $ already drawn */
-  .dbp-amount-input { color: #f3d488 !important; opacity: 1 !important; }  /* dynamic value stays */
-  .dbp-chip, .dbp-chip--active { background: none !important; border: none !important; box-shadow: none !important; color: transparent !important; }
-  .dbp-toggle, .dbp-toggle__track, .dbp-toggle--on .dbp-toggle__track { background: none !important; border: none !important; box-shadow: none !important; }
-  .dbp-toggle__label { color: transparent !important; }             /* AUTO BET drawn */
-  .dbp-btn, .dbp-btn--img { background: none !important; border: none !important; box-shadow: none !important; }
-  .dbp-btn--img img { display: none !important; }                   /* hide Button.png sprite */
-  .dbp-btn__label { color: #f3d488 !important; }                    /* keep action text (BET/CASH OUT) */
+  .dbp-content { position: absolute !important; inset: 0; padding: 0 !important; display: block !important;
+    background: none !important; border: none !important; box-shadow: none !important; }
+
+  /* − [amount] + row over the drawn − / $1.00 box / + */
+  .dbp-amount-row { position: absolute !important; top: 6%; left: 4%; width: 67%; height: 24%;
+    margin: 0 !important; display: flex !important; align-items: center; gap: 0; }
+  .dbp-step-btn { flex: 0 0 14%; height: 100%; background: none !important; border: none !important;
+    box-shadow: none !important; color: transparent !important; }            /* − / + drawn */
+  /* black clickable amount input over the drawn $1.00 box */
+  .dbp-amount-display { flex: 1 1 auto; height: 76%; margin: 0 3%;
+    background: #0b0805 !important; border: 1px solid rgba(214,158,46,.4) !important; border-radius: 8px !important;
+    box-shadow: inset 0 2px 8px rgba(0,0,0,.75) !important;
+    display: flex !important; align-items: center; justify-content: center; }
+  .dbp-amount-currency { color: #f3d488 !important; }
+  .dbp-amount-input { color: #f3d488 !important; opacity: 1 !important; text-align: center; }
+
+  /* quick chips over the drawn $1 / $5 / $10 / $50 */
+  .dbp-chips { position: absolute !important; top: 38%; left: 4%; width: 63%; height: 20%;
+    margin: 0 !important; display: flex !important; gap: 2%; }
+  .dbp-chip, .dbp-chip--active { flex: 1 1 0; height: 100%; background: none !important; border: none !important;
+    box-shadow: none !important; color: transparent !important; }            /* values drawn */
+
+  /* AUTO BET — animated knob over the drawn round knob */
+  .dbp-options { position: absolute !important; top: 36%; left: 84%; width: 13%; height: 24%;
+    margin: 0 !important; padding: 0 !important; }
+  .dbp-toggle { position: absolute !important; inset: 0; background: none !important; border: none !important; }
+  .dbp-toggle__label { display: none !important; }                           /* AUTO BET drawn */
+  .dbp-toggle__track { position: absolute !important; left: 50%; top: 50%; transform: translate(-50%,-50%);
+    width: 46% !important; aspect-ratio: 1; min-width: 0; height: auto !important;
+    border-radius: 50% !important; background: radial-gradient(circle at 35% 30%, #6f6f6f, #262626 70%) !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,.6) !important; animation: ab-idle 2.4s ease-in-out infinite; }
+  .dbp-toggle__track::after { display: none !important; }
+  .dbp-toggle--on .dbp-toggle__track { background: radial-gradient(circle at 35% 30%, #ffd27a, #c8860f 70%) !important;
+    box-shadow: 0 0 10px rgba(255,190,70,.85) !important; animation: ab-on 1s ease-in-out infinite; }
+  @keyframes ab-idle { 0%,100%{ box-shadow: 0 1px 3px rgba(0,0,0,.6); } 50%{ box-shadow: 0 0 8px rgba(214,158,46,.55); } }
+  @keyframes ab-on { 0%,100%{ transform: translate(-50%,-50%) scale(1); } 50%{ transform: translate(-50%,-50%) scale(1.13); } }
+
+  /* main action button over the drawn NEXT ROUND BET */
+  .dbp-btn-area { position: absolute !important; top: 66%; left: 0%; width: 58%; height: 30%; margin: 0 !important; }
+  .dbp-btn, .dbp-btn--img { width: 100% !important; height: 100% !important;
+    background: none !important; border: none !important; box-shadow: none !important; }
+  .dbp-btn--img img { display: none !important; }
+  .dbp-btn__label { color: #f3d488 !important; }
 
   /* WASTED — centered exactly on the game broadcast (game-area), not the viewport.
      --ga-* vars are written by App.tsx from .game-area's live rect (desktop only). */
