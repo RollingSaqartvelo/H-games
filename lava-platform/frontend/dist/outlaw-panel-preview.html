@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1400">
+<title>Outlaw Escape — Panel Preview</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  width: 1400px;
+  height: 875px;
+  overflow: hidden;
+  background: #0e0905;
+  font-family: 'Georgia', serif;
+}
+
+/* ── WOOD BACKGROUND ── */
+.wood-bg {
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(
+      180deg,
+      transparent 0px, transparent 38px,
+      rgba(0,0,0,0.18) 38px, rgba(0,0,0,0.18) 40px
+    ),
+    repeating-linear-gradient(
+      180deg,
+      transparent 0px, transparent 78px,
+      rgba(255,255,255,0.015) 78px, rgba(255,255,255,0.015) 80px
+    ),
+    linear-gradient(170deg,
+      #1a0e07 0%, #221208 15%, #1e1009 30%,
+      #17090520 45%, #1c0d08 60%, #240f06 75%, #1a0d07 100%
+    );
+  background-size: 100% 100%;
+}
+.wood-grain {
+  position: absolute;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(
+      92deg,
+      transparent 0px,
+      rgba(255,200,100,0.012) 1px,
+      transparent 3px,
+      transparent 14px
+    ),
+    repeating-linear-gradient(
+      88deg,
+      transparent 0px,
+      rgba(0,0,0,0.08) 1px,
+      transparent 4px,
+      transparent 22px
+    );
+}
+
+/* ── HEADER ── */
+.header {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 78px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    linear-gradient(180deg, #3d2008 0%, #2a1505 40%, #1e0f04 100%);
+  border-bottom: 3px solid #5a3010;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,200,80,0.12);
+  z-index: 10;
+}
+.header::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    180deg,
+    transparent 0, transparent 6px,
+    rgba(0,0,0,0.15) 6px, rgba(0,0,0,0.15) 7px
+  );
+}
+.header-plaque {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  background: linear-gradient(180deg, #6b3b12 0%, #4a2509 50%, #3a1c07 100%);
+  border: 2px solid #8a5020;
+  border-radius: 6px;
+  padding: 10px 40px;
+  box-shadow:
+    0 0 0 1px #2a1200,
+    0 4px 15px rgba(0,0,0,0.6),
+    inset 0 1px 0 rgba(255,200,80,0.2),
+    inset 0 -1px 0 rgba(0,0,0,0.4);
+}
+.header-plaque::before,
+.header-plaque::after {
+  content: '✦';
+  color: #8a6030;
+  font-size: 14px;
+  opacity: 0.7;
+}
+.skull-icon {
+  font-size: 28px;
+  filter: sepia(1) saturate(0.3) brightness(0.6);
+}
+.header-title {
+  font-size: 34px;
+  font-weight: 900;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #c8a055;
+  text-shadow:
+    0 1px 0 #8a6020,
+    0 2px 0 #6a4810,
+    0 3px 6px rgba(0,0,0,0.8),
+    0 0 20px rgba(200,160,80,0.2);
+  font-family: 'Georgia', 'Times New Roman', serif;
+}
+/* corner rivets on header */
+.rivet {
+  position: absolute;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #9a7040, #4a3010);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.6), inset 0 1px 2px rgba(255,200,80,0.3);
+}
+.rivet.tl { top: 12px; left: 12px; }
+.rivet.tr { top: 12px; right: 12px; }
+.rivet.bl { bottom: 8px; left: 12px; }
+.rivet.br { bottom: 8px; right: 12px; }
+
+/* ── MAIN LAYOUT ── */
+.main {
+  position: absolute;
+  top: 78px; bottom: 0; left: 0; right: 0;
+  display: flex;
+  padding: 12px 14px 0;
+  gap: 12px;
+}
+
+/* ── LEFT PANEL ── */
+.left-panel {
+  width: 358px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.search-bar {
+  height: 36px;
+  background: linear-gradient(180deg, #1a0d06 0%, #150b05 100%);
+  border: 1px solid #4a2a10;
+  border-radius: 6px;
+  box-shadow: inset 0 2px 6px rgba(0,0,0,0.6), 0 1px 0 rgba(255,200,80,0.06);
+}
+
+.tabs-row {
+  display: flex;
+  gap: 5px;
+  height: 32px;
+}
+.tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-radius: 5px;
+  cursor: pointer;
+  border: 1px solid #3a2008;
+}
+.tab.active {
+  background: linear-gradient(180deg, #c8a840 0%, #9a7820 50%, #7a5c10 100%);
+  color: #1a0e04;
+  border-color: #d4b04a;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.2);
+  box-shadow: 0 2px 8px rgba(180,140,40,0.4), inset 0 1px 0 rgba(255,230,120,0.3);
+}
+.tab.inactive {
+  background: linear-gradient(180deg, #2a1608 0%, #1e0f05 100%);
+  color: #7a5830;
+  border-color: #3a1e08;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.4);
+}
+
+.stats-bar {
+  height: 52px;
+  background: linear-gradient(180deg, #1e1006 0%, #180d05 100%);
+  border: 1px solid #3a2008;
+  border-radius: 6px;
+  display: flex;
+  box-shadow: inset 0 2px 6px rgba(0,0,0,0.5);
+}
+.stat-cell {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+}
+.stat-cell + .stat-cell {
+  border-left: 1px solid #3a2008;
+}
+.stat-label {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: #7a5830;
+  text-transform: uppercase;
+}
+.stat-value {
+  font-size: 14px;
+  font-weight: 700;
+  color: #6a4820;
+  letter-spacing: 0.05em;
+}
+
+.bets-list {
+  flex: 1;
+  background: linear-gradient(180deg, #1a0d06 0%, #130a04 100%);
+  border: 1px solid #3a2008;
+  border-radius: 6px;
+  position: relative;
+  box-shadow: inset 0 3px 10px rgba(0,0,0,0.6);
+  margin-bottom: 4px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 14px;
+}
+.waiting-text {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: #6a4820;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+/* ── RIGHT BROADCAST SCREEN ── */
+.right-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.broadcast-screen {
+  flex: 1;
+  position: relative;
+  background: #050302;
+  border: 3px solid #3a2208;
+  border-radius: 8px;
+  box-shadow:
+    0 0 0 1px #1a0e04,
+    0 0 30px rgba(0,0,0,0.8),
+    inset 0 0 40px rgba(0,0,0,0.9);
+  overflow: visible;
+}
+/* metal corner bolts */
+.bolt {
+  position: absolute;
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #8a6030, #3a2008);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.7), inset 0 1px 2px rgba(255,200,80,0.25);
+  z-index: 2;
+}
+.bolt.tl { top: -5px; left: -5px; }
+.bolt.tr { top: -5px; right: -5px; }
+.bolt.bl { bottom: -5px; left: -5px; }
+.bolt.br { bottom: -5px; right: -5px; }
+
+/* ── BET CONTROLS ── */
+.bet-controls {
+  height: 162px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.bet-main-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 68px;
+}
+
+.bet-btn {
+  width: 68px;
+  height: 68px;
+  flex-shrink: 0;
+  background: linear-gradient(180deg, #2e1a08 0%, #1e0f04 50%, #160b03 100%);
+  border: 2px solid #5a3212;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  color: #c8a050;
+  cursor: pointer;
+  box-shadow:
+    0 4px 12px rgba(0,0,0,0.6),
+    inset 0 1px 0 rgba(255,200,80,0.12),
+    inset 0 -2px 4px rgba(0,0,0,0.4);
+  text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+}
+.bet-btn:hover { background: linear-gradient(180deg, #3e2410 0%, #2a1508 100%); }
+
+.bet-display {
+  flex: 1;
+  height: 100%;
+  background: linear-gradient(180deg, #100804 0%, #0c0603 60%, #100804 100%);
+  border: 2px solid #4a2a10;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow:
+    0 4px 12px rgba(0,0,0,0.6),
+    inset 0 3px 8px rgba(0,0,0,0.7),
+    inset 0 1px 0 rgba(255,200,80,0.06);
+}
+.bet-amount {
+  font-size: 30px;
+  font-weight: 900;
+  color: #d4a840;
+  letter-spacing: 0.04em;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.8), 0 0 12px rgba(200,160,60,0.3);
+  font-family: 'Courier New', monospace;
+}
+.bet-label {
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  color: #7a5830;
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
+.bet-quick-row {
+  display: flex;
+  gap: 7px;
+  height: 44px;
+  align-items: center;
+}
+.quick-btn {
+  flex: 1;
+  height: 44px;
+  background: linear-gradient(180deg, #2a1608 0%, #1c0e04 50%, #160a03 100%);
+  border: 1.5px solid #4a2a10;
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  color: #c8a050;
+  cursor: pointer;
+  letter-spacing: 0.06em;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,200,80,0.08);
+  text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+}
+
+.autobet-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #7a5830;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  padding-left: 4px;
+}
+.autobet-toggle {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #3a2208, #1a0e04);
+  border: 2px solid #4a2a10;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.6), inset 0 1px 3px rgba(0,0,0,0.5);
+}
+
+.next-round-btn {
+  height: 62px;
+  background: linear-gradient(180deg, #3a2008 0%, #2a1507 50%, #221205 100%);
+  border: 2px solid #6a3a14;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: 0.2em;
+  color: #d4a840;
+  cursor: pointer;
+  text-transform: uppercase;
+  box-shadow:
+    0 4px 15px rgba(0,0,0,0.6),
+    inset 0 1px 0 rgba(255,200,80,0.14),
+    inset 0 -2px 4px rgba(0,0,0,0.4);
+  text-shadow: 0 2px 4px rgba(0,0,0,0.9), 0 0 15px rgba(200,160,60,0.2);
+  font-family: 'Georgia', serif;
+}
+/* decorative corner clips on NEXT ROUND BET */
+.next-round-btn::before,
+.next-round-btn::after {
+  content: '';
+  position: absolute;
+  width: 12px; height: 12px;
+  border: 2px solid #8a5020;
+}
+
+/* ── DECORATIVE PROPS ── */
+.props-left {
+  position: absolute;
+  left: 14px;
+  bottom: 0;
+  width: 300px;
+  height: 220px;
+  pointer-events: none;
+}
+.prop-lantern {
+  position: absolute;
+  left: 0; bottom: 0;
+  width: 100px; height: 160px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 18px rgba(255,160,30,0.65)) drop-shadow(0 6px 12px rgba(0,0,0,0.8));
+}
+.prop-hat {
+  position: absolute;
+  left: 80px; bottom: 0;
+  width: 190px; height: 120px;
+  object-fit: contain;
+  filter: drop-shadow(0 6px 12px rgba(0,0,0,0.7));
+}
+.prop-revolver {
+  position: absolute;
+  left: 90px; bottom: -10px;
+  width: 170px; height: 90px;
+  object-fit: contain;
+  transform: rotate(-20deg);
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.8));
+}
+.coins-left {
+  position: absolute;
+  left: 10px; bottom: 0;
+  font-size: 24px;
+  letter-spacing: -4px;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8));
+}
+
+.props-right {
+  position: absolute;
+  right: 14px;
+  bottom: 0;
+  width: 220px;
+  height: 250px;
+  pointer-events: none;
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  justify-content: flex-end;
+}
+.prop-whiskey {
+  width: 80px; height: 220px;
+  object-fit: contain;
+  filter: drop-shadow(0 6px 12px rgba(0,0,0,0.7));
+  align-self: flex-end;
+}
+.prop-glass {
+  width: 80px; height: 100px;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.6));
+  align-self: flex-end;
+}
+.coins-right {
+  position: absolute;
+  right: 20px; bottom: -5px;
+  font-size: 20px;
+  letter-spacing: -3px;
+  filter: drop-shadow(0 2px 3px rgba(0,0,0,0.8));
+}
+
+/* ── TABLE/FLOOR ── */
+.floor-edge {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 8px;
+  background: linear-gradient(180deg, #4a2a0a, #2a1406);
+  box-shadow: 0 -2px 0 #5a3410, 0 2px 8px rgba(0,0,0,0.8);
+}
+</style>
+</head>
+<body>
+
+<div class="wood-bg"></div>
+<div class="wood-grain"></div>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="rivet tl"></div>
+  <div class="rivet tr"></div>
+  <div class="rivet bl"></div>
+  <div class="rivet br"></div>
+  <div class="header-plaque">
+    <span class="header-title">OUTLAW</span>
+    <span style="font-size:32px; color:#7a5020; margin:0 4px;">🐂</span>
+    <span class="header-title">ESCAPE</span>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- LEFT -->
+  <div class="left-panel">
+    <div class="search-bar"></div>
+
+    <div class="tabs-row">
+      <div class="tab active">ALL</div>
+      <div class="tab inactive">MY</div>
+      <div class="tab inactive">TOP</div>
+      <div class="tab inactive">LAST ROUND</div>
+    </div>
+
+    <div class="stats-bar">
+      <div class="stat-cell">
+        <div class="stat-label">BETS</div>
+        <div class="stat-value">--</div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-label">PLAYERS</div>
+        <div class="stat-value">--</div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-label">TOP WIN</div>
+        <div class="stat-value">--</div>
+      </div>
+    </div>
+
+    <div class="bets-list">
+      <div class="waiting-text">WAITING FOR ROUND TO COMPLETE</div>
+    </div>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="right-panel">
+    <div class="broadcast-screen">
+      <div class="bolt tl"></div>
+      <div class="bolt tr"></div>
+      <div class="bolt bl"></div>
+      <div class="bolt br"></div>
+    </div>
+
+    <div class="bet-controls">
+      <div class="bet-main-row">
+        <button class="bet-btn">−</button>
+        <div class="bet-display">
+          <div class="bet-amount">$ 1.00</div>
+          <div class="bet-label">BET AMOUNT</div>
+        </div>
+        <button class="bet-btn">+</button>
+      </div>
+
+      <div class="bet-quick-row">
+        <button class="quick-btn">$1</button>
+        <button class="quick-btn">$5</button>
+        <button class="quick-btn">$10</button>
+        <button class="quick-btn">$50</button>
+        <div class="autobet-wrap">
+          <div class="autobet-toggle"></div>
+          AUTO BET
+        </div>
+      </div>
+
+      <button class="next-round-btn" style="position:relative;">NEXT ROUND BET</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- DECORATIVE PROPS LEFT — подставь свои PNG сюда -->
+<div class="props-left">
+  <!-- ФОНАРЬ: замени src на свой файл -->
+  <img class="prop-lantern" src="" alt="lantern" style="background:rgba(255,140,30,0.08); border:1px dashed #5a3010; border-radius:8px;">
+  <!-- ШЛЯПА: замени src на свой файл -->
+  <img class="prop-hat" src="" alt="hat" style="background:rgba(255,255,255,0.04); border:1px dashed #5a3010; border-radius:8px;">
+  <!-- ПИСТОЛЕТ: замени src на свой файл -->
+  <img class="prop-revolver" src="" alt="revolver" style="background:rgba(255,255,255,0.03); border:1px dashed #5a3010; border-radius:8px;">
+  <!-- МОНЕТЫ: замени src на свой файл -->
+  <img style="position:absolute;left:10px;bottom:0;width:180px;height:40px;object-fit:contain;" src="" alt="coins" style="border:1px dashed #5a3010;">
+</div>
+
+<!-- DECORATIVE PROPS RIGHT — подставь свои PNG сюда -->
+<div class="props-right">
+  <!-- БУТЫЛКА ВИСКИ: замени src на свой файл -->
+  <img class="prop-whiskey" src="" alt="whiskey" style="background:rgba(255,255,255,0.04); border:1px dashed #5a3010; border-radius:8px;">
+  <!-- СТАКАН: замени src на свой файл -->
+  <img class="prop-glass" src="" alt="glass" style="background:rgba(255,255,255,0.04); border:1px dashed #5a3010; border-radius:8px;">
+  <!-- МОНЕТЫ СПРАВА: замени src на свой файл -->
+  <img style="position:absolute;right:20px;bottom:0;width:140px;height:35px;object-fit:contain;" src="" alt="coins-right">
+</div>
+
+<div class="floor-edge"></div>
+
+</body>
+</html>
