@@ -601,7 +601,7 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
   .bottom-panel{ grid-area:controls; z-index:1; padding:5px 10px 10px; transform:translateY(-140px); }
 
   /* full-width wooden beam (palka, cropped to the beam): SPIN centred, − / amount / + on the right */
-  .bottom-panel .bet-row{ position:relative; width:1040px; aspect-ratio:1968/214;
+  .bottom-panel .bet-row{ position:relative; width:1034px; aspect-ratio:1968/214;
      margin:5px auto 0; padding:0; display:block;
      background:url('assets/h-slots/pirate/palka.png') center/contain no-repeat; }
   .bottom-panel .bet-row .bet-lbl{ display:none; }
@@ -1544,7 +1544,7 @@ function setCell(col, idx, symId, doubloonVal) {
   const src = (SYMBOL_IMGS[symId] ?? SYMBOL_IMGS[0]) + SYM_V;
   const img = document.createElement('img');
   img.alt = SYMBOL_NAMES[symId] || '';
-  img.style.cssText = 'width:100%;height:100%;object-fit:contain;display:block;background:transparent;';
+  img.style.cssText = 'width:72%;height:72%;object-fit:contain;display:block;margin:auto;background:transparent;';
   // gold placeholder only if this symbol isn't decoded yet (preloaded URL matches src)
   const pre = _preloaded[symId];
   if (!pre || !pre.complete || pre.naturalWidth === 0) {
