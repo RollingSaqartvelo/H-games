@@ -1667,77 +1667,51 @@ ul, li { list-style: none; }
 @media (min-width: 1000px) {
   body { background: #0a0603; }
 
+  /* ═══ Cabinet skin "New cab.png": fixed-aspect frame, live zones overlaid.
+     History strip → purple-marked zone, broadcast → yellow-marked screen. ═══ */
   .app {
-    max-width: 1180px;
-    width: 100%;
-    margin: 24px auto;
-    min-height: calc(100dvh - 48px);
-    display: grid;
-    grid-template-columns: 300px minmax(0, 1fr);
-    grid-template-rows: auto auto auto auto;
-    grid-template-areas:
-      "topbar topbar"
-      "stats  history"
-      "stats  game"
-      "stats  panel";
-    column-gap: 14px;
-    row-gap: 10px;
-    padding: 14px;
-    align-content: start;
-    /* dark-brown background with small western symbols around the panels */
-    background: #19100a url('/assets/desk-bg-pattern.png') repeat;
-    background-size: 300px;
-    border: 1.5px solid rgba(214,158,46,.35);
-    border-radius: 12px;
+    position: relative; display: block;
+    width: 96vw; max-width: 1300px; aspect-ratio: 1587 / 991;
+    margin: 16px auto; min-height: 0; padding: 0;
+    background: #0a0603 url('/assets/new-cab-outlaw.png?v=1') center / 100% 100% no-repeat;
+    border: none; border-radius: 18px; box-shadow: 0 10px 40px rgba(0,0,0,.55);
+    overflow: hidden;
   }
 
-  .top-bar { grid-area: topbar; }
-  .mh-row  { grid-area: history; margin: 0; }
-
-  /* lift the footer's children (bet panel + stats) into the grid */
+  /* lift the footer's children (bet panel + stats) out so they can be placed */
   .app__footer  { display: contents; }
   .player-badge { display: none; }
 
-  /* stats — left column, full play-area height, own scroll, framed */
+  /* top bar (balance/state) over the drawn title bar */
+  .top-bar { position: absolute !important; top: 0.6%; left: 3%; width: 94%; height: 6%;
+    background: transparent !important; border: none !important; }
+
+  /* previous-rounds history strip — PURPLE-marked zone (same animation, on this strip) */
+  .mh-row { position: absolute !important; left: 38.5%; top: 12.8%; width: 57.5%; height: 6.6%;
+    margin: 0 !important; background: transparent !important; }
+
+  /* left stats list — over the drawn left panel */
   .bv-root {
-    grid-area: stats;
-    align-self: stretch;
-    height: 100%;
-    min-height: 0;
-    overflow-y: auto;
-    border: 1.5px solid rgba(214,158,46,.5);
-    border-radius: 8px;
-    background: #100a04;
-    box-shadow: 0 0 12px rgba(0,0,0,.45);
+    position: absolute !important; left: 14.3%; top: 19%; width: 22.8%; height: 44%;
+    margin: 0 !important; min-height: 0; overflow-y: auto;
+    background: transparent !important; border: none !important; border-radius: 0; box-shadow: none;
   }
 
-  /* game — exact 16:9 box (width-driven), nothing stretched or cropped */
+  /* game broadcast — YELLOW-marked screen zone */
   .game-area {
-    grid-area: game;
-    flex: none;
-    width: 100%;
-    height: auto;
-    aspect-ratio: 16 / 9;
-    align-self: start;
-    border-radius: 10px;
-    border: 1.5px solid rgba(214,158,46,.5);
-    box-shadow: 0 0 12px rgba(0,0,0,.5);
+    position: absolute !important; left: 39.4%; top: 20.7%; width: 57%; height: 40.3%;
+    margin: 0 !important; flex: none; aspect-ratio: auto !important;
+    background: transparent !important; border: none !important; border-radius: 10px; box-shadow: none;
   }
   .game-area::after { display: none; }
-  /* Main gameplay video is 16:9 — fill the box (no pillars, no crop) */
   #running-bg-video { object-fit: cover !important; }
-  /* Betting video is portrait → contain (pillarbox), side gaps filled by the
-     neutral backdrop on .bvb-wrap below. Only shows during WAITING/BETTING. */
   .bvb-wrap > video { object-fit: contain !important; }
-  /* Side gaps filled with the same neutral colour as the stats block (no icons) */
-  .bvb-wrap { background: #100a04; }
+  .bvb-wrap { background: transparent; }
 
-  /* bet panel — bottom, centered, constrained */
+  /* bet panel — bottom bet-control area */
   .dbp-root {
-    grid-area: panel;
-    width: 100%;
-    max-width: 460px;
-    margin: 8px auto 0;
+    position: absolute !important; left: 46%; top: 63%; width: 42%; height: 34%;
+    margin: 0 !important; max-width: none;
   }
 
   /* WASTED — centered exactly on the game broadcast (game-area), not the viewport.
