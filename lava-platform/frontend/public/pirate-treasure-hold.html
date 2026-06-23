@@ -124,7 +124,7 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
 @keyframes sandFall{to{background-position:0 17px, 7px 26px, 0 64px;}}
 .sym-cell{display:flex;align-items:center;justify-content:center;
   position:relative;background:transparent!important;border:none!important;box-shadow:none!important;}
-.sym-cell img{width:72%;height:72%;object-fit:contain;display:block;background:transparent;}
+.sym-cell img{width:76%;height:76%;object-fit:contain;display:block;background:transparent;}
 /* scatter pops out of its cell when the reels settle */
 @keyframes sym-pop{ 0%{transform:scale(1)} 34%{transform:scale(1.3) translateY(-9%)} 62%{transform:scale(.94)} 100%{transform:scale(1)} }
 .sym-cell.sym-pop{ animation:sym-pop .55s ease-out; position:relative; z-index:6; }
@@ -598,10 +598,10 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
   .col-jackpot{ display:none; }
   .col-jackpot .jp-panel-wrap{ width:100%; height:auto; }
   .col-jackpot .jp-panel-img{ width:100%; height:auto; object-fit:contain; }
-  .bottom-panel{ grid-area:controls; z-index:1; padding:5px 10px 10px; transform:translateY(-140px); }
+  .bottom-panel{ grid-area:controls; z-index:1; padding:5px 10px 10px; transform:translateY(-40px); }
 
   /* full-width wooden beam (palka, cropped to the beam): SPIN centred, − / amount / + on the right */
-  .bottom-panel .bet-row{ position:relative; width:1034px; aspect-ratio:1968/214;
+  .bottom-panel .bet-row{ position:relative; width:982px; aspect-ratio:1968/214;
      margin:5px auto 0; padding:0; display:block;
      background:url('assets/h-slots/pirate/palka.png') center/contain no-repeat; }
   .bottom-panel .bet-row .bet-lbl{ display:none; }
@@ -636,11 +636,11 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
 
   /* the wooden cabinet panel, positioned so its centre opening == the reel window.
      New baraban (1536×1024): opening L7.88% R92.38% T13.77% B83.89% (aspect 1.808). */
-  .pirate-panel{ display:block; position:absolute; z-index:3; pointer-events:none;
+  .pirate-panel{ display:block; position:absolute; z-index:0; pointer-events:none;
                  width:130%; left:-15.17%; top:-30%; height:auto; }
 
   /* glowing eyes overlaid on the sleeping bat; blink open every 3.5s */
-  .bat-eyes{ display:block; position:absolute; z-index:4; pointer-events:none;
+  .bat-eyes{ display:block; position:absolute; z-index:2; pointer-events:none;
              left:126.3%; top:62.0%; transform:translate(-50%,-50%);
              width:18%; height:auto; opacity:0;
              animation:batBlink 3.5s infinite; }
@@ -787,7 +787,7 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
     '/assets/h-slots/pirate/pir-baraban-new.png',
 '/assets/h-slots/pirate/flight-mouse.png',
     '/assets/h-slots/pirate/left-panel.png',
-    '/assets/h-slots/pirate/pirate-mascot.png',
+    '/assets/h-slots/pirate/pirate-mascot-3.png',
     '/assets/h-slots/pirate/board-bonus.png',
     '/assets/h-slots/pirate/chest-stage.png?v=1',
     '/assets/h-slots/pirate/bonus-win.png',
@@ -1461,7 +1461,7 @@ function buildReels() {
       // pirate mascot on the left, standing from the bottom up to the cabinet
       var mascot = document.createElement('img');
       mascot.className = 'pt-mascot';
-      mascot.src = 'assets/h-slots/pirate/pirate-mascot.png';
+      mascot.src = 'assets/h-slots/pirate/pirate-mascot-3.png';
       mascot.alt = '';
       wrap.appendChild(mascot);
       // move the WIN readout onto the cabinet's top wooden beam
@@ -1544,7 +1544,7 @@ function setCell(col, idx, symId, doubloonVal) {
   const src = (SYMBOL_IMGS[symId] ?? SYMBOL_IMGS[0]) + SYM_V;
   const img = document.createElement('img');
   img.alt = SYMBOL_NAMES[symId] || '';
-  img.style.cssText = 'width:72%;height:72%;object-fit:contain;display:block;margin:auto;background:transparent;';
+  img.style.cssText = 'width:78%;height:78%;object-fit:contain;display:block;margin:auto;background:transparent;';
   // gold placeholder only if this symbol isn't decoded yet (preloaded URL matches src)
   const pre = _preloaded[symId];
   if (!pre || !pre.complete || pre.naturalWidth === 0) {
