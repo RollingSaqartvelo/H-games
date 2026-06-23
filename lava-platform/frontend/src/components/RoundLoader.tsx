@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useGame } from '../store/game'
 
-const LOADER_MS = 2000
+const LOADER_MS = 4000
 
 /**
  * Inter-round loader: after the crash sequence (WASTED) finishes, show the

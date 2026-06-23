@@ -216,7 +216,7 @@ ul, li { list-style: none; }
   width: 0;
   border-radius: 99px;
   background: linear-gradient(90deg, #b8860b, #ffd700, #fff0a0);
-  animation: rl-fill 2s linear forwards;
+  animation: rl-fill 4s linear forwards;
 }
 @keyframes rl-fill { from { width: 0 } to { width: 100% } }
 
