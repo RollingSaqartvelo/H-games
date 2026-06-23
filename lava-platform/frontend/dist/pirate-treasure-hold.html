@@ -563,7 +563,7 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
 
   /* pirate mascot standing to the LEFT of the cabinet, rooted at the very
      bottom (boots clipped by game-wrap overflow), head/monkey up by the reels */
-  .pt-mascot{ position:absolute; left:40px; bottom:-3%; height:53%; width:auto; z-index:4;
+  .pt-mascot{ position:absolute; left:-80px; bottom:-3%; height:53%; width:auto; z-index:4;
      pointer-events:none; filter:drop-shadow(0 8px 16px rgba(0,0,0,.55));
      transform-origin:50% 100%; animation:mascotIdle 5.5s ease-in-out infinite; }
   @keyframes mascotIdle{
@@ -598,7 +598,7 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
   .col-jackpot{ display:none; }
   .col-jackpot .jp-panel-wrap{ width:100%; height:auto; }
   .col-jackpot .jp-panel-img{ width:100%; height:auto; object-fit:contain; }
-  .bottom-panel{ grid-area:controls; z-index:1; padding:5px 10px 10px; transform:translateY(-40px); }
+  .bottom-panel{ grid-area:controls; z-index:0; padding:5px 10px 10px; transform:translateY(-140px); }
 
   /* full-width wooden beam (palka, cropped to the beam): SPIN centred, − / amount / + on the right */
   .bottom-panel .bet-row{ position:relative; width:982px; aspect-ratio:1968/214;
