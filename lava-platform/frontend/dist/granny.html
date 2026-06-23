@@ -900,40 +900,40 @@
     /* ═══ Desktop Aviator-style layout (≥1000px) ═══════════════════════════════
        Stats left, history top, 16:9 game screen (contain), bet panels bottom. */
     @media (min-width:1000px){
-      /* ═══ Cabinet skin: "Кабинет гренни.png" as the fixed-aspect frame,
-         live zones overlaid on the drawn slots (mobile layout untouched). ═══ */
+      /* ═══ Cabinet skin: "кабинет гренни 2" as the fixed-aspect frame,
+         live zones overlaid on the slots (mobile layout untouched). ═══ */
       .gran-panel{ display:contents; }
 
       .app{
         position:relative; display:block;
-        width:96vw; max-width:1240px; aspect-ratio:1411/1115;
+        width:96vw; max-width:1240px; aspect-ratio:1412/1114;
         min-height:0; margin:16px auto; padding:0;
-        background:#0a2a2e url('/assets/granny/granny-cabinet.png?v=1') center/100% 100% no-repeat;
+        background:#0a2a2e url('/assets/granny/granny-cabinet.png?v=2') center/100% 100% no-repeat;
         border:none; border-radius:20px; box-shadow:0 10px 40px rgba(0,0,0,.5);
         overflow:hidden;
       }
       /* top bar (back + balance) over the drawn title bar */
-      .topbar{ position:absolute!important; top:1%; left:3%; width:94%; height:4.6%;
+      .topbar{ position:absolute!important; top:0.8%; left:3%; width:94%; height:4.2%;
         background:transparent!important; border:none!important; padding:0!important; }
-      /* multiplier-history pills near the drawn "?" + multiplier pill */
-      .np-history{ position:absolute!important; top:8.8%; left:38%; width:28%; height:3.2%;
+      /* multiplier-history pills at the top of the game screen */
+      .np-history{ position:absolute!important; top:8%; left:33%; width:30%; height:3%;
         background:transparent!important; }
-      /* left stats list over the drawn bets panel */
+      /* left stats list (tabs + BETS/PLAYERS/TOP WIN + list) over the left panel */
       .lip{
-        position:absolute!important; left:1.6%; top:12.2%; width:11.6%; height:53%;
+        position:absolute!important; left:2.8%; top:7%; width:25.5%; height:71%;
         margin:0!important; max-width:none!important; min-height:0; overflow:hidden;
         background:transparent!important; border:none!important; border-radius:0;
       }
-      /* game screen over the drawn dark screen */
+      /* game screen over the big drawn screen */
       .game-area{
-        position:absolute!important; left:14.3%; top:12.5%; width:83.5%; height:53%;
+        position:absolute!important; left:31%; top:9.5%; width:66%; height:68%;
         margin:0!important; aspect-ratio:auto!important;
-        background:transparent!important; border:none!important; border-radius:10px;
+        background:transparent!important; border:none!important; border-radius:14px;
       }
       #bvbVideo{ object-fit:cover!important; background:transparent!important; }
-      /* both live bet panels over the two drawn panels */
+      /* live bet panels in the clear bottom area (right of the clipboard) */
       .bet-footer{
-        position:absolute!important; left:13.5%; top:66.5%; width:73.5%; height:31%;
+        position:absolute!important; left:31%; top:79.5%; width:66%; height:18.5%;
         margin:0!important; display:flex!important; flex-direction:row; gap:2.5%;
         align-items:flex-start; justify-content:center;
       }
