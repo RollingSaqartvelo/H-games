@@ -1678,6 +1678,27 @@ ul, li { list-style: none; }
     overflow: hidden;
   }
 
+  /* flickering warm glow over the drawn lamp (bottom-left) */
+  .app::before {
+    content: ''; position: absolute; left: 5%; top: 80%;
+    width: 13%; aspect-ratio: 1; transform: translate(-50%, -50%);
+    border-radius: 50%; pointer-events: none; z-index: 3; mix-blend-mode: screen;
+    background: radial-gradient(circle, rgba(255,190,90,.9) 0%, rgba(255,150,40,.45) 38%, rgba(255,120,20,0) 70%);
+    animation: lampFlicker 2.6s infinite;
+  }
+  @keyframes lampFlicker {
+    0%   { opacity: .85; transform: translate(-50%,-50%) scale(1); }
+    8%   { opacity: .55; transform: translate(-50%,-50%) scale(.96); }
+    14%  { opacity: .95; transform: translate(-50%,-50%) scale(1.04); }
+    22%  { opacity: .65; transform: translate(-50%,-50%) scale(.98); }
+    35%  { opacity: 1;   transform: translate(-50%,-50%) scale(1.05); }
+    48%  { opacity: .6;  transform: translate(-50%,-50%) scale(.97); }
+    60%  { opacity: .9;  transform: translate(-50%,-50%) scale(1.02); }
+    72%  { opacity: .5;  transform: translate(-50%,-50%) scale(.95); }
+    85%  { opacity: .92; transform: translate(-50%,-50%) scale(1.03); }
+    100% { opacity: .85; transform: translate(-50%,-50%) scale(1); }
+  }
+
   /* lift the footer's children (bet panel + stats) out so they can be placed */
   .app__footer  { display: contents; }
   .player-badge { display: none; }
@@ -1714,8 +1735,8 @@ ul, li { list-style: none; }
     position: absolute !important; inset: 0 !important; width: 100% !important; height: 100% !important;
   }
   #running-bg-video, .rv-video { object-fit: cover !important; }
-  /* betting-stage video background removed on the cabinet (countdown stays) */
-  .bvb-wrap { display: none !important; }
+  /* betting-stage mp4 video shown in the broadcast screen (fills via .game-area rule) */
+  .bvb-wrap { display: block !important; }
 
   /* tabs & stat labels are already DRAWN on the cabinet — keep only transparent
      click targets + live values, don't re-draw them on top */
