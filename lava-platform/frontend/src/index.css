@@ -110,9 +110,13 @@ ul, li { list-style: none; }
   background: #000 url('/assets/hgames-logo.jpg') center center / contain no-repeat;
 }
 
-/* TEMP: static image background instead of mp4 — hide ALL video layers globally
-   (not only inside the desktop cabinet media query) so no mp4 ever plays. */
+/* TEMP: static image background instead of mp4 — hide ALL moving layers globally.
+   The "mp4" during running is the scrolling Pixi desert (z:1, revealed once the
+   HTML running video is hidden), so hide BOTH the videos AND the pixi canvas.
+   The visible riders are GifCharacters (z:10, a separate HTML layer) — unaffected. */
 #running-bg-video, .bvb-wrap, .rv-video { display: none !important; }
+.pixi-mount { display: none !important; }
+.game-area { background: #c8773a url('/assets/outlaw.png?v=1') center / cover no-repeat !important; }
 
 /* Soft fade at the bottom of the game area — blends the canyon footage into the
    dark betting-panel background so there is no hard seam / divider line. */
@@ -1730,7 +1734,7 @@ ul, li { list-style: none; }
   .game-area {
     position: absolute !important; left: 28%; top: 20.4%; width: 68.6%; height: 40.3%;
     margin: 0 !important; flex: none; aspect-ratio: auto !important;
-    background: #d9c9a8 url('/assets/new-bg-outlaw.png?v=1') center / cover no-repeat !important;
+    background: #c8773a url('/assets/outlaw.png?v=1') center / cover no-repeat !important;
     border: none !important; border-radius: 10px; box-shadow: none;
     overflow: hidden;
   }
