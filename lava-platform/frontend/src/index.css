@@ -1671,9 +1671,9 @@ ul, li { list-style: none; }
      History strip → purple-marked zone, broadcast → yellow-marked screen. ═══ */
   .app {
     position: relative; display: block;
-    width: 96vw; max-width: 1300px; aspect-ratio: 1587 / 991;
+    width: 96vw; max-width: 1300px; aspect-ratio: 1600 / 992;
     margin: 16px auto; min-height: 0; padding: 0;
-    background: #0a0603 url('/assets/new-cab-outlaw.png?v=1') center / 100% 100% no-repeat;
+    background: #0a0603 url('/assets/new-cabinet-outlaw.jpeg?v=1') center / 100% 100% no-repeat;
     border: none; border-radius: 18px; box-shadow: 0 10px 40px rgba(0,0,0,.55);
     overflow: hidden;
   }
