@@ -1703,7 +1703,7 @@ ul, li { list-style: none; }
 
   /* game broadcast — YELLOW-marked screen zone */
   .game-area {
-    position: absolute !important; left: 38%; top: 20.4%; width: 58.6%; height: 40.3%;
+    position: absolute !important; left: 28%; top: 20.4%; width: 68.6%; height: 40.3%;
     margin: 0 !important; flex: none; aspect-ratio: auto !important;
     background: transparent !important; border: none !important; border-radius: 10px; box-shadow: none;
     overflow: hidden;
@@ -1762,15 +1762,17 @@ ul, li { list-style: none; }
     margin: 0 !important; padding: 0 !important; }
   .dbp-toggle { position: absolute !important; inset: 0; background: none !important; border: none !important; }
   .dbp-toggle__label { display: none !important; }                           /* AUTO BET drawn */
+  /* knob sits over the drawn round knob (OFF) and slides to the right when ON.
+     No drawn button — just the existing gray knob moving. */
   .dbp-toggle__track { position: absolute !important; left: 50%; top: 50%; transform: translate(-50%,-50%);
-    width: 46% !important; aspect-ratio: 1; min-width: 0; height: auto !important;
-    border-radius: 50% !important; background: radial-gradient(circle at 35% 30%, #6f6f6f, #262626 70%) !important;
-    box-shadow: 0 1px 3px rgba(0,0,0,.6) !important; animation: ab-idle 2.4s ease-in-out infinite; }
+    width: 44% !important; aspect-ratio: 1; min-width: 0; height: auto !important;
+    border-radius: 50% !important; background: radial-gradient(circle at 35% 30%, #7a7a7a, #2a2a2a 72%) !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,.7) !important;
+    transition: left .26s cubic-bezier(.4,1.4,.6,1), background .26s, box-shadow .26s; }
   .dbp-toggle__track::after { display: none !important; }
-  .dbp-toggle--on .dbp-toggle__track { background: radial-gradient(circle at 35% 30%, #ffd27a, #c8860f 70%) !important;
-    box-shadow: 0 0 10px rgba(255,190,70,.85) !important; animation: ab-on 1s ease-in-out infinite; }
-  @keyframes ab-idle { 0%,100%{ box-shadow: 0 1px 3px rgba(0,0,0,.6); } 50%{ box-shadow: 0 0 8px rgba(214,158,46,.55); } }
-  @keyframes ab-on { 0%,100%{ transform: translate(-50%,-50%) scale(1); } 50%{ transform: translate(-50%,-50%) scale(1.13); } }
+  .dbp-toggle--on .dbp-toggle__track { left: 86% !important;
+    background: radial-gradient(circle at 35% 30%, #a9a9a9, #3a3a3a 72%) !important;
+    box-shadow: 0 0 7px rgba(214,158,46,.5), 0 1px 3px rgba(0,0,0,.7) !important; }
 
   /* main action button over the drawn NEXT ROUND BET */
   .dbp-btn-area { position: absolute !important; top: 66%; left: 0%; width: 58%; height: 30%; margin: 0 !important; }
