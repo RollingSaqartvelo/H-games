@@ -1703,12 +1703,17 @@ ul, li { list-style: none; }
 
   /* game broadcast — YELLOW-marked screen zone */
   .game-area {
-    position: absolute !important; left: 39.4%; top: 20.7%; width: 57%; height: 40.3%;
+    position: absolute !important; left: 38%; top: 20.4%; width: 58.6%; height: 40.3%;
     margin: 0 !important; flex: none; aspect-ratio: auto !important;
     background: transparent !important; border: none !important; border-radius: 10px; box-shadow: none;
+    overflow: hidden;
   }
   .game-area::after { display: none; }
-  #running-bg-video { object-fit: cover !important; }
+  /* every broadcast layer fills the whole screen zone (no black gap on the left) */
+  .game-area > *, .pixi-mount, .pixi-mount canvas, .bvb-wrap, #running-bg-video, .rv-video {
+    position: absolute !important; inset: 0 !important; width: 100% !important; height: 100% !important;
+  }
+  #running-bg-video, .rv-video { object-fit: cover !important; }
   /* betting-stage video background removed on the cabinet (countdown stays) */
   .bvb-wrap { display: none !important; }
 
