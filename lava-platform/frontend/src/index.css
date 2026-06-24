@@ -1798,7 +1798,8 @@ ul, li { list-style: none; }
 
   /* ── Bet panel: dedicated "bet panel.png" placed over the cabinet's lower bet
      zone; transparent live controls aligned onto its drawn buttons ── */
-  .dbp-root { position: absolute !important; left: 37%; top: 60%; width: 46%;
+  .dbp-root { display: none !important; }   /* current bet panel hidden per request */
+  .dbp-root.__keep { position: absolute !important; left: 37%; top: 60%; width: 46%;
     aspect-ratio: 1600 / 894; height: auto !important;
     margin: 0 !important; max-width: none; z-index: 6;
     background: url('/assets/bet-panel.png?v=1') center / 100% 100% no-repeat; }
