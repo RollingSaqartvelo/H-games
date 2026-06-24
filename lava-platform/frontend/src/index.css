@@ -1726,7 +1726,8 @@ ul, li { list-style: none; }
   .game-area {
     position: absolute !important; left: 28%; top: 20.4%; width: 68.6%; height: 40.3%;
     margin: 0 !important; flex: none; aspect-ratio: auto !important;
-    background: transparent !important; border: none !important; border-radius: 10px; box-shadow: none;
+    background: #d9c9a8 url('/assets/new-bg-outlaw.png?v=1') center / cover no-repeat !important;
+    border: none !important; border-radius: 10px; box-shadow: none;
     overflow: hidden;
   }
   .game-area::after { display: none; }
@@ -1734,9 +1735,8 @@ ul, li { list-style: none; }
   .game-area > *, .pixi-mount, .pixi-mount canvas, .bvb-wrap, #running-bg-video, .rv-video {
     position: absolute !important; inset: 0 !important; width: 100% !important; height: 100% !important;
   }
-  #running-bg-video, .rv-video { object-fit: cover !important; }
-  /* betting-stage mp4 video shown in the broadcast screen (fills via .game-area rule) */
-  .bvb-wrap { display: block !important; }
+  /* static image replaces the mp4 background for now — hide both video layers */
+  #running-bg-video, .rv-video, .bvb-wrap { display: none !important; }
 
   /* ── OUR ivory / ornamental statistics design (left zone is blank on this cabinet) ── */
   .bv-tabs { display: flex !important; gap: 4%; justify-content: center; }
