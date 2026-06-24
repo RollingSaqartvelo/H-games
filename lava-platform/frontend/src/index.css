@@ -1712,15 +1712,15 @@ ul, li { list-style: none; }
   .mh-row { position: absolute !important; left: 38.5%; top: 12.1%; width: 57.5%; height: 6.6%;
     margin: 0 !important; background: transparent !important; }
 
-  /* left stats list — over the drawn left panel */
+  /* ── Statistics panel — fills the empty left felt zone, OUR ivory/ornamental design ── */
   .bv-root {
-    position: absolute !important; left: 14.3%; top: 25%; width: 22.8%; height: 38%; z-index: 6;
-    margin: 0 !important; min-height: 0; overflow-y: auto;
+    position: absolute !important; left: 4%; top: 14.5%; width: 31.5%; height: 47%; z-index: 6;
+    margin: 0 !important; min-height: 0; overflow: hidden;
     background: transparent !important; border: none !important; border-radius: 0; box-shadow: none;
+    display: flex !important; flex-direction: column;
+    --ivory: #ece0c4; --ivory-dim: rgba(236,224,196,.62); --ivory-gold: #e3b765;
   }
-  /* enlarge tab click targets so the drawn ALL/MY/TOP/LAST ROUND are tappable */
-  .bv-header { padding: 2px 8px 0 !important; }
-  .bv-tab { padding: 8px 12px !important; }
+  .bv-header { padding: 0 !important; }
 
   /* game broadcast — YELLOW-marked screen zone */
   .game-area {
@@ -1738,16 +1738,55 @@ ul, li { list-style: none; }
   /* betting-stage mp4 video shown in the broadcast screen (fills via .game-area rule) */
   .bvb-wrap { display: block !important; }
 
-  /* tabs & stat labels are already DRAWN on the cabinet — keep only transparent
-     click targets + live values, don't re-draw them on top */
+  /* ── OUR ivory / ornamental statistics design (left zone is blank on this cabinet) ── */
+  .bv-tabs { display: flex !important; gap: 4%; justify-content: center; }
   .bv-tab, .bv-tab--active {
-    background: none !important; border: none !important; color: transparent !important;
-    box-shadow: none !important;
-  }
-  .bv-pill { background: none !important; border: none !important; color: transparent !important; }
-  .bv-stats { border: none !important; }
-  .bv-stat + .bv-stat { border-left: none !important; }
-  .bv-stat-lbl { color: transparent !important; }   /* BETS / PLAYERS / TOP WIN drawn on cabinet */
+    flex: 1 1 0; background: rgba(20,12,6,.35) !important;
+    border: 1px solid rgba(236,224,196,.22) !important; border-radius: 5px !important;
+    box-shadow: inset 0 0 8px rgba(0,0,0,.4) !important;
+    font-family: 'Rye', Georgia, serif !important; font-size: clamp(8px, 1vw, 13px) !important;
+    letter-spacing: .5px; color: var(--ivory-dim) !important; padding: 5px 0 !important;
+    text-shadow: 0 1px 1px rgba(0,0,0,.7); transition: color .15s, border-color .15s; }
+  .bv-tab--active {
+    color: var(--ivory) !important; border-color: rgba(227,183,101,.7) !important;
+    box-shadow: inset 0 0 10px rgba(227,183,101,.25), 0 0 6px rgba(227,183,101,.2) !important; }
+  .bv-pill {
+    background: none !important; border: none !important;
+    font-family: 'Rye', Georgia, serif !important; color: var(--ivory-gold) !important;
+    font-size: clamp(8px, .95vw, 12px) !important; letter-spacing: 1px; text-align: center;
+    margin-top: 3% !important; text-shadow: 0 1px 2px rgba(0,0,0,.8); }
+
+  .bv-stats { border: none !important; display: flex !important; justify-content: space-between;
+    margin: 4% 0 !important; padding: 4% 2% !important;
+    border-top: 1px solid rgba(236,224,196,.18) !important;
+    border-bottom: 1px solid rgba(236,224,196,.18) !important; }
+  .bv-stat { text-align: center; flex: 1 1 0; }
+  .bv-stat + .bv-stat { border-left: 1px solid rgba(236,224,196,.14) !important; }
+  .bv-stat-lbl { display: block; font-family: 'Rye', Georgia, serif !important;
+    color: var(--ivory-dim) !important; font-size: clamp(7px, .8vw, 10px) !important; letter-spacing: .5px; }
+  .bv-stat-val { display: block; font-family: 'Rye', Georgia, serif !important;
+    color: var(--ivory) !important; font-size: clamp(10px, 1.2vw, 16px) !important;
+    text-shadow: 0 1px 2px rgba(0,0,0,.8); margin-top: 2px; }
+
+  .bv-list { flex: 1 1 auto; overflow-y: auto; min-height: 0; padding-right: 2px; }
+  .bv-row { display: flex !important; align-items: center; gap: 5px;
+    padding: 4px 4px !important; border-bottom: 1px solid rgba(236,224,196,.08) !important;
+    font-family: 'Rye', Georgia, serif !important; font-size: clamp(7px, .82vw, 11px) !important;
+    color: var(--ivory) !important; background: none !important; }
+  .bv-name { color: var(--ivory) !important; flex: 1 1 auto; white-space: nowrap;
+    overflow: hidden; text-overflow: ellipsis; }
+  .bv-bet  { color: var(--ivory-dim) !important; }
+  .bv-mult { color: var(--ivory-gold) !important; }
+  .bv-mult--lost { color: #b65a4a !important; }
+  .bv-profit--win  { color: #7fc77a !important; }
+  .bv-profit--loss { color: #b65a4a !important; }
+  .bv-profit--live { color: var(--ivory-gold) !important; }
+  .bv-rank { color: var(--ivory-gold) !important; font-family: 'Rye', Georgia, serif !important; }
+  .bv-avatar { font-family: 'Rye', Georgia, serif !important; color: var(--ivory) !important;
+    border: 1px solid rgba(236,224,196,.25) !important; }
+  .bv-empty { font-family: 'Rye', Georgia, serif !important; color: var(--ivory-dim) !important;
+    text-align: center; padding: 16% 8% !important; font-size: clamp(8px, .9vw, 12px) !important;
+    letter-spacing: .5px; line-height: 1.5; }
 
   /* ── Bet panel: dedicated "bet panel.png" placed over the cabinet's lower bet
      zone; transparent live controls aligned onto its drawn buttons ── */
