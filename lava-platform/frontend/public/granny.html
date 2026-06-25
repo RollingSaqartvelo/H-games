@@ -385,10 +385,15 @@
       font-size:0!important;
       display:flex!important;align-items:center;justify-content:center;text-align:center;
       touch-action:manipulation;cursor:pointer;border:none;padding:0!important;margin:0;
-      transition:none!important;animation:none!important;
+      transition:transform .08s ease, box-shadow .08s ease;animation:none!important;
       z-index:5;
     }
-    .bet-panel .bp-btn:not(:disabled):active{filter:none!important;transform:none!important}
+    /* press-in feedback over the drawn green BET */
+    .bet-panel .bp-btn:not(:disabled):active{
+      transform:scale(.95) translateY(1px)!important;
+      box-shadow:inset 0 3px 14px rgba(0,0,0,.5), inset 0 0 0 99px rgba(0,0,0,.14)!important;
+      border-radius:13%!important;
+    }
     .bet-panel .bp-btn-bet{background:transparent!important;color:transparent!important}
     .bet-panel .bp-btn-cashout{background:transparent!important;color:transparent!important}
     .bet-panel .bp-btn-next-round{background:transparent!important;color:transparent!important;box-shadow:none!important;animation:none!important}
