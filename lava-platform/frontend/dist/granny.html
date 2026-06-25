@@ -374,25 +374,25 @@
 
     /* Big action button (right side, spans rows 2–3) — BET / CASH OUT / NEXT BET */
     .bet-panel .bp-btn-pair{display:none!important}
+    /* transparent click-target over the drawn green BET — no button visual/animation */
     .bet-panel .bp-btn{
       position:absolute!important;
       left:67%;top:33%;width:31%!important;height:42%!important;
       aspect-ratio:unset!important;border-radius:13%!important;
-      background:linear-gradient(160deg,#33d9ac 0%,#1f9e74 50%,#13795c 100%)!important;
-      box-shadow:0 3px 12px rgba(15,120,90,.45), inset 0 2px 0 rgba(255,255,255,.35)!important;
-      color:#fff;
-      font-family:'Rajdhani',sans-serif;
-      font-size:clamp(13px,3.4vw,21px)!important;font-weight:800;letter-spacing:2px;
+      background:transparent!important;
+      box-shadow:none!important;
+      color:transparent!important;
+      font-size:0!important;
       display:flex!important;align-items:center;justify-content:center;text-align:center;
-      touch-action:manipulation;cursor:pointer;border:none;padding:0 4%!important;margin:0;
-      transition:filter .12s,transform .12s;
+      touch-action:manipulation;cursor:pointer;border:none;padding:0!important;margin:0;
+      transition:none!important;animation:none!important;
       z-index:5;
     }
-    .bet-panel .bp-btn:not(:disabled):active{filter:brightness(.93);transform:scale(.97)}
-    .bet-panel .bp-btn-bet{background:linear-gradient(160deg,#33d9ac 0%,#1f9e74 50%,#13795c 100%)!important;color:#fff!important}
-    .bet-panel .bp-btn-cashout{background:linear-gradient(160deg,#46e89a 0%,#23b277 50%,#149455 100%)!important;color:#fff!important}
-    .bet-panel .bp-btn-next-round{background:linear-gradient(160deg,#ffa83a 0%,#ff7d10 50%,#e85f00 100%)!important;color:#fff!important;box-shadow:0 3px 12px rgba(200,90,0,.45),inset 0 2px 0 rgba(255,255,255,.4)!important;animation:none!important;font-size:clamp(9px,2.3vw,14px)!important;letter-spacing:.3px!important}
-    .bet-panel .bp-btn:disabled{filter:saturate(.45) brightness(.85);cursor:default}
+    .bet-panel .bp-btn:not(:disabled):active{filter:none!important;transform:none!important}
+    .bet-panel .bp-btn-bet{background:transparent!important;color:transparent!important}
+    .bet-panel .bp-btn-cashout{background:transparent!important;color:transparent!important}
+    .bet-panel .bp-btn-next-round{background:transparent!important;color:transparent!important;box-shadow:none!important;animation:none!important}
+    .bet-panel .bp-btn:disabled{filter:none;cursor:default}
 
     /* ── HISTORY — past-game pills, green theme (above the screen) ── */
     .np-history{
