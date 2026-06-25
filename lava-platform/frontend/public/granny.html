@@ -916,18 +916,37 @@
       .topbar{ position:absolute!important; top:0.8%; left:3%; width:94%; height:4.2%;
         background:transparent!important; border:none!important; padding:0!important; }
       .topbar-logo{ display:none!important; }   /* GRANNY RUN is drawn on the cabinet */
-      /* 3 top-bar squares: sound / info / settings — transparent click-targets */
-      .snd-toggle, .info-btn, .settings-btn{ display:block!important; position:absolute!important;
-        top:11.3%; width:4.9%; height:6%; background:transparent; border:none; padding:0; cursor:pointer;
-        border-radius:7px; -webkit-tap-highlight-color:transparent; z-index:6; }
-      .snd-toggle{ left:82.4%; animation:sndPulse 1.8s ease-in-out infinite; }
-      .snd-toggle.muted{ animation:none!important; box-shadow:inset 0 0 8px rgba(255,90,90,.55); }
-      .info-btn{ left:88.4%; }
-      .settings-btn{ left:94.3%; }
-      .info-btn:hover,.settings-btn:hover,.info-btn:active,.settings-btn:active{
-        box-shadow:0 0 10px 2px rgba(95,224,180,.5); }
+      /* 3 top-bar squares: timer / sound / info — icons inside */
+      .timer-btn, .snd-toggle, .info-btn{ display:flex!important; position:absolute!important;
+        top:11.3%; width:4.9%; height:6%; align-items:center; justify-content:center;
+        background:transparent; border:none; padding:0; border-radius:7px;
+        -webkit-tap-highlight-color:transparent; z-index:6; color:#5fe0b4; }
+      .timer-btn svg, .snd-toggle svg, .info-btn svg{ width:60%; height:60%; display:block; }
+      .timer-btn{ left:82.4%; cursor:default; }
+      .snd-toggle{ left:88.4%; cursor:pointer; animation:sndPulse 1.8s ease-in-out infinite; }
+      .snd-toggle.muted{ animation:none!important; color:#ff6a6a; }
+      .snd-toggle .ic-muted{ display:none; }
+      .snd-toggle.muted .ic-sound{ display:none; }
+      .snd-toggle.muted .ic-muted{ display:block; }
+      .info-btn{ left:94.3%; cursor:pointer; }
+      .info-btn:hover, .info-btn:active{ box-shadow:0 0 10px 2px rgba(95,224,180,.5); }
       @keyframes sndPulse{ 0%,100%{ box-shadow:0 0 4px 1px rgba(95,224,180,.25) }
-        50%{ box-shadow:0 0 13px 3px rgba(95,224,180,.6) } }
+        50%{ box-shadow:0 0 13px 3px rgba(95,224,180,.55) } }
+      /* rules modal */
+      .rules-modal{ position:fixed; inset:0; z-index:99998; background:rgba(0,10,16,.82);
+        display:flex; align-items:center; justify-content:center; padding:20px; }
+      .rules-box{ position:relative; max-width:560px; width:92%; max-height:84vh; overflow-y:auto;
+        background:linear-gradient(160deg,#0a2030,#06121f); border:1.5px solid rgba(95,224,180,.5);
+        border-radius:16px; box-shadow:0 0 44px rgba(0,180,200,.28); padding:26px 28px;
+        color:#cfeee4; font-family:'Rajdhani',sans-serif; }
+      .rules-box h2{ color:#5fe0b4; margin:0 0 6px; font-size:23px; letter-spacing:1px; }
+      .rules-box h3{ color:#7fe0c0; margin:16px 0 5px; font-size:15px; letter-spacing:.5px; }
+      .rules-box p{ font-size:13.5px; line-height:1.55; color:#bfe0d8; margin:4px 0; }
+      .rules-box ul{ margin:4px 0 0; padding-left:18px; }
+      .rules-box li{ font-size:13.5px; line-height:1.55; color:#bfe0d8; margin:3px 0; }
+      .rules-box b{ color:#eafff7; }
+      .rules-close{ position:absolute; top:8px; right:12px; background:transparent; border:none;
+        color:#7fe0c0; font-size:24px; line-height:1; cursor:pointer; }
       /* multiplier-history pills at the top of the game screen — compact so they fit */
       .np-history{ position:absolute!important; top:11.49%; left:29.05%; width:52.9%; height:5.8%;
         background:transparent!important; overflow:hidden; }
@@ -1071,10 +1090,45 @@
     <div class="state-badge betting" id="stateBadge">BETTING</div>
   </div>
 
-  <!-- 3 top-bar square slots: sound / info / settings -->
-  <button id="sndToggle"     class="snd-toggle"    aria-label="sound"    onclick="toggleSound()"  style="display:none"></button>
-  <button id="infoBtn"       class="info-btn"      aria-label="info"     onclick="showInfo()"     style="display:none"></button>
-  <button id="settingsBtn"   class="settings-btn"  aria-label="settings" onclick="showSettings()" style="display:none"></button>
+  <!-- 3 top-bar square slots: timer / sound / info -->
+  <div id="timerBtn" class="timer-btn" aria-label="timer" style="display:none">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7.5V12l3 2"/></svg>
+  </div>
+  <button id="sndToggle" class="snd-toggle" aria-label="sound" onclick="toggleSound()" style="display:none">
+    <svg class="ic-sound" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16 8.5a5 5 0 0 1 0 7"/><path d="M18.7 6a9 9 0 0 1 0 12"/></svg>
+    <svg class="ic-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16.5 9.5l5 5M21.5 9.5l-5 5"/></svg>
+  </button>
+  <button id="infoBtn" class="info-btn" aria-label="info" onclick="showInfo()" style="display:none">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 7.6h.01"/></svg>
+  </button>
+
+  <!-- rules modal -->
+  <div id="rulesModal" class="rules-modal" style="display:none" onclick="if(event.target===this)hideInfo()">
+    <div class="rules-box">
+      <button class="rules-close" onclick="hideInfo()" aria-label="close">&#10005;</button>
+      <h2>GRANNY RUN — Правила</h2>
+
+      <h3>Как играть</h3>
+      <p>Сделай ставку до старта раунда. После старта множитель растёт от <b>1.00×</b> и выше. Забери выигрыш кнопкой <b>BET → CASH OUT</b> до того, как бабушка сорвётся (краш). Успел вывести — получаешь <b>ставка × множитель</b> на момент вывода. Не успел до краша — ставка сгорает.</p>
+      <p>Можно играть <b>двумя ставками одновременно</b> — левая и правая панели независимы.</p>
+
+      <h3>Волатильность</h3>
+      <p>Средне-высокая. Большинство раундов крашится на низких множителях (<b>1.1×–2×</b>), но регулярно вылетают высокие (<b>10×, 50×, 100×+</b>). Чем дольше ждёшь — тем больше выигрыш и риск. Стратегии: частые мелкие выводы на 1.3×–1.8× либо редкие крупные на риск.</p>
+
+      <h3>Кнопки</h3>
+      <ul>
+        <li><b>BET / CASH OUT</b> — поставить ставку, затем во время раунда забрать выигрыш.</li>
+        <li><b>− / +</b> — уменьшить / увеличить сумму ставки.</li>
+        <li><b>5 / 25 / 50 / 100</b> — быстрый выбор суммы ставки.</li>
+        <li><b>Поле суммы</b> — ввести точную сумму вручную.</li>
+        <li><b>Autobet</b> — автоставка: ставка делается автоматически каждый раунд.</li>
+        <li><b>Autowithdrawal</b> — автовывод: выигрыш забирается автоматически на заданном множителе (поле справа, напр. 2.00).</li>
+        <li><b>Таймер (🕐)</b> — обратный отсчёт до старта/конца раунда.</li>
+        <li><b>Звук (🔊)</b> — включить / выключить музыку и звуки.</li>
+        <li><b>Инфо (i)</b> — это окно с правилами.</li>
+      </ul>
+    </div>
+  </div>
 
   <!-- Gran panel (background image + all game UI inside) -->
   <div class="gran-panel">
@@ -1401,10 +1455,10 @@ function toggleSound() {
   if (b) b.classList.toggle('muted', window._sndMuted)
 }
 function showInfo() {
-  alert('GRANNY RUN — крэш-игра.\n\nСделай ставку до старта раунда. Множитель растёт — забери выигрыш кнопкой до того, как бабушка сорвётся. Чем выше множитель, тем больше выигрыш и риск.')
+  const m = document.getElementById('rulesModal'); if (m) m.style.display = 'flex'
 }
-function showSettings() {
-  alert('Настройки скоро будут доступны.')
+function hideInfo() {
+  const m = document.getElementById('rulesModal'); if (m) m.style.display = 'none'
 }
 
 // ── UI Sound Engine (Web Audio API) ──────────────────────────────────────────
