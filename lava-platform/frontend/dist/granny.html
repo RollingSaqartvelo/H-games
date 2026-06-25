@@ -916,19 +916,19 @@
       .topbar{ position:absolute!important; top:0.8%; left:3%; width:94%; height:4.2%;
         background:transparent!important; border:none!important; padding:0!important; }
       .topbar-logo{ display:none!important; }   /* GRANNY RUN is drawn on the cabinet */
-      /* 3 top-bar squares: timer / sound / info — icons inside */
+      /* 3 top-bar squares: timer / sound / info — emoji icons inside */
       .timer-btn, .snd-toggle, .info-btn{ display:flex!important; position:absolute!important;
-        top:11.3%; width:4.9%; height:6%; align-items:center; justify-content:center;
+        top:11.74%; width:4.9%; height:6%; align-items:center; justify-content:center;
         background:transparent; border:none; padding:0; border-radius:7px;
-        -webkit-tap-highlight-color:transparent; z-index:6; color:#5fe0b4; }
-      .timer-btn svg, .snd-toggle svg, .info-btn svg{ width:60%; height:60%; display:block; }
-      .timer-btn{ left:82.4%; cursor:default; }
-      .snd-toggle{ left:88.4%; cursor:pointer; animation:sndPulse 1.8s ease-in-out infinite; }
-      .snd-toggle.muted{ animation:none!important; color:#ff6a6a; }
+        -webkit-tap-highlight-color:transparent; z-index:6;
+        font-size:clamp(15px,1.9vw,25px); line-height:1; }
+      .timer-btn{ left:82.06%; cursor:default; }
+      .snd-toggle{ left:88.06%; cursor:pointer; animation:sndPulse 1.8s ease-in-out infinite; }
+      .snd-toggle.muted{ animation:none!important; }
       .snd-toggle .ic-muted{ display:none; }
       .snd-toggle.muted .ic-sound{ display:none; }
-      .snd-toggle.muted .ic-muted{ display:block; }
-      .info-btn{ left:94.3%; cursor:pointer; }
+      .snd-toggle.muted .ic-muted{ display:inline; }
+      .info-btn{ left:93.96%; cursor:pointer; }
       .info-btn:hover, .info-btn:active{ box-shadow:0 0 10px 2px rgba(95,224,180,.5); }
       @keyframes sndPulse{ 0%,100%{ box-shadow:0 0 4px 1px rgba(95,224,180,.25) }
         50%{ box-shadow:0 0 13px 3px rgba(95,224,180,.55) } }
@@ -1090,17 +1090,10 @@
     <div class="state-badge betting" id="stateBadge">BETTING</div>
   </div>
 
-  <!-- 3 top-bar square slots: timer / sound / info -->
-  <div id="timerBtn" class="timer-btn" aria-label="timer" style="display:none">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7.5V12l3 2"/></svg>
-  </div>
-  <button id="sndToggle" class="snd-toggle" aria-label="sound" onclick="toggleSound()" style="display:none">
-    <svg class="ic-sound" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16 8.5a5 5 0 0 1 0 7"/><path d="M18.7 6a9 9 0 0 1 0 12"/></svg>
-    <svg class="ic-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16.5 9.5l5 5M21.5 9.5l-5 5"/></svg>
-  </button>
-  <button id="infoBtn" class="info-btn" aria-label="info" onclick="showInfo()" style="display:none">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 7.6h.01"/></svg>
-  </button>
+  <!-- 3 top-bar square slots: timer / sound / info (emoji icons) -->
+  <div id="timerBtn" class="timer-btn" aria-label="timer" style="display:none">&#128336;</div>
+  <button id="sndToggle" class="snd-toggle" aria-label="sound" onclick="toggleSound()" style="display:none"><span class="ic-sound">&#128266;</span><span class="ic-muted">&#128263;</span></button>
+  <button id="infoBtn" class="info-btn" aria-label="info" onclick="showInfo()" style="display:none">&#8505;&#65039;</button>
 
   <!-- rules modal -->
   <div id="rulesModal" class="rules-modal" style="display:none" onclick="if(event.target===this)hideInfo()">
