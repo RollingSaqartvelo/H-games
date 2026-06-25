@@ -1796,56 +1796,55 @@ ul, li { list-style: none; }
     text-align: center; padding: 16% 8% !important; font-size: clamp(8px, .9vw, 12px) !important;
     letter-spacing: .5px; line-height: 1.5; }
 
-  /* ── Bet panel: dedicated "bet panel.png" placed over the cabinet's lower bet
-     zone; transparent live controls aligned onto its drawn buttons ── */
-  .dbp-root { display: none !important; }   /* current bet panel hidden per request */
-  .dbp-root.__keep { position: absolute !important; left: 37%; top: 60%; width: 46%;
-    aspect-ratio: 1600 / 894; height: auto !important;
-    margin: 0 !important; max-width: none; z-index: 6;
-    background: url('/assets/bet-panel.png?v=1') center / 100% 100% no-repeat; }
+  /* ── Bet panel "try-panel.png" (попробуй.png, 2182×721): full-width bar pinned
+     flush to the very bottom; live controls aligned to its drawn buttons.
+     Button coords measured in python as % of the full image. ── */
+  .dbp-root { display: block !important; position: absolute !important;
+    left: 0; right: 0; bottom: 0; width: 100%; aspect-ratio: 2182 / 721; height: auto !important;
+    margin: 0 !important; max-width: none; z-index: 8;
+    background: url('/assets/try-panel.png?v=1') center / 100% 100% no-repeat; }
   .dbp-block { position: absolute !important; inset: 0; padding: 0 !important;
     background: none !important; border: none !important; box-shadow: none !important; }
   .dbp-block__header { display: none !important; }
   .dbp-content { position: absolute !important; inset: 0; padding: 0 !important; display: block !important;
     background: none !important; border: none !important; box-shadow: none !important; }
 
-  /* − [amount] + row over the drawn − / display / + (panel top row) */
-  .dbp-amount-row { position: absolute !important; top: 6%; left: 4%; width: 92%; height: 14%;
+  /* − [amount] + row over drawn − / "$ 1.00 BET AMOUNT" / + */
+  .dbp-amount-row { position: absolute !important; top: 11%; left: 38.5%; width: 44.2%; height: 16%;
     margin: 0 !important; display: flex !important; align-items: center; gap: 0; }
-  .dbp-step-btn { flex: 0 0 10%; height: 100%; background: none !important; border: none !important;
+  .dbp-step-btn { flex: 0 0 12.5%; height: 100%; background: none !important; border: none !important;
     box-shadow: none !important; color: transparent !important; }            /* − / + drawn */
-  /* clickable amount input over the drawn black display slot */
-  .dbp-amount-display { flex: 1 1 auto; height: 88%; margin: 0 1%;
-    background: transparent !important; border: none !important; border-radius: 6px !important;
-    box-shadow: none !important;
+  /* clickable amount input over the drawn display slot (upper part = "$1.00") */
+  .dbp-amount-display { flex: 1 1 auto; height: 56%; margin: 0 8%; align-self: flex-start !important;
+    background: transparent !important; border: none !important; box-shadow: none !important;
     display: flex !important; align-items: center; justify-content: center; }
-  .dbp-amount-currency { color: #f3d488 !important; }
-  .dbp-amount-input { color: #f3d488 !important; opacity: 1 !important; text-align: center; }
+  .dbp-amount-currency { color: transparent !important; width: 0; }
+  .dbp-amount-input { color: #f3d488 !important; opacity: 1 !important; text-align: center;
+    font-family: 'Rye', Georgia, serif !important; }
 
-  /* quick chips over the drawn $1 / $5 / $10 / $50 */
-  .dbp-chips { position: absolute !important; top: 44%; left: 5%; width: 61%; height: 18%;
-    margin: 0 !important; display: flex !important; gap: 3%; }
+  /* quick chips over drawn $1 / $5 / $10 / $50 */
+  .dbp-chips { position: absolute !important; top: 31%; left: 39.4%; width: 36%; height: 9%;
+    margin: 0 !important; display: flex !important; gap: 2%; }
   .dbp-chip, .dbp-chip--active { flex: 1 1 0; height: 100%; background: none !important; border: none !important;
     box-shadow: none !important; color: transparent !important; }            /* values drawn */
 
-  /* AUTO BET — clickable area over the drawn "AUTO BET" text + small sliding knob
-     to its right (this panel draws only the text, no knob slot) */
-  .dbp-options { position: absolute !important; top: 44%; left: 74%; width: 24%; height: 18%;
+  /* AUTO BET — knob overlay on the drawn round knob (~88%), slides right when ON */
+  .dbp-options { position: absolute !important; top: 31%; left: 85.5%; width: 6%; height: 12%;
     margin: 0 !important; padding: 0 !important; }
   .dbp-toggle { position: absolute !important; inset: 0; background: none !important; border: none !important; }
-  .dbp-toggle__label { display: none !important; }                           /* AUTO BET drawn */
-  .dbp-toggle__track { position: absolute !important; left: 60%; top: 78%; transform: translate(-50%,-50%);
-    width: 16% !important; aspect-ratio: 1; min-width: 0; height: auto !important;
-    border-radius: 50% !important; background: radial-gradient(circle at 35% 30%, #7a7a7a, #2a2a2a 72%) !important;
-    box-shadow: 0 1px 3px rgba(0,0,0,.7) !important;
+  .dbp-toggle__label { display: none !important; }                           /* AUTO BET text drawn */
+  .dbp-toggle__track { position: absolute !important; left: 42%; top: 50%; transform: translate(-50%,-50%);
+    width: 70% !important; aspect-ratio: 1; min-width: 0; height: auto !important;
+    border-radius: 50% !important; background: radial-gradient(circle at 35% 30%, #4a4a4a, #141414 72%) !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,.8) !important;
     transition: left .26s cubic-bezier(.4,1.4,.6,1), background .26s, box-shadow .26s; }
   .dbp-toggle__track::after { display: none !important; }
-  .dbp-toggle--on .dbp-toggle__track { left: 90% !important;
+  .dbp-toggle--on .dbp-toggle__track { left: 85% !important;
     background: radial-gradient(circle at 35% 30%, #ffd27a, #c8860f 72%) !important;
-    box-shadow: 0 0 8px rgba(255,190,70,.8), 0 1px 3px rgba(0,0,0,.7) !important; }
+    box-shadow: 0 0 8px rgba(255,190,70,.85), 0 1px 3px rgba(0,0,0,.8) !important; }
 
-  /* main action button over the drawn NEXT ROUND BET (panel bottom) */
-  .dbp-btn-area { position: absolute !important; top: 72%; left: 9%; width: 82%; height: 17%; margin: 0 !important; }
+  /* main action button over drawn NEXT ROUND BET */
+  .dbp-btn-area { position: absolute !important; top: 56%; left: 39%; width: 43%; height: 11%; margin: 0 !important; }
   .dbp-btn, .dbp-btn--img { width: 100% !important; height: 100% !important;
     background: none !important; border: none !important; box-shadow: none !important; }
   .dbp-btn--img img { display: none !important; }
