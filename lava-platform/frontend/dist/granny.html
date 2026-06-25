@@ -906,9 +906,9 @@
 
       .app{
         position:relative; display:block;
-        width:91.2vw; max-width:1178px; aspect-ratio:1438/1093;
+        width:91.2vw; max-width:1178px; aspect-ratio:1437/1094;
         min-height:0; margin:16px auto; padding:0;
-        background:#06121f url('/assets/granny/new-cabinet-granny.png?v=1') center/100% 100% no-repeat;
+        background:#06121f url('/assets/granny/the-new-cabinet-granny.png?v=1') center/100% 100% no-repeat;
         border:none; border-radius:20px; box-shadow:0 10px 40px rgba(0,0,0,.5);
         overflow:hidden;
       }
@@ -916,37 +916,37 @@
       .topbar{ position:absolute!important; top:0.8%; left:3%; width:94%; height:4.2%;
         background:transparent!important; border:none!important; padding:0!important; }
       .topbar-logo{ display:none!important; }   /* GRANNY RUN is drawn on the cabinet */
-      /* sound toggle over the drawn speaker icon (exact size), pulsing animation */
-      .snd-toggle{ display:block!important; position:absolute!important; left:89.2%; top:10.1%; width:2.8%; height:3%;
-        background:transparent; border:none; padding:0; cursor:pointer; border-radius:6px;
-        -webkit-tap-highlight-color:transparent; z-index:6;
-        animation:sndPulse 1.8s ease-in-out infinite; }
+      /* 3 top-bar squares: sound / info / settings — transparent click-targets */
+      .snd-toggle, .info-btn, .settings-btn{ display:block!important; position:absolute!important;
+        top:7%; width:4%; height:5.8%; background:transparent; border:none; padding:0; cursor:pointer;
+        border-radius:7px; -webkit-tap-highlight-color:transparent; z-index:6; }
+      .snd-toggle{ left:86.5%; animation:sndPulse 1.8s ease-in-out infinite; }
       .snd-toggle.muted{ animation:none!important; box-shadow:inset 0 0 8px rgba(255,90,90,.55); }
+      .info-btn{ left:91.2%; }
+      .settings-btn{ left:96%; }
+      .info-btn:hover,.settings-btn:hover,.info-btn:active,.settings-btn:active{
+        box-shadow:0 0 10px 2px rgba(95,224,180,.5); }
       @keyframes sndPulse{ 0%,100%{ box-shadow:0 0 4px 1px rgba(95,224,180,.25) }
         50%{ box-shadow:0 0 13px 3px rgba(95,224,180,.6) } }
       /* multiplier-history pills at the top of the game screen — compact so they fit */
-      .np-history{ position:absolute!important; top:9.64%; left:32.34%; width:33%; height:3.6%;
+      .np-history{ position:absolute!important; top:6.9%; left:31.7%; width:53.3%; height:5.9%;
         background:transparent!important; overflow:hidden; }
       .np-history .hist-cur-pill, .np-history .pill{ font-size:10px!important; padding:0 7px!important;
         border-radius:7px!important; height:84%!important; }
       .np-history .hist-cur-pill::after{ display:none!important; }
-      /* clock moved into the empty far-right slot of the screen top bar */
-      .hist-clock{ display:flex!important; position:absolute!important;
-        left:97.7%; top:11.6%; transform:translate(-50%,-50%);
-        width:2%; height:3.2%; min-width:0;
-        background:transparent!important; border:none!important; box-shadow:none!important;
-        font-size:14px!important; color:#bfe8d6!important; z-index:6; }
+      /* clock removed — this cabinet's 3 slots are sound/info/settings */
+      .hist-clock{ display:none!important; }
       /* left stats list (tabs + BETS/PLAYERS/TOP WIN + list) over the left panel */
       /* left stats over the drawn tabs / BETS·PLAYERS·TOP WIN / list frames */
       .lip{
-        position:absolute!important; left:1.5%; top:5%; width:30%; height:66%;
+        position:absolute!important; left:2.1%; top:5.8%; width:27.8%; height:53%;
         margin:0!important; max-width:none!important; min-height:0; overflow:hidden;
         background:transparent!important; border:none!important; border-radius:0;
       }
       /* game screen over the big drawn screen */
       /* broadcast fills the screen ABOVE the two bet-panel blocks */
       .game-area{
-        position:absolute!important; left:34.99%; top:16.22%; width:61.2%; height:33%;
+        position:absolute!important; left:32%; top:16.3%; width:66%; height:35%;
         margin:0!important; aspect-ratio:auto!important;
         background:transparent!important; border:none!important; border-radius:14px;
       }
@@ -957,9 +957,9 @@
         position:absolute!important; inset:0; left:0; top:0; width:100%; height:100%;
         margin:0!important; display:block!important; pointer-events:none;
       }
-      #panel0.bet-panel{ position:absolute!important; left:36.53%; top:52.45%; width:27.2%; height:15.75%;
+      #panel0.bet-panel{ position:absolute!important; left:36.9%; top:52.2%; width:24.4%; height:17.5%;
         aspect-ratio:auto!important; max-width:none; margin:0!important; pointer-events:auto; }
-      #panel1.bet-panel{ position:absolute!important; left:67.3%; top:52%; width:29%; height:15.75%;
+      #panel1.bet-panel{ position:absolute!important; left:66.3%; top:52.2%; width:25.1%; height:17.5%;
         aspect-ratio:auto!important; max-width:none; margin:0!important; pointer-events:auto; }
     }
   </style>
@@ -1070,10 +1070,10 @@
     <div class="state-badge betting" id="stateBadge">BETTING</div>
   </div>
 
-  <!-- sound toggle — transparent click-target exactly over the drawn speaker icon -->
-  <button id="sndToggle" class="snd-toggle" aria-label="sound" onclick="toggleSound()" style="display:none"></button>
-  <!-- clock — sits in the empty (far-right) slot of the screen top bar -->
-  <div class="hist-clock" aria-label="clock" style="display:none">🕐</div>
+  <!-- 3 top-bar square slots: sound / info / settings -->
+  <button id="sndToggle"     class="snd-toggle"    aria-label="sound"    onclick="toggleSound()"  style="display:none"></button>
+  <button id="infoBtn"       class="info-btn"      aria-label="info"     onclick="showInfo()"     style="display:none"></button>
+  <button id="settingsBtn"   class="settings-btn"  aria-label="settings" onclick="showSettings()" style="display:none"></button>
 
   <!-- Gran panel (background image + all game UI inside) -->
   <div class="gran-panel">
@@ -1398,6 +1398,12 @@ function toggleSound() {
   if (_bgm) _bgm.muted = window._sndMuted
   const b = document.getElementById('sndToggle')
   if (b) b.classList.toggle('muted', window._sndMuted)
+}
+function showInfo() {
+  alert('GRANNY RUN — крэш-игра.\n\nСделай ставку до старта раунда. Множитель растёт — забери выигрыш кнопкой до того, как бабушка сорвётся. Чем выше множитель, тем больше выигрыш и риск.')
+}
+function showSettings() {
+  alert('Настройки скоро будут доступны.')
 }
 
 // ── UI Sound Engine (Web Audio API) ──────────────────────────────────────────
