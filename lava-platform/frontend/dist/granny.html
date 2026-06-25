@@ -288,7 +288,7 @@
       position:absolute;
       /* same BET PANEL.png shown smaller via CSS sprite (no image crop):
          panel region x46-838,y826-1195 of the 893x1600 png mapped into the box */
-      background:url('/assets/granny/new%20bet%20panel%202.png?v=2') center/100% 100% no-repeat!important;
+      background:url('/assets/granny/bet-panel-granny.png?v=1') center/100% 100% no-repeat!important;
       border:none;padding:0;margin:0;
       display:none;
     }
@@ -328,8 +328,8 @@
     .bps-toggle{ position:absolute;background:transparent;border:none;padding:0;cursor:pointer;
       -webkit-tap-highlight-color:transparent;touch-action:manipulation;z-index:6; }
     /* square checkboxes over the baked Auto Bet / Auto Cash Out boxes */
-    .np-autobet { left:7.8%;  top:16.4%; width:6.8%; height:14.3%; }
-    .np-autocash{ left:35.4%; top:16.9%; width:6.6%; height:13.8%; }
+    .np-autobet { left:5.3%;  top:11%; width:8%; height:15%; }
+    .np-autocash{ left:34.7%; top:11%; width:8%; height:15%; }
     .np-sw{ position:absolute;inset:0;border-radius:6px;background:#0e2a20;
       border:1.5px solid rgba(120,205,175,.55);transition:background .15s,border-color .15s; }
     .np-sw .knob{ display:none!important; }
@@ -340,7 +340,7 @@
     .bps-toggle:active{ transform:scale(.9); }
 
     /* auto-cashout multiplier input — right of the Auto Cash Out checkbox */
-    .np-mult{ position:absolute;left:72%;top:15.6%;width:20.5%;height:16%;
+    .np-mult{ position:absolute;left:74%;top:11%;width:23%;height:16%;
       display:flex;align-items:center;justify-content:center;z-index:6;
       background:#0e2a20;border:1px solid rgba(120,205,175,.35);border-radius:8px; }
     .np-mult-inp{ width:100%;height:100%;background:transparent;border:none;outline:none;
@@ -350,11 +350,11 @@
     .np-mult-inp::-webkit-inner-spin-button,.np-mult-inp::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
 
     /* Row 2 — [−]  amount  [+] (new bet panel 2.png fractions) */
-    .bps-minus{ left:5.5%;  top:40%; width:13.5%; height:16.5%; }
-    .bps-plus { left:46.5%; top:40%; width:13.5%; height:16.5%; }
+    .bps-minus{ left:4.6%;  top:37%; width:11.3%; height:17%; }
+    .bps-plus { left:53.4%; top:37%; width:11.4%; height:17%; }
     .bps-amount{
       position:absolute;
-      left:22.5%;top:41%;width:21.5%;height:14%;
+      left:18%;top:40%;width:33%;height:13%;
       background:transparent;border:none;outline:none;
       color:#fff;
       font-family:'Share Tech Mono',monospace;
@@ -366,17 +366,17 @@
     .bps-amount::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
 
     /* Row 3 — quick amounts 5 / 25 / 50 / 100 (new bet panel 2.png fractions) */
-    .np-q5  { left:8.69%; top:64.5%; width:11.2%; height:16.5%; }
-    .np-q25 { left:21.19%;top:64.5%; width:11.5%; height:16.5%; }
-    .np-q50 { left:33.49%;top:64.5%; width:11.5%; height:16.5%; }
-    .np-q100{ left:45.7%; top:64.5%; width:13.2%; height:16.5%; }
+    .np-q5  { left:3.5%;  top:61%; width:8%;    height:13%; }
+    .np-q25 { left:11.7%; top:61%; width:9.5%;  height:13%; }
+    .np-q50 { left:21.9%; top:61%; width:9.5%;  height:13%; }
+    .np-q100{ left:31.8%; top:61%; width:11.4%; height:13%; }
     .bps-min,.bps-max,.bps-q1,.bps-q10,.bps-half,.bps-autobet{ display:none!important; }
 
     /* Big action button (right side, spans rows 2–3) — BET / CASH OUT / NEXT BET */
     .bet-panel .bp-btn-pair{display:none!important}
     .bet-panel .bp-btn{
       position:absolute!important;
-      left:63.2%;top:37.2%;width:29.1%!important;height:47%!important;
+      left:67%;top:33%;width:31%!important;height:42%!important;
       aspect-ratio:unset!important;border-radius:13%!important;
       background:linear-gradient(160deg,#33d9ac 0%,#1f9e74 50%,#13795c 100%)!important;
       box-shadow:0 3px 12px rgba(15,120,90,.45), inset 0 2px 0 rgba(255,255,255,.35)!important;
@@ -923,11 +923,7 @@
       .np-history .hist-cur-pill::after{ display:none!important; }
       .np-history .hist-clock{ font-size:11px!important; }
       /* left stats list (tabs + BETS/PLAYERS/TOP WIN + list) over the left panel */
-      .lip{
-        position:absolute!important; left:2.8%; top:9%; width:26%; height:64%;
-        margin:0!important; max-width:none!important; min-height:0; overflow:hidden;
-        background:transparent!important; border:none!important; border-radius:0;
-      }
+      .lip{ display:none!important; }   /* left stats hidden per request */
       /* game screen over the big drawn screen */
       .game-area{
         position:absolute!important; left:31%; top:9%; width:65.5%; height:63%;
@@ -936,15 +932,16 @@
       }
       #bvbVideo{ object-fit:cover!important; background:transparent!important; }
       /* live bet panels in the clear bottom area (right of the clipboard) */
+      /* panels flush to each other, touching the screen bottom (72%), within screen width */
       .bet-footer{
-        position:absolute!important; left:31%; top:73.5%; width:65.5%; height:24%;
-        margin:0!important; display:flex!important; flex-direction:row; gap:2.5%;
+        position:absolute!important; left:31%; top:72%; width:65.5%; height:25%;
+        margin:0!important; display:flex!important; flex-direction:row; gap:0;
         align-items:flex-start; justify-content:center;
       }
       #panel0.bet-panel, #panel1.bet-panel{
         position:relative!important; left:auto!important; top:auto!important;
         flex:1 1 0; min-width:0; width:auto!important; height:auto!important;
-        aspect-ratio:2000/926; max-width:none; margin:0!important;
+        aspect-ratio:1413/719; max-width:none; margin:0!important;
       }
     }
   </style>
