@@ -922,14 +922,18 @@
         background:transparent; border:none; padding:0; border-radius:5px;
         -webkit-tap-highlight-color:transparent; z-index:6;
         font-size:clamp(9px,1.06vw,15px); line-height:1; }
-      .timer-btn svg{ width:144%; height:144%; display:block; color:#d6efe6; }
+      /* PNG icon assets fill each button (object-fit keeps aspect) */
+      .timer-btn .ic-img{ width:150%; height:150%; }
+      .snd-toggle .ic-img{ width:120%; height:120%; }
+      .info-btn  .ic-img{ width:108%; height:108%; }
+      .ic-img{ object-fit:contain; display:block; }
       .timer-btn{ left:83.24%; top:13.88%; cursor:default; }
-      .snd-toggle{ left:88.57%; top:13.78%; cursor:pointer; font-size:clamp(12px,1.38vw,20px); animation:sndPulse 1.8s ease-in-out infinite; }
+      .snd-toggle{ left:88.57%; top:13.78%; cursor:pointer; animation:sndPulse 1.8s ease-in-out infinite; }
       .snd-toggle.muted{ animation:none!important; }
       .snd-toggle .ic-muted{ display:none; }
       .snd-toggle.muted .ic-sound{ display:none; }
-      .snd-toggle.muted .ic-muted{ display:inline; }
-      .info-btn{ left:93.54%; top:13.66%; cursor:pointer; font-size:clamp(11px,1.27vw,18px); }
+      .snd-toggle.muted .ic-muted{ display:block; }
+      .info-btn{ left:93.54%; top:13.66%; cursor:pointer; }
       .info-btn:hover, .info-btn:active{ box-shadow:0 0 10px 2px rgba(95,224,180,.5); }
       @keyframes sndPulse{ 0%,100%{ box-shadow:0 0 4px 1px rgba(95,224,180,.25) }
         50%{ box-shadow:0 0 13px 3px rgba(95,224,180,.55) } }
@@ -1092,9 +1096,9 @@
   </div>
 
   <!-- 3 top-bar square slots: timer / sound / info (emoji icons) -->
-  <div id="timerBtn" class="timer-btn" aria-label="timer" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7.4V12l3.3 2"/></svg></div>
-  <button id="sndToggle" class="snd-toggle" aria-label="sound" onclick="toggleSound()" style="display:none"><span class="ic-sound">&#128266;</span><span class="ic-muted">&#128263;</span></button>
-  <button id="infoBtn" class="info-btn" aria-label="info" onclick="showInfo()" style="display:none">&#8505;&#65039;</button>
+  <div id="timerBtn" class="timer-btn" aria-label="timer" style="display:none"><img class="ic-img" src="/assets/granny/ic-timer.png?v=1" alt=""></div>
+  <button id="sndToggle" class="snd-toggle" aria-label="sound" onclick="toggleSound()" style="display:none"><img class="ic-sound ic-img" src="/assets/granny/ic-sound.png?v=1" alt=""><img class="ic-muted ic-img" src="/assets/granny/ic-sound-muted.png?v=1" alt=""></button>
+  <button id="infoBtn" class="info-btn" aria-label="info" onclick="showInfo()" style="display:none"><img class="ic-img" src="/assets/granny/ic-info.png?v=1" alt=""></button>
 
   <!-- rules modal -->
   <div id="rulesModal" class="rules-modal" style="display:none" onclick="if(event.target===this)hideInfo()">
