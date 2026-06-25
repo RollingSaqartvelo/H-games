@@ -270,6 +270,7 @@
     }
     .crashed-banner.show{display:flex}
     .crashed-title{
+      display:none;   /* INJECTED word hidden — 3D asset to be added */
       font-size:40px;color:var(--red);letter-spacing:4px;
       text-shadow:0 0 50px var(--red-glow);
       animation:crashPulse .6s ease-in-out;
@@ -1917,11 +1918,11 @@ function drawScene(ts) {
   }
   ctx.restore()
 
-  // ── INJECTED crash text ────────────────────────────────────────────────────
-  if (crashed) {
-    ctx.save(); ctx.font='bold 16px Courier New'; ctx.fillStyle='#ef4444'; ctx.textAlign='center'
-    ctx.fillText('INJECTED! 💉', W/2, H*0.28); ctx.restore()
-  }
+  // ── INJECTED crash text — hidden (3D asset to be added) ─────────────────────
+  // if (crashed) {
+  //   ctx.save(); ctx.font='bold 16px Courier New'; ctx.fillStyle='#ef4444'; ctx.textAlign='center'
+  //   ctx.fillText('INJECTED! 💉', W/2, H*0.28); ctx.restore()
+  // }
 
   animFrame = requestAnimationFrame(drawScene)
 }
