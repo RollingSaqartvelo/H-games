@@ -933,15 +933,16 @@
       }
       #bvbVideo{ object-fit:cover!important; background:transparent!important; }
       /* live bet panels in the clear bottom area (right of the clipboard) */
-      /* panels flush to each other, touching the screen bottom (72%), within screen width */
+      /* panels INSIDE the screen's rectangular opening, lower part — must not exceed it.
+         screen opening ≈ x33-96%, panels per yellow marks: L 34.5-59.8%, R 69.1-95.7%, Y ~80-97% */
       .bet-footer{
-        position:absolute!important; left:31%; top:72%; width:65.5%; height:25%;
+        position:absolute!important; left:34.5%; top:80%; width:61.2%; height:17%;
         margin:0!important; display:flex!important; flex-direction:row; gap:0;
-        align-items:flex-start; justify-content:center;
+        align-items:flex-start; justify-content:space-between;
       }
       #panel0.bet-panel, #panel1.bet-panel{
         position:relative!important; left:auto!important; top:auto!important;
-        flex:1 1 0; min-width:0; width:auto!important; height:auto!important;
+        flex:0 0 42.5%; min-width:0; width:auto!important; height:auto!important;
         aspect-ratio:1413/719; max-width:none; margin:0!important;
       }
     }
