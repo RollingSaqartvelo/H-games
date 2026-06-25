@@ -930,9 +930,12 @@
       .np-history .hist-cur-pill, .np-history .pill{ font-size:10px!important; padding:0 7px!important;
         border-radius:7px!important; height:84%!important; }
       .np-history .hist-cur-pill::after{ display:none!important; }
-      /* clock pinned into the empty slot marked in the screen's top bar */
-      .np-history .hist-clock{ position:absolute!important; left:91%; top:50%;
-        transform:translate(-50%,-50%); font-size:13px!important; z-index:4; }
+      /* clock moved into the empty far-right slot of the screen top bar */
+      .hist-clock{ display:flex!important; position:absolute!important;
+        left:97.7%; top:11.6%; transform:translate(-50%,-50%);
+        width:2%; height:3.2%; min-width:0;
+        background:transparent!important; border:none!important; box-shadow:none!important;
+        font-size:14px!important; color:#bfe8d6!important; z-index:6; }
       /* left stats list (tabs + BETS/PLAYERS/TOP WIN + list) over the left panel */
       /* left stats over the drawn tabs / BETS·PLAYERS·TOP WIN / list frames */
       .lip{
@@ -954,9 +957,9 @@
         position:absolute!important; inset:0; left:0; top:0; width:100%; height:100%;
         margin:0!important; display:block!important; pointer-events:none;
       }
-      #panel0.bet-panel{ position:absolute!important; left:35%; top:51.1%; width:25.1%; height:15.75%;
+      #panel0.bet-panel{ position:absolute!important; left:36.7%; top:52%; width:27.2%; height:15.75%;
         aspect-ratio:auto!important; max-width:none; margin:0!important; pointer-events:auto; }
-      #panel1.bet-panel{ position:absolute!important; left:65.6%; top:51.1%; width:26.9%; height:15.75%;
+      #panel1.bet-panel{ position:absolute!important; left:67.3%; top:52%; width:29%; height:15.75%;
         aspect-ratio:auto!important; max-width:none; margin:0!important; pointer-events:auto; }
     }
   </style>
@@ -1069,6 +1072,8 @@
 
   <!-- sound toggle — transparent click-target exactly over the drawn speaker icon -->
   <button id="sndToggle" class="snd-toggle" aria-label="sound" onclick="toggleSound()" style="display:none"></button>
+  <!-- clock — sits in the empty (far-right) slot of the screen top bar -->
+  <div class="hist-clock" aria-label="clock" style="display:none">🕐</div>
 
   <!-- Gran panel (background image + all game UI inside) -->
   <div class="gran-panel">
@@ -1078,7 +1083,6 @@
       <span class="hist-cur-pill" id="histCurPill">?</span>
       <span class="hist-cur-ptr" id="histCurPtr" style="display:none"></span>
       <div class="hist-scroll" id="history"></div>
-      <div class="hist-clock" aria-label="history">🕐</div>
     </div>
 
   <!-- Game area -->
