@@ -1725,13 +1725,13 @@ ul, li { list-style: none; }
 
   /* ── Statistics panel — fills the empty left felt zone, OUR ivory/ornamental design ── */
   .bv-root {
-    position: absolute !important; left: 4.5%; top: 21.49%; width: 18.69%; height: 50%; z-index: 6;
-    margin: 0 !important; min-height: 0; overflow: hidden;
+    position: absolute !important; left: 5.65%; top: 21.49%; width: 18.69%; height: 50%; z-index: 6;
+    margin: 0 !important; min-height: 0; overflow: visible;
     background: transparent !important; border: none !important; border-radius: 0; box-shadow: none;
     display: flex !important; flex-direction: column;
     --ivory: #ece0c4; --ivory-dim: rgba(236,224,196,.62); --ivory-gold: #e3b765;
   }
-  .bv-header { padding: 0 !important; transform: translateY(-52px); }
+  .bv-header { padding: 0 !important; transform: translateY(-66px); }
 
   /* game broadcast — YELLOW-marked screen zone */
   .game-area {
