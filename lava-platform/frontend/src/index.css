@@ -1880,6 +1880,13 @@ ul, li { list-style: none; }
     left: calc(var(--ga-left, 0px) + var(--ga-w, 100vw) / 2) !important;
     top:  calc(var(--ga-top, 0px) + var(--ga-h, 100vh) / 2) !important;
   }
+  /* HEIST countdown — no rectangular strip, just text/number over the video */
+  .rcd {
+    background: none !important;
+    backdrop-filter: none !important;
+    border-top: none !important;
+    padding: 6px 16px 0 !important;
+  }
 }
 
 /* WASTED slam image base width (mobile) */
