@@ -1734,7 +1734,7 @@ ul, li { list-style: none; }
     display: flex !important; flex-direction: column;
     --ivory: #ece0c4; --ivory-dim: rgba(236,224,196,.62); --ivory-gold: #e3b765;
   }
-  .bv-header { padding: 0 !important; transform: translate(5px, -49px); }
+  .bv-header { padding: 0 !important; transform: translate(35px, -29px); }
 
   /* game broadcast — YELLOW-marked screen zone */
   .game-area {
