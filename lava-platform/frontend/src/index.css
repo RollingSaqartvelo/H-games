@@ -316,6 +316,7 @@ ul, li { list-style: none; }
   width: 96px; height: 28px; padding: 0;
   color: transparent !important; border: none; background: none;
   background-repeat: no-repeat; background-position: center; background-size: contain;
+  transform: translateY(10px);
 }
 .state-badge--waiting { background-image: url('/assets/badge-betting.png?v=1'); }
 .state-badge--betting { background-image: url('/assets/badge-betting.png?v=1'); }
@@ -1721,7 +1722,7 @@ ul, li { list-style: none; }
 
   /* ── Statistics panel — fills the empty left felt zone, OUR ivory/ornamental design ── */
   .bv-root {
-    position: absolute !important; left: 4.5%; top: 15.73%; width: 21%; height: 50%; z-index: 6;
+    position: absolute !important; left: 4.5%; top: 16.88%; width: 21%; height: 50%; z-index: 6;
     margin: 0 !important; min-height: 0; overflow: hidden;
     background: transparent !important; border: none !important; border-radius: 0; box-shadow: none;
     display: flex !important; flex-direction: column;
@@ -1731,10 +1732,10 @@ ul, li { list-style: none; }
 
   /* game broadcast — YELLOW-marked screen zone */
   .game-area {
-    position: absolute !important; left: 32.23%; top: 18.07%; width: 62.37%; height: 41.4%;
+    position: absolute !important; left: 31.83%; top: 18.07%; width: 63.17%; height: 41.4%;
     margin: 0 !important; flex: none; aspect-ratio: auto !important;
     background: #c8773a url('/assets/outlaw.png?v=1') center / cover no-repeat !important;
-    border: none !important; border-radius: 10px; box-shadow: none;
+    border: none !important; border-radius: 18px; box-shadow: none;
     overflow: hidden;
   }
   .game-area::after { display: none; }
