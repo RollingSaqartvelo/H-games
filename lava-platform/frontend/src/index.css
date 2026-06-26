@@ -1735,7 +1735,7 @@ ul, li { list-style: none; }
     position: absolute !important; left: 31.83%; top: 18.07%; width: 63.17%; height: 41.4%;
     margin: 0 !important; flex: none; aspect-ratio: auto !important;
     background: #c8773a url('/assets/outlaw.png?v=1') center / cover no-repeat !important;
-    border: none !important; border-radius: 18px; box-shadow: none;
+    border: none !important; border-radius: 30px 30px 18px 18px; box-shadow: none;
     overflow: hidden;
   }
   .game-area::after { display: none; }
@@ -1800,7 +1800,7 @@ ul, li { list-style: none; }
      flush to the very bottom; live controls aligned to its drawn buttons.
      Button coords measured in python as % of the full image. ── */
   .dbp-root { display: block !important; position: absolute !important;
-    left: 31%; top: 58%; width: 36%; height: 25%;
+    left: 34%; top: 64.5%; width: 41.5%; height: 26%;
     margin: 0 !important; max-width: none; z-index: 8;
     background: none !important; }
   .dbp-block { position: absolute !important; inset: 0; padding: 0 !important;
@@ -1810,41 +1810,42 @@ ul, li { list-style: none; }
     background: none !important; border: none !important; box-shadow: none !important; }
 
   /* − [amount] + row over drawn − / display / + (top row of the drawn panel) */
-  .dbp-amount-row { position: absolute !important; top: 2%; left: 3%; width: 94%; height: 20%;
+  .dbp-amount-row { position: absolute !important; top: 0.8%; left: 0%; width: 100%; height: 22.3%;
     margin: 0 !important; display: flex !important; align-items: center; gap: 0; }
-  .dbp-step-btn { flex: 0 0 9%; height: 100%; background: none !important; border: none !important;
+  .dbp-step-btn { flex: 0 0 12%; height: 100%; background: none !important; border: none !important;
     box-shadow: none !important; color: transparent !important; }            /* − / + drawn */
-  /* clickable amount input over the drawn display slot */
-  .dbp-amount-display { flex: 1 1 auto; height: 80%; margin: 0 3%;
-    background: transparent !important; border: none !important; box-shadow: none !important;
+  /* black input box exactly in the drawn display slot, digits centered */
+  .dbp-amount-display { flex: 1 1 auto; height: 74%; margin: 0 11% 0 9%;
+    background: #0a0806 !important; border: 1px solid rgba(150,110,60,.45) !important; border-radius: 7px !important;
+    box-shadow: inset 0 2px 7px rgba(0,0,0,.8) !important;
     display: flex !important; align-items: center; justify-content: center; }
-  .dbp-amount-currency { color: transparent !important; width: 0; }
+  .dbp-amount-currency { color: #f3d488 !important; margin-right: 1px; }
   .dbp-amount-input { color: #f3d488 !important; opacity: 1 !important; text-align: center;
     font-family: 'Rye', Georgia, serif !important; }
 
-  /* quick chips over the drawn middle-row buttons */
-  .dbp-chips { position: absolute !important; top: 30%; left: 5%; width: 80%; height: 26%;
-    margin: 0 !important; display: flex !important; gap: 3%; }
+  /* quick chips over the 4 drawn middle-row buttons */
+  .dbp-chips { position: absolute !important; top: 34.2%; left: 0.7%; width: 75.2%; height: 30.4%;
+    margin: 0 !important; display: flex !important; gap: 2%; }
   .dbp-chip, .dbp-chip--active { flex: 1 1 0; height: 100%; background: none !important; border: none !important;
     box-shadow: none !important; color: transparent !important; }            /* values drawn */
 
-  /* AUTO BET — hidden until the drawn panel's knob position is confirmed */
-  .dbp-options { display: none !important; position: absolute !important; top: 30%; left: 88%; width: 11%; height: 24%;
+  /* AUTO BET — knob in the 5th drawn middle-row slot */
+  .dbp-options { display: block !important; position: absolute !important; top: 34.2%; left: 79%; width: 16.4%; height: 30.4%;
     margin: 0 !important; padding: 0 !important; }
   .dbp-toggle { position: absolute !important; inset: 0; background: none !important; border: none !important; }
   .dbp-toggle__label { display: none !important; }                           /* AUTO BET text drawn */
-  .dbp-toggle__track { position: absolute !important; left: 51%; top: 50%; transform: translate(-50%,-50%);
-    width: 60% !important; aspect-ratio: 1; min-width: 0; height: auto !important;
-    border-radius: 50% !important; background: radial-gradient(circle at 35% 30%, #4a4a4a, #141414 72%) !important;
+  .dbp-toggle__track { position: absolute !important; left: 50%; top: 50%; transform: translate(-50%,-50%);
+    width: 38% !important; aspect-ratio: 1; min-width: 0; height: auto !important;
+    border-radius: 50% !important; background: radial-gradient(circle at 35% 30%, #5a4a38, #1c140c 72%) !important;
     box-shadow: 0 1px 3px rgba(0,0,0,.8) !important;
-    transition: left .26s cubic-bezier(.4,1.4,.6,1), background .26s, box-shadow .26s; }
+    transition: background .2s, box-shadow .2s; }
   .dbp-toggle__track::after { display: none !important; }
-  .dbp-toggle--on .dbp-toggle__track { left: 90% !important;
+  .dbp-toggle--on .dbp-toggle__track {
     background: radial-gradient(circle at 35% 30%, #ffd27a, #c8860f 72%) !important;
     box-shadow: 0 0 8px rgba(255,190,70,.85), 0 1px 3px rgba(0,0,0,.8) !important; }
 
   /* main action button over the drawn BET row (bottom) */
-  .dbp-btn-area { position: absolute !important; top: 70%; left: 5%; width: 90%; height: 26%; margin: 0 !important; }
+  .dbp-btn-area { position: absolute !important; top: 71.9%; left: 0.7%; width: 94.2%; height: 26.2%; margin: 0 !important; }
   .dbp-btn, .dbp-btn--img { width: 100% !important; height: 100% !important;
     background: none !important; border: none !important; box-shadow: none !important; }
   .dbp-btn--img img { display: none !important; }
