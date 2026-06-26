@@ -1822,9 +1822,14 @@ ul, li { list-style: none; }
 
   /* − [amount] + row over drawn − / display / + (top row of the drawn panel) */
   .dbp-amount-row { position: absolute !important; top: 0.8%; left: 0%; width: 100%; height: 22.3%;
-    margin: 0 !important; display: flex !important; align-items: center; gap: 0; }
-  .dbp-step-btn { flex: 0 0 12%; height: 100%; background: none !important; border: none !important;
-    box-shadow: none !important; color: transparent !important; }            /* − / + drawn */
+    margin: 0 !important; padding: 0 12% !important; box-sizing: border-box !important;
+    display: flex !important; align-items: center; gap: 0; }
+  /* transparent click zones laid exactly over the drawn − / + on the cabinet */
+  .dbp-step-btn { position: absolute !important; top: -8%; height: 116%; width: 15%;
+    flex: none !important; padding: 0 !important; background: none !important; border: none !important;
+    box-shadow: none !important; color: transparent !important; cursor: pointer; pointer-events: auto; z-index: 6; }
+  .dbp-step-btn:first-of-type { left: 14%; }     /* − over drawn minus */
+  .dbp-step-btn:last-of-type  { left: 86%; }     /* + over drawn plus */
   /* black input box exactly in the drawn display slot, digits centered */
   .dbp-amount-display { flex: 1 1 auto; height: 84%; margin: 0 3.11% 0 1.85%;
     transform: translate(67px, -5px);
