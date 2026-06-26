@@ -1821,7 +1821,7 @@ ul, li { list-style: none; }
   .dbp-step-btn { flex: 0 0 12%; height: 100%; background: none !important; border: none !important;
     box-shadow: none !important; color: transparent !important; }            /* − / + drawn */
   /* black input box exactly in the drawn display slot, digits centered */
-  .dbp-amount-display { flex: 1 1 auto; height: 84%; margin: 0 -2.89% 0 -4.15%;
+  .dbp-amount-display { flex: 1 1 auto; height: 84%; margin: 0 2.11% 0 0.85%;
     transform: translate(67px, -5px);
     background: #0a0806 !important; border: 1px solid rgba(150,110,60,.45) !important; border-radius: 7px !important;
     box-shadow: inset 0 2px 7px rgba(0,0,0,.8) !important;
