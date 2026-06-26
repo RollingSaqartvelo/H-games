@@ -1678,17 +1678,17 @@ ul, li { list-style: none; }
      History strip → purple-marked zone, broadcast → yellow-marked screen. ═══ */
   .app {
     position: relative; display: block;
-    width: 96vw; max-width: 1300px; aspect-ratio: 1600 / 992;
+    width: 96vw; max-width: 1300px; aspect-ratio: 1536 / 1024;
     margin: 16px auto; min-height: 0; padding: 0;
-    background: #0a0603 url('/assets/new-cabinet-outlaw.jpeg?v=1') center / 100% 100% no-repeat;
+    background: #0a0603 url('/assets/outlaw-pannel.png?v=1') center / 100% 100% no-repeat;
     border: none; border-radius: 18px; box-shadow: 0 10px 40px rgba(0,0,0,.55);
     overflow: hidden;
   }
 
   /* flickering warm glow over the drawn lamp (bottom-left) */
   .app::before {
-    content: ''; position: absolute; left: 5%; top: 80%;
-    width: 13%; aspect-ratio: 1; transform: translate(-50%, -50%);
+    content: ''; position: absolute; left: 8%; top: 80%;
+    width: 11%; aspect-ratio: 1; transform: translate(-50%, -50%);
     border-radius: 50%; pointer-events: none; z-index: 3; mix-blend-mode: screen;
     background: radial-gradient(circle, rgba(255,190,90,.9) 0%, rgba(255,150,40,.45) 38%, rgba(255,120,20,0) 70%);
     animation: lampFlicker 2.6s infinite;
@@ -1716,12 +1716,12 @@ ul, li { list-style: none; }
   .top-bar__logo { display: none !important; }   /* OUTLAW ESCAPE is drawn on the cabinet */
 
   /* previous-rounds history strip — PURPLE-marked zone (same animation, on this strip) */
-  .mh-row { position: absolute !important; left: 38.5%; top: 12.1%; width: 57.5%; height: 6.6%;
-    margin: 0 !important; background: transparent !important; }
+  .mh-row { position: absolute !important; left: 31%; top: 14.8%; width: 60%; height: 4.6%;
+    margin: 0 !important; background: transparent !important; z-index: 7; }
 
   /* ── Statistics panel — fills the empty left felt zone, OUR ivory/ornamental design ── */
   .bv-root {
-    position: absolute !important; left: 4%; top: 14.5%; width: 31.5%; height: 47%; z-index: 6;
+    position: absolute !important; left: 4.5%; top: 14%; width: 21%; height: 50%; z-index: 6;
     margin: 0 !important; min-height: 0; overflow: hidden;
     background: transparent !important; border: none !important; border-radius: 0; box-shadow: none;
     display: flex !important; flex-direction: column;
@@ -1731,7 +1731,7 @@ ul, li { list-style: none; }
 
   /* game broadcast — YELLOW-marked screen zone */
   .game-area {
-    position: absolute !important; left: 28%; top: 20.4%; width: 68.6%; height: 40.3%;
+    position: absolute !important; left: 31%; top: 14.5%; width: 60%; height: 42.5%;
     margin: 0 !important; flex: none; aspect-ratio: auto !important;
     background: #c8773a url('/assets/outlaw.png?v=1') center / cover no-repeat !important;
     border: none !important; border-radius: 10px; box-shadow: none;
@@ -1799,36 +1799,36 @@ ul, li { list-style: none; }
      flush to the very bottom; live controls aligned to its drawn buttons.
      Button coords measured in python as % of the full image. ── */
   .dbp-root { display: block !important; position: absolute !important;
-    left: 35%; bottom: 0; width: 53%; aspect-ratio: 1244 / 527; height: auto !important;
+    left: 31%; top: 58%; width: 36%; height: 25%;
     margin: 0 !important; max-width: none; z-index: 8;
-    background: url('/assets/try-panel-box.png?v=1') center / 100% 100% no-repeat; }
+    background: none !important; }
   .dbp-block { position: absolute !important; inset: 0; padding: 0 !important;
     background: none !important; border: none !important; box-shadow: none !important; }
   .dbp-block__header { display: none !important; }
   .dbp-content { position: absolute !important; inset: 0; padding: 0 !important; display: block !important;
     background: none !important; border: none !important; box-shadow: none !important; }
 
-  /* − [amount] + row over drawn − / "$ 1.00 BET AMOUNT" / + */
-  .dbp-amount-row { position: absolute !important; top: 10%; left: 4.4%; width: 82.8%; height: 22%;
+  /* − [amount] + row over drawn − / display / + (top row of the drawn panel) */
+  .dbp-amount-row { position: absolute !important; top: 2%; left: 3%; width: 94%; height: 20%;
     margin: 0 !important; display: flex !important; align-items: center; gap: 0; }
-  .dbp-step-btn { flex: 0 0 12%; height: 100%; background: none !important; border: none !important;
+  .dbp-step-btn { flex: 0 0 9%; height: 100%; background: none !important; border: none !important;
     box-shadow: none !important; color: transparent !important; }            /* − / + drawn */
-  /* clickable amount input over the drawn display slot (upper part = "$1.00") */
-  .dbp-amount-display { flex: 1 1 auto; height: 58%; margin: 0 4%; align-self: flex-start !important;
+  /* clickable amount input over the drawn display slot */
+  .dbp-amount-display { flex: 1 1 auto; height: 80%; margin: 0 3%;
     background: transparent !important; border: none !important; box-shadow: none !important;
     display: flex !important; align-items: center; justify-content: center; }
   .dbp-amount-currency { color: transparent !important; width: 0; }
   .dbp-amount-input { color: #f3d488 !important; opacity: 1 !important; text-align: center;
     font-family: 'Rye', Georgia, serif !important; }
 
-  /* quick chips over drawn $1 / $5 / $10 / $50 */
-  .dbp-chips { position: absolute !important; top: 42%; left: 7.6%; width: 54.3%; height: 15%;
-    margin: 0 !important; display: flex !important; gap: 4%; }
+  /* quick chips over the drawn middle-row buttons */
+  .dbp-chips { position: absolute !important; top: 30%; left: 5%; width: 80%; height: 26%;
+    margin: 0 !important; display: flex !important; gap: 3%; }
   .dbp-chip, .dbp-chip--active { flex: 1 1 0; height: 100%; background: none !important; border: none !important;
     box-shadow: none !important; color: transparent !important; }            /* values drawn */
 
-  /* AUTO BET — knob overlay on the drawn round knob (~94%), slides right when ON */
-  .dbp-options { position: absolute !important; top: 42%; left: 88%; width: 11%; height: 15%;
+  /* AUTO BET — hidden until the drawn panel's knob position is confirmed */
+  .dbp-options { display: none !important; position: absolute !important; top: 30%; left: 88%; width: 11%; height: 24%;
     margin: 0 !important; padding: 0 !important; }
   .dbp-toggle { position: absolute !important; inset: 0; background: none !important; border: none !important; }
   .dbp-toggle__label { display: none !important; }                           /* AUTO BET text drawn */
@@ -1842,8 +1842,8 @@ ul, li { list-style: none; }
     background: radial-gradient(circle at 35% 30%, #ffd27a, #c8860f 72%) !important;
     box-shadow: 0 0 8px rgba(255,190,70,.85), 0 1px 3px rgba(0,0,0,.8) !important; }
 
-  /* main action button over drawn NEXT ROUND BET */
-  .dbp-btn-area { position: absolute !important; top: 68%; left: 6%; width: 64%; height: 21%; margin: 0 !important; }
+  /* main action button over the drawn BET row (bottom) */
+  .dbp-btn-area { position: absolute !important; top: 70%; left: 5%; width: 90%; height: 26%; margin: 0 !important; }
   .dbp-btn, .dbp-btn--img { width: 100% !important; height: 100% !important;
     background: none !important; border: none !important; box-shadow: none !important; }
   .dbp-btn--img img { display: none !important; }
