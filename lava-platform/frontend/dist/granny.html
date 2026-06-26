@@ -279,6 +279,18 @@
       font-family:'Courier New',monospace;font-size:15px;color:#f87171;
     }
     @keyframes crashPulse{0%{transform:scale(1.4)}100%{transform:scale(1)}}
+    /* INJECTED 3D word — pops in 50ms after crash */
+    .injected-img{ width:74%;max-width:540px;height:auto;opacity:0;
+      animation:injPop .38s cubic-bezier(.2,1.5,.5,1) .05s forwards; }
+    @keyframes injPop{0%{opacity:0;transform:scale(.55)}100%{opacity:1;transform:scale(1)}}
+    /* inter-round loader (logo + 4s bar) inside the crash screen */
+    .gr-loader-logo{ width:32%;max-width:190px;height:auto;opacity:.9;margin-top:12px;border-radius:8px; }
+    .gr-loader-bar{ width:44%;max-width:300px;height:5px;border-radius:4px;
+      background:rgba(255,255,255,.12);overflow:hidden;margin-top:8px; }
+    .gr-loader-fill{ display:block;height:100%;width:0;border-radius:4px;
+      background:linear-gradient(90deg,#00c6ff,#33d9ac,#46e89a);
+      animation:grFill 4s linear forwards; }
+    @keyframes grFill{from{width:0}to{width:100%}}
 
     /* ── Bet footer ─────────────────────────────────────────── */
     /* ── Bet footer — dissolved, children absolute in gran-panel ── */
@@ -926,9 +938,9 @@
       .state-badge{ background:none!important; border:none!important; color:transparent!important;
         width:9%!important; height:300%!important; padding:0!important; align-self:center;
         background-repeat:no-repeat!important; background-position:center!important; background-size:contain!important; }
-      .state-badge.betting{ background-image:url('/assets/badge-betting.png?v=1')!important; }
+      .state-badge.betting{ background-image:url('/assets/badge-betting.png?v=1')!important; transform:translateY(4px); }
       .state-badge.running{ background-image:url('/assets/badge-running.png?v=1')!important; }
-      .state-badge.crashed{ background-image:url('/assets/badge-caught.png?v=1')!important; }
+      .state-badge.crashed{ background-image:url('/assets/badge-caught.png?v=1')!important; transform:translateY(4px); }
       /* 3 top-bar squares: timer / sound / info — small icons inside */
       .timer-btn, .snd-toggle, .info-btn{ display:flex!important; position:absolute!important;
         top:13%; width:1.9%; height:2.4%; align-items:center; justify-content:center;
@@ -983,7 +995,7 @@
       /* game screen over the big drawn screen */
       /* broadcast fills the screen ABOVE the two bet-panel blocks */
       .game-area{
-        position:absolute!important; left:29.07%; top:18.9%; width:68.245%; height:41%;
+        position:absolute!important; left:29.155%; top:19.12%; width:68.16%; height:40.78%;
         margin:0!important; aspect-ratio:auto!important;
         background:transparent!important; border:none!important; border-radius:14px;
       }
@@ -1190,8 +1202,10 @@
 
     <!-- Crashed banner -->
     <div class="crashed-banner" id="crashedBanner">
-      <div class="crashed-title">INJECTED!</div>
+      <img class="injected-img" src="/assets/granny/injected.png?v=1" alt="">
       <div class="crashed-point" id="crashedPoint">1.00×</div>
+      <img class="gr-loader-logo" src="/assets/hgames-logo.jpg" alt="">
+      <div class="gr-loader-bar"><span class="gr-loader-fill"></span></div>
     </div>
 
     <!-- z:6 — Social cashout ticker (top-right, like Outlaw SocialTicker) -->
