@@ -276,11 +276,12 @@ ul, li { list-style: none; }
   color: transparent;
   font-size: 16px;
   line-height: 1;
-  width: 46px;
-  height: 31px;
+  width: 53px;
+  height: 36px;
   padding: 0;
   cursor: pointer;
   flex-shrink: 0;
+  transform: translate(5px, 5px);
 }
 .top-bar__balance {
   display: flex;
