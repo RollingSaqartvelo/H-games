@@ -318,11 +318,12 @@ ul, li { list-style: none; }
   display: inline-block;
   width: 96px; height: 28px; padding: 0;
   color: transparent !important; border: none; background: none;
-  background-repeat: no-repeat; background-position: center; background-size: contain;
+  background-repeat: no-repeat; background-position: center; background-size: auto 23px;
   transform: translate(-15px, 40px);
 }
-.state-badge--waiting { background-image: url('/assets/badge-betting.png?v=1'); }
-.state-badge--betting { background-image: url('/assets/badge-betting.png?v=1'); }
+/* betting art is taller/narrower → match height of running/caught, nudge 2px lower */
+.state-badge--waiting { background-image: url('/assets/badge-betting.png?v=1'); transform: translate(-15px, 42px); }
+.state-badge--betting { background-image: url('/assets/badge-betting.png?v=1'); transform: translate(-15px, 42px); }
 .state-badge--running { background-image: url('/assets/badge-running.png?v=1'); }
 .state-badge--crashed { background-image: url('/assets/badge-caught.png?v=1'); }
 
@@ -1724,7 +1725,8 @@ ul, li { list-style: none; }
 
   /* previous-rounds history strip — PURPLE-marked zone (same animation, on this strip) */
   .mh-row { position: absolute !important; left: 32.54%; top: 14.57%; width: 60%; height: 4.6%;
-    margin: 0 !important; background: transparent !important; z-index: 7; }
+    margin: 0 !important; background: transparent !important; z-index: 7;
+    transform: translate(4px, -2px); }
 
   /* ── Statistics panel — fills the empty left felt zone, OUR ivory/ornamental design ── */
   .bv-root {
@@ -1734,7 +1736,7 @@ ul, li { list-style: none; }
     display: flex !important; flex-direction: column;
     --ivory: #ece0c4; --ivory-dim: rgba(236,224,196,.62); --ivory-gold: #e3b765;
   }
-  .bv-header { padding: 0 !important; transform: translate(35px, -29px); }
+  .bv-header { padding: 0 !important; transform: translate(31px, -34px); }
 
   /* game broadcast — YELLOW-marked screen zone */
   .game-area {
@@ -1821,7 +1823,7 @@ ul, li { list-style: none; }
   .dbp-step-btn { flex: 0 0 12%; height: 100%; background: none !important; border: none !important;
     box-shadow: none !important; color: transparent !important; }            /* − / + drawn */
   /* black input box exactly in the drawn display slot, digits centered */
-  .dbp-amount-display { flex: 1 1 auto; height: 84%; margin: 0 2.11% 0 0.85%;
+  .dbp-amount-display { flex: 1 1 auto; height: 84%; margin: 0 3.11% 0 1.85%;
     transform: translate(67px, -5px);
     background: #0a0806 !important; border: 1px solid rgba(150,110,60,.45) !important; border-radius: 7px !important;
     box-shadow: inset 0 2px 7px rgba(0,0,0,.8) !important;

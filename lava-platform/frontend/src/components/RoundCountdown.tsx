@@ -10,7 +10,7 @@ export function RoundCountdown() {
   const startingAt = useGame((s) => s.startingAt)
 
   const [seconds, setSeconds]   = useState(BETTING_DURATION)
-  const [progress, setProgress] = useState(1)   // 1 → 0 as time runs out
+  const [, setProgress] = useState(1)   // 1 → 0 as time runs out (drives countdown sound timing)
   const [showRide, setShowRide] = useState(false)
   const rideTimer    = useRef<number | undefined>(undefined)
   const tickTimer    = useRef<number | undefined>(undefined)
@@ -90,12 +90,6 @@ export function RoundCountdown() {
       <div className={`rcd rcd--${urgency}`} aria-live="polite">
         {!isFinal && <div className="rcd__label">HEIST STARTS IN</div>}
         {!isFinal && <div className="rcd__number">{seconds}</div>}
-        <div className="rcd__bar-wrap">
-          <div
-            className="rcd__bar-fill"
-            style={{ width: `${progress * 100}%` }}
-          />
-        </div>
       </div>
     </>
   )
