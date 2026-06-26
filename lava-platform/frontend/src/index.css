@@ -1721,7 +1721,7 @@ ul, li { list-style: none; }
 
   /* ── Statistics panel — fills the empty left felt zone, OUR ivory/ornamental design ── */
   .bv-root {
-    position: absolute !important; left: 4.5%; top: 14%; width: 21%; height: 50%; z-index: 6;
+    position: absolute !important; left: 4.5%; top: 15.73%; width: 21%; height: 50%; z-index: 6;
     margin: 0 !important; min-height: 0; overflow: hidden;
     background: transparent !important; border: none !important; border-radius: 0; box-shadow: none;
     display: flex !important; flex-direction: column;
@@ -1731,7 +1731,7 @@ ul, li { list-style: none; }
 
   /* game broadcast — YELLOW-marked screen zone */
   .game-area {
-    position: absolute !important; left: 31%; top: 14.5%; width: 60%; height: 42.5%;
+    position: absolute !important; left: 32.23%; top: 18.07%; width: 62.37%; height: 41.4%;
     margin: 0 !important; flex: none; aspect-ratio: auto !important;
     background: #c8773a url('/assets/outlaw.png?v=1') center / cover no-repeat !important;
     border: none !important; border-radius: 10px; box-shadow: none;
