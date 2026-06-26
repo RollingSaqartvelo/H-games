@@ -114,8 +114,11 @@ ul, li { list-style: none; }
    The "mp4" during running is the scrolling Pixi desert (z:1, revealed once the
    HTML running video is hidden), so hide BOTH the videos AND the pixi canvas.
    The visible riders are GifCharacters (z:10, a separate HTML layer) — unaffected. */
-#running-bg-video, .bvb-wrap, .rv-video { display: none !important; }
+#running-bg-video, .rv-video { display: none !important; }
 .pixi-mount { display: none !important; }
+/* betting-stage 9:16 video shown fully (contain) with black bars on the sides */
+.bvb-wrap { background: #000 !important; }
+.bvb-wrap video { object-fit: contain !important; background: #000 !important; }
 .game-area { background: #c8773a url('/assets/outlaw.png?v=1') center / cover no-repeat !important; }
 
 /* Soft fade at the bottom of the game area — blends the canyon footage into the
@@ -1728,7 +1731,7 @@ ul, li { list-style: none; }
     display: flex !important; flex-direction: column;
     --ivory: #ece0c4; --ivory-dim: rgba(236,224,196,.62); --ivory-gold: #e3b765;
   }
-  .bv-header { padding: 0 !important; }
+  .bv-header { padding: 0 !important; transform: translateY(-52px); }
 
   /* game broadcast — YELLOW-marked screen zone */
   .game-area {
@@ -1743,8 +1746,8 @@ ul, li { list-style: none; }
   .game-area > *, .pixi-mount, .pixi-mount canvas, .bvb-wrap, #running-bg-video, .rv-video {
     position: absolute !important; inset: 0 !important; width: 100% !important; height: 100% !important;
   }
-  /* static image replaces the mp4 background for now — hide both video layers */
-  #running-bg-video, .rv-video, .bvb-wrap { display: none !important; }
+  /* static image for running; betting-stage 9:16 video stays (contain, black bars) */
+  #running-bg-video, .rv-video { display: none !important; }
 
   /* ── OUR ivory / ornamental statistics design (left zone is blank on this cabinet) ── */
   .bv-tabs { display: flex !important; gap: 4%; justify-content: center; }
