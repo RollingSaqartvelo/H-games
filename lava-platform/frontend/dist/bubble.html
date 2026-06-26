@@ -54,13 +54,14 @@
       color:var(--pink-b);display:flex;align-items:center;gap:6px;
     }
     .topbar-balance .coin{font-size:16px}
+    /* state badge as 3D PNG (same set across games) */
     .state-badge{
-      font-family:'Courier New',monospace;font-size:10px;letter-spacing:1px;
-      padding:3px 9px;border-radius:20px;text-transform:uppercase;
+      width:104px;height:30px;padding:0;background:none;border:none;color:transparent!important;
+      background-repeat:no-repeat;background-position:center;background-size:contain;
     }
-    .state-badge.betting{background:rgba(244,114,182,.15);color:var(--pink);border:1px solid var(--pink-dim)}
-    .state-badge.running{background:rgba(239,68,68,.15);color:#f87171;border:1px solid #7f1d1d}
-    .state-badge.crashed{background:rgba(239,68,68,.2);color:#ef4444;border:1px solid #991b1b}
+    .state-badge.betting{background-image:url('/assets/badge-betting.png?v=1')}
+    .state-badge.running{background-image:url('/assets/badge-running.png?v=1')}
+    .state-badge.crashed{background-image:url('/assets/badge-caught.png?v=1')}
 
     /* ── History bar ─────────────────────────────────────────── */
     .hist-bar{

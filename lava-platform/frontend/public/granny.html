@@ -1191,7 +1191,7 @@
     <!-- Crashed banner -->
     <div class="crashed-banner" id="crashedBanner">
       <div class="crashed-title">INJECTED!</div>
-      <div class="crashed-point" id="crashedPoint">Doctor: 1.00×</div>
+      <div class="crashed-point" id="crashedPoint">1.00×</div>
     </div>
 
     <!-- z:6 — Social cashout ticker (top-right, like Outlaw SocialTicker) -->
@@ -2011,7 +2011,7 @@ function connectWS() {
       updateMultVis()
       updateBadge()
       document.getElementById('countdown').style.display = 'none'
-      document.getElementById('crashedPoint').textContent = 'Doctor: ' + d.crash_point.toFixed(2) + '×'
+      document.getElementById('crashedPoint').textContent = d.crash_point.toFixed(2) + '×'
       document.getElementById('crashedBanner').classList.add('show')
       updateMult(d.crash_point, true)
       addHistory(d.crash_point)

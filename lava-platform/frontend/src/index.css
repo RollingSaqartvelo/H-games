@@ -310,18 +310,17 @@ ul, li { list-style: none; }
 }
 .top-bar__round-id { color: var(--text-dim); font-size: 10px; letter-spacing: 1px; }
 
+/* state badge as 3D PNG (same set across games) */
 .state-badge {
   display: inline-block;
-  padding: 2px 7px;
-  border-radius: 10px;
-  font-size: 9px;
-  font-weight: bold;
-  letter-spacing: 1px;
+  width: 96px; height: 28px; padding: 0;
+  color: transparent !important; border: none; background: none;
+  background-repeat: no-repeat; background-position: center; background-size: contain;
 }
-.state-badge--waiting { background: var(--surface-3); color: var(--text-muted); border: 1px solid var(--border); }
-.state-badge--betting { background: rgba(217,119,6,0.15); color: var(--gold-bright); border: 1px solid var(--gold-dim); animation: badge-pulse 1.5s ease-in-out infinite; }
-.state-badge--running { background: rgba(34,197,94,0.15); color: var(--green-light); border: 1px solid var(--green-dim); }
-.state-badge--crashed { background: rgba(239,68,68,0.15); color: var(--red-light); border: 1px solid var(--red-dim); }
+.state-badge--waiting { background-image: url('/assets/badge-betting.png?v=1'); }
+.state-badge--betting { background-image: url('/assets/badge-betting.png?v=1'); }
+.state-badge--running { background-image: url('/assets/badge-running.png?v=1'); }
+.state-badge--crashed { background-image: url('/assets/badge-caught.png?v=1'); }
 
 .top-bar__hash {
   display: flex;
