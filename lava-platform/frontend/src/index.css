@@ -1719,8 +1719,8 @@ ul, li { list-style: none; }
     background: transparent !important; border: none !important; }
   .top-bar__logo { display: none !important; }   /* OUTLAW ESCAPE is drawn on the cabinet */
   /* back + hash buttons nudged into the drawn top-left plate */
-  .top-bar__left { transform: translate(20px, 25px); }
-  .top-bar__hash { transform: translate(20px, 25px); }
+  .top-bar__left { transform: translate(40px, 35px); }
+  .top-bar__hash { transform: translate(40px, 35px); }
 
   /* previous-rounds history strip — PURPLE-marked zone (same animation, on this strip) */
   .mh-row { position: absolute !important; left: 32.54%; top: 14.57%; width: 60%; height: 4.6%;
@@ -1734,7 +1734,7 @@ ul, li { list-style: none; }
     display: flex !important; flex-direction: column;
     --ivory: #ece0c4; --ivory-dim: rgba(236,224,196,.62); --ivory-gold: #e3b765;
   }
-  .bv-header { padding: 0 !important; transform: translate(5px, -59px); }
+  .bv-header { padding: 0 !important; transform: translate(5px, -49px); }
 
   /* game broadcast — YELLOW-marked screen zone */
   .game-area {
@@ -1821,7 +1821,7 @@ ul, li { list-style: none; }
   .dbp-step-btn { flex: 0 0 12%; height: 100%; background: none !important; border: none !important;
     box-shadow: none !important; color: transparent !important; }            /* − / + drawn */
   /* black input box exactly in the drawn display slot, digits centered */
-  .dbp-amount-display { flex: 1 1 auto; height: 84%; margin: 0 8.41% 0 7.15%;
+  .dbp-amount-display { flex: 1 1 auto; height: 84%; margin: 0 7.11% 0 5.85%;
     transform: translate(67px, -5px);
     background: #0a0806 !important; border: 1px solid rgba(150,110,60,.45) !important; border-radius: 7px !important;
     box-shadow: inset 0 2px 7px rgba(0,0,0,.8) !important;
