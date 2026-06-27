@@ -1824,7 +1824,8 @@ ul, li { list-style: none; }
   .dbp-amount-row { position: absolute !important; top: 0.8%; left: 0%; width: 100%; height: 22.3%;
     margin: 0 !important; display: flex !important; align-items: center; gap: 0; }
   .dbp-step-btn { flex: 0 0 12%; height: 100%; background: none !important; border: none !important;
-    box-shadow: none !important; color: transparent !important; }            /* − / + drawn */
+    box-shadow: none !important; color: transparent !important;
+    position: relative; z-index: 5; }   /* lift above the translated input box so + stays clickable */
   /* black input box exactly in the drawn display slot, digits centered */
   .dbp-amount-display { flex: 1 1 auto; height: 84%; margin: 0 3.11% 0 1.85%;
     transform: translate(67px, -5px);
