@@ -1763,11 +1763,13 @@ ul, li { list-style: none; }
     flex: 1 1 0; background: rgba(20,12,6,.35) !important;
     border: 1px solid rgba(236,224,196,.22) !important; border-radius: 5px !important;
     box-shadow: inset 0 0 8px rgba(0,0,0,.4) !important;
-    font-family: 'Rye', Georgia, serif !important; font-size: clamp(8px, 1vw, 13px) !important;
-    letter-spacing: .5px; color: var(--ivory-dim) !important; padding: 5px 0 !important;
-    text-shadow: 0 1px 1px rgba(0,0,0,.7); transition: color .15s, border-color .15s; }
+    font-family: 'Rye', Georgia, serif !important; font-weight: 700 !important; font-size: clamp(8px, 1vw, 13px) !important;
+    letter-spacing: .5px; color: #f3d488 !important; padding: 5px 0 !important;
+    text-shadow: 0 1px 0 #000, 0 2px 3px rgba(0,0,0,.75), 0 0 7px rgba(0,0,0,.5) !important;
+    transition: color .15s, border-color .15s, text-shadow .15s; }
   .bv-tab--active {
-    color: var(--ivory) !important; border-color: rgba(227,183,101,.7) !important;
+    color: #ffe6a8 !important; border-color: rgba(227,183,101,.7) !important;
+    text-shadow: 0 0 9px rgba(255,205,95,.95), 0 0 18px rgba(255,180,60,.6), 0 1px 0 #000 !important;
     box-shadow: inset 0 0 10px rgba(227,183,101,.25), 0 0 6px rgba(227,183,101,.2) !important; }
   .bv-pill {
     background: none !important; border: none !important;
