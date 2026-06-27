@@ -1,5 +1,7 @@
+import { useState } from 'react'
 import { useGame } from '../store/game'
 import type { RoundState } from '../ws/types'
+import { isMuted, toggleMute } from '../audio/mute'
 
 function StateBadge({ state }: { state: RoundState | null }) {
   if (!state || state === 'CREATED') {
@@ -30,6 +32,7 @@ export function TopBar() {
   const serverSeedHash = useGame((s) => s.serverSeedHash)
   const serverSeed     = useGame((s) => s.serverSeed)
   const balance        = useGame((s) => s.balance)
+  const [muted, setMuted] = useState(isMuted())
 
   const shortId = roundId ? `#${roundId.slice(0, 6)}` : '#------'
 
@@ -62,6 +65,14 @@ export function TopBar() {
           <span className="top-bar__round-id">{shortId}</span>
         </div>
       </div>
+
+      {/* Mute toggle — top-right of the cabinet */}
+      <button
+        className={`top-bar__mute ${muted ? 'top-bar__mute--muted' : ''}`}
+        onClick={() => setMuted(toggleMute())}
+        aria-label={muted ? 'Unmute sound' : 'Mute sound'}
+        title={muted ? 'Включить звук' : 'Выключить звук'}
+      />
 
       {/* Provably-fair hash strip */}
       {(serverSeedHash || serverSeed) && (

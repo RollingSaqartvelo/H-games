@@ -233,6 +233,7 @@ ul, li { list-style: none; }
 
 /* ─── TopBar ─────────────────────────────────────────────────────────────────── */
 .top-bar {
+  position: relative;
   flex: 0 0 auto;
   min-height: 44px;
   background: var(--surface-2);
@@ -244,6 +245,23 @@ ul, li { list-style: none; }
   padding: 0 10px;
   padding-top: env(safe-area-inset-top, 0px);
 }
+/* mute toggle (base / mobile) */
+.top-bar__mute {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  width: 30px;
+  height: 30px;
+  background: url('/assets/granny/ic-sound.png?v=1') center / contain no-repeat;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  z-index: 25;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform .06s ease, filter .15s ease;
+}
+.top-bar__mute--muted { background-image: url('/assets/granny/ic-sound-muted.png?v=1'); }
+.top-bar__mute:active { transform: scale(.88); }
 .top-bar__row {
   display: flex;
   align-items: center;
@@ -1725,6 +1743,9 @@ ul, li { list-style: none; }
   /* back + hash buttons nudged into the drawn top-left plate */
   .top-bar__left { transform: translate(60px, 35px); }
   .top-bar__hash { transform: translate(50px, 35px); }
+  /* mute toggle on the drawn top-right plate (mirror of the back button) */
+  .top-bar__mute { top: 100%; right: 1.5%; left: auto;
+    width: 3.4%; height: auto; aspect-ratio: 1; z-index: 8; }
 
   /* previous-rounds history strip — PURPLE-marked zone (same animation, on this strip) */
   .mh-row { position: absolute !important; left: 32.54%; top: 14.57%; width: 60%; height: 4.6%;
