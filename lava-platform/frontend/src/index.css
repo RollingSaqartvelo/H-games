@@ -1839,7 +1839,7 @@ ul, li { list-style: none; }
 
   /* quick chips — styled value buttons over the 4 drawn slots */
   .dbp-chips { position: absolute !important; top: 34.2%; left: 0.7%; width: 75.2%; height: 30.4%;
-    margin: 0 !important; display: flex !important; gap: 2%; transform: translateY(-22px); }
+    margin: 0 !important; display: flex !important; gap: 2%; transform: translate(40px, -42px); }
   .dbp-chip, .dbp-chip--active { flex: 1 1 0; height: 100%; background: none !important; border: none !important;
     box-shadow: none !important; cursor: pointer;
     display: flex !important; align-items: center; justify-content: center;
@@ -1855,13 +1855,13 @@ ul, li { list-style: none; }
   /* AUTO BET — styled toggle button in the 5th drawn slot */
   .dbp-options { display: flex !important; align-items: center; justify-content: center;
     position: absolute !important; top: 34.2%; left: 79%; width: 16.4%; height: 30.4%;
-    margin: 0 !important; padding: 0 !important; background: none !important; transform: translateY(-22px);
+    margin: 0 !important; padding: 0 !important; background: none !important; transform: translate(40px, -42px);
     transition: transform .06s ease, filter .06s ease; }
-  .dbp-options:active { transform: translateY(-19px) scale(.9) !important; filter: brightness(.8) !important; }
+  .dbp-options:active { transform: translate(40px, -39px) scale(.9) !important; filter: brightness(.8) !important; }
   .dbp-toggle { position: absolute !important; inset: 0; display: flex !important; flex-direction: column;
     align-items: center; justify-content: center; gap: 7%; background: none !important; border: none !important; cursor: pointer; }
   .dbp-toggle input { display: none !important; }
-  .dbp-toggle__label { display: block !important; color: #f3d488 !important;
+  .dbp-toggle__label { display: block !important; color: #f3d488 !important; width: min-content !important;
     font-family: 'Rye', Georgia, serif !important; font-weight: 700; text-transform: uppercase;
     font-size: clamp(11px, 1.05vw, 16px) !important; line-height: 1.05; text-align: center; letter-spacing: .5px;
     text-shadow: 0 1px 0 #000, 0 2px 3px rgba(0,0,0,.75), 0 0 6px rgba(0,0,0,.5); }
