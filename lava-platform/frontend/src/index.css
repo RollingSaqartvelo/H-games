@@ -1745,7 +1745,8 @@ ul, li { list-style: none; }
   .top-bar__hash { transform: translate(50px, 35px); }
   /* mute toggle — left of the state badge (BETTING/RUNNING/CAUGHT) */
   .top-bar__mute { top: 100%; right: 12%; left: auto;
-    width: 3.4%; height: auto; aspect-ratio: 1; z-index: 8; }
+    width: 3.4%; height: auto; aspect-ratio: 1; z-index: 8;
+    transform: translate(-10px, -5px); }
   /* hide the "Waiting…/Join the heist" ticker strip over the broadcast */
   .social-ticker { display: none !important; }
 
@@ -1882,9 +1883,9 @@ ul, li { list-style: none; }
   /* AUTO BET — styled toggle button in the 5th drawn slot */
   .dbp-options { display: flex !important; align-items: center; justify-content: center;
     position: absolute !important; top: 34.2%; left: 79%; width: 16.4%; height: 30.4%;
-    margin: 0 !important; padding: 0 !important; background: none !important; transform: translate(110px, -42px);
+    margin: 0 !important; padding: 0 !important; background: none !important; transform: translate(100px, -42px);
     transition: transform .06s ease, filter .06s ease; }
-  .dbp-options:active { transform: translate(110px, -39px) scale(.9) !important; filter: brightness(.8) !important; }
+  .dbp-options:active { transform: translate(100px, -39px) scale(.9) !important; filter: brightness(.8) !important; }
   .dbp-toggle { position: absolute !important; inset: 0; display: flex !important; flex-direction: column;
     align-items: center; justify-content: center; gap: 7%; background: none !important; border: none !important; cursor: pointer; }
   .dbp-toggle input { display: none !important; }
