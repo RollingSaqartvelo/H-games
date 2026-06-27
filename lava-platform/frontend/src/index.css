@@ -1743,9 +1743,11 @@ ul, li { list-style: none; }
   /* back + hash buttons nudged into the drawn top-left plate */
   .top-bar__left { transform: translate(60px, 35px); }
   .top-bar__hash { transform: translate(50px, 35px); }
-  /* mute toggle on the drawn top-right plate (mirror of the back button) */
-  .top-bar__mute { top: 100%; right: 1.5%; left: auto;
+  /* mute toggle — left of the state badge (BETTING/RUNNING/CAUGHT) */
+  .top-bar__mute { top: 100%; right: 12%; left: auto;
     width: 3.4%; height: auto; aspect-ratio: 1; z-index: 8; }
+  /* hide the "Waiting…/Join the heist" ticker strip over the broadcast */
+  .social-ticker { display: none !important; }
 
   /* previous-rounds history strip — PURPLE-marked zone (same animation, on this strip) */
   .mh-row { position: absolute !important; left: 32.54%; top: 14.57%; width: 60%; height: 4.6%;
@@ -1837,7 +1839,7 @@ ul, li { list-style: none; }
     left: 34%; top: 64.5%; width: 41.5%; height: 26%;
     margin: 0 !important; max-width: none; z-index: 8;
     background: none !important; }
-  .dbp-block { position: absolute !important; inset: 0; padding: 0 !important;
+  .dbp-block { position: absolute !important; inset: 0; padding: 0 !important; overflow: visible !important;
     background: none !important; border: none !important; box-shadow: none !important; }
   .dbp-block__header { display: none !important; }
   .dbp-content { position: absolute !important; inset: 0; padding: 0 !important; display: block !important;
@@ -1870,7 +1872,8 @@ ul, li { list-style: none; }
     font-size: clamp(14px, 1.5vw, 23px) !important; letter-spacing: .5px;
     text-shadow: 0 1px 0 #000, 0 2px 3px rgba(0,0,0,.75), 0 0 7px rgba(0,0,0,.5);
     transition: transform .06s ease, filter .06s ease, text-shadow .15s, color .15s; }
-  .dbp-chips .dbp-chip:nth-child(1), .dbp-chips .dbp-chip:nth-child(2) { transform: translateX(-3px); }
+  .dbp-chips .dbp-chip:nth-child(1) { transform: translateX(-13px); }
+  .dbp-chips .dbp-chip:nth-child(2) { transform: translateX(-3px); }
   .dbp-chip--active { color: #ffe6a8 !important;
     text-shadow: 0 0 9px rgba(255,205,95,.95), 0 0 18px rgba(255,180,60,.6), 0 1px 0 #000 !important; }
   /* press-in: label sinks into the cabinet */
@@ -1879,9 +1882,9 @@ ul, li { list-style: none; }
   /* AUTO BET — styled toggle button in the 5th drawn slot */
   .dbp-options { display: flex !important; align-items: center; justify-content: center;
     position: absolute !important; top: 34.2%; left: 79%; width: 16.4%; height: 30.4%;
-    margin: 0 !important; padding: 0 !important; background: none !important; transform: translate(70px, -42px);
+    margin: 0 !important; padding: 0 !important; background: none !important; transform: translate(110px, -42px);
     transition: transform .06s ease, filter .06s ease; }
-  .dbp-options:active { transform: translate(70px, -39px) scale(.9) !important; filter: brightness(.8) !important; }
+  .dbp-options:active { transform: translate(110px, -39px) scale(.9) !important; filter: brightness(.8) !important; }
   .dbp-toggle { position: absolute !important; inset: 0; display: flex !important; flex-direction: column;
     align-items: center; justify-content: center; gap: 7%; background: none !important; border: none !important; cursor: pointer; }
   .dbp-toggle input { display: none !important; }
