@@ -116,7 +116,7 @@ export function App() {
       const im = new Image(); im.onload = () => res(); im.onerror = () => res(); im.src = src
     }))
     const vids = [
-      '/video/betting-loop2.mp4',
+      '/video/New vestern video.mp4',
       '/video/outlawbgnew.mp4?v=2',
     ].map(src => fetch(src).then(r => r.blob()).then(() => {}).catch(() => {}))
     Promise.all([...imgs, ...vids]).then(finish)

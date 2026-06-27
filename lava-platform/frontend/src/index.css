@@ -116,9 +116,9 @@ ul, li { list-style: none; }
    The visible riders are GifCharacters (z:10, a separate HTML layer) — unaffected. */
 #running-bg-video, .rv-video { display: none !important; }
 .pixi-mount { display: none !important; }
-/* betting-stage 9:16 video shown fully (contain) with black bars on the sides */
+/* betting-stage western video fills the whole broadcast screen */
 .bvb-wrap { background: #000 !important; }
-.bvb-wrap video { object-fit: contain !important; background: #000 !important; }
+.bvb-wrap video { object-fit: cover !important; background: #000 !important; }
 .game-area { background: #c8773a url('/assets/outlaw.png?v=1') center / cover no-repeat !important; }
 
 /* Soft fade at the bottom of the game area — blends the canyon footage into the
