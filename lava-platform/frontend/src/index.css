@@ -1849,6 +1849,7 @@ ul, li { list-style: none; }
     font-size: clamp(14px, 1.5vw, 23px) !important; letter-spacing: .5px;
     text-shadow: 0 1px 0 #000, 0 2px 3px rgba(0,0,0,.75), 0 0 7px rgba(0,0,0,.5);
     transition: transform .06s ease, filter .06s ease, text-shadow .15s, color .15s; }
+  .dbp-chips .dbp-chip:nth-child(1), .dbp-chips .dbp-chip:nth-child(2) { transform: translateX(-3px); }
   .dbp-chip--active { color: #ffe6a8 !important;
     text-shadow: 0 0 9px rgba(255,205,95,.95), 0 0 18px rgba(255,180,60,.6), 0 1px 0 #000 !important; }
   /* press-in: label sinks into the cabinet */
