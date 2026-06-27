@@ -118,7 +118,7 @@ ul, li { list-style: none; }
 .pixi-mount { display: none !important; }
 /* betting-stage western video fills the whole broadcast screen */
 .bvb-wrap { background: #000 !important; }
-.bvb-wrap video { object-fit: cover !important; background: #000 !important; }
+.bvb-wrap video { object-fit: cover !important; object-position: center top !important; background: #000 !important; }
 .game-area { background: #c8773a url('/assets/outlaw.png?v=1') center / cover no-repeat !important; }
 
 /* Soft fade at the bottom of the game area — blends the canyon footage into the
@@ -1746,7 +1746,7 @@ ul, li { list-style: none; }
   /* mute toggle — left of the state badge (BETTING/RUNNING/CAUGHT) */
   .top-bar__mute { top: 100%; right: 12%; left: auto;
     width: 3.4%; height: auto; aspect-ratio: 1; z-index: 8;
-    transform: translate(-10px, -5px); }
+    transform: translate(-17px, -8px); }
   /* hide the "Waiting…/Join the heist" ticker strip over the broadcast */
   .social-ticker { display: none !important; }
 
@@ -1883,9 +1883,9 @@ ul, li { list-style: none; }
   /* AUTO BET — styled toggle button in the 5th drawn slot */
   .dbp-options { display: flex !important; align-items: center; justify-content: center;
     position: absolute !important; top: 34.2%; left: 79%; width: 16.4%; height: 30.4%;
-    margin: 0 !important; padding: 0 !important; background: none !important; transform: translate(100px, -42px);
+    margin: 0 !important; padding: 0 !important; background: none !important; transform: translate(93px, -42px);
     transition: transform .06s ease, filter .06s ease; }
-  .dbp-options:active { transform: translate(100px, -39px) scale(.9) !important; filter: brightness(.8) !important; }
+  .dbp-options:active { transform: translate(93px, -39px) scale(.9) !important; filter: brightness(.8) !important; }
   .dbp-toggle { position: absolute !important; inset: 0; display: flex !important; flex-direction: column;
     align-items: center; justify-content: center; gap: 7%; background: none !important; border: none !important; cursor: pointer; }
   .dbp-toggle input { display: none !important; }
