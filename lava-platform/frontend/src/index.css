@@ -1746,7 +1746,7 @@ ul, li { list-style: none; }
   /* mute toggle — left of the state badge (BETTING/RUNNING/CAUGHT) */
   .top-bar__mute { top: 100%; right: 12%; left: auto;
     width: 3.4%; height: auto; aspect-ratio: 1; z-index: 8;
-    transform: translate(-17px, -8px); }
+    transform: translate(-21px, -12px); }
   /* hide the "Waiting…/Join the heist" ticker strip over the broadcast */
   .social-ticker { display: none !important; }
 
@@ -1873,8 +1873,10 @@ ul, li { list-style: none; }
     font-size: clamp(14px, 1.5vw, 23px) !important; letter-spacing: .5px;
     text-shadow: 0 1px 0 #000, 0 2px 3px rgba(0,0,0,.75), 0 0 7px rgba(0,0,0,.5);
     transition: transform .06s ease, filter .06s ease, text-shadow .15s, color .15s; }
-  .dbp-chips .dbp-chip:nth-child(1) { transform: translateX(-13px); }
-  .dbp-chips .dbp-chip:nth-child(2) { transform: translateX(-3px); }
+  .dbp-chips .dbp-chip:nth-child(1) { transform: translate(-15px, -2px); }
+  .dbp-chips .dbp-chip:nth-child(2) { transform: translate(-5px, -4px); }
+  .dbp-chips .dbp-chip:nth-child(3) { transform: translateY(-4px); }
+  .dbp-chips .dbp-chip:nth-child(4) { transform: translate(4px, -3px); }
   .dbp-chip--active { color: #ffe6a8 !important;
     text-shadow: 0 0 9px rgba(255,205,95,.95), 0 0 18px rgba(255,180,60,.6), 0 1px 0 #000 !important; }
   /* press-in: label sinks into the cabinet */
@@ -1883,9 +1885,9 @@ ul, li { list-style: none; }
   /* AUTO BET — styled toggle button in the 5th drawn slot */
   .dbp-options { display: flex !important; align-items: center; justify-content: center;
     position: absolute !important; top: 34.2%; left: 79%; width: 16.4%; height: 30.4%;
-    margin: 0 !important; padding: 0 !important; background: none !important; transform: translate(91px, -44px);
+    margin: 0 !important; padding: 0 !important; background: none !important; transform: translate(88px, -44px);
     transition: transform .06s ease, filter .06s ease; }
-  .dbp-options:active { transform: translate(91px, -41px) scale(.9) !important; filter: brightness(.8) !important; }
+  .dbp-options:active { transform: translate(88px, -41px) scale(.9) !important; filter: brightness(.8) !important; }
   .dbp-toggle { position: absolute !important; inset: 0; display: flex !important; flex-direction: column;
     align-items: center; justify-content: center; gap: 7%; background: none !important; border: none !important; cursor: pointer; }
   .dbp-toggle input { display: none !important; }
