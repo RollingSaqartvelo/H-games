@@ -1855,10 +1855,10 @@ ul, li { list-style: none; }
 
   /* AUTO BET — wooden plaque asset; live indicator sits in the drilled black hole */
   .dbp-options { display: block !important; position: absolute !important; top: 34.2%; left: 79%; width: 16.4%; height: 30.4%;
-    margin: 0 !important; padding: 0 !important; transform: translateY(-22px);
-    background: url('/assets/chip-auto.png?v=1') center/contain no-repeat !important;
+    margin: 0 !important; padding: 0 !important; transform: translate(30px, -30px);
+    background: url('/assets/chip-auto.png?v=1') center / auto 85% no-repeat !important;
     transition: transform .06s ease, filter .06s ease; }
-  .dbp-options:active { transform: translateY(-19px) scale(.9) !important; filter: brightness(.8) !important; }
+  .dbp-options:active { transform: translate(30px, -27px) scale(.9) !important; filter: brightness(.8) !important; }
   .dbp-toggle { position: absolute !important; inset: 0; background: none !important; border: none !important; cursor: pointer; }
   .dbp-toggle__label { display: none !important; }                           /* AUTO BET text is on the plaque */
   .dbp-toggle__track { position: absolute !important; left: 77%; top: 66.5%; transform: translate(-50%,-50%);
